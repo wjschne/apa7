@@ -14,3 +14,5 @@ Imports:
     purrr,
     quarto,
     rstudioapi
+URL: https://github.com/wjschne/apa7
+BugReports: https://github.com/wjschne/apa7/issues
