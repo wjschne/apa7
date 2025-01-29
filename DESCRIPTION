@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
-Description: What the package does (one paragraph).
+Description: Functions to create APA Style 7th Edition documents
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
