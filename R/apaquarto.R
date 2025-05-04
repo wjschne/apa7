@@ -20,7 +20,7 @@ install_apaquarto <- function(make_project = TRUE) {
       "sampleimage.png"
     ), function(myfile) {
       m <- ifelse(myfile == "sampleimage.png", "wb", "w")
-      download.file(
+      utils::download.file(
         url = fs::path("https://raw.github.com/wjschne/apaquarto/main/", myfile),
         destfile = fs::path(path, myfile),
         mode = m
@@ -52,13 +52,13 @@ install_apaquarto <- function(make_project = TRUE) {
 #' @examples
 #' # Values less than .001 are <.001
 #' apa_p(.0002)
-#' Values between .001 and .01 are rounded to 3 digits
+#' # Values between .001 and .01 are rounded to 3 digits
 #' apa_p(.002)
-#' Values between .01 and .995 are rounded to 2 digits
+#' # Values between .01 and .995 are rounded to 2 digits
 #' apa_p(.02)#'
 #' apa_p(.22)
 #' apa_p(.994)
-#' Values above .995 are >.99
+#' # Values above .995 are >.99
 #' apa_p(.999)
 apa_p <- function(p,
                   inline = TRUE) {

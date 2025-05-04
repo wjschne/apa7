@@ -5,7 +5,7 @@ Authors@R:
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
 Description: What the package does (one paragraph).
-License: MIT + file LICENSE
+License: CC0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -14,4 +14,12 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
-    S7
+    flextable,
+    fs,
+    gt,
+    purrr,
+    quarto,
+    rstudioapi,
+    utils
+Depends: 
+    R (>= 4.1.0)

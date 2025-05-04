@@ -4,3 +4,6 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^LICENSE\.md$
+asdf.*
+_quarto.yml
