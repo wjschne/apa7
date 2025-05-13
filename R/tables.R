@@ -7,28 +7,28 @@
 #' @param border_color border color
 #' @param border_width border width in pixels
 #' @param line_spacing spacing between lines
-#' @name style_apa
+#' @name apa_style
 #' @returns object
 #' @export
 #'
 #' @examples
 #' d <- data.frame(x = 1:3, y = 4:6)
 #' flextable::flextable(d) |>
-#'   style_apa()
+#'   apa_style()
 #' gt::gt(d) |>
-#'   style_apa()
-style_apa <- function(x,
+#'   apa_style()
+apa_style <- function(x,
                       family = "Times New Roman",
                       font_size = 12,
                       border_color = "black",
                       border_width = 0.5,
                       line_spacing = 2) {
-  UseMethod("style_apa")
+  UseMethod("apa_style")
 }
 
 #' @export
-#' @rdname style_apa
-style_apa.gt_tbl <- function(x ,
+#' @rdname apa_style
+apa_style.gt_tbl <- function(x ,
                              family = "Times New Roman",
                              font_size = 12,
                              border_color = "black",
@@ -63,8 +63,8 @@ style_apa.gt_tbl <- function(x ,
 }
 
 #' @export
-#' @rdname style_apa
-style_apa.flextable <- function(x ,
+#' @rdname apa_style
+apa_style.flextable <- function(x ,
                                 family = "Times New Roman",
                                 font_size = 12,
                                 border_color = "black",
@@ -91,7 +91,7 @@ style_apa.flextable <- function(x ,
 #' @param p_value p-value needed to be flagged as significant
 #' @param bold_significant bold significant correlations
 #' @param output output type. Can be "flextable" "gt" or "tibble"
-#' @inheritParams style_apa
+#' @inheritParams apa_style
 #' @param ... <[`data-masking`][rlang::args_data_masking]> parameters passed to psych::corTest
 #'
 #' @returns flextable, gt, or tibble
@@ -157,7 +157,7 @@ apa_cor <- function(data,
     flextable::set_flextable_defaults(font.family = family)
     d <-
       flextable::flextable(d_R) |>
-      style_apa(family = family,
+      apa_style(family = family,
                 font_size = font_size,
                 border_color = border_color,
                 border_width = border_width,
@@ -173,7 +173,7 @@ apa_cor <- function(data,
 
   if (output == "gt") {
     d <-  gt::gt(d_R) |>
-      style_apa(family = family,
+      apa_style(family = family,
                 font_size = font_size,
                 border_color = border_color,
                 border_width = border_width,
@@ -191,6 +191,76 @@ apa_cor <- function(data,
 
 
   d_R
+}
+
+
+#' Make contingency table with chi-square test of independence
+#'
+#' @param x A two-column data.frame or tibble
+#' @param suppress_warnings Suppress any warnings if true.
+#' @inheritParams apa_style
+#'
+#' @returns flextable
+#' @export
+#' @importFrom rlang .data
+#'
+#' @examples
+#' apa_chisq(mtcars[, c("am", "gear")])
+apa_chisq <- function(x, suppress_warnings = TRUE, family = "Times New Roman", font_size = 12, line_spacing = 2, border_color = "black", border_width = .5) {
+  if (!inherits(x, "data.frame")) stop("x must be a data.frame or tibble.")
+  if (ncol(x) != 2) stop('x must have 2 columns. Select the 2 variables you wish to test before passing them to this function. For example:\nx <- mtcars[, c("am", "cyl")]\nor\nx <- dplyr::select(mtcars, am, cyl)')
+
+  tbl <- table(x)
+
+  if (nrow(tbl) < 2 || ncol(tbl) < 2) stop("The contingency table must be at least a 2 by 2 table.")
+
+  if (suppress_warnings) {
+    fit <- suppressWarnings(stats::chisq.test(tbl))
+  } else {
+    fit <- stats::chisq.test(tbl)
+  }
+
+  ef <- effectsize::effectsize(fit, type = "cramers_v")
+
+
+
+
+  dd <- tbl |>
+    tibble::as_tibble() |>
+    dplyr::mutate(`%` = scales::percent(.data$n / sum(.data$n), accuracy = .1), .by = dplyr::all_of(colnames(x)[1]),
+           n = as.character(.data$n)) |>
+    tidyr::pivot_longer(c(.data$n, .data$`%`)) |>
+    tidyr::unite("mycols", dplyr::all_of(colnames(x)[1]), .data$name) |>
+    tidyr::pivot_wider(names_from = .data$mycols, values_from = .data$value)
+  my_keys <- purrr::imap(colnames(dd), \(xx, idx) {
+    if (stringr::str_ends(xx, "_%")) {
+      xx <- c(xx, paste0("mybreak", idx))
+    }
+    xx
+  }) |>
+    unlist()
+  my_keys <- my_keys[-length(my_keys)]
+  my_headers <- list()
+  my_headers[my_keys] <- c("", rep(colnames(x)[1], length(my_keys) - 1))
+
+
+    dd |>
+    flextable::flextable(col_keys = my_keys) |>
+      apa_style(family = family, font_size = font_size, border_color = border_color, border_width = border_width, line_spacing = line_spacing ) |>
+    flextable::separate_header() |>
+    flextable::align(part = "all", align = "center") |>
+      flextable::add_header(values = my_headers) |>
+      flextable::merge_h(i = 1, part = "header") |>
+      flextable::border_remove() |>
+      flextable::hline(i = 1, j = 2:3, part = "header") |>
+      flextable::empty_blanks() |>
+      flextable::hline_bottom() |>
+      flextable::hline_bottom(part = "header") |>
+      flextable::hline(i = 2, part = "header") |>
+      flextable::hline_top(part = "header") |>
+      flextable::italic(i = 3, j = seq(2, length(my_keys), 3), italic = TRUE, part = "header") |>
+      flextable::add_footer_lines(values = flextable::as_paragraph( flextable::as_equation(paste0("Note.~\\chi^2\\left(",fit$parameter,"\\right)=", scales::number(fit$statistic, accuracy = .01), ",\\,", apa_p(fit$p.value, inline = TRUE, plain = TRUE), ",\\,\\text{Adj. Cramer's}\\,V=", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)), props = flextable::fp_text_default(font.size = font_size * .85, font.family = family)))) |>
+      flextable::autofit(add_w = 0, add_h = 0, part = "footer")
 }
 
 
