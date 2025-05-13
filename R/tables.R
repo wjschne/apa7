@@ -98,10 +98,10 @@ style_apa.flextable <- function(x ,
 #' @export
 #'
 #' @examples
-#' cor_apa(mtcars[, c("mpg", "am", "gear", "carb")], output = "flextable")
-#' cor_apa(mtcars[, c("mpg", "am", "gear", "carb")], output = "gt")
-#' cor_apa(mtcars[, c("mpg", "am", "gear", "carb")], output = "tibble")
-cor_apa <- function(data,
+#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "flextable")
+#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "gt")
+#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "tibble")
+apa_cor <- function(data,
                     p_value = .05,
                     bold_significant = TRUE,
                     output = c("flextable", "gt", "tibble"),

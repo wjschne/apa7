@@ -2,7 +2,7 @@
 
 S3method(style_apa,flextable)
 S3method(style_apa,gt_tbl)
+export(apa_cor)
 export(apa_p)
-export(cor_apa)
 export(install_apaquarto)
 export(style_apa)
