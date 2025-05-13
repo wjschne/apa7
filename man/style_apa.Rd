@@ -8,23 +8,29 @@
 \usage{
 style_apa(
   x,
-  family = c("Times", "Times New Roman"),
+  family = "Times New Roman",
+  font_size = 12,
   border_color = "black",
-  border_width = 0.5
+  border_width = 0.5,
+  line_spacing = 2
 )
 
 \method{style_apa}{gt_tbl}(
   x,
-  family = c("Times", "Times New Roman"),
+  family = "Times New Roman",
+  font_size = 12,
   border_color = "black",
-  border_width = 0.5
+  border_width = 0.5,
+  line_spacing = 2
 )
 
 \method{style_apa}{flextable}(
   x,
-  family = c("Times", "Times New Roman"),
+  family = "Times New Roman",
+  font_size = 12,
   border_color = "black",
-  border_width = 0.5
+  border_width = 0.5,
+  line_spacing = 2
 )
 }
 \arguments{
@@ -32,9 +38,13 @@ style_apa(
 
 \item{family}{font family}
 
+\item{font_size}{font size}
+
 \item{border_color}{border color}
 
 \item{border_width}{border width in pixels}
+
+\item{line_spacing}{spacing between lines}
 }
 \value{
 object

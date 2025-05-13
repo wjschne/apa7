@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
-Description: Functions to create APA Style 7th Edition documents
+Description: Functions to create APA Style 7th Edition documents. 
 License: CC0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -13,13 +13,18 @@ URL: https://wjschne.github.io/apa7/
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Imports: 
+Imports:
+    dplyr,
     flextable,
+    ftExtra,
     fs,
     gt,
+    psych,
     purrr,
     quarto,
     rstudioapi,
+    signs,
+    tibble,
     utils
 Depends: 
     R (>= 4.1.0)

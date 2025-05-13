@@ -17,8 +17,6 @@ remotes::install_github("wjschne/apa7")
 
 ## Install apaquarto extension
 
-
-
 ``` r
 library(apa7)
 install_apaquarto()
