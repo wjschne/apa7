@@ -90,9 +90,10 @@ trees %>%
 To remove summary statistics entirely, set `summary_functions` to `NULL`.
 
 ```{r}
-apa_cor(trees, 
+x <- apa_cor(trees, 
         summary_functions = NULL, 
-        bold_significant = FALSE)
+        bold_significant = FALSE, output = "gt") 
+  
 ```
 
 # Customization
