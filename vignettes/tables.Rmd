@@ -1,0 +1,96 @@
+---
+title: "APA Tables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(apa7)
+library(dplyr)
+```
+
+Some tables, like correlation matrices, can be standardized and automated. Others are uniquely tied to a specific purpose, and no function could anticipate their structure. The apa7 package has a few functions to automate what can be automated and a styling function to make the final styling of a complex table a little easier.
+
+## Correlation matrices
+
+The output of `apa_cor`, by default is a [flextable](https://davidgohel.github.io/flextable/), with significant correlations bolded.
+
+```{r}
+summary_functions <- list(M = mean,
+                          SD = sd,
+                          n = \(x) sum(!is.na(x)))
+
+
+
+
+trees %>% 
+  apa_cor(p_value = .001)
+```
+
+If you prefer to work with [gt tables](https://gt.rstudio.com/), set `output` function to `gt`.
+
+```{r}
+trees %>% 
+  apa_cor(output = "gt") 
+```
+
+If you want to use some other table package, you can get a tibble instead, and then process the table however you want.
+
+```{r}
+options(knitr.kable.NA = '')
+trees %>% 
+  apa_cor(output = "tibble") %>% 
+  knitr::kable(align = "lrrrrr")
+```
+
+# Styling options
+
+Your styling options include:
+
+* `p_value` Significance value. Default: `.05`
+* `digits` Number of digits for rounding. Default: `2`
+* `bold_significant` Whether to bold significant correlations. Default:  `TRUE`
+* `significance_note` Whether note about bolding correlations appears. Note will not appear if no correlations are significant. Default:  `TRUE`
+* `output` Options are `flextable`, `gt` or `tibble`. Default: `flextable`
+* `family` Font family (typeface). Default: `Times New Roman`
+* `font_size` Font size (in points). Default: `12`
+* `text_color` Text color. Default: `black`
+* `border_color` Table border color. Default: `black`
+* `border_width` Table border width. Default: `0.5`
+* `line_spacing` Text line spacing. Default: `2`
+
+
+For example, 
+
+```{r}
+# List of descriptive functions
+my_summaries <- list(M = mean,
+                     SD = sd,
+                     Skew = psych::skew,
+                     `Kurt.` = psych::kurtosi,
+                     n = function(x) sum(!is.na(x)))
+trees %>% 
+  apa_cor(p_value = .001, 
+          digits = 2,
+          bold_significant = TRUE, 
+          significance_note = TRUE,
+          summary_functions = my_summaries,
+          output = "gt", 
+          family = "Arial", 
+          font_size = 10, 
+          text_color = "darkred",
+          border_color = "royalblue4", 
+          border_width = 1, 
+          line_spacing = 2)
+```
+

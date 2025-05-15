@@ -1,3 +1,5 @@
+library(apa7)
+library(testthat)
 test_that("apa_p", {
   expect_equal(apa_p(0), "*p*&nbsp;<&nbsp;.001")
   expect_equal(apa_p(0, FALSE), "<.001")
@@ -15,4 +17,6 @@ test_that("apa_p", {
   expect_equal(apa_p(0.0999, FALSE), ".10")
   expect_equal(apa_p(0.0999), "*p*&nbsp;=&nbsp;.10")
   expect_equal(apa_p(0.0999, FALSE), ".10")
+  expect_equal(apa_p(0.0999, plain = T), "p = .10")
+  expect_equal(apa_p(0, plain = T), "p < .001")
 })

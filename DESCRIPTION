@@ -11,6 +11,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 URL: https://wjschne.github.io/apa7/
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports:
@@ -34,3 +36,4 @@ Imports:
     rlang
 Depends: 
     R (>= 4.1.0)
+VignetteBuilder: knitr

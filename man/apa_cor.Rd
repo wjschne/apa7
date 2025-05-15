@@ -7,13 +7,17 @@
 apa_cor(
   data,
   p_value = 0.05,
+  digits = 2,
   bold_significant = TRUE,
+  significance_note = TRUE,
   output = c("flextable", "gt", "tibble"),
   family = "Times New Roman",
   font_size = 12,
+  text_color = "black",
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
+  summary_functions = list(M = mean, SD = stats::sd),
   ...
 )
 }
@@ -22,7 +26,11 @@ apa_cor(
 
 \item{p_value}{p-value needed to be flagged as significant}
 
+\item{digits}{Number of digits for rounding}
+
 \item{bold_significant}{bold significant correlations}
+
+\item{significance_note}{If TRUE, place note at bottom of table that significant correlations are bolded.}
 
 \item{output}{output type. Can be "flextable" "gt" or "tibble"}
 
@@ -30,11 +38,15 @@ apa_cor(
 
 \item{font_size}{font size}
 
+\item{text_color}{text color}
+
 \item{border_color}{border color}
 
 \item{border_width}{border width in pixels}
 
 \item{line_spacing}{spacing between lines}
+
+\item{summary_functions}{A named list of functions that summarize data columns (e.g., mean, sd)}
 
 \item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> parameters passed to psych::corTest}
 }

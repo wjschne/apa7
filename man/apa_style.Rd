@@ -10,6 +10,7 @@ apa_style(
   x,
   family = "Times New Roman",
   font_size = 12,
+  text_color = "black",
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2
@@ -19,6 +20,7 @@ apa_style(
   x,
   family = "Times New Roman",
   font_size = 12,
+  text_color = "black",
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2
@@ -28,6 +30,7 @@ apa_style(
   x,
   family = "Times New Roman",
   font_size = 12,
+  text_color = "black",
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2
@@ -39,6 +42,8 @@ apa_style(
 \item{family}{font family}
 
 \item{font_size}{font size}
+
+\item{text_color}{text color}
 
 \item{border_color}{border color}
 

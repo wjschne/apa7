@@ -9,6 +9,7 @@ apa_chisq(
   suppress_warnings = TRUE,
   family = "Times New Roman",
   font_size = 12,
+  text_color = "black",
   line_spacing = 2,
   border_color = "black",
   border_width = 0.5
@@ -22,6 +23,8 @@ apa_chisq(
 \item{family}{font family}
 
 \item{font_size}{font size}
+
+\item{text_color}{text color}
 
 \item{line_spacing}{spacing between lines}
 
