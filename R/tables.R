@@ -310,20 +310,17 @@ apa_cor <- function(data,
 
       d <- d |>
         gt::tab_style(
-          style = gt::cell_text(font = family, size = gt::px(font_size * 4 / 3)),
+          style = gt::cell_text(font = family, size = gt::px(font_size * 4 / 3), color = text_color),
           locations = gt::cells_footnotes()
         ) |>
         gt::tab_style(
-          style = gt::cell_text(indent = gt::px(5)),
+          style = gt::cell_text(indent = gt::px(5), color = text_color),
           locations = list(
             gt::cells_column_labels(columns = "Variable"),
             gt::cells_body(columns = "Variable"),
             gt::cells_footnotes()
           )
-        ) |>
-        gt::tab_style(style = "padding-right:5px",
-                      locations = list(gt::cells_column_labels(columns = ncol(d_R)),
-                                       gt::cells_body(columns = ncol(d_R))))
+        )
 
       k <- nrow(d$`_boxhead`)
 
@@ -402,7 +399,7 @@ apa_chisq <- function(x, family = "Times New Roman", font_size = 12, text_color 
       flextable::hline(i = 2, part = "header", border = my_border) |>
       flextable::hline_top(part = "header", border = my_border) |>
       flextable::italic(i = 3, j = seq(2, length(my_keys), 3), italic = TRUE, part = "header") |>
-      flextable::add_footer_lines(ftExtra::as_paragraph_md(paste0("*Note*. *&chi;*^2^(", fit$parameter, ") = ", scales::number(fit$statistic, accuracy = .01), ", ", apa_p(fit$p.value, inline = TRUE), ", Adj. Cramer's *V* = ", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)))) |>
+      flextable::add_footer_lines(ftExtra::as_paragraph_md(paste0("*Note*. *&chi;*^2&thinsp;^(", fit$parameter, ") = ", scales::number(fit$statistic, accuracy = .01), ", ", apa_p(fit$p.value, inline = TRUE), ", Adj. Cramer's *V* = ", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)))) |>
       # flextable::add_footer_lines(values = flextable::as_paragraph( flextable::as_equation(paste0("Note.~\\chi^2\\left(",fit$parameter,"\\right)=", scales::number(fit$statistic, accuracy = .01), ",\\,", apa_p(fit$p.value, inline = TRUE, plain = TRUE), ",\\,\\text{Adj. Cramer's}\\,V=", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)), props = flextable::fp_text_default(font.size = font_size * .85, font.family = family, color = text_color)))) |>
       flextable::font(part = "all",fontname = family) |>
       flextable::color(color = text_color, part = "all") |>
@@ -410,6 +407,7 @@ apa_chisq <- function(x, family = "Times New Roman", font_size = 12, text_color 
       #
       flextable::line_spacing(space = line_spacing, part = "all") |>
       flextable::padding(padding.top = 0, padding.bottom = 0, part = "all") |>
+      flextable::align(j = 1, align = "left", part = "all") |>
       flextable::autofit(add_w = 0, add_h = 0, part = "footer")
 }
 

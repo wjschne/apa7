@@ -32,6 +32,18 @@ apa_chisq(d)
 The table can be styled in many ways:
 
 ```{r}
-apa_chisq(d, font_size = 16, line_spacing = 3, text_color = "darkred", border_width = 2, border_color = "gray", family = "Arial")
+apa_chisq(
+  d,
+  font_size = 16,
+  line_spacing = 3,
+  text_color = "darkred",
+  border_width = 2,
+  border_color = "gray",
+  family = "Arial"
+)
+```
+
+```{r}
+apa_chisq(d)
 ```
 
