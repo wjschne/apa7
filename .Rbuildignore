@@ -7,3 +7,4 @@
 ^LICENSE\.md$
 asdf.*
 _quarto.yml
+^README\.Rmd$
