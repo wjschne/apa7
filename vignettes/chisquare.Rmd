@@ -1,0 +1,37 @@
+---
+title: "Contingency Tables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{chisquare}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(apa7)
+library(dplyr)
+d <- mtcars %>% 
+  select(Gears = gear, Transmission = am) %>% 
+  mutate(Transmission = factor(Transmission, labels = c("Automatic", "Manual")))
+  
+```
+
+The default output of the `apa_chisq` function is a contingency table with a chi-square test of independence in the table note. The output is a flextable, which can be modified in any way one perfers.
+
+```{r}
+apa_chisq(d)
+```
+
+The table can be styled in many ways:
+
+```{r}
+apa_chisq(d, font_size = 16, line_spacing = 3, text_color = "darkred", border_width = 2, border_color = "gray", family = "Arial")
+```
+

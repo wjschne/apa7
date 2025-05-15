@@ -338,8 +338,9 @@ apa_cor <- function(data,
 #' Make contingency table with chi-square test of independence
 #'
 #' @param x A two-column data.frame or tibble
-#' @param suppress_warnings Suppress any warnings if true.
+#' @param note Custom note (overrides automatic note.)
 #' @inheritParams apa_style
+#' @param suppress_warnings Suppress any warnings if true.
 #'
 #' @returns flextable
 #' @export
@@ -347,7 +348,7 @@ apa_cor <- function(data,
 #'
 #' @examples
 #' apa_chisq(mtcars[, c("am", "gear")])
-apa_chisq <- function(x, suppress_warnings = TRUE, family = "Times New Roman", font_size = 12, text_color = "black", line_spacing = 2, border_color = "black", border_width = .5) {
+apa_chisq <- function(x, family = "Times New Roman", font_size = 12, text_color = "black", line_spacing = 2, border_color = "black", border_width = .5, suppress_warnings = TRUE) {
   if (!inherits(x, "data.frame")) stop("x must be a data.frame or tibble.")
   if (ncol(x) != 2) stop('x must have 2 columns. Select the 2 variables you wish to test before passing them to this function. For example:\nx <- mtcars[, c("am", "cyl")]\nor\nx <- dplyr::select(mtcars, am, cyl)')
 
@@ -383,24 +384,32 @@ apa_chisq <- function(x, suppress_warnings = TRUE, family = "Times New Roman", f
   my_keys <- my_keys[-length(my_keys)]
   my_headers <- list()
   my_headers[my_keys] <- c("", rep(colnames(x)[1], length(my_keys) - 1))
-
+  my_border <- flextable::fp_border_default(color = border_color, width = border_width)
 
     dd |>
     flextable::flextable(col_keys = my_keys) |>
-      apa_style(family = family, font_size = font_size, text_color = text_color, border_color = border_color, border_width = border_width, line_spacing = line_spacing ) |>
+      # apa_style(family = family, font_size = font_size, text_color = text_color, border_color = border_color, border_width = border_width, line_spacing = line_spacing ) |>
+      flextable::valign(part = "all", valign = "center") |>
     flextable::separate_header() |>
     flextable::align(part = "all", align = "center") |>
       flextable::add_header(values = my_headers) |>
       flextable::merge_h(i = 1, part = "header") |>
       flextable::border_remove() |>
-      flextable::hline(i = 1, j = 2:3, part = "header") |>
+      flextable::hline(i = 1, j = 2:3, part = "header", border = my_border) |>
       flextable::empty_blanks() |>
-      flextable::hline_bottom() |>
-      flextable::hline_bottom(part = "header") |>
-      flextable::hline(i = 2, part = "header") |>
-      flextable::hline_top(part = "header") |>
+      flextable::hline_bottom(border = my_border) |>
+      flextable::hline_bottom(part = "header", border = my_border) |>
+      flextable::hline(i = 2, part = "header", border = my_border) |>
+      flextable::hline_top(part = "header", border = my_border) |>
       flextable::italic(i = 3, j = seq(2, length(my_keys), 3), italic = TRUE, part = "header") |>
-      flextable::add_footer_lines(values = flextable::as_paragraph( flextable::as_equation(paste0("Note.~\\chi^2\\left(",fit$parameter,"\\right)=", scales::number(fit$statistic, accuracy = .01), ",\\,", apa_p(fit$p.value, inline = TRUE, plain = TRUE), ",\\,\\text{Adj. Cramer's}\\,V=", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)), props = flextable::fp_text_default(font.size = font_size * .85, font.family = family)))) |>
+      flextable::add_footer_lines(ftExtra::as_paragraph_md(paste0("*Note*. *&chi;*^2^(", fit$parameter, ") = ", scales::number(fit$statistic, accuracy = .01), ", ", apa_p(fit$p.value, inline = TRUE), ", Adj. Cramer's *V* = ", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)))) |>
+      # flextable::add_footer_lines(values = flextable::as_paragraph( flextable::as_equation(paste0("Note.~\\chi^2\\left(",fit$parameter,"\\right)=", scales::number(fit$statistic, accuracy = .01), ",\\,", apa_p(fit$p.value, inline = TRUE, plain = TRUE), ",\\,\\text{Adj. Cramer's}\\,V=", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)), props = flextable::fp_text_default(font.size = font_size * .85, font.family = family, color = text_color)))) |>
+      flextable::font(part = "all",fontname = family) |>
+      flextable::color(color = text_color, part = "all") |>
+      flextable::fontsize(part = "all", size = font_size) |>
+      #
+      flextable::line_spacing(space = line_spacing, part = "all") |>
+      flextable::padding(padding.top = 0, padding.bottom = 0, part = "all") |>
       flextable::autofit(add_w = 0, add_h = 0, part = "footer")
 }
 
