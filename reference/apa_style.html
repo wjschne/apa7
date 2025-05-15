@@ -16,6 +16,10 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/tables.html">APA Tables</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -41,6 +45,7 @@
 <span>  <span class="va">x</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"Times New Roman"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  text_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  line_spacing <span class="op">=</span> <span class="fl">2</span></span>
@@ -51,6 +56,7 @@
 <span>  <span class="va">x</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"Times New Roman"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  text_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  line_spacing <span class="op">=</span> <span class="fl">2</span></span>
@@ -61,6 +67,7 @@
 <span>  <span class="va">x</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"Times New Roman"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  text_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  line_spacing <span class="op">=</span> <span class="fl">2</span></span>
@@ -81,6 +88,10 @@
 
 <dt id="arg-font-size">font_size<a class="anchor" aria-label="anchor" href="#arg-font-size"></a></dt>
 <dd><p>font size</p></dd>
+
+
+<dt id="arg-text-color">text_color<a class="anchor" aria-label="anchor" href="#arg-text-color"></a></dt>
+<dd><p>text color</p></dd>
 
 
 <dt id="arg-border-color">border_color<a class="anchor" aria-label="anchor" href="#arg-border-color"></a></dt>
@@ -105,7 +116,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, y <span class="op">=</span> <span class="fl">4</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">apa_style</span><span class="op">(</span><span class="op">)</span></span></span>
-<style></style><div class="tabwid"><style>.cl-8fd24476{}.cl-8fcc7d84{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-8fcefec4{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-8fcf1968{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8fcf1972{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8fcf197c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="table cl-8fd24476"><thead><tr style="overflow-wrap:break-word;"><th class="cl-8fcf1968"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">x</span></p></th><th class="cl-8fcf1968"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">y</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-8fcf1972"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">1</span></p></td><td class="cl-8fcf1972"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8fcf1972"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">2</span></p></td><td class="cl-8fcf1972"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8fcf197c"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">3</span></p></td><td class="cl-8fcf197c"><p class="cl-8fcefec4"><span class="cl-8fcc7d84">6</span></p></td></tr></tbody></table></div><span class="r-in"><span><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<style></style><div class="tabwid"><style>.cl-04b6d45c{}.cl-04b04916{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-04b3917a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-04b3ad54{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-04b3ad5e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-04b3ad68{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="table cl-04b6d45c"><thead><tr style="overflow-wrap:break-word;"><th class="cl-04b3ad54"><p class="cl-04b3917a"><span class="cl-04b04916">x</span></p></th><th class="cl-04b3ad54"><p class="cl-04b3917a"><span class="cl-04b04916">y</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-04b3ad5e"><p class="cl-04b3917a"><span class="cl-04b04916">1</span></p></td><td class="cl-04b3ad5e"><p class="cl-04b3917a"><span class="cl-04b04916">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-04b3ad5e"><p class="cl-04b3917a"><span class="cl-04b04916">2</span></p></td><td class="cl-04b3ad5e"><p class="cl-04b3917a"><span class="cl-04b04916">5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-04b3ad68"><p class="cl-04b3917a"><span class="cl-04b04916">3</span></p></td><td class="cl-04b3ad68"><p class="cl-04b3917a"><span class="cl-04b04916">6</span></p></td></tr></tbody></table></div><span class="r-in"><span><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">apa_style</span><span class="op">(</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
