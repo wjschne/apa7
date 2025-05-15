@@ -320,7 +320,12 @@ apa_cor <- function(data,
             gt::cells_body(columns = "Variable"),
             gt::cells_footnotes()
           )
-        )
+        ) %>%
+        gt::tab_style(style = gt::cell_text(font = family, size = gt::px(font_size * 4 / 3), color = text_color), locations = list(
+          gt::cells_column_labels(),
+          gt::cells_body(),
+          gt::cells_footnotes()
+        ))
 
       k <- nrow(d$`_boxhead`)
 
