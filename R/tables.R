@@ -98,7 +98,8 @@ apa_style.flextable <- function(x ,
     flextable::hline_bottom(part = "all", border = myborder) |>
     flextable::fontsize(part = "all", size = font_size) |>
     flextable::valign(part = "all", valign = "center") |>
-    flextable::line_spacing(space = line_spacing, part = "all")
+    flextable::line_spacing(space = line_spacing, part = "all") |>
+    flextable::padding(padding.top = 0, padding.bottom = 0, part = "all")
 
 
 }
@@ -107,6 +108,7 @@ apa_style.flextable <- function(x ,
 #' APA-formatted correlation table
 #'
 #' @param data data.frame or tibble with variables to be
+#' @param note Custom note to appear below table. (Overrides automatic note.)
 #' @param p_value p-value needed to be flagged as significant
 #' @param digits Number of digits for rounding
 #' @param bold_significant bold significant correlations
@@ -125,6 +127,7 @@ apa_style.flextable <- function(x ,
 #' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "gt")
 #' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "tibble")
 apa_cor <- function(data,
+                    note = NULL,
                     p_value = .05,
                     digits = 2,
                     bold_significant = TRUE,
@@ -227,11 +230,36 @@ apa_cor <- function(data,
       flextable::italic(j = colnames(d_msd)[-1], part = "header", italic = TRUE) |>
       ftExtra::colformat_md(j = -"Variable")
 
-    if (significance_note && any(ct$p <= p_value)) {
-      my_paragraph <- flextable::as_paragraph(flextable::as_i("Note. "), "Correlations signficant at ", flextable::as_i("p"), " < ", formatC(p_value, digits = 2, format = "fg") |> gsub(pattern = "^0", replacement = ""), " are ", flextable::as_b("bolded"), ".")
+    if (is.null(note)) {
+      if (significance_note &&
+          bold_significant &&
+          any(ct$p <= p_value)) {
 
-      d <- d |>
-        flextable::add_footer_lines(values = my_paragraph) |>
+        my_paragraph <- flextable::as_paragraph(
+          flextable::as_i("Note. "),
+          "Correlations signficant at ",
+          flextable::as_i("p"),
+          " < ",
+          formatC(p_value, digits = 2, format = "fg") |> gsub(pattern = "^0", replacement = ""),
+          " are ",
+          flextable::as_b("bolded"),
+          "."
+        )
+
+        d <- d |>
+          flextable::add_footer_lines(values = my_paragraph) |>
+          flextable::font(part = "footer", fontname = family) |>
+          flextable::fontsize(part = "footer", size = font_size) |>
+          flextable::line_spacing(part = "footer", space = line_spacing) |>
+          flextable::color(part = "footer", color = text_color)
+
+      }
+
+    } else {
+      d <- flextable::add_footer_lines(
+        x = d,
+        values = ftExtra::as_paragraph_md(
+          paste0("*Note*. ", note))) |>
         flextable::font(part = "footer", fontname = family) |>
         flextable::fontsize(part = "footer", size = font_size) |>
         flextable::line_spacing(part = "footer", space = line_spacing) |>
@@ -239,9 +267,11 @@ apa_cor <- function(data,
 
     }
 
-
     d_R <- flextable::autofit(d, add_w = 0, add_h = 0)
-  }
+
+    }
+
+
 
   if (output == "gt") {
     d <-  gt::gt(d_R) |>
@@ -259,10 +289,10 @@ apa_cor <- function(data,
         style = gt::cell_text(style = "italic")
       )  |>
       gt::fmt_markdown(columns = -1)
-    if (significance_note && any(ct$p <= p_value)) {
-      d <- d |>
-        gt::tab_footnote(gt::md(
-          paste0(
+
+      if (is.null(note)) {
+        if (significance_note && any(ct$p <= p_value)) {
+          my_note <- paste0(
             "*Note*. Correlations significant at *p* < ",
             gsub(
               pattern = "^0",
@@ -271,7 +301,14 @@ apa_cor <- function(data,
             ),
             " are **bolded**."
           )
-        )) |>
+          d <- gt::tab_footnote(d, gt::md(my_note))
+        }
+      } else {
+        my_note <- paste0("*Note*. ", note)
+        d <- gt::tab_footnote(d, gt::md(my_note))
+      }
+
+      d <- d |>
         gt::tab_style(
           style = gt::cell_text(font = family, size = gt::px(font_size * 4 / 3)),
           locations = gt::cells_footnotes()
@@ -287,15 +324,12 @@ apa_cor <- function(data,
         gt::tab_style(style = "padding-right:5px",
                       locations = list(gt::cells_column_labels(columns = ncol(d_R)),
                                        gt::cells_body(columns = ncol(d_R))))
+
+      k <- nrow(d$`_boxhead`)
+
+      d$`_boxhead`[seq(1, k), "column_width"] <- gt::pct(column_percent)
+      d_R <- d
     }
-
-    k <- nrow(d$`_boxhead`)
-
-    d$`_boxhead`[seq(1, k), "column_width"] <- gt::pct(column_percent)
-    d_R <- d
-
-  }
-
 
   d_R
 }

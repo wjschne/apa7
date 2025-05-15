@@ -6,6 +6,7 @@
 \usage{
 apa_cor(
   data,
+  note = NULL,
   p_value = 0.05,
   digits = 2,
   bold_significant = TRUE,
@@ -23,6 +24,8 @@ apa_cor(
 }
 \arguments{
 \item{data}{data.frame or tibble with variables to be}
+
+\item{note}{Custom note to appear below table. (Overrides automatic note.)}
 
 \item{p_value}{p-value needed to be flagged as significant}
 
