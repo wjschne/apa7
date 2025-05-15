@@ -6,19 +6,20 @@
 \usage{
 apa_chisq(
   x,
-  suppress_warnings = TRUE,
+  note = NULL,
   family = "Times New Roman",
   font_size = 12,
   text_color = "black",
   line_spacing = 2,
   border_color = "black",
-  border_width = 0.5
+  border_width = 0.5,
+  suppress_warnings = TRUE
 )
 }
 \arguments{
 \item{x}{A two-column data.frame or tibble}
 
-\item{suppress_warnings}{Suppress any warnings if true.}
+\item{note}{Custom note (overrides automatic note.)}
 
 \item{family}{font family}
 
@@ -31,6 +32,8 @@ apa_chisq(
 \item{border_color}{border color}
 
 \item{border_width}{border width in pixels}
+
+\item{suppress_warnings}{Suppress any warnings if true.}
 }
 \value{
 flextable

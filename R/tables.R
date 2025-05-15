@@ -320,7 +320,7 @@ apa_cor <- function(data,
             gt::cells_body(columns = "Variable"),
             gt::cells_footnotes()
           )
-        ) %>%
+        ) |>
         gt::tab_style(style = gt::cell_text(font = family, size = gt::px(font_size * 4 / 3), color = text_color), locations = list(
           gt::cells_column_labels(),
           gt::cells_body(),
@@ -350,7 +350,7 @@ apa_cor <- function(data,
 #'
 #' @examples
 #' apa_chisq(mtcars[, c("am", "gear")])
-apa_chisq <- function(x, family = "Times New Roman", font_size = 12, text_color = "black", line_spacing = 2, border_color = "black", border_width = .5, suppress_warnings = TRUE) {
+apa_chisq <- function(x, note = NULL, family = "Times New Roman", font_size = 12, text_color = "black", line_spacing = 2, border_color = "black", border_width = .5, suppress_warnings = TRUE) {
   if (!inherits(x, "data.frame")) stop("x must be a data.frame or tibble.")
   if (ncol(x) != 2) stop('x must have 2 columns. Select the 2 variables you wish to test before passing them to this function. For example:\nx <- mtcars[, c("am", "cyl")]\nor\nx <- dplyr::select(mtcars, am, cyl)')
 
@@ -388,9 +388,8 @@ apa_chisq <- function(x, family = "Times New Roman", font_size = 12, text_color 
   my_headers[my_keys] <- c("", rep(colnames(x)[1], length(my_keys) - 1))
   my_border <- flextable::fp_border_default(color = border_color, width = border_width)
 
-    dd |>
+    dd <- dd |>
     flextable::flextable(col_keys = my_keys) |>
-      # apa_style(family = family, font_size = font_size, text_color = text_color, border_color = border_color, border_width = border_width, line_spacing = line_spacing ) |>
       flextable::valign(part = "all", valign = "center") |>
     flextable::separate_header() |>
     flextable::align(part = "all", align = "center") |>
@@ -403,13 +402,36 @@ apa_chisq <- function(x, family = "Times New Roman", font_size = 12, text_color 
       flextable::hline_bottom(part = "header", border = my_border) |>
       flextable::hline(i = 2, part = "header", border = my_border) |>
       flextable::hline_top(part = "header", border = my_border) |>
-      flextable::italic(i = 3, j = seq(2, length(my_keys), 3), italic = TRUE, part = "header") |>
-      flextable::add_footer_lines(ftExtra::as_paragraph_md(paste0("*Note*. *&chi;*^2&thinsp;^(", fit$parameter, ") = ", scales::number(fit$statistic, accuracy = .01), ", ", apa_p(fit$p.value, inline = TRUE), ", Adj. Cramer's *V* = ", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)))) |>
-      # flextable::add_footer_lines(values = flextable::as_paragraph( flextable::as_equation(paste0("Note.~\\chi^2\\left(",fit$parameter,"\\right)=", scales::number(fit$statistic, accuracy = .01), ",\\,", apa_p(fit$p.value, inline = TRUE, plain = TRUE), ",\\,\\text{Adj. Cramer's}\\,V=", signs::signs(ef$Cramers_v_adjusted, accuracy = .01, trim_leading_zeros = TRUE)), props = flextable::fp_text_default(font.size = font_size * .85, font.family = family, color = text_color)))) |>
+      flextable::italic(i = 3, j = seq(2, length(my_keys), 3), italic = TRUE, part = "header")
+
+    if (!is.null(note)) {
+      if (!is.na(note)) {
+        dd <- dd |> flextable::add_footer_lines(ftExtra::as_paragraph_md(paste0("*Note*. ", note)))
+      }
+
+    } else {
+      dd <- dd |> flextable::add_footer_lines(ftExtra::as_paragraph_md(
+        paste0(
+          "*Note*. *&chi;*^2&thinsp;^(",
+          fit$parameter,
+          ") = ",
+          scales::number(fit$statistic, accuracy = .01),
+          ", ",
+          apa_p(fit$p.value, inline = TRUE),
+          ", Adj. Cramer's *V* = ",
+          signs::signs(
+            ef$Cramers_v_adjusted,
+            accuracy = .01,
+            trim_leading_zeros = TRUE
+          )
+        )
+      ))
+      }
+
+       dd |>
       flextable::font(part = "all",fontname = family) |>
       flextable::color(color = text_color, part = "all") |>
       flextable::fontsize(part = "all", size = font_size) |>
-      #
       flextable::line_spacing(space = line_spacing, part = "all") |>
       flextable::padding(padding.top = 0, padding.bottom = 0, part = "all") |>
       flextable::align(j = 1, align = "left", part = "all") |>

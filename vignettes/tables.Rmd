@@ -24,14 +24,14 @@ Some tables, like correlation matrices, can be standardized and automated. Other
 By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/flextable/), with significant correlations bolded.
 
 ```{r}
-trees %>% 
+trees |> 
   apa_cor()
 ```
 
 If you prefer to work with [gt tables](https://gt.rstudio.com/), set `output` function to `gt`.
 
 ```{r}
-trees %>% 
+trees |> 
   apa_cor(output = "gt") 
 ```
 
@@ -39,8 +39,8 @@ If you want to use some other table package, you can output a tibble instead, an
 
 ```{r}
 options(knitr.kable.NA = '')
-trees %>% 
-  apa_cor(output = "tibble") %>% 
+trees |> 
+  apa_cor(output = "tibble") |> 
   knitr::kable(align = "lrrrrr")
 ```
 
@@ -71,7 +71,7 @@ my_summaries <- list(M = mean,
                      Skew = psych::skew,
                      `Kurt.` = psych::kurtosi,
                      n = function(x) sum(!is.na(x)))
-trees %>% 
+trees |> 
   apa_cor(note = "*M* = Mean, *SD* = Standard Deviation, *Skew* =  Skewness, *Kurt.* =  Kurtosis",
           p_value = .001, 
           digits = 2,
@@ -101,9 +101,9 @@ x <- apa_cor(trees,
 The styling options for `apa_cor` are minimal, but flexable and gt tables allow for all kinds of customization. Just place whatever code from flextable or gt you want after `apa_cor`. For example, gt tables usually span 100% of the width in a space. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
 
 ```{r}
-apa_cor(trees, output = "gt", significance_note = F) %>% 
+apa_cor(trees, output = "gt", significance_note = F) |> 
   gt::tab_options(table.width = gt::pct(50), 
-                  table.align = "left") %>% 
+                  table.align = "left") |> 
   gt::tab_footnote("This is a footnote.", 
                    locations = gt::cells_body(columns = "Variable", 
                                               rows = 2))
@@ -112,9 +112,9 @@ apa_cor(trees, output = "gt", significance_note = F) %>%
 Here I do the same with flextable:
 
 ```{r}
-apa_cor(trees, significance_note = F) %>%
-  flextable::set_table_properties(align = "left") %>%
-  flextable::width(j = c("Variable", "M", "SD", "1", "2", "3"), width = c(1, .45, .45, .45, .45, .45)) %>% 
+apa_cor(trees, significance_note = F) |>
+  flextable::set_table_properties(align = "left") |>
+  flextable::width(j = c("Variable", "M", "SD", "1", "2", "3"), width = c(1, .45, .45, .45, .45, .45)) |> 
   flextable::footnote(
     i = 2,
     j = "Variable",

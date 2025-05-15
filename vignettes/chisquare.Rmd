@@ -17,13 +17,13 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(apa7)
 library(dplyr)
-d <- mtcars %>% 
-  select(Gears = gear, Transmission = am) %>% 
+d <- mtcars |> 
+  select(Gears = gear, Transmission = am) |> 
   mutate(Transmission = factor(Transmission, labels = c("Automatic", "Manual")))
   
 ```
 
-The default output of the `apa_chisq` function is a contingency table with a chi-square test of independence in the table note. The output is a flextable, which can be modified in any way one perfers.
+The default output of the `apa_chisq` function is a contingency table with a chi-square test of independence in the table note. The output is a flextable, which can be modified with flextable commands.
 
 ```{r}
 apa_chisq(d)
@@ -44,6 +44,12 @@ apa_chisq(
 ```
 
 ```{r}
+# Automatic chi square note
 apa_chisq(d)
+# No note
+apa_chisq(d, note = NA)
+# Custom note
+apa_chisq(d, note = "This is a *custom* note written in **markdown** $x > \\omega$.")
+
 ```
 

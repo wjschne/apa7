@@ -15,6 +15,7 @@ BugReports: https://github.com/wjschne/apa7/issues
 Suggests: 
     knitr,
     rmarkdown,
+    spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports:
@@ -39,3 +40,4 @@ Imports:
 Depends: 
     R (>= 4.1.0)
 VignetteBuilder: knitr
+Language: en-US
