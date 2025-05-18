@@ -34,6 +34,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/chisquare.html">Contingency Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/summarize.html">Summarize Data</a></li>
     <li><a class="dropdown-item" href="../articles/tables.html">Correlation Tables</a></li>
   </ul>
 </li>
@@ -91,43 +92,43 @@ significant correlations bolded.</p>
 <span><span class="co">#&gt;   method                  from     </span></span>
 <span><span class="co">#&gt;   as_flextable.data.frame flextable</span></span></code></pre></div>
 <div class="tabwid">
-<style>.cl-7ed072c8{}.cl-7ec980c6{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7ec980da{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7ec980db{font-family:'Times New Roman';font-size:12pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7ecccdf8{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-7eccce02{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-7eccce03{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-7eccebda{width:0.889in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebe4{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebe5{width:0.889in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebe6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebee{width:0.889in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebef{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebf0{width:0.889in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebf8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebf9{width:0.889in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7eccebfa{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
-<table data-quarto-disable-processing="true" class="table cl-7ed072c8">
+<style>.cl-5b446698{}.cl-5b3d6564{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5b3d656e{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5b3d6578{font-family:'Times New Roman';font-size:12pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5b40c092{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:3pt;padding-right:3pt;line-height: 2;background-color:transparent;}.cl-5b40c09c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:3pt;padding-right:3pt;line-height: 2;background-color:transparent;}.cl-5b40c09d{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-5b40de38{width:0.815in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de39{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de42{width:0.815in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de43{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de44{width:0.815in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de4c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de4d{width:0.815in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de4e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de56{width:0.815in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b40de57{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-5b446698">
 <thead><tr style="overflow-wrap:break-word;">
-<th class="cl-7eccebda"><p class="cl-7ecccdf8"><span class="cl-7ec980c6">Variable</span></p></th>
-<th class="cl-7eccebe4"><p class="cl-7eccce02"><span class="cl-7ec980da">M</span></p></th>
-<th class="cl-7eccebe4"><p class="cl-7eccce02"><span class="cl-7ec980da">SD</span></p></th>
-<th class="cl-7eccebe4"><p class="cl-7eccce02"><span class="cl-7ec980c6">1</span></p></th>
-<th class="cl-7eccebe4"><p class="cl-7eccce02"><span class="cl-7ec980c6">2</span></p></th>
-<th class="cl-7eccebe4"><p class="cl-7eccce02"><span class="cl-7ec980c6">3</span></p></th>
+<th class="cl-5b40de38"><p class="cl-5b40c092"><span class="cl-5b3d6564">Variable</span></p></th>
+<th class="cl-5b40de39"><p class="cl-5b40c09c"><span class="cl-5b3d656e">M</span></p></th>
+<th class="cl-5b40de39"><p class="cl-5b40c09c"><span class="cl-5b3d656e">SD</span></p></th>
+<th class="cl-5b40de39"><p class="cl-5b40c09c"><span class="cl-5b3d6564">1</span></p></th>
+<th class="cl-5b40de39"><p class="cl-5b40c09c"><span class="cl-5b3d6564">2</span></p></th>
+<th class="cl-5b40de39"><p class="cl-5b40c09c"><span class="cl-5b3d6564">3</span></p></th>
 </tr></thead>
 <tbody>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-7eccebe5"><p class="cl-7ecccdf8"><span class="cl-7ec980c6">1. Girth</span></p></td>
-<td class="cl-7eccebe6"><p class="cl-7eccce02"><span class="cl-7ec980c6">13.25</span></p></td>
-<td class="cl-7eccebe6"><p class="cl-7eccce02"><span class="cl-7ec980c6">3.14</span></p></td>
-<td class="cl-7eccebe6"><p class="cl-7eccce02"><span class="cl-7ec980c6">—</span></p></td>
-<td class="cl-7eccebe6"><p class="cl-7eccce02"><span class="cl-7ec980c6"></span></p></td>
-<td class="cl-7eccebe6"><p class="cl-7eccce02"><span class="cl-7ec980c6"></span></p></td>
+<td class="cl-5b40de42"><p class="cl-5b40c092"><span class="cl-5b3d6564">1. Girth</span></p></td>
+<td class="cl-5b40de43"><p class="cl-5b40c09c"><span class="cl-5b3d6564">13.25</span></p></td>
+<td class="cl-5b40de43"><p class="cl-5b40c09c"><span class="cl-5b3d6564">3.14</span></p></td>
+<td class="cl-5b40de43"><p class="cl-5b40c09c"><span class="cl-5b3d6564">—</span></p></td>
+<td class="cl-5b40de43"><p class="cl-5b40c09c"><span class="cl-5b3d6564"></span></p></td>
+<td class="cl-5b40de43"><p class="cl-5b40c09c"><span class="cl-5b3d6564"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-7eccebee"><p class="cl-7ecccdf8"><span class="cl-7ec980c6">2. Height</span></p></td>
-<td class="cl-7eccebef"><p class="cl-7eccce02"><span class="cl-7ec980c6">76.00</span></p></td>
-<td class="cl-7eccebef"><p class="cl-7eccce02"><span class="cl-7ec980c6">6.37</span></p></td>
-<td class="cl-7eccebef"><p class="cl-7eccce02"><span class="cl-7ec980db">.52</span></p></td>
-<td class="cl-7eccebef"><p class="cl-7eccce02"><span class="cl-7ec980c6">—</span></p></td>
-<td class="cl-7eccebef"><p class="cl-7eccce02"><span class="cl-7ec980c6"></span></p></td>
+<td class="cl-5b40de44"><p class="cl-5b40c092"><span class="cl-5b3d6564">2. Height</span></p></td>
+<td class="cl-5b40de4c"><p class="cl-5b40c09c"><span class="cl-5b3d6564">76.00</span></p></td>
+<td class="cl-5b40de4c"><p class="cl-5b40c09c"><span class="cl-5b3d6564">6.37</span></p></td>
+<td class="cl-5b40de4c"><p class="cl-5b40c09c"><span class="cl-5b3d6578">.52</span></p></td>
+<td class="cl-5b40de4c"><p class="cl-5b40c09c"><span class="cl-5b3d6564">—</span></p></td>
+<td class="cl-5b40de4c"><p class="cl-5b40c09c"><span class="cl-5b3d6564"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-7eccebf0"><p class="cl-7ecccdf8"><span class="cl-7ec980c6">3. Volume</span></p></td>
-<td class="cl-7eccebf8"><p class="cl-7eccce02"><span class="cl-7ec980c6">30.17</span></p></td>
-<td class="cl-7eccebf8"><p class="cl-7eccce02"><span class="cl-7ec980c6">16.44</span></p></td>
-<td class="cl-7eccebf8"><p class="cl-7eccce02"><span class="cl-7ec980db">.97</span></p></td>
-<td class="cl-7eccebf8"><p class="cl-7eccce02"><span class="cl-7ec980db">.60</span></p></td>
-<td class="cl-7eccebf8"><p class="cl-7eccce02"><span class="cl-7ec980c6">—</span></p></td>
+<td class="cl-5b40de4d"><p class="cl-5b40c092"><span class="cl-5b3d6564">3. Volume</span></p></td>
+<td class="cl-5b40de4e"><p class="cl-5b40c09c"><span class="cl-5b3d6564">30.17</span></p></td>
+<td class="cl-5b40de4e"><p class="cl-5b40c09c"><span class="cl-5b3d6564">16.44</span></p></td>
+<td class="cl-5b40de4e"><p class="cl-5b40c09c"><span class="cl-5b3d6578">.97</span></p></td>
+<td class="cl-5b40de4e"><p class="cl-5b40c09c"><span class="cl-5b3d6578">.60</span></p></td>
+<td class="cl-5b40de4e"><p class="cl-5b40c09c"><span class="cl-5b3d6564">—</span></p></td>
 </tr>
 </tbody>
-<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-7eccebf9"><p class="cl-7eccce03"><span class="cl-7ec980da">Note. </span><span class="cl-7ec980c6">Correlations signficant at </span><span class="cl-7ec980da">p</span><span class="cl-7ec980c6"> &lt; </span><span class="cl-7ec980c6">.05</span><span class="cl-7ec980c6"> are </span><span class="cl-7ec980db">bolded</span><span class="cl-7ec980c6">.</span></p></td></tr></tfoot>
+<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-5b40de56"><p class="cl-5b40c09d"><span class="cl-5b3d656e">Note. </span><span class="cl-5b3d6564">Correlations signficant at </span><span class="cl-5b3d656e">p</span><span class="cl-5b3d6564"> &lt; </span><span class="cl-5b3d6564">.05</span><span class="cl-5b3d6564"> are </span><span class="cl-5b3d6578">bolded</span><span class="cl-5b3d6564">.</span></p></td></tr></tfoot>
 </table>
 </div>
 <p>If you prefer to work with <a href="https://gt.rstudio.com/" class="external-link">gt
@@ -164,13 +165,13 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   background-color: #FFFFFF;
   width: auto;
   border-top-style: solid;
-  border-top-width: 0.5px;
-  border-top-color: #000000;
+  border-top-width: 0px;
+  border-top-color: #A8A8A8;
   border-right-style: none;
   border-right-width: 2px;
   border-right-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #A8A8A8;
   border-left-style: none;
   border-left-width: 2px;
@@ -188,8 +189,8 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   font-weight: initial;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   border-bottom-color: #FFFFFF;
   border-bottom-width: 0;
 }
@@ -200,8 +201,8 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   font-weight: initial;
   padding-top: 7px;
   padding-bottom: 9px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
@@ -220,17 +221,17 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
 
 #mwlefoodfi .gt_bottom_border {
   border-bottom-style: solid;
-  border-bottom-width: 0.5px;
+  border-bottom-width: 0px;
   border-bottom-color: #000000;
 }
 
 #mwlefoodfi .gt_col_headings {
-  border-top-style: none;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
+  border-top-style: solid;
+  border-top-width: 0.5px;
+  border-top-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 0.5px;
+  border-bottom-color: #000000;
   border-left-style: none;
   border-left-width: 1px;
   border-left-color: #D3D3D3;
@@ -254,8 +255,8 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   vertical-align: bottom;
   padding-top: 8px;
   padding-bottom: 9px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   overflow-x: hidden;
 }
 
@@ -280,9 +281,9 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
 }
 
 #mwlefoodfi .gt_column_spanner {
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 0.5px;
+  border-bottom-color: #000000;
   vertical-align: bottom;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -298,18 +299,18 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
 #mwlefoodfi .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-top-style: none;
-  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
@@ -327,11 +328,11 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: initial;
-  border-top-style: none;
-  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   vertical-align: middle;
 }
@@ -347,11 +348,11 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
 #mwlefoodfi .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   margin: 10px;
-  border-top-style: none;
-  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
@@ -369,11 +370,11 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: none;
-  border-right-width: 2px;
+  border-right-style: solid;
+  border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mwlefoodfi .gt_stub_row_group {
@@ -382,20 +383,20 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: none;
-  border-right-width: 2px;
+  border-right-style: solid;
+  border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   vertical-align: top;
 }
 
 #mwlefoodfi .gt_row_group_first td {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #mwlefoodfi .gt_row_group_first th {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #mwlefoodfi .gt_summary_row {
@@ -404,26 +405,26 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   text-transform: inherit;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mwlefoodfi .gt_first_summary_row {
-  border-top-style: none;
+  border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
 #mwlefoodfi .gt_first_summary_row.thick {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #mwlefoodfi .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
@@ -433,27 +434,27 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   text-transform: inherit;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mwlefoodfi .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-top-style: none;
-  border-top-width: 6px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-top-style: double;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
 }
 
 #mwlefoodfi .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-bottom-style: none;
-  border-bottom-width: 6px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-bottom-style: double;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
@@ -463,18 +464,18 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
 
 #mwlefoodfi .gt_table_body {
   border-top-style: solid;
-  border-top-width: 0.5px;
-  border-top-color: #000000;
+  border-top-width: 0px;
+  border-top-color: #D3D3D3;
   border-bottom-style: solid;
-  border-bottom-width: 0.5px;
-  border-bottom-color: #000000;
+  border-bottom-width: 0px;
+  border-bottom-color: #D3D3D3;
 }
 
 #mwlefoodfi .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 2px;
@@ -489,15 +490,15 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   font-size: 90%;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mwlefoodfi .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 2px;
@@ -511,8 +512,8 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
   font-size: 90%;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mwlefoodfi .gt_left {
@@ -594,37 +595,37 @@ tables</a>, set <code>output</code> function to <code>gt</code>.</p>
 <col style="width:12.9032258064516%;">
 </colgroup>
 <thead><tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="Variable">Variable</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="M">M</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="SD">SD</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a1">1</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a2">2</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a3">3</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="Variable">Variable</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="M">M</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="SD">SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a1">1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a2">2</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a3">3</th>
     </tr></thead>
 <tbody class="gt_table_body">
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">1. Girth</td>
-<td headers="M" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">13.25</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">3.14</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
-<td headers="2" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
-<td headers="3" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">1. Girth</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">13.25</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">3.14</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">2. Height</td>
-<td headers="M" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">76.00</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">6.37</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.52</strong></span></td>
-<td headers="2" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
-<td headers="3" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">2. Height</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">76.00</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">6.37</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.52</strong></span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">3. Volume</td>
-<td headers="M" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">30.17</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">16.44</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.97</strong></span></td>
-<td headers="2" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.60</strong></span></td>
-<td headers="3" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">3. Volume</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">30.17</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">16.44</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.97</strong></span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.60</strong></span></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
 </tr>
 </tbody>
 <tfoot class="gt_footnotes"><tr>
@@ -784,13 +785,13 @@ note will not appear if no correlations are significant. Default:
   background-color: #FFFFFF;
   width: auto;
   border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #27408B;
+  border-top-width: 0px;
+  border-top-color: #A8A8A8;
   border-right-style: none;
   border-right-width: 2px;
   border-right-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #A8A8A8;
   border-left-style: none;
   border-left-width: 2px;
@@ -808,8 +809,8 @@ note will not appear if no correlations are significant. Default:
   font-weight: initial;
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   border-bottom-color: #FFFFFF;
   border-bottom-width: 0;
 }
@@ -820,8 +821,8 @@ note will not appear if no correlations are significant. Default:
   font-weight: initial;
   padding-top: 5.66667px;
   padding-bottom: 7.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
@@ -840,17 +841,17 @@ note will not appear if no correlations are significant. Default:
 
 #mfaamrewka .gt_bottom_border {
   border-bottom-style: solid;
-  border-bottom-width: 1px;
+  border-bottom-width: 0px;
   border-bottom-color: #27408B;
 }
 
 #mfaamrewka .gt_col_headings {
-  border-top-style: none;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #27408B;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #27408B;
   border-left-style: none;
   border-left-width: 1px;
   border-left-color: #D3D3D3;
@@ -874,8 +875,8 @@ note will not appear if no correlations are significant. Default:
   vertical-align: bottom;
   padding-top: 6.66667px;
   padding-bottom: 7.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   overflow-x: hidden;
 }
 
@@ -900,9 +901,9 @@ note will not appear if no correlations are significant. Default:
 }
 
 #mfaamrewka .gt_column_spanner {
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #27408B;
   vertical-align: bottom;
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
@@ -918,18 +919,18 @@ note will not appear if no correlations are significant. Default:
 #mfaamrewka .gt_group_heading {
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   color: #8B0000;
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-top-style: none;
-  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
@@ -947,11 +948,11 @@ note will not appear if no correlations are significant. Default:
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: initial;
-  border-top-style: none;
-  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   vertical-align: middle;
 }
@@ -967,11 +968,11 @@ note will not appear if no correlations are significant. Default:
 #mfaamrewka .gt_row {
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   margin: 10px;
-  border-top-style: none;
-  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
@@ -989,11 +990,11 @@ note will not appear if no correlations are significant. Default:
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: none;
-  border-right-width: 2px;
+  border-right-style: solid;
+  border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mfaamrewka .gt_stub_row_group {
@@ -1002,20 +1003,20 @@ note will not appear if no correlations are significant. Default:
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: none;
-  border-right-width: 2px;
+  border-right-style: solid;
+  border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   vertical-align: top;
 }
 
 #mfaamrewka .gt_row_group_first td {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #mfaamrewka .gt_row_group_first th {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #mfaamrewka .gt_summary_row {
@@ -1024,26 +1025,26 @@ note will not appear if no correlations are significant. Default:
   text-transform: inherit;
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mfaamrewka .gt_first_summary_row {
-  border-top-style: none;
+  border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
 #mfaamrewka .gt_first_summary_row.thick {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #mfaamrewka .gt_last_summary_row {
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
@@ -1053,27 +1054,27 @@ note will not appear if no correlations are significant. Default:
   text-transform: inherit;
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mfaamrewka .gt_first_grand_summary_row {
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-top-style: none;
-  border-top-width: 6px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-top-style: double;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
 }
 
 #mfaamrewka .gt_last_grand_summary_row_top {
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-bottom-style: none;
-  border-bottom-width: 6px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-bottom-style: double;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
@@ -1083,18 +1084,18 @@ note will not appear if no correlations are significant. Default:
 
 #mfaamrewka .gt_table_body {
   border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #27408B;
+  border-top-width: 0px;
+  border-top-color: #D3D3D3;
   border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: #27408B;
+  border-bottom-width: 0px;
+  border-bottom-color: #D3D3D3;
 }
 
 #mfaamrewka .gt_footnotes {
   color: #8B0000;
   background-color: #FFFFFF;
   border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 2px;
@@ -1109,15 +1110,15 @@ note will not appear if no correlations are significant. Default:
   font-size: 90%;
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mfaamrewka .gt_sourcenotes {
   color: #8B0000;
   background-color: #FFFFFF;
   border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 2px;
@@ -1131,8 +1132,8 @@ note will not appear if no correlations are significant. Default:
   font-size: 90%;
   padding-top: 6.66667px;
   padding-bottom: 6.66667px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #mfaamrewka .gt_left {
@@ -1217,49 +1218,49 @@ note will not appear if no correlations are significant. Default:
 <col style="width:9.09090909090909%;">
 </colgroup>
 <thead><tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="Variable">Variable</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="M">M</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="SD">SD</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="Skew">Skew</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="Kurt.">Kurt.</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="n">n</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="a1">1</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="a2">2</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="a3">3</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="Variable">Variable</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="M">M</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="SD">SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="Skew">Skew</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="Kurt.">Kurt.</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; font-style: italic; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="n">n</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="a1">1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="a2">2</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; border-top-width: 1px; border-top-style: solid; border-top-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;" scope="col" id="a3">3</th>
     </tr></thead>
 <tbody class="gt_table_body">
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;">1. Girth</td>
-<td headers="M" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">13.25</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">3.14</span></td>
-<td headers="Skew" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">0.50</span></td>
-<td headers="Kurt." class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">−0.71</span></td>
-<td headers="n" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">31</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">—</span></td>
-<td headers="2" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><br></td>
-<td headers="3" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><br></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;">1. Girth</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">13.25</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">3.14</span></td>
+<td headers="Skew" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">0.50</span></td>
+<td headers="Kurt." class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">−0.71</span></td>
+<td headers="n" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">31</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">—</span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><br></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><br></td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;">2. Height</td>
-<td headers="M" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">76.00</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">6.37</span></td>
-<td headers="Skew" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">−0.36</span></td>
-<td headers="Kurt." class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">−0.72</span></td>
-<td headers="n" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">31</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">.52</span></td>
-<td headers="2" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">—</span></td>
-<td headers="3" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><br></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;">2. Height</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">76.00</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">6.37</span></td>
+<td headers="Skew" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">−0.36</span></td>
+<td headers="Kurt." class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">−0.72</span></td>
+<td headers="n" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">31</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">.52</span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">—</span></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><br></td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;">3. Volume</td>
-<td headers="M" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">30.17</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">16.44</span></td>
-<td headers="Skew" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">1.01</span></td>
-<td headers="Kurt." class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">0.25</span></td>
-<td headers="n" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">31</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">.97</span></td>
-<td headers="2" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">.60</span></td>
-<td headers="3" class="gt_row gt_right" style="color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">—</span></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; text-indent: 5px; font-family: Arial; font-size: 13.3333333333333px;">3. Volume</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">30.17</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">16.44</span></td>
+<td headers="Skew" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">1.01</span></td>
+<td headers="Kurt." class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">0.25</span></td>
+<td headers="n" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">31</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">.97</span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">.60</span></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: royalblue4; color: #8B0000; font-family: Arial; font-size: 13.3333333333333px;"><span class="gt_from_md">—</span></td>
 </tr>
 </tbody>
 <tfoot class="gt_footnotes"><tr>
@@ -1321,13 +1322,13 @@ place a footnote in a specific cell in the table body.</p>
   background-color: #FFFFFF;
   width: 50%;
   border-top-style: solid;
-  border-top-width: 0.5px;
-  border-top-color: #000000;
+  border-top-width: 0px;
+  border-top-color: #A8A8A8;
   border-right-style: none;
   border-right-width: 2px;
   border-right-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #A8A8A8;
   border-left-style: none;
   border-left-width: 2px;
@@ -1345,8 +1346,8 @@ place a footnote in a specific cell in the table body.</p>
   font-weight: initial;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   border-bottom-color: #FFFFFF;
   border-bottom-width: 0;
 }
@@ -1357,8 +1358,8 @@ place a footnote in a specific cell in the table body.</p>
   font-weight: initial;
   padding-top: 7px;
   padding-bottom: 9px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
@@ -1377,17 +1378,17 @@ place a footnote in a specific cell in the table body.</p>
 
 #ymbwmszxcq .gt_bottom_border {
   border-bottom-style: solid;
-  border-bottom-width: 0.5px;
+  border-bottom-width: 0px;
   border-bottom-color: #000000;
 }
 
 #ymbwmszxcq .gt_col_headings {
-  border-top-style: none;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
+  border-top-style: solid;
+  border-top-width: 0.5px;
+  border-top-color: #000000;
+  border-bottom-style: solid;
+  border-bottom-width: 0.5px;
+  border-bottom-color: #000000;
   border-left-style: none;
   border-left-width: 1px;
   border-left-color: #D3D3D3;
@@ -1411,8 +1412,8 @@ place a footnote in a specific cell in the table body.</p>
   vertical-align: bottom;
   padding-top: 8px;
   padding-bottom: 9px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   overflow-x: hidden;
 }
 
@@ -1437,9 +1438,9 @@ place a footnote in a specific cell in the table body.</p>
 }
 
 #ymbwmszxcq .gt_column_spanner {
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 0.5px;
+  border-bottom-color: #000000;
   vertical-align: bottom;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -1455,18 +1456,18 @@ place a footnote in a specific cell in the table body.</p>
 #ymbwmszxcq .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-top-style: none;
-  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
@@ -1484,11 +1485,11 @@ place a footnote in a specific cell in the table body.</p>
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: initial;
-  border-top-style: none;
-  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   vertical-align: middle;
 }
@@ -1504,11 +1505,11 @@ place a footnote in a specific cell in the table body.</p>
 #ymbwmszxcq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   margin: 10px;
-  border-top-style: none;
-  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 1px;
@@ -1526,11 +1527,11 @@ place a footnote in a specific cell in the table body.</p>
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: none;
-  border-right-width: 2px;
+  border-right-style: solid;
+  border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #ymbwmszxcq .gt_stub_row_group {
@@ -1539,20 +1540,20 @@ place a footnote in a specific cell in the table body.</p>
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: none;
-  border-right-width: 2px;
+  border-right-style: solid;
+  border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
   vertical-align: top;
 }
 
 #ymbwmszxcq .gt_row_group_first td {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #ymbwmszxcq .gt_row_group_first th {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #ymbwmszxcq .gt_summary_row {
@@ -1561,26 +1562,26 @@ place a footnote in a specific cell in the table body.</p>
   text-transform: inherit;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #ymbwmszxcq .gt_first_summary_row {
-  border-top-style: none;
+  border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
 #ymbwmszxcq .gt_first_summary_row.thick {
-  border-top-width: 2px;
+  border-top-width: 0px;
 }
 
 #ymbwmszxcq .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-bottom-style: solid;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
@@ -1590,27 +1591,27 @@ place a footnote in a specific cell in the table body.</p>
   text-transform: inherit;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #ymbwmszxcq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-top-style: none;
-  border-top-width: 6px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-top-style: double;
+  border-top-width: 0px;
   border-top-color: #D3D3D3;
 }
 
 #ymbwmszxcq .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
-  border-bottom-style: none;
-  border-bottom-width: 6px;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-bottom-style: double;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
@@ -1620,18 +1621,18 @@ place a footnote in a specific cell in the table body.</p>
 
 #ymbwmszxcq .gt_table_body {
   border-top-style: solid;
-  border-top-width: 0.5px;
-  border-top-color: #000000;
+  border-top-width: 0px;
+  border-top-color: #D3D3D3;
   border-bottom-style: solid;
-  border-bottom-width: 0.5px;
-  border-bottom-color: #000000;
+  border-bottom-width: 0px;
+  border-bottom-color: #D3D3D3;
 }
 
 #ymbwmszxcq .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 2px;
@@ -1646,15 +1647,15 @@ place a footnote in a specific cell in the table body.</p>
   font-size: 90%;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #ymbwmszxcq .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
-  border-bottom-width: 2px;
+  border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
   border-left-width: 2px;
@@ -1668,8 +1669,8 @@ place a footnote in a specific cell in the table body.</p>
   font-size: 90%;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #ymbwmszxcq .gt_left {
@@ -1751,38 +1752,38 @@ place a footnote in a specific cell in the table body.</p>
 <col style="width:12.9032258064516%;">
 </colgroup>
 <thead><tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="Variable">Variable</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="M">M</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="SD">SD</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a1">1</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a2">2</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a3">3</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="Variable">Variable</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="M">M</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; font-style: italic; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="SD">SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a1">1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a2">2</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;" scope="col" id="a3">3</th>
     </tr></thead>
 <tbody class="gt_table_body">
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">1. Girth</td>
-<td headers="M" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">13.25</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">3.14</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
-<td headers="2" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
-<td headers="3" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">1. Girth</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">13.25</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">3.14</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">2. Height<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">2. Height<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span>
 </td>
-<td headers="M" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">76.00</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">6.37</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.52</strong></span></td>
-<td headers="2" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
-<td headers="3" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">76.00</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">6.37</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.52</strong></span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><br></td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">3. Volume</td>
-<td headers="M" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">30.17</span></td>
-<td headers="SD" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">16.44</span></td>
-<td headers="1" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.97</strong></span></td>
-<td headers="2" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.60</strong></span></td>
-<td headers="3" class="gt_row gt_right" style="color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
+<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; text-indent: 5px; font-family: 'Times New Roman'; font-size: 16px;">3. Volume</td>
+<td headers="M" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">30.17</span></td>
+<td headers="SD" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">16.44</span></td>
+<td headers="1" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.97</strong></span></td>
+<td headers="2" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md"><strong>.60</strong></span></td>
+<td headers="3" class="gt_row gt_right" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; color: #000000; font-family: 'Times New Roman'; font-size: 16px;"><span class="gt_from_md">—</span></td>
 </tr>
 </tbody>
 <tfoot class="gt_footnotes"><tr>
@@ -1803,43 +1804,43 @@ place a footnote in a specific cell in the table body.</p>
 <span>    part <span class="op">=</span> <span class="st">"body"</span></span>
 <span>  <span class="op">)</span> </span></code></pre></div>
 <div class="tabwid tabwid_left">
-<style>.cl-7fb9301c{}.cl-7fb29234{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7fb2923e{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7fb2923f{font-family:'Times New Roman';font-size:7.2pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.6pt;}.cl-7fb29248{font-family:'Times New Roman';font-size:12pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7fb29252{font-family:'Times New Roman';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-7fb29253{font-family:'Times New Roman';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7fb52d14{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-7fb52d1e{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-7fb52d1f{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-7fb5474a{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb54754{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb54755{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb5475e{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb5475f{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb54768{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb54769{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb54772{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb5477c{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7fb5477d{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
-<table data-quarto-disable-processing="true" class="table cl-7fb9301c">
+<style>.cl-5c2ed278{}.cl-5c2801be{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5c2801d2{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5c2801d3{font-family:'Times New Roman';font-size:7.2pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.6pt;}.cl-5c2801dc{font-family:'Times New Roman';font-size:12pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5c2801dd{font-family:'Times New Roman';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-5c2801e6{font-family:'Times New Roman';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5c2aaf7c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:3pt;padding-right:3pt;line-height: 2;background-color:transparent;}.cl-5c2aaf86{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:3pt;padding-right:3pt;line-height: 2;background-color:transparent;}.cl-5c2aaf90{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-5c2acc32{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc3c{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc3d{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc46{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc47{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc48{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc50{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc51{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc52{width:1in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c2acc53{width:0.45in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-5c2ed278">
 <thead><tr style="overflow-wrap:break-word;">
-<th class="cl-7fb5474a"><p class="cl-7fb52d14"><span class="cl-7fb29234">Variable</span></p></th>
-<th class="cl-7fb54754"><p class="cl-7fb52d1e"><span class="cl-7fb2923e">M</span></p></th>
-<th class="cl-7fb54754"><p class="cl-7fb52d1e"><span class="cl-7fb2923e">SD</span></p></th>
-<th class="cl-7fb54754"><p class="cl-7fb52d1e"><span class="cl-7fb29234">1</span></p></th>
-<th class="cl-7fb54754"><p class="cl-7fb52d1e"><span class="cl-7fb29234">2</span></p></th>
-<th class="cl-7fb54754"><p class="cl-7fb52d1e"><span class="cl-7fb29234">3</span></p></th>
+<th class="cl-5c2acc32"><p class="cl-5c2aaf7c"><span class="cl-5c2801be">Variable</span></p></th>
+<th class="cl-5c2acc3c"><p class="cl-5c2aaf86"><span class="cl-5c2801d2">M</span></p></th>
+<th class="cl-5c2acc3c"><p class="cl-5c2aaf86"><span class="cl-5c2801d2">SD</span></p></th>
+<th class="cl-5c2acc3c"><p class="cl-5c2aaf86"><span class="cl-5c2801be">1</span></p></th>
+<th class="cl-5c2acc3c"><p class="cl-5c2aaf86"><span class="cl-5c2801be">2</span></p></th>
+<th class="cl-5c2acc3c"><p class="cl-5c2aaf86"><span class="cl-5c2801be">3</span></p></th>
 </tr></thead>
 <tbody>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-7fb54755"><p class="cl-7fb52d14"><span class="cl-7fb29234">1. Girth</span></p></td>
-<td class="cl-7fb5475e"><p class="cl-7fb52d1e"><span class="cl-7fb29234">13.25</span></p></td>
-<td class="cl-7fb5475e"><p class="cl-7fb52d1e"><span class="cl-7fb29234">3.14</span></p></td>
-<td class="cl-7fb5475e"><p class="cl-7fb52d1e"><span class="cl-7fb29234">—</span></p></td>
-<td class="cl-7fb5475e"><p class="cl-7fb52d1e"><span class="cl-7fb29234"></span></p></td>
-<td class="cl-7fb5475e"><p class="cl-7fb52d1e"><span class="cl-7fb29234"></span></p></td>
+<td class="cl-5c2acc3d"><p class="cl-5c2aaf7c"><span class="cl-5c2801be">1. Girth</span></p></td>
+<td class="cl-5c2acc46"><p class="cl-5c2aaf86"><span class="cl-5c2801be">13.25</span></p></td>
+<td class="cl-5c2acc46"><p class="cl-5c2aaf86"><span class="cl-5c2801be">3.14</span></p></td>
+<td class="cl-5c2acc46"><p class="cl-5c2aaf86"><span class="cl-5c2801be">—</span></p></td>
+<td class="cl-5c2acc46"><p class="cl-5c2aaf86"><span class="cl-5c2801be"></span></p></td>
+<td class="cl-5c2acc46"><p class="cl-5c2aaf86"><span class="cl-5c2801be"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-7fb5475f"><p class="cl-7fb52d14"><span class="cl-7fb29234">2. Height</span><span class="cl-7fb2923f">1</span></p></td>
-<td class="cl-7fb54768"><p class="cl-7fb52d1e"><span class="cl-7fb29234">76.00</span></p></td>
-<td class="cl-7fb54768"><p class="cl-7fb52d1e"><span class="cl-7fb29234">6.37</span></p></td>
-<td class="cl-7fb54768"><p class="cl-7fb52d1e"><span class="cl-7fb29248">.52</span></p></td>
-<td class="cl-7fb54768"><p class="cl-7fb52d1e"><span class="cl-7fb29234">—</span></p></td>
-<td class="cl-7fb54768"><p class="cl-7fb52d1e"><span class="cl-7fb29234"></span></p></td>
+<td class="cl-5c2acc47"><p class="cl-5c2aaf7c"><span class="cl-5c2801be">2. Height</span><span class="cl-5c2801d3">1</span></p></td>
+<td class="cl-5c2acc48"><p class="cl-5c2aaf86"><span class="cl-5c2801be">76.00</span></p></td>
+<td class="cl-5c2acc48"><p class="cl-5c2aaf86"><span class="cl-5c2801be">6.37</span></p></td>
+<td class="cl-5c2acc48"><p class="cl-5c2aaf86"><span class="cl-5c2801dc">.52</span></p></td>
+<td class="cl-5c2acc48"><p class="cl-5c2aaf86"><span class="cl-5c2801be">—</span></p></td>
+<td class="cl-5c2acc48"><p class="cl-5c2aaf86"><span class="cl-5c2801be"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-7fb54769"><p class="cl-7fb52d14"><span class="cl-7fb29234">3. Volume</span></p></td>
-<td class="cl-7fb54772"><p class="cl-7fb52d1e"><span class="cl-7fb29234">30.17</span></p></td>
-<td class="cl-7fb54772"><p class="cl-7fb52d1e"><span class="cl-7fb29234">16.44</span></p></td>
-<td class="cl-7fb54772"><p class="cl-7fb52d1e"><span class="cl-7fb29248">.97</span></p></td>
-<td class="cl-7fb54772"><p class="cl-7fb52d1e"><span class="cl-7fb29248">.60</span></p></td>
-<td class="cl-7fb54772"><p class="cl-7fb52d1e"><span class="cl-7fb29234">—</span></p></td>
+<td class="cl-5c2acc50"><p class="cl-5c2aaf7c"><span class="cl-5c2801be">3. Volume</span></p></td>
+<td class="cl-5c2acc51"><p class="cl-5c2aaf86"><span class="cl-5c2801be">30.17</span></p></td>
+<td class="cl-5c2acc51"><p class="cl-5c2aaf86"><span class="cl-5c2801be">16.44</span></p></td>
+<td class="cl-5c2acc51"><p class="cl-5c2aaf86"><span class="cl-5c2801dc">.97</span></p></td>
+<td class="cl-5c2acc51"><p class="cl-5c2aaf86"><span class="cl-5c2801dc">.60</span></p></td>
+<td class="cl-5c2acc51"><p class="cl-5c2aaf86"><span class="cl-5c2801be">—</span></p></td>
 </tr>
 </tbody>
-<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-7fb5477c"><p class="cl-7fb52d1f"><span class="cl-7fb29252">1</span><span class="cl-7fb29253">This is a footnote.</span></p></td></tr></tfoot>
+<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-5c2acc52"><p class="cl-5c2aaf90"><span class="cl-5c2801dd">1</span><span class="cl-5c2801e6">This is a footnote.</span></p></td></tr></tfoot>
 </table>
 </div>
 </div>

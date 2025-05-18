@@ -3,8 +3,9 @@ pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   chisquare: chisquare.html
+  summarize: summarize.html
   tables: tables.html
-last_built: 2025-05-15T05:28Z
+last_built: 2025-05-18T16:22Z
 urls:
   reference: https://wjschne.github.io/apa7/reference
   article: https://wjschne.github.io/apa7/articles
