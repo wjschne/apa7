@@ -8,6 +8,7 @@
 #' @param border_color border color
 #' @param border_width border width in pixels
 #' @param line_spacing spacing between lines
+#' @param horizontal_padding horitonal padding (in pixels)
 #' @name apa_style
 #' @returns object
 #' @export
@@ -24,7 +25,8 @@ apa_style <- function(x,
                       text_color = "black",
                       border_color = "black",
                       border_width = 0.5,
-                      line_spacing = 2) {
+                      line_spacing = 2,
+                      horizontal_padding = 3) {
   UseMethod("apa_style")
 }
 
@@ -36,28 +38,36 @@ apa_style.gt_tbl <- function(x ,
                              text_color = "black",
                              border_color = "black",
                              border_width = 0.5,
-                             line_spacing = 2) {
+                             line_spacing = 2,
+                             horizontal_padding = 3) {
   pd <- (line_spacing - 1) * font_size * 2 / 3
-  d <- x |>
-  gt::opt_table_lines("none") |>
+  k <- nrow(x$`_data`)
+
+  x |>
+    gt::tab_style(cell_borders(style = "solid", sides = c("bottom", "top"),color = border_color, weight = px(border_width)), locations = cells_column_labels()) |>
+    gt::tab_style(style = cell_borders(style = "hidden", sides = "bottom"), locations = cells_body()) |>
     gt::tab_options(
-      table.border.top.style = "solid",
-      table.border.top.color = border_color,
-      table.border.top.width = border_width,
-
-      table_body.border.bottom.style = "solid",
-      table_body.border.bottom.color = border_color,
-      table_body.border.bottom.width = border_width,
-
-      heading.border.bottom.style = "solid",
       heading.border.bottom.color = border_color,
-      heading.border.bottom.width = border_width,
-
-      table_body.border.top.style = "solid",
-      table_body.border.top.color = border_color,
-      table_body.border.top.width = border_width,
-
+      column_labels.border.bottom.color = border_color,
+      column_labels.border.bottom.width = border_width,
+      column_labels.border.top.color = border_color,
+      column_labels.border.top.width = border_width,
+      table.border.bottom.width = 0,
+      table.border.top.width = 0,
+      table_body.border.bottom.width = 0,
+      table_body.border.top.width = 0,
+      table_body.hlines.width = 0,
+      stub.border.width = 0,
+      row_group.border.top.width = 0,
+      heading.border.bottom.width = 0,
+      summary_row.border.width = 0,
+      footnotes.border.bottom.width = 0,
+      row_group.border.bottom.width = 0,
+      source_notes.border.bottom.width = 0,
+      stub_row_group.border.width = 0,
+      grand_summary_row.border.width = 0
     ) |>
+    gt::tab_style(style = gt::cell_borders(sides = "bottom", color = border_color, style = "solid", weight = px(border_width)), locations = cells_body(rows = k)) |>
     gt::opt_table_font(font = family, color = text_color, size = gt::px(font_size * 4 / 3)) |>
     gt::tab_options(data_row.padding = gt::px(pd),
                     heading.padding = gt::px(pd),
@@ -67,14 +77,14 @@ apa_style.gt_tbl <- function(x ,
                     summary_row.padding  = gt::px(pd),
                     grand_summary_row.padding = gt::px(pd),
                     source_notes.padding = gt::px(pd),
-                    data_row.padding.horizontal = gt::px(2),
-                    heading.padding.horizontal = gt::px(2),
-                    column_labels.padding.horizontal = gt::px(2),
-                    footnotes.padding.horizontal = gt::px(2),
-                    row_group.padding.horizontal = gt::px(2),
-                    summary_row.padding.horizontal = gt::px(2),
-                    grand_summary_row.padding.horizontal = gt::px(2),
-                    source_notes.padding.horizontal = gt::px(2),
+                    data_row.padding.horizontal = gt::px(horizontal_padding),
+                    heading.padding.horizontal = gt::px(horizontal_padding),
+                    column_labels.padding.horizontal = gt::px(horizontal_padding),
+                    footnotes.padding.horizontal = gt::px(horizontal_padding),
+                    row_group.padding.horizontal = gt::px(horizontal_padding),
+                    summary_row.padding.horizontal = gt::px(horizontal_padding),
+                    grand_summary_row.padding.horizontal = gt::px(horizontal_padding),
+                    source_notes.padding.horizontal = gt::px(horizontal_padding),
                     ) |>
     gt::sub_missing(missing_text = "")
 }
@@ -87,7 +97,8 @@ apa_style.flextable <- function(x ,
                                 text_color = "black",
                                 border_color = "black",
                                 border_width = 0.5,
-                                line_spacing = 2) {
+                                line_spacing = 2,
+                                horizontal_padding = 3) {
   myborder <- list(color = border_color, width = border_width, style = "solid")
   x |>
     flextable::font(part = "all",fontname = family) |>
@@ -99,7 +110,7 @@ apa_style.flextable <- function(x ,
     flextable::fontsize(part = "all", size = font_size) |>
     flextable::valign(part = "all", valign = "center") |>
     flextable::line_spacing(space = line_spacing, part = "all") |>
-    flextable::padding(padding.top = 0, padding.bottom = 0, part = "all")
+    flextable::padding(padding.top = 0, padding.bottom = 0, padding.left = horizontal_padding, padding.right = horizontal_padding, part = "all")
 
 
 }

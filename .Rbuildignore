@@ -8,3 +8,4 @@
 asdf.*
 _quarto.yml
 ^README\.Rmd$
+math-rendered-by-lua-filter.html

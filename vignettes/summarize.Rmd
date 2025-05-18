@@ -1,0 +1,81 @@
+---
+title: "Summarize Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{summarize}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(apa7)
+library(flextable)
+library(gt)
+library(dplyr)
+library(tidyr)
+```
+
+```{r setup}
+library(apa7)
+library(flextable)
+library(gt)
+library(dplyr)
+library(tidyr)
+```
+
+The flextable and gt packages have many, many options and helper functions. The flextable package's `tabulator`, `summarizor`, and `proc_freq` functions are particularly powerful ways of summarizing and describing data. Functions that automate your descriptive statistics tables for you inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the `apa_style` function will get a flextable or gt table close to APA style. You may need to do some additional styling yourself as well.
+
+Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that flextable and gt can do most of the rest after that. Flextable has a `theme_apa` function that can get things very close to full APA style. That apa7 `apa_style` function provides a little more flexibility. Getting gt to have APA style borders took me a long time to figure out because of the complex rules by which borders overwrite each other. The `apa_style` function saves me from having to figure it all out repeatedly when working with gt tables.
+
+```{r}
+d <- iris %>% 
+  pivot_longer(where(is.numeric), names_to = "Variable") %>% 
+  mutate(Species = forcats::fct_relabel(Species, stringr::str_to_title),
+         Variable = snakecase::to_title_case(Variable)) %>% 
+  summarise(
+    M = mean(value, na.rm = TRUE),
+    SD = sd(value, na.rm = TRUE),
+    n = n(),
+    .by = c(Variable, Species)) %>% 
+    # tabulator(rows = "Variable", columns = "Species") %>% 
+  pivot_longer(c(M, SD,n)) %>% 
+  unite(Species, Species, name) %>% 
+  pivot_wider(names_from = Species) %>% 
+  mutate(across(ends_with("_n"), .fns = as.integer))
+
+
+# Where are the columns that end in _n?
+ats <- match(colnames(d)[endsWith(colnames(d), "_n")], colnames(d))
+
+# Insert break columns after _n variables
+keys <- R.utils::insert(colnames(d), 
+                        ats = ats[-length(ats)] + 1, 
+                        values = paste0("break", 1:2))
+# Flextable
+flextable(d, col_keys = keys) %>% 
+  colformat_double(digits = 2) %>% 
+  separate_header() %>% 
+  empty_blanks() %>% 
+  align(align = "center", part = "all") %>%
+  align(j = 1, align = "left", part = "all") %>% 
+  italic(i = 2, part = "header") %>%
+  set_table_properties(layout = "autofit", width = 1) %>% 
+  apa_style()
+  
+# gt
+gt(d) %>% 
+  gt::fmt_number(decimals = 2, columns = is.double) %>%
+  gt::tab_spanner_delim(delim = "_") %>% 
+  gt::cols_align(align = "center", columns = -1) %>% 
+  gt::tab_style(cell_text(style = "italic"), locations = cells_column_labels(-Variable)) %>% 
+  gt::tab_options(table.width = gt::pct(100)) %>% 
+  apa_style()
+
+
+
+```
+

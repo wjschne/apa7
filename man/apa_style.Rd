@@ -13,7 +13,8 @@ apa_style(
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2
+  line_spacing = 2,
+  horizontal_padding = 3
 )
 
 \method{apa_style}{gt_tbl}(
@@ -23,7 +24,8 @@ apa_style(
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2
+  line_spacing = 2,
+  horizontal_padding = 3
 )
 
 \method{apa_style}{flextable}(
@@ -50,6 +52,8 @@ apa_style(
 \item{border_width}{border width in pixels}
 
 \item{line_spacing}{spacing between lines}
+
+\item{horizontal_padding}{horitonal padding (in pixels)}
 }
 \value{
 object

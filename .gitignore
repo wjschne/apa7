@@ -23,3 +23,4 @@ vignettes/*.pdf
 asdf.qmd
 asdf.*
 inst/doc
+math-rendered-by-lua-filter.html
