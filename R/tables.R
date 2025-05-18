@@ -8,7 +8,7 @@
 #' @param border_color border color
 #' @param border_width border width in pixels
 #' @param line_spacing spacing between lines
-#' @param horizontal_padding horitonal padding (in pixels)
+#' @param horizontal_padding horizontal padding (in pixels)
 #' @name apa_style
 #' @returns object
 #' @export
@@ -44,8 +44,8 @@ apa_style.gt_tbl <- function(x ,
   k <- nrow(x$`_data`)
 
   x |>
-    gt::tab_style(cell_borders(style = "solid", sides = c("bottom", "top"),color = border_color, weight = px(border_width)), locations = cells_column_labels()) |>
-    gt::tab_style(style = cell_borders(style = "hidden", sides = "bottom"), locations = cells_body()) |>
+    gt::tab_style(gt::cell_borders(style = "solid", sides = c("bottom", "top"),color = border_color, weight = gt::px(border_width)), locations = gt::cells_column_labels()) |>
+    gt::tab_style(style = gt::cell_borders(style = "hidden", sides = "bottom"), locations = gt::cells_body()) |>
     gt::tab_options(
       heading.border.bottom.color = border_color,
       column_labels.border.bottom.color = border_color,
@@ -67,7 +67,7 @@ apa_style.gt_tbl <- function(x ,
       stub_row_group.border.width = 0,
       grand_summary_row.border.width = 0
     ) |>
-    gt::tab_style(style = gt::cell_borders(sides = "bottom", color = border_color, style = "solid", weight = px(border_width)), locations = cells_body(rows = k)) |>
+    gt::tab_style(style = gt::cell_borders(sides = "bottom", color = border_color, style = "solid", weight = gt::px(border_width)), locations = gt::cells_body(rows = k)) |>
     gt::opt_table_font(font = family, color = text_color, size = gt::px(font_size * 4 / 3)) |>
     gt::tab_options(data_row.padding = gt::px(pd),
                     heading.padding = gt::px(pd),

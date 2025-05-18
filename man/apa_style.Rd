@@ -35,7 +35,8 @@ apa_style(
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2
+  line_spacing = 2,
+  horizontal_padding = 3
 )
 }
 \arguments{
@@ -53,7 +54,7 @@ apa_style(
 
 \item{line_spacing}{spacing between lines}
 
-\item{horizontal_padding}{horitonal padding (in pixels)}
+\item{horizontal_padding}{horizontal padding (in pixels)}
 }
 \value{
 object

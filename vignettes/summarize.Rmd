@@ -68,11 +68,11 @@ flextable(d, col_keys = keys) %>%
   
 # gt
 gt(d) %>% 
-  gt::fmt_number(decimals = 2, columns = is.double) %>%
-  gt::tab_spanner_delim(delim = "_") %>% 
-  gt::cols_align(align = "center", columns = -1) %>% 
-  gt::tab_style(cell_text(style = "italic"), locations = cells_column_labels(-Variable)) %>% 
-  gt::tab_options(table.width = gt::pct(100)) %>% 
+  fmt_number(decimals = 2, columns = is.double) %>%
+  tab_spanner_delim(delim = "_") %>% 
+  cols_align(align = "center", columns = -1) %>% 
+  tab_style(cell_text(style = "italic"), locations = cells_column_labels(-Variable)) %>% 
+  tab_options(table.width = pct(100)) %>% 
   apa_style()
 
 
