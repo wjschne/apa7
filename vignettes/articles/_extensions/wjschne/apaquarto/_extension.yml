@@ -1,0 +1,178 @@
+title: My Document in APA Style, Seventh Edition
+author: W. Joel Schneider
+version: 5.0.1
+quarto-required: ">=1.4.549"
+contributes:
+  formats:
+    common:
+      execute:
+        echo: false
+      citeproc: false
+      link-citations: true
+      fig-cap-location: top
+      tbl-cap-location: top
+      cap-location: top
+      csl: apa.csl
+      toc: false
+      fig-width: 6.5
+      fig-height: 6.5
+      crossref:
+        subref-labels: alpha A
+      suppress-title-page: false
+      suppress-title-page-number: false
+      suppress-title: false
+      suppress-short-title: false
+      suppress-author: false
+      suppress-affiliation: false
+      suppress-author-note: false
+      suppress-orcid: false
+      suppress-status-change-paragraph: false
+      suppress-disclosures-paragraph: false
+      suppress-credit-statement: false
+      suppress-corresponding-paragraph: false
+      suppress-corresponding-group: false
+      suppress-corresponding-department: false
+      suppress-corresponding-affiliation-name: false
+      suppress-corresponding-address: false
+      suppress-corresponding-city: false
+      suppress-corresponding-region: false
+      suppress-corresponding-postal-code: false
+      suppress-corresponding-email: false
+      suppress-abstract: false
+      suppress-impact-statement: false
+      suppress-keywords: false
+      suppress-title-introduction: false
+      no-ampersand-parenthetical: false
+      language: 
+        citation-last-author-separator: "and"
+        citation-masked-author: "Masked Author"
+        citation-masked-title: "Masked Title"
+        citation-masked-date: "n.d."
+        email: "Email"
+        figure-table-note: "Note"
+        title-block-author-note: "Author Note"
+        title-block-correspondence-note: "Correspondence concerning this article should be addressed to"
+        title-block-role-introduction: "Author roles were classified using the Contributor Role Taxonomy (CRediT; https://credit.niso.org/) as follows:"
+        title-impact-statement: "Impact Statement"
+        references-meta-analysis: "Las referencias marcadas con un asterisco indican estudios incluidos en el metanálisis."
+      filters:
+        # Sets language defaults other than English
+        - at: pre-ast
+          path: apalanguage.lua
+        # Prepare plain markdown tables to be used by crossrefprefix.lua
+        - at: pre-ast
+          path: markdowntable.lua
+        # Give figures and tables appendix prefixes
+        - at: pre-ast
+          path: crossrefprefix.lua
+        # Move figures and tables to end of document
+        - at: pre-ast
+          path: apafloatstoend.lua
+        # Give error message to early versions of apaquarto
+        - at: pre-ast
+          path: apafgtb.lua
+        # Set latex document mode
+        - at: pre-ast
+          path: journalmode.lua
+        # Set latex images to column width by default
+        - at: pre-ast
+          path: apafigurewidthlatex.lua     
+        # Make apa-note an attribute of figure in latex
+        - at: pre-ast
+          path: apanotelatex.lua
+        # Make appendices citable with apx prefix
+        - at: pre-ast
+          path: apaciteappendix.lua
+        # Add a refs div if it was omitted.
+        - at: pre-ast
+          path: apaomitrefsdiv.lua
+        - at: post-ast
+          path: apamasked.lua
+        - at: post-ast
+          path: apatwocolumnlatex.lua
+        - at: pre-quarto
+          path: apaheader.lua
+        - at: pre-quarto
+          path: apastriptitle.lua
+        - at: pre-quarto
+          path: wordcount.lua
+        - at: pre-quarto
+          path: frontmatter.lua
+        - at: pre-quarto
+          path: apaquote.lua
+        - at: pre-quarto
+          path: latexnoindent.lua
+        - at: pre-quarto
+          path: apafigtblappendix.lua
+        - at: post-quarto
+          path: apafloatlatex.lua
+        - at: post-quarto
+          path: apaoneauthoraffiliation.lua
+        - at: post-render
+          path: apaextractfigure.lua
+        - at: post-render
+          path: apanote.lua
+        - at: post-render
+          path: apafloat.lua
+        - at: post-render
+          path: apacaption.lua
+        - at: post-render
+          path: apaafternote.lua
+        - at: post-render
+          path: citeprocr.lua
+        - at: post-render
+          path: apaandcite.lua
+        - at: post-render
+          path: apaappendixlatex.lua
+    native: default
+    html:
+      toc: true
+      toc-location: left
+      anchor-sections: false
+      fig-cap-location: top
+      html-math-method: katex
+      mainfont: Times, Times New Roman, serif
+      grid: 
+        body-width: "7in"
+      css: apa.css
+      theme: 
+        - apa.scss
+      template-partials:
+        - title-block.html
+      knitr: 
+        opts_chunk: 
+          dev: svglite
+    pdf:
+      documentclass: apa7
+      pdf-engine: xelatex
+      suppress-bibliography: false
+      hyperrefoptions: 
+        - linktoc=none
+      block-headings: false
+      template: apatemplate.tex
+      mainfontfallback: Arial
+      template-partials:
+        - doc-class.tex
+        - title.tex
+        - before-body.tex
+        - header.tex
+      classoption: "colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue"
+    docx: 
+      reference-doc: apaquarto.docx
+      filters: 
+        - at: post-quarto
+          path: docxstyler.lua
+        - at: post-render
+          path: docxlinenumber.lua
+      knitr: 
+        opts_chunk: 
+          dev: ragg_png
+    typst:
+      filters: 
+        - at: post-quarto
+          path: typst/formattypst.lua
+      template-partials:
+        - typst/typst-template.typ
+        - typst/typst-show.typ
+      format-resources:
+        - apa.csl

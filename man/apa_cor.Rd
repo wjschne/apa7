@@ -10,6 +10,7 @@ apa_cor(
   p_value = 0.05,
   digits = 2,
   bold_significant = TRUE,
+  star_significant = FALSE,
   significance_note = TRUE,
   output = c("flextable", "gt", "tibble"),
   family = "Times New Roman",
@@ -32,6 +33,8 @@ apa_cor(
 \item{digits}{Number of digits for rounding}
 
 \item{bold_significant}{bold significant correlations}
+
+\item{star_significant}{start significant correlations}
 
 \item{significance_note}{If TRUE, place note at bottom of table that significant correlations are bolded.}
 

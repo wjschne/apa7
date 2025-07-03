@@ -1,22 +1,34 @@
 ---
-title: "Correlation Tables"
-output: rmarkdown::html_vignette
+title: "Correlations"
+knitr:
+  opts_chunk: 
+    collapse: true
+    comment: '#>'
+    dev: "ragg_png"
+format: 
+  html:
+    toc: true
+    html-math-method: katex
 vignette: >
-  %\VignetteIndexEntry{tables}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Correlations}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
-
-```{r setup}
 library(apa7)
 library(dplyr)
+library(flextable)
+```
+
+```{r loading}
+library(apa7)
+library(dplyr)
+library(flextable)
 ```
 
 Some tables, like correlation matrices, can be standardized and automated. Others are uniquely tied to a specific purpose, and no function could anticipate their structure. The apa7 package has a few functions to automate what can be automated and a styling function to make the final styling of a complex table a little easier.
@@ -24,18 +36,23 @@ Some tables, like correlation matrices, can be standardized and automated. Other
 By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/flextable/), with significant correlations bolded.
 
 ```{r}
+#| label: tbl-treesflex
+#| tbl-cap: Correlation table using flextable via `apa_cor`
+#| message: false
 trees |> 
-  apa_cor()
+  apa_cor(star_significant = TRUE)
 ```
 
 If you prefer to work with [gt tables](https://gt.rstudio.com/), set `output` function to `gt`.
 
 ```{r}
+#| label: tbl-treesgt
+#| tbl-cap: Correlation table using gt via `apa_cor`
 trees |> 
-  apa_cor(output = "gt") 
+  apa_cor(output = "gt", star_significant = T) 
 ```
 
-If you want to use some other table package, you can output a tibble instead, and then process the table however you want.
+If you want to use some other table package, you can output a tibble instead and then process the table however you want. 
 
 ```{r}
 options(knitr.kable.NA = '')
@@ -52,6 +69,7 @@ Your styling options include:
 * `p_value` Significance value. Default: `.05`
 * `digits` Number of digits for rounding. Default: `2`
 * `bold_significant` Whether to bold significant correlations. Default:  `TRUE`
+* `star_significant` Whether to star significant correlations. Default: `FALSE`
 * `significance_note` Whether note about bolding correlations appears. Overridden by a custom note. Also, the automatic note will not appear if no correlations are significant. Default:  `TRUE`
 * `output` Options are `flextable`, `gt` or `tibble`. Default: `flextable`
 * `family` Font family (typeface). Default: `Times New Roman`
@@ -66,19 +84,19 @@ For example,
 
 ```{r}
 # List of descriptive functions
-my_summaries <- list(M = mean,
+my_summaries <- list(
+                     n = function(x) sum(!is.na(x)),
+                     M = mean,
                      SD = sd,
-                     Skew = psych::skew,
-                     `Kurt.` = psych::kurtosi,
-                     n = function(x) sum(!is.na(x)))
+                     Skewness = psych::skew,
+                     Kurtosis = psych::kurtosi)
 trees |> 
-  apa_cor(note = "*M* = Mean, *SD* = Standard Deviation, *Skew* =  Skewness, *Kurt.* =  Kurtosis",
-          p_value = .001, 
+  apa_cor(p_value = .001, 
           digits = 2,
-          bold_significant = FALSE, 
-          significance_note = FALSE,
+          star_significant = TRUE, 
+          significance_note = TRUE,
           summary_functions = my_summaries,
-          output = "gt", 
+          output = "flextable", 
           family = "Arial", 
           font_size = 10, 
           text_color = "darkred",
@@ -101,12 +119,12 @@ x <- apa_cor(trees,
 The styling options for `apa_cor` are minimal, but flexable and gt tables allow for all kinds of customization. Just place whatever code from flextable or gt you want after `apa_cor`. For example, gt tables usually span 100% of the width in a space. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
 
 ```{r}
-apa_cor(trees, output = "gt", significance_note = F) |> 
+apa_cor(trees, output = "gt", significance_note = T) |> 
   gt::tab_options(table.width = gt::pct(50), 
                   table.align = "left") |> 
   gt::tab_footnote("This is a footnote.", 
                    locations = gt::cells_body(columns = "Variable", 
-                                              rows = 2))
+                                              rows = 2)) 
 ```
 
 Here I do the same with flextable:

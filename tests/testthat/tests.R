@@ -19,4 +19,7 @@ test_that("apa_p", {
   expect_equal(apa_p(0.0999, FALSE), ".10")
   expect_equal(apa_p(0.0999, plain = T), "p = .10")
   expect_equal(apa_p(0, plain = T), "p < .001")
+  expect_equal(apa_p(c(.0001, .001,.01,.5,.99, .995), inline = F),
+               c("<.001", ".001",  ".01",   ".50",   ".99",   ">.99"))
+
 })

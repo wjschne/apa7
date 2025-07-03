@@ -1,0 +1,139 @@
+---
+title: "Summarize Data"
+knitr:
+  opts_chunk: 
+    collapse: true
+    comment: '#>'
+    dev: "ragg_png"
+format: 
+  html:
+    toc: true
+    html-math-method: katex
+vignette: >
+  %\VignetteIndexEntry{summarize}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| label: presetup
+#| include: false
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(apa7)
+library(flextable)
+library(gt)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(purrr)
+```
+
+```{r setup}
+library(apa7)
+library(flextable)
+library(gt)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(purrr)
+```
+
+The flextable and gt packages have many, many options and helper functions. The `tabulator`, `summarizor`, and `proc_freq` functions from the flextable package are particularly powerful ways of summarizing and describing data. Functions that automate your descriptive statistics tables for you (e.g., the amazing [gtsummary package](https://www.danieldsjoberg.com/gtsummary/index.html)) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the `apa_style` function will get a flextable or gt table close to APA style. You may need to do some additional styling with flextable or gt as well.
+
+Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that flextable and gt can do most of the rest after that. 
+
+# Data Setup
+
+```{r dataprocessing}
+d <- diamonds %>% 
+  select(cut, price, carat, depth, table) %>% 
+  arrange(cut) %>% 
+  rename_with(str_to_title) %>% 
+  pivot_longer(where(is.numeric), names_to = "Variable") %>% 
+  summarise(
+    M = mean(value, na.rm = TRUE),
+    SD = sd(value, na.rm = TRUE),
+    n = n(),
+    .by = c(Variable, Cut)) %>% 
+  pivot_longer(c(M, SD)) %>% 
+  unite(Variable, Variable, name) %>%
+  pivot_wider(names_from = Variable) 
+```
+
+
+
+# Flextable
+
+The flextable package has a `theme_apa` function that can get things very close to full APA style. The apa7 `apa_style` function provides a little more flexibility with respect to fonts, colors, and border widths. 
+
+To get flextable to have small breaks in the header, a little extra work is needed to insert extra blank columns, but the results are really nice.
+
+```{r}
+#| label: tbl-flextable
+#| tbl-cap: Price, Carat, Depth, Table Using Flextable
+
+# Where are the columns that end in _n?
+blank_column <- dplyr::ends_with("_SD", vars = colnames(d))
+n_names <- colnames(d)[blank_column]
+
+# Remove last break
+blank_column <- blank_column[-length(blank_column)]
+
+# Blank column header names
+blank_names <- paste0("apabreak", seq_along(blank_column))
+
+# Insert break columns after _n variables
+keys <- R.utils::insert(colnames(d), 
+                        ats = blank_column + 1, 
+                        values = blank_names)
+
+
+# Table
+d %>% 
+  flextable(col_keys = keys) %>% 
+  colformat_double(digits = 2) %>% 
+  separate_header() %>% 
+  align(align = "center", part = "header") %>%
+  align(j = 1, align = "left", part = "all") %>%
+  italic(i = 2, part = "header") %>%
+  italic(j = "n", part = "header") %>%
+  mk_par(j = blank_names, part = "header", value = as_paragraph(" ")) %>% 
+  flextable::colformat_double(j = c("Price_M", "Price_SD"), 
+                              prefix = "$", 
+                              digits = 2) %>% 
+  apa_style(horizontal_padding = 8) %>% 
+  valign(j = 1:2, valign = "bottom", part = "header")
+
+```
+
+
+# gt
+
+Getting gt to have APA style borders took me a long time to figure out because of the complex rules by which borders overwrite each other. The `apa_style` function saves me from having to figure it all out repeatedly when working with gt tables.
+
+
+
+```{r}
+#| label: tbl-gt
+#| tbl-cap: Price, Carat, Depth, Table Using gt
+gt(d) %>%
+  fmt_number(decimals = 2, columns = is.double) %>%
+  fmt_number(columns = is.integer, decimals = 0) %>%
+  fmt_currency(columns = contains("Price")) %>% 
+  tab_spanner_delim(delim = "_") %>%
+  cols_align(align = "center", columns = -1) %>%
+  cols_align(align = "left", columns = "Cut")  %>%
+  tab_style(cell_text(style = "italic"), 
+            locations = cells_column_labels(-Cut)) %>%
+  tab_style(cell_text(align = "right"), 
+            locations = cells_body(-Cut)) %>%
+  apa_style(horizontal_padding = 10) %>% 
+  tab_options(table.align = "left")
+  
+```
+

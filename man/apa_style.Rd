@@ -14,7 +14,10 @@ apa_style(
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
-  horizontal_padding = 3
+  horizontal_padding = 3,
+  table_align = "left",
+  layout = "autofit",
+  table_width = 0
 )
 
 \method{apa_style}{gt_tbl}(
@@ -36,7 +39,10 @@ apa_style(
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
-  horizontal_padding = 3
+  horizontal_padding = 3,
+  table_align = "left",
+  layout = "autofit",
+  table_width = 0
 )
 }
 \arguments{

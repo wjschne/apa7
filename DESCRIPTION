@@ -44,3 +44,4 @@ Depends:
     R (>= 4.1.0)
 VignetteBuilder: knitr
 Language: en-US
+Config/Needs/website: quarto

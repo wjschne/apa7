@@ -2,9 +2,12 @@
 
 S3method(apa_style,flextable)
 S3method(apa_style,gt_tbl)
+export(add_break_columns)
 export(apa_chisq)
 export(apa_cor)
+export(apa_flextable)
 export(apa_p)
 export(apa_style)
 export(install_apaquarto)
+export(pretty_widths)
 importFrom(rlang,.data)

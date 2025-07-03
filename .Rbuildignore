@@ -9,3 +9,6 @@ asdf.*
 _quarto.yml
 ^README\.Rmd$
 math-rendered-by-lua-filter.html
+^vignettes/articles/\.quarto$
+^vignettes/articles/*_files$
+^vignettes/articles$
