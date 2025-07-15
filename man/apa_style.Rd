@@ -8,7 +8,7 @@
 \usage{
 apa_style(
   x,
-  family = "Times New Roman",
+  font_family = NULL,
   font_size = 12,
   text_color = "black",
   border_color = "black",
@@ -22,7 +22,7 @@ apa_style(
 
 \method{apa_style}{gt_tbl}(
   x,
-  family = "Times New Roman",
+  font_family = NULL,
   font_size = 12,
   text_color = "black",
   border_color = "black",
@@ -33,7 +33,7 @@ apa_style(
 
 \method{apa_style}{flextable}(
   x,
-  family = "Times New Roman",
+  font_family = NULL,
   font_size = 12,
   text_color = "black",
   border_color = "black",
@@ -48,7 +48,7 @@ apa_style(
 \arguments{
 \item{x}{object}
 
-\item{family}{font family}
+\item{font_family}{font family}
 
 \item{font_size}{font size}
 

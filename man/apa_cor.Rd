@@ -7,18 +7,19 @@
 apa_cor(
   data,
   note = NULL,
-  p_value = 0.05,
+  p_value = c(0.05, 0.01, 0.001),
   digits = 2,
   bold_significant = TRUE,
   star_significant = FALSE,
   significance_note = TRUE,
   output = c("flextable", "gt", "tibble"),
-  family = "Times New Roman",
+  font_family = NULL,
   font_size = 12,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
+  keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   ...
 )
@@ -40,7 +41,7 @@ apa_cor(
 
 \item{output}{output type. Can be "flextable" "gt" or "tibble"}
 
-\item{family}{font family}
+\item{font_family}{font family}
 
 \item{font_size}{font size}
 
@@ -51,6 +52,8 @@ apa_cor(
 \item{border_width}{border width in pixels}
 
 \item{line_spacing}{spacing between lines}
+
+\item{keep_empty_star_columns}{Keep remove empty star columns (Default: \code{TRUE})}
 
 \item{summary_functions}{A named list of functions that summarize data columns (e.g., mean, sd)}
 

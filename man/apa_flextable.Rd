@@ -9,23 +9,37 @@ apa_flextable(
   row_title_column = NULL,
   row_title_prefix = "",
   row_title_sep = " ",
+  row_title_align = "center",
   row_title_border = list(color = "gray20", style = "solid", width = 1),
   col_keys = names(data),
   cwidth = 0.75,
   cheight = 0.25,
+  apastyle = TRUE,
   ...
 )
 }
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{...}{arguments passed to flextable::flextable}
+\item{row_title_column}{quoted column name to group rows}
 
-\item{column}{quoted column name to group rows}
+\item{row_title_prefix}{text to be added to each title}
 
-\item{prefix}{to be added to each title}
+\item{row_title_sep}{separator for prefix}
 
-\item{sep}{separator for prefix}
+\item{row_title_align}{alignment of row title ("left", "center", "right")}
+
+\item{row_title_border}{list of flextable styles}
+
+\item{col_keys}{column keys passed to flextable (defaults data column names)}
+
+\item{cwidth}{initial cell width in inches}
+
+\item{cheight}{initial cell height in inches}
+
+\item{...}{arguments passed to \code{apa_style}}
+
+\item{apa_style}{apply \code{apa_style} function}
 }
 \value{
 flextable

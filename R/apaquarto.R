@@ -41,7 +41,7 @@ install_apaquarto <- function(make_project = TRUE) {
 
 }
 
-apa_template <- function(font_family = "Times New Roman", paper_size = c("us-letter", "a4")) {
+apa_template <- function(font_family = the$font_family, paper_size = c("us-letter", "a4")) {
   paper_size <- match.arg(paper_size, c("us-letter", "a4"))
   paper_size
 }

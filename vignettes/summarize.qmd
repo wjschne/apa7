@@ -18,10 +18,6 @@ vignette: >
 ```{r}
 #| label: presetup
 #| include: false
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
 library(apa7)
 library(flextable)
 library(gt)

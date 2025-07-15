@@ -1,10 +1,13 @@
 ---
 title: "Correlations"
+crossref: 
+  title-delim: "."
 knitr:
   opts_chunk: 
     collapse: true
     comment: '#>'
     dev: "ragg_png"
+    cache: false
 format: 
   html:
     toc: true
@@ -16,19 +19,13 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
 library(apa7)
 library(dplyr)
 library(flextable)
 ```
 
 ```{r loading}
-library(apa7)
-library(dplyr)
-library(flextable)
+<<setup>>
 ```
 
 Some tables, like correlation matrices, can be standardized and automated. Others are uniquely tied to a specific purpose, and no function could anticipate their structure. The apa7 package has a few functions to automate what can be automated and a styling function to make the final styling of a complex table a little easier.
@@ -40,8 +37,19 @@ By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/fle
 #| tbl-cap: Correlation table using flextable via `apa_cor`
 #| message: false
 trees |> 
+  apa_cor()
+```
+
+Significant correlations can be starred instead.
+
+```{r}
+#| label: tbl-stars
+#| tbl-cap: Starring significant correlations
+#| message: false
+trees |> 
   apa_cor(star_significant = TRUE)
 ```
+
 
 If you prefer to work with [gt tables](https://gt.rstudio.com/), set `output` function to `gt`.
 
@@ -49,12 +57,14 @@ If you prefer to work with [gt tables](https://gt.rstudio.com/), set `output` fu
 #| label: tbl-treesgt
 #| tbl-cap: Correlation table using gt via `apa_cor`
 trees |> 
-  apa_cor(output = "gt", star_significant = T) 
+  apa_cor(output = "gt") 
 ```
 
 If you want to use some other table package, you can output a tibble instead and then process the table however you want. 
 
 ```{r}
+#| label: tbl-treeskable
+#| tbl-cap: Correlation table using `kable` via `apa_cor`
 options(knitr.kable.NA = '')
 trees |> 
   apa_cor(output = "tibble") |> 
@@ -82,7 +92,7 @@ Your styling options include:
 
 For example, 
 
-```{r}
+```{r altstyle}
 # List of descriptive functions
 my_summaries <- list(
                      n = function(x) sum(!is.na(x)),
@@ -97,7 +107,7 @@ trees |>
           significance_note = TRUE,
           summary_functions = my_summaries,
           output = "flextable", 
-          family = "Arial", 
+          font_family = "Arial", 
           font_size = 10, 
           text_color = "darkred",
           border_color = "royalblue4", 
@@ -105,11 +115,11 @@ trees |>
           line_spacing = 2)
 ```
 
-To remove summary statistics entirely, set `summary_functions` to `NULL`.
+To remove summary statistics entirely, set `summary_functions` to `NA` or `NULL`.
 
-```{r}
+```{r nosummary}
 x <- apa_cor(trees, 
-        summary_functions = NULL, 
+        summary_functions = NA, 
         bold_significant = FALSE, output = "gt") 
   
 ```
@@ -118,27 +128,31 @@ x <- apa_cor(trees,
 
 The styling options for `apa_cor` are minimal, but flexable and gt tables allow for all kinds of customization. Just place whatever code from flextable or gt you want after `apa_cor`. For example, gt tables usually span 100% of the width in a space. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
 
-```{r}
-apa_cor(trees, output = "gt", significance_note = T) |> 
+```{r altgt}
+apa_cor(trees, 
+        output = "gt", 
+        significance_note = T, ) |> 
   gt::tab_options(table.width = gt::pct(50), 
                   table.align = "left") |> 
   gt::tab_footnote("This is a footnote.", 
-                   locations = gt::cells_body(columns = "Variable", 
-                                              rows = 2)) 
+                   locations = gt::cells_body(
+                     columns = "Variable", 
+                     rows = 2)) 
 ```
 
 Here I do the same with flextable:
 
-```{r}
-apa_cor(trees, significance_note = F) |>
-  flextable::set_table_properties(align = "left") |>
-  flextable::width(j = c("Variable", "M", "SD", "1", "2", "3"), width = c(1, .45, .45, .45, .45, .45)) |> 
+```{r altflextable}
+apa_cor(trees) |>
   flextable::footnote(
     i = 2,
     j = "Variable",
     value = flextable::as_paragraph("This is a footnote."),
     part = "body"
-  ) 
+  ) |>
+  flextable::set_table_properties(
+    width = .5, 
+    align = "left")
 
 ```
 

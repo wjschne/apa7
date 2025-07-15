@@ -44,7 +44,6 @@ local function apanote(elem)
 
         local cnt = 0
         for v in string.gmatch(apanoteparas..'","', '(.-)%",%"') do
-          print(v)
           local apanote = pandoc.Div({})
           apanote.attributes['custom-style'] = 'FigureNote'
           apanote.classes:extend({"FigureNote"})

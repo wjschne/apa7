@@ -1,6 +1,6 @@
 Package: apa7
 Title: Write Documents in APA Style 7th Edition
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
@@ -39,9 +39,12 @@ Imports:
     tibble,
     tidyr,
     utils,
-    rlang
+    rlang,
+    parameters,
+    performance,
+    S7
 Depends: 
     R (>= 4.1.0)
-VignetteBuilder: knitr
+VignetteBuilder: knitr, quarto
 Language: en-US
 Config/Needs/website: quarto

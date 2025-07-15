@@ -4,7 +4,7 @@
 \alias{apa_p}
 \title{p-value in APA format}
 \usage{
-apa_p(p, inline = TRUE, plain = FALSE)
+apa_p(p, inline = FALSE, plain = FALSE, min_digits = 2, max_digits = 3)
 }
 \arguments{
 \item{p}{probability}
@@ -30,4 +30,12 @@ apa_p(.22)
 apa_p(.994)
 # Values above .995 are >.99
 apa_p(.999)
+# Rounding to 3 digits
+apa_p(.2341, min_digits = 3)
+apa_p(.0123, min_digits = 3)
+apa_p(.00123, min_digits = 3)
+apa_p(.000123, min_digits = 3)
+apa_p(.991, min_digits = 3)
+apa_p(.9991, min_digits = 3)
+apa_p(.9995, min_digits = 3)
 }

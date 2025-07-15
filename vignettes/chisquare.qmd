@@ -1,36 +1,37 @@
 ---
 title: "Contingency Tables"
-output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{chisquare}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Contingency Tables}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+```{r}
+#| label: setup
+#| include: false
 library(apa7)
 library(dplyr)
 library(flextable)
 ```
 
-```{r setup}
-library(apa7)
-library(dplyr)
-library(flextable)
+
+```{r}
+#| label: import
+<<setup>>
 d <- mtcars |> 
   select(Gears = gear, Transmission = am) |> 
   mutate(Transmission = factor(Transmission, labels = c("Automatic", "Manual")))
-  
 ```
+
 
 The default output of the `apa_chisq` function is a contingency table with a chi-square test of independence in the table note. The output is a flextable, which can be modified with flextable commands.
 
 ```{r}
-apa_chisq(d)
+apa_chisq(d) 
 ```
 
 The table can be styled in many ways:
@@ -43,7 +44,7 @@ apa_chisq(
   text_color = "darkred",
   border_width = 2,
   border_color = "gray",
-  family = "Arial"
+  font_family = "Arial"
 )
 ```
 
@@ -66,7 +67,7 @@ There are a lot of options out there. The flextable package has the `proc_freq` 
 mtcars %>% 
   proc_freq(row = "gear", 
             col = "vs")  %>%
-  flextable::theme_apa()
+  theme_apa()
 ```
 
 These can be turned off selectively:
@@ -78,7 +79,7 @@ mtcars %>%
             include.row_percent = FALSE, 
             include.column_percent = FALSE, 
             include.table_percent = FALSE)  %>%
-  flextable::theme_apa() 
+  apa_style(table_width = .5) 
 ```
 
 

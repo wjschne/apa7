@@ -7,7 +7,7 @@
 apa_chisq(
   x,
   note = NULL,
-  family = "Times New Roman",
+  font_family = NULL,
   font_size = 12,
   text_color = "black",
   line_spacing = 2,
@@ -21,7 +21,7 @@ apa_chisq(
 
 \item{note}{Custom note (overrides automatic note.)}
 
-\item{family}{font family}
+\item{font_family}{font family}
 
 \item{font_size}{font size}
 
