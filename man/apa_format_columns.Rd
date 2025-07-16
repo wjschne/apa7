@@ -9,7 +9,10 @@ apa_format_columns(
   formatter = NULL,
   columns = NULL,
   rename_headers = TRUE,
-  latex_headers = FALSE
+  latex_headers = FALSE,
+  format_separated_headers = TRUE,
+  sep = "_",
+  accuracy = NULL
 )
 }
 \arguments{
@@ -33,6 +36,5 @@ Format data columns
 lm(mpg ~ cyl + wt, data = mtcars) |>
   parameters::parameters() |>
   apa_format_columns() |>
-  apa_flextable() |>
-  colformat_md(part = "header")
+  apa_flextable()
 }

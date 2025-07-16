@@ -9,6 +9,8 @@ apa7_defaults(
   font_family = NULL,
   intercept_text = NULL,
   parameter_formatter = NULL,
+  number_formatter = NULL,
+  trim_leading_zero = NULL,
   reset = FALSE
 )
 }

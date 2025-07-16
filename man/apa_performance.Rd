@@ -32,5 +32,5 @@ format model performance metrics in APA style
 lm(mpg ~ cyl + wt, data = mtcars) |>
    apa_performance() |>
    apa_flextable() |>
-   colformat_md(part = "all")
+   ftExtra::colformat_md(part = "all")
 }

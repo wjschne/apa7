@@ -29,5 +29,5 @@ m1 <- lm(mpg ~ cyl, data = mtcars)
 m2 <- lm(mpg ~ cyl + wt, data = mtcars)
 apa_performance_comparison(list(`Model 1` =m1, `Model 3` =m2)) |>
    apa_flextable() |>
-   colformat_md(part = "all")
+   ftExtra::colformat_md(part = "all")
 }

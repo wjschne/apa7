@@ -18,6 +18,10 @@ add_star_column(
 \item{...}{column names or tidyselect function}
 
 \item{superscript}{make stars superscript}
+
+\item{star}{character to use for stars (default: "\\*")}
+
+\item{star_replace}{character to replace stars with (default: "\\\\*")}
 }
 \value{
 data.frame or tibble

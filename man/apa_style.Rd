@@ -17,7 +17,10 @@ apa_style(
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
-  table_width = 0
+  table_width = 0,
+  markdown = TRUE,
+  markdown_header = markdown,
+  markdown_body = markdown
 )
 
 \method{apa_style}{gt_tbl}(
@@ -28,7 +31,10 @@ apa_style(
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
-  horizontal_padding = 3
+  horizontal_padding = 3,
+  table_align = "left",
+  layout = "autofit",
+  table_width = 0
 )
 
 \method{apa_style}{flextable}(
@@ -42,7 +48,10 @@ apa_style(
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
-  table_width = 0
+  table_width = 0,
+  markdown = TRUE,
+  markdown_header = markdown,
+  markdown_body = markdown
 )
 }
 \arguments{
@@ -61,6 +70,14 @@ apa_style(
 \item{line_spacing}{spacing between lines}
 
 \item{horizontal_padding}{horizontal padding (in pixels)}
+
+\item{markdown}{apply markdown formatting to header and body}
+
+\item{markdown_header}{apply markdown formatting to header}
+
+\item{mardown_body}{apply markdown formatting to body}
+
+\item{markdown_footter}{apply markdown formatting to footer}
 }
 \value{
 object

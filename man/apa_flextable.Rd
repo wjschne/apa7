@@ -14,7 +14,21 @@ apa_flextable(
   col_keys = names(data),
   cwidth = 0.75,
   cheight = 0.25,
+  separate_headers = TRUE,
   apastyle = TRUE,
+  font_family = NULL,
+  font_size = 12,
+  text_color = "black",
+  border_color = "black",
+  border_width = 0.5,
+  line_spacing = 2,
+  horizontal_padding = 3,
+  table_align = "left",
+  layout = "autofit",
+  table_width = 1,
+  markdown = TRUE,
+  markdown_header = markdown,
+  markdown_body = markdown,
   ...
 )
 }
@@ -37,9 +51,9 @@ apa_flextable(
 
 \item{cheight}{initial cell height in inches}
 
-\item{...}{arguments passed to \code{apa_style}}
+\item{apastyle}{apply \code{apa_style} function (default: \code{TRUE})}
 
-\item{apa_style}{apply \code{apa_style} function}
+\item{...}{arguments passed to \code{apa_style}}
 }
 \value{
 flextable

@@ -16,8 +16,7 @@ apa_parameters(
 
 \method{apa_parameters}{lm}(
   fit,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t",
-    "df_error", "p"),
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
   starred = NA,
   bolded = NA,
   column_formatter = NULL
@@ -25,7 +24,9 @@ apa_parameters(
 
 \method{apa_parameters}{list}(
   fit,
-  predictor_parameters = c("Coefficient", "SE", "Std_Coefficient"),
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
+  starred = NA,
+  bolded = NA,
   column_formatter = NULL
 )
 }
@@ -37,6 +38,8 @@ apa_parameters(
 \item{starred}{columns to star with significant p_values}
 
 \item{bolded}{columns to bold, if significant}
+
+\item{column_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
 }
 \value{
 tibble
@@ -48,5 +51,5 @@ format model parameters in APA style
 lm(mpg ~ cyl + wt, data = mtcars) |>
    apa_parameters() |>
    apa_flextable() |>
-   colformat_md(part = "all")
+   ftExtra::colformat_md(part = "all")
 }
