@@ -43,7 +43,9 @@ Imports:
     rlang,
     parameters,
     performance,
-    S7
+    S7,
+    glue,
+    zip
 Depends: 
     R (>= 4.1.0)
 VignetteBuilder: knitr, quarto

@@ -9,10 +9,13 @@ parameter_formatter(
   accuracy = NULL,
   intercept_text = NULL,
   starred_columns = character(0),
-  variable_labels = character(0)
+  variable_labels = character(0),
+  custom_columns = NULL
 )
 }
 \arguments{
+\item{.data}{list of \code{apa_column} objects}
+
 \item{accuracy}{numeric (passed to scales::number)}
 
 \item{intercept_text}{describe intercept}
@@ -20,6 +23,8 @@ parameter_formatter(
 \item{starred_columns}{which columns get p-value stars}
 
 \item{variable_labels}{named vector of variable names (with vector names as labels). For example, c(\verb{Parental Income} = "parental_income", \verb{Number of Siblings} = "n_siblings")}
+
+\item{custom_columns}{named list of apa_columns to add or replace existing columns}
 }
 \value{
 parameter_formatter
@@ -27,8 +32,26 @@ parameter_formatter
 \description{
 Create a set of column formats
 }
+\section{Slots}{
+
+\describe{
+\item{\code{get_column_names}}{getter for column names}
+
+\item{\code{get_headers}}{getter for column headers}
+
+\item{\code{get_latex}}{getter for column latex headers}
+
+\item{\code{get_formatters}}{getter for column formatters}
+
+\item{\code{get_header_rename}}{getter for column names with headers as names}
+
+\item{\code{get_header_rename_latex}}{getter for column names with latex headers as names}
+
+\item{\code{get_tibble}}{getter for tibble with column names, headers, latex headers, and formatters}
+}}
+
 \examples{
 my_formatter <- parameter_formatter()
-my_formatter@Coefficient@formatter <- \(x) round(x, 2)
-my_formatter@Coefficient@formatter(2.214)
+my_formatter$Coefficient@formatter <- \(x) round(x, 2)
+my_formatter$Coefficient@formatter(2.214)
 }

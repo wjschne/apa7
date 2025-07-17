@@ -3,6 +3,8 @@
 #' @param p probability
 #' @param inline If TRUE (default), returns statistic (e.g.,e p = .04), otherwise just the number (e.g., .04)
 #' @param plain Outputs plain text compatible with latex if TRUE, otherwise defaults to  markdown
+#' @param min_digits minimum number of digits to round to. Default is 2.
+#' @param max_digits maximum number of digits to round to. Default is 3.
 #'
 #' @return character vector
 #' @export
@@ -36,7 +38,7 @@ apa_p <- function(p,
 
   if (is.character(p)) {
     p <- stringr::str_trim(p)
-    less_than <- str_detect(p, "<")
+    less_than <- stringr::str_detect(p, "<")
     p <- stringr::str_remove(p, "^<") |> as.numeric()
     p[less_than] <- 10 ^ (-max_digits - 1)
   }
@@ -114,8 +116,8 @@ hanging_indent <- function(
   stringr::str_replace_all(x, "\u2007", "\u2057") |>
     stringr::str_wrap(width = width,
                       whitespace_only = whitespace_only) |>
-    str_replace_all("\n", paste0(newline, indent_chr)) |>
-    str_replace_all("\u2057", "\u2007")
+    stringr::str_replace_all("\n", paste0(newline, indent_chr)) |>
+    stringr::str_replace_all("\u2057", "\u2007")
 
 
 }
@@ -164,6 +166,7 @@ num_pad <- function(x,
 #' @param center text on which to align text. Center on decimal by default, but can be any text.
 #' @param format_integers If TRUE, integers will be formatted with digits
 #' @param side side on which to make text of equal width
+#' @param NA_value value to replace NA
 #' @param ... additional arguments passed to `signs::signs()`
 #'
 #' @returns character vector
@@ -237,6 +240,11 @@ align_chr <- function(
                      rep("", length(xx)))
 
     middle[is.na(xx)] <- ""
+    if (is.character(x)) {
+      middle[!nzchar(left_x)] <- ""
+      middle[!nzchar(right_x)] <- ""
+    }
+
 
 
     xx <- paste0(left_x,
@@ -289,7 +297,8 @@ p2stars <- function(p,
 #' Surrounds text with tags unless empty
 #'
 #' @param x character vector
-#' @param fence character vector
+#' @param tag opening tag, e.g., `<span>`
+#' @param right_tag closing tag, e.g., `</span>`. Defaults to the same value as the opening tag.
 #'
 #' @returns character vector
 #' @export
@@ -514,16 +523,46 @@ the$columns <- list(
     latex = "$\\eta^2$",
     formatter = the$trim_leading_zero
   ),
+    Eta2_partial = apa_column(
+    name = "Eta2_partial",
+    header = "*&eta;*^2^",
+    latex = "$\\eta^2$",
+    formatter = the$trim_leading_zero
+  ),
   `F` = apa_column(
     name = "F",
     header = "*F*",
     latex = "$F$",
     formatter = the$number_formatter
   ),
+  m = apa_column(
+    name = "m",
+    header = "*m*",
+    latex = "$m$",
+    formatter = the$number_formatter
+  ),
   M = apa_column(
     name = "M",
     header = "*M*",
     latex = "$M$",
+    formatter = the$number_formatter
+  ),
+  Mean = apa_column(
+    name = "Mean",
+    header = "*Mean*",
+    latex = "$Mean$",
+    formatter = the$number_formatter
+  ),
+  n = apa_column(
+    name = "n",
+    header = "*n*",
+    latex = "$n$",
+    formatter = the$number_formatter
+  ),
+  N = apa_column(
+    name = "N",
+    header = "*N*",
+    latex = "$N$",
     formatter = the$number_formatter
   ),
   omega = apa_column(
@@ -575,6 +614,12 @@ the$columns <- list(
     latex = "$RMSE$",
     formatter = the$number_formatter
   ),
+  s = apa_column(
+    name = "s",
+    header = "*s*",
+    latex = "$s$",
+    formatter = the$number_formatter
+  ),
   SD = apa_column(
     name = "SD",
     header = "*SD*",
@@ -609,19 +654,27 @@ the$columns <- list(
 
 # apa_parameter_formatter ----
 #' Create a set of column formats
-#'
+#' @param .data list of `apa_column` objects
 #' @param accuracy numeric (passed to scales::number)
 #' @param intercept_text describe intercept
 #' @param starred_columns which columns get p-value stars
 #' @param variable_labels named vector of variable names (with vector names as labels). For example, c(`Parental Income` = "parental_income", `Number of Siblings` = "n_siblings")
+#' @param custom_columns named list of apa_columns to add or replace existing columns
+#' @slot get_column_names getter for column names
+#' @slot get_headers getter for column headers
+#' @slot get_latex getter for column latex headers
+#' @slot get_formatters getter for column formatters
+#' @slot get_header_rename getter for column names with headers as names
+#' @slot get_header_rename_latex getter for column names with latex headers as names
+#' @slot get_tibble getter for tibble with column names, headers, latex headers, and formatters
 #'
 #' @returns parameter_formatter
 #' @export
 #'
 #' @examples
 #' my_formatter <- parameter_formatter()
-#' my_formatter@Coefficient@formatter <- \(x) round(x, 2)
-#' my_formatter@Coefficient@formatter(2.214)
+#' my_formatter$Coefficient@formatter <- \(x) round(x, 2)
+#' my_formatter$Coefficient@formatter(2.214)
 parameter_formatter <- new_class(
   name = "parameter_formatter",
   parent = class_list,
@@ -681,7 +734,8 @@ parameter_formatter <- new_class(
     accuracy = NULL,
     intercept_text = NULL,
     starred_columns = character(0),
-    variable_labels = character(0)
+    variable_labels = character(0),
+    custom_columns = NULL
   ) {
     if (is.null(.data)) .data <- the$columns
     if (is.null(accuracy)) accuracy <- the$accuracy
@@ -696,6 +750,16 @@ parameter_formatter <- new_class(
       }
 
     }
+
+    if (!is.null(custom_columns)) {
+      if (is.null(names(custom_columns))) {
+        stop("custom_columns must be a named list")
+        }
+      .data[names(custom_columns)] <- custom_columns
+
+    }
+
+
 
     S7::new_object(
       .data,
@@ -738,6 +802,8 @@ the$parameter_formatter <- parameter_formatter()
 #' @param font_family font family
 #' @param intercept_text what to call the intercept
 #' @param parameter_formatter column formatting functions
+#' @param number_formatter default function to format numbers
+#' @param trim_leading_zero default function to trim leading zeros from numbers
 #' @param reset if `TRUE`, reset all defaults (except as specified)
 #'
 #' @returns previous defaults
@@ -800,6 +866,9 @@ apa7_defaults <- function(accuracy = NULL,
 #' @param columns (optional) vector of columns to format
 #' @param rename_headers if `TRUE`, rename headers with markdown or latex
 #' @param latex_headers if `TRUE`, rename headers with latex instead of markdown
+#' @param format_separated_headers if `TRUE`, format headers with separated names. For example, if the formatter formats column `R2` as `*R*^2^`, then `Model 1_R2` becomes `Model 1_*R*^2^`)
+#' @param sep separator for separated headers (default is "_")
+#' @param accuracy numeric (default: NULL, uses the current default accuracy set with [apa7_defaults()]). If not NULL, sets the accuracy for the formatter.
 #'
 #' @returns tibble
 #' @export
@@ -817,7 +886,7 @@ apa_format_columns <- function(data,
                                format_separated_headers = TRUE,
                                sep = "_",
                                accuracy = NULL) {
-  CI_low <- CI_high <- df_error <- NULL
+  CI_low <- CI_high <- df_error <- name <- header <- column <- group <- value <- NULL
 
 
 
@@ -832,6 +901,7 @@ apa_format_columns <- function(data,
 
 
   data <- tibble::as_tibble(data)
+
 
   data_names <- colnames(data)
   format_names <- names(formatter)
@@ -855,10 +925,13 @@ apa_format_columns <- function(data,
       )
   }
 
+
   d_names <- dplyr::left_join(d_names,
                               d_formatter,
                               by = dplyr::join_by(name)) |>
     dplyr::filter(!is.na(header))
+
+
 
   cls <- d_names |> dplyr::pull(column)
 
@@ -872,9 +945,6 @@ apa_format_columns <- function(data,
   if (all(c("CI", "CI_low", "CI_high") %in% d_names$name) &&
       !is.null(formatter$CI) & ("CI" %in% cls)) {
 
-    formatter$CI@header <- glue::glue(formatter$CI@header) |> as.character()
-    formatter$CI@latex <- glue::glue(formatter$CI@latex) |> as.character()
-
     d_ci <- d_names |>
       dplyr::mutate(group = stringr::str_remove(column, paste0(sep, name, "$"))) |>
       dplyr::filter(name == "CI") |>
@@ -882,6 +952,7 @@ apa_format_columns <- function(data,
              CI_high = paste0(group, sep, "high"))
 
     for (i in seq_len(nrow(d_ci))) {
+
       ci_names <- d_ci[i, c("column", "CI_low", "CI_high")] |>
         tidyr::pivot_longer(dplyr::everything()) |>
         dplyr::pull(value)
@@ -890,6 +961,10 @@ apa_format_columns <- function(data,
 
       if (all(ci_names %in% colnames(data))) {
         ci <- max(data[, ci_names[1]], na.rm = TRUE)
+
+        d_names[d_names$column == d_ci[[i, "column"]], "header"] <- glue::glue(formatter$CI@header) |>
+          as.character()
+
         data[, ci_names[1]] <- formatter$CI@formatter(
           dplyr::pull(data, dplyr::any_of(ci_names[2])),
           dplyr::pull(data, dplyr::any_of(ci_names[3])),
@@ -900,12 +975,13 @@ apa_format_columns <- function(data,
         cls <- cls[cls != ci_names[1]]
       }
     }
-    end
+
 
   }
 
-  if (all(c("t", "df_error") %in% data_names) &&
-      !is.null(formatter$CI) &&
+
+
+  if (all(c("t", "df_error") %in% data_names)  &&
       ("t" %in% cls)) {
     df <- paste0(
       "(",
@@ -929,10 +1005,25 @@ apa_format_columns <- function(data,
 
   }
 
+
+
   for (cl in cls) {
-    data <- dplyr::mutate(data,
-                          dplyr::across(dplyr::any_of(cl), formatter[[cl]]@formatter))
+
+    f1 <- d_names |>
+      dplyr::filter(column == cl) |>
+      pull(formatter)
+
+
+    if (!is.null(f1)) {
+      if (cl %in% colnames(data)) {
+        data <- dplyr::mutate(data, {{ cl }} := f1[[1]]( data[, cl, drop = TRUE]))
+      }
+
+    } else {}
+
   }
+
+
 
   if (rename_headers) {
     if (latex_headers) {
@@ -940,12 +1031,38 @@ apa_format_columns <- function(data,
     } else {
       rcls <- formatter@get_headers
     }
-    nrcls <- rcls
-    names(nrcls) <- paste0("^", names(nrcls) ,"$")
-    colnames(data) <- stringr::str_replace_all(colnames(data), nrcls)
-    nrcls <- rcls
-    names(nrcls) <- paste0("_", names(nrcls) ,"$")
-    colnames(data) <- stringr::str_replace_all(colnames(data), nrcls)
+
+
+    if (nrow(d_names) > 0) {
+      rcls <- d_names |>
+        dplyr::mutate(pattern_1 = paste0("^", name, "$"),
+                      replace_1 = header,
+                      pattern_2 = paste0("_",name,"$"),
+                      replace_2 = paste0("_", header)) |>
+        dplyr::select(column,
+                      pattern_1,
+                      pattern_2,
+                      replace_1,
+                      replace_2) |>
+        tidyr::pivot_longer(-column) |>
+        tidyr::separate(name, c("name", "type")) |>
+        tidyr::pivot_wider() |>
+        dplyr::mutate(should_replace = stringr::str_detect(column, pattern)) |>
+        dplyr::select(-type) |>
+        dplyr::filter(should_replace) |>
+        dplyr::mutate(id = row_number(), .by = column) |>
+        dplyr::filter(id == 1) |>
+        dplyr::mutate(replacer = str_replace(column, pattern, replace)) |>
+        dplyr::select(replacer, column) |>
+        tibble::deframe()
+
+      data <- data |>
+        dplyr::rename(dplyr::any_of(rcls))
+    }
+
+
+
+
   }
   data
 
@@ -969,3 +1086,28 @@ star_balance <- function(x, star = "\\*", superscript = TRUE) {
   ss <- strrep(ifelse(superscript, "^", ""), (k > 0) * 1)
   paste0(ss, strrep("&numsp;", k), ss, x)
 }
+
+
+#' Tests if a character vector contains numeric-like values
+#'
+#' @param x character vector
+#' @param elementwise if `TRUE`, returns a logical vector for each element, otherwise returns a single logical value indicating if all elements are numeric-like (default: `FALSE`)
+#' @returns logical vector
+#' @export
+#'
+#' @examples
+#' is_numeric_like(c("-9", " 2.0", "-1.0 "))
+#' is_numeric_like(c("9-", -1, "10"))
+#' is_numeric_like(c("9", -1.2, "10"))
+is_numeric_like <- function(x, elementwise = FALSE) {
+  x <- as.character(x) |>
+    stringr::str_trim()
+
+  test_x <- grepl("^-?[0-9.]+$", x) | is.na(x) | nzchar(x)
+  if (elementwise) {
+    test_x
+  } else {
+    all(test_x)
+  }
+  }
+

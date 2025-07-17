@@ -6,17 +6,19 @@
 \usage{
 apa_performance_comparison(
   ...,
-  performance_metrics = c("R2", "deltaR2", "F", "p"),
+  metrics = c("R2", "deltaR2", "F", "p"),
   starred = NA,
   column_formatter = NULL
 )
 }
 \arguments{
-\item{performance_metrics}{performance metrics. Default is deltaR2}
+\item{...}{model fit objects}
 
-\item{fit1}{model fit object}
+\item{metrics}{performance metrics. Default is R2, deltaR2, F, and p}
 
-\item{fit2}{modle fit object}
+\item{starred}{columns to star with significant p_values}
+
+\item{column_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
 }
 \value{
 tibble

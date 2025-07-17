@@ -25,6 +25,12 @@ apa_format_columns(
 \item{rename_headers}{if \code{TRUE}, rename headers with markdown or latex}
 
 \item{latex_headers}{if \code{TRUE}, rename headers with latex instead of markdown}
+
+\item{format_separated_headers}{if \code{TRUE}, format headers with separated names. For example, if the formatter formats column \code{R2} as \verb{*R*^2^}, then \verb{Model 1_R2} becomes \verb{Model 1_*R*^2^})}
+
+\item{sep}{separator for separated headers (default is "_")}
+
+\item{accuracy}{numeric (default: NULL, uses the current default accuracy set with \code{\link[=apa7_defaults]{apa7_defaults()}}). If not NULL, sets the accuracy for the formatter.}
 }
 \value{
 tibble

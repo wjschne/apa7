@@ -402,7 +402,7 @@ d <- d |>
     paste0(Variable, "^a^"), Group) |>
       hanging_indent(width = 22)) |>
   rename(`Baseline\ncharacteristic` = Group) |> 
-  mutate(across(c(ends_with("_n"), 
+  mutate(across(c(ends_with("_\\*n\\*"), 
                   ends_with("_%")), 
                 .fns = \(x) align_chr(x, accuracy = .1)))
 
@@ -415,10 +415,10 @@ d |>
     table_width = 1, 
     line_spacing = 1.5, 
     layout = "fixed", 
-    horizontal_padding = 0
+    horizontal_padding = 0, 
+    auto_format_columns = T
   ) |>
   align(j = 1, align = "left") |>
-  italic(i = 2, part = "header") |>
   padding(j = 1, 
           i = ~ is.na(row_title), 
           padding.left = 15) |> 
@@ -473,8 +473,7 @@ d <- tibble::tribble(
 
 # Format data
 d <- d |> 
-  mutate(Range = align_chr(Range, center = "–")) |> 
-  apa_format_columns()
+  mutate(Range = align_chr(Range, center = "–")) 
 
 # Make table
 d |>
@@ -640,23 +639,23 @@ d |>
 # make data
 d <- "
 Source                       	Do not believe	Unsure	Believe	chi   
-Media reports                	17.00         	140.00	44.00  	124.75
-Family reports               	47.00         	106.00	48.00  	34.06 
-Friends' reports             	42.00         	112.00	47.00  	45.52 
-Caught by media              	19.00         	82.00 	100.00 	54.00 
-Celebrity display of behavior	12.00         	61.00 	128.00 	101.22" |>
+Media reports                	17            	140   	44    	124.75
+Family reports               	47            	106   	48    	34.06 
+Friends' reports             	42            	112   	47    	45.52 
+Caught by media              	19            	82    	100   	54.00 
+Celebrity display of behavior	12            	61    	128   	101.22" |>
   readr::read_tsv(show_col_types = F)
 
 # Format data
 d <- d |> 
-  pivot_longer(-c(Source, chi), values_to = "*n*") |>
+  pivot_longer(-c(Source, chi), values_to = "n") |>
   mutate(name = fct_inorder(name)) |>
   mutate(`%` = scales::number(
-    100 * `*n*` / sum(`*n*`), 
+    100 * `n` / sum(`n`), 
     accuracy = .01),
     .by = Source) |>
   pivot_wider(
-    values_from = c(`*n*`, `%`),
+    values_from = c(`n`, `%`),
     names_glue = "{name}_{.value}",
     names_vary = "slowest"
   ) |>
@@ -823,20 +822,19 @@ Insensitive       	Start   	Effective	1.14	c        " |>
 
 # Statistics
 d_test <- "
-Professor trait   	*F* ratio	*p*   	*&eta;*^2^
+Professor trait   	F      	p   	eta2
 Dedicated         	19.26  	0.00	0.15
 Easy to understand	5.01   	0.03	0.03
 Fair              	5.75   	0.02	0.06
 Manipulative      	3.92   	0.05	0.05
 Insensitive       	8.12   	0.01	0.06" |>
   readr::read_tsv() |> 
-  suppressMessages() |> 
-  mutate(`*p*` = signs(`*p*`, accuracy = .001, trim_leading_zeros = TRUE),
-         `*&eta;*^2^` = signs(`*&eta;*^2^`, accuracy = .01, trim_leading_zeros = TRUE))
+  suppressMessages() 
 
-d_mean |>
+# Format data
+d <- d_mean |>
   mutate(Semester = paste0(Semester, 
-                           " of semester\nprofessor type")) |>
+                           " of semester\\\nprofessor type")) |>
   mutate(Mean = scales::number(Mean, accuracy = .001),
          Subscript = paste0("~", Subscript, "~")) |>
   unite(Mean, c(Mean, Subscript), sep = "") |>
@@ -844,10 +842,20 @@ d_mean |>
   pivot_wider(names_from = Semester, 
               values_from = Mean) |>
   left_join(d_test, by = join_by(`Professor trait`)) |>
-  mutate(`Professor trait` = hanging_indent(`Professor trait`, width = 8), 
-         `*F* ratio` = align_chr(`*F* ratio`)) |> 
-  add_break_columns(3) |> 
-  apa_flextable(table_width = 1) 
+  mutate(`Professor trait` = hanging_indent(`Professor trait`, width = 8)) |> 
+  add_break_columns(3)
+
+# custom formatter
+my_formatter <-  parameter_formatter()
+## change p column's accuracy to 0.001
+my_formatter$p@formatter  = my_formatter$p@formatter |> 
+  purrr::partial(accuracy = .001)
+my_formatter$F@header <- "*F* ratio"
+
+# Make table
+apa_flextable(d, 
+              table_width = 1, 
+              column_formatter = my_formatter) 
 ```
 
 <hr>
@@ -1091,7 +1099,7 @@ d <- d |>
                 .by = c(Group, Time)) |> 
       pivot_wider(names_from = Group,
                   values_from = c(M, SD), 
-                  names_glue = "{Group}_*{.value}*", 
+                  names_glue = "{Group}_{.value}", 
                   names_vary = "slowest") |> 
       mutate(Time = paste("Time", Time))
   }),
@@ -1120,10 +1128,7 @@ d <- d |>
                Parameter,
                levels = c("Group", "Time", "Group:Time"),
                labels = c("G", "T", "G \u00D7 T"))) |>
-             rename(Effect = Parameter,
-                    `*F* ratio` = `F`,
-                    `*df*` = df,
-                    `&eta;^2^` = Eta2_partial)
+             rename(Effect = Parameter)
          })
 ) 
 
@@ -1132,16 +1137,15 @@ d <- d |>
   dplyr::select(v, descriptives, Ftest) |> 
   unnest(c(descriptives, Ftest)) |> 
   rename(Variable = Time) |> 
-  mutate(`*F* ratio` = align_chr(`*F* ratio`, 
+  mutate(`F` = align_chr(`F`, 
                                  accuracy = .01),
-         `&eta;^2^` =  align_chr(`&eta;^2^`, 
-                                 accuracy = .01, 
-                                 trim_leading_zeros = T)) |>
-  mutate(`papa7starcolumn` = p2stars(p, superscript = T), 
-         .after = `*F* ratio`) |>
+         `papa7starcolumn` = p2stars(p, superscript = T), 
+         .after = `F`) |>
+  unite(`*F* ratio`, c(`F`, papa7starcolumn), sep = "") |> 
+  mutate(`*F* ratio` = star_balance(`*F* ratio`)) |> 
   select(-p) |> 
-  rename_with(\(x) paste0("ANOVA_",x),.cols = Effect:`&eta;^2^`) |> 
-  add_break_columns(ends_with("SD*"))
+  rename_with(\(x) paste0("ANOVA_",x),.cols = Effect:Eta2_partial) |> 
+  add_break_columns(ends_with("SD"))
 
 
 # Make table
@@ -1150,11 +1154,10 @@ d |>
                 row_title_align  = "left",
                 table_width = .5, 
                 layout = "fixed") |>
+  align(align = "center") |> 
+  align(j = c("Variable"), align = "left") |> 
   padding(i = ~is.na(row_title), j = 1, padding.left = 20)  |> 
-  width(j = 1, width = 1.5) |> 
-  width(j = "ANOVA_papa7starcolumn", .3)
-
-  
+  width(j = 1, width = 1.5) 
 ```
 
 
@@ -1296,11 +1299,10 @@ If we really want just the output of `parameter` as it displays, we use the `for
 
 ```{r}
 parameters(m2) |> 
-  format() |> 
-  as_tibble()
+  format() 
 ```
 
-This gets us closer to APA style, but not quite all the way there. Notice that the output is all text. In a few places, it takes us a few steps backwards. The `format` function for this output has a number of options that can get us very close to APA style.
+This gets us closer to APA style, but not quite all the way there. Notice that the output is all text. In a few places, it takes us a few steps backwards. The `format` function for this output has a number of options that can get us closer to APA style, but not quite all the way there.
 
 ```{r}
 parameters(m2) |> 
@@ -1316,9 +1318,9 @@ apa_parameters(m2)
 Applying `apa_flextable` looks like APA style:
 
 ```{r}
-parameters(m2) |> 
-  apa_format_columns() |> 
-  apa_flextable()
+apa_parameters(m2) |> 
+  apa_flextable() |> 
+  align(j = -1, align = "center")
 ```
 
 What if I want my coefficient estimate to always be a lowercase italicized *b* and its standard error to be *se~b~*? Suppose I want all the numeric columns to be rounded to 3 decimals of precision instead of 2? I can do that with the `parameter_formatter` function.

@@ -23,6 +23,10 @@ apa7_defaults(
 
 \item{parameter_formatter}{column formatting functions}
 
+\item{number_formatter}{default function to format numbers}
+
+\item{trim_leading_zero}{default function to trim leading zeros from numbers}
+
 \item{reset}{if \code{TRUE}, reset all defaults (except as specified)}
 }
 \value{

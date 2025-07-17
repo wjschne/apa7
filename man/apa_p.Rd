@@ -12,6 +12,10 @@ apa_p(p, inline = FALSE, plain = FALSE, min_digits = 2, max_digits = 3)
 \item{inline}{If TRUE (default), returns statistic (e.g.,e p = .04), otherwise just the number (e.g., .04)}
 
 \item{plain}{Outputs plain text compatible with latex if TRUE, otherwise defaults to  markdown}
+
+\item{min_digits}{minimum number of digits to round to. Default is 2.}
+
+\item{max_digits}{maximum number of digits to round to. Default is 3.}
 }
 \value{
 character vector

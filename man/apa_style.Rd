@@ -34,7 +34,10 @@ apa_style(
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
-  table_width = 0
+  table_width = 0,
+  markdown = TRUE,
+  markdown_header = markdown,
+  markdown_body = markdown
 )
 
 \method{apa_style}{flextable}(
@@ -71,13 +74,17 @@ apa_style(
 
 \item{horizontal_padding}{horizontal padding (in pixels)}
 
+\item{table_align}{table alignment ("left", "center", "right")}
+
+\item{layout}{table layout ("autofit", "fixed")}
+
+\item{table_width}{table width (in pixels, 0 for auto)}
+
 \item{markdown}{apply markdown formatting to header and body}
 
 \item{markdown_header}{apply markdown formatting to header}
 
-\item{mardown_body}{apply markdown formatting to body}
-
-\item{markdown_footter}{apply markdown formatting to footer}
+\item{markdown_body}{apply markdown formatting to body}
 }
 \value{
 object

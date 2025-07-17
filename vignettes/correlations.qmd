@@ -37,7 +37,7 @@ By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/fle
 #| tbl-cap: Correlation table using flextable via `apa_cor`
 #| message: false
 trees |> 
-  apa_cor()
+  apa_cor(star_significant = T)
 ```
 
 Significant correlations can be starred instead.

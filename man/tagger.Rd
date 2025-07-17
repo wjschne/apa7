@@ -24,9 +24,11 @@ header_md(x, level = 1)
 \arguments{
 \item{x}{character vector}
 
-\item{level}{heading level}
+\item{tag}{opening tag, e.g., \verb{<span>}}
 
-\item{fence}{character vector}
+\item{right_tag}{closing tag, e.g., \verb{</span>}. Defaults to the same value as the opening tag.}
+
+\item{level}{heading level}
 }
 \value{
 character vector

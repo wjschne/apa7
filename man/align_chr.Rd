@@ -34,6 +34,8 @@ align_chr(
 
 \item{side}{side on which to make text of equal width}
 
+\item{NA_value}{value to replace NA}
+
 \item{...}{additional arguments passed to \code{signs::signs()}}
 }
 \value{

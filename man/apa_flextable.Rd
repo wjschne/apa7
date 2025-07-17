@@ -11,7 +11,7 @@ apa_flextable(
   row_title_sep = " ",
   row_title_align = "center",
   row_title_border = list(color = "gray20", style = "solid", width = 1),
-  col_keys = names(data),
+  col_keys = colnames(data),
   cwidth = 0.75,
   cheight = 0.25,
   separate_headers = TRUE,
@@ -29,6 +29,8 @@ apa_flextable(
   markdown = TRUE,
   markdown_header = markdown,
   markdown_body = markdown,
+  auto_format_columns = TRUE,
+  column_formatter = NULL,
   ...
 )
 }
@@ -51,7 +53,35 @@ apa_flextable(
 
 \item{cheight}{initial cell height in inches}
 
+\item{separate_headers}{separate header rows (default: \code{TRUE})}
+
 \item{apastyle}{apply \code{apa_style} function (default: \code{TRUE})}
+
+\item{font_family}{font family}
+
+\item{font_size}{font size}
+
+\item{text_color}{text color}
+
+\item{border_color}{border color}
+
+\item{border_width}{border width in pixels}
+
+\item{line_spacing}{spacing between lines}
+
+\item{horizontal_padding}{horizontal padding (in pixels)}
+
+\item{table_align}{table alignment ("left", "center", "right")}
+
+\item{layout}{table layout ("autofit", "fixed")}
+
+\item{table_width}{table width (in pixels, 0 for auto)}
+
+\item{markdown}{apply markdown formatting to header and body}
+
+\item{markdown_header}{apply markdown formatting to header}
+
+\item{markdown_body}{apply markdown formatting to body}
 
 \item{...}{arguments passed to \code{apa_style}}
 }
@@ -63,13 +93,16 @@ Make flextable with merged row titles according to selected column
 }
 \examples{
 library(dplyr)
+library(tidyr)
+library(flextable)
 mtcars \%>\%
-  select(vs, am, gear, carb) \%>\%
-  pivot_longer(-vs,  names_to = "Variable") \%>\%
+  dplyr::select(vs, am, gear, carb) |>
+  tidyr::pivot_longer(-vs,  names_to = "Variable") |>
   dplyr::summarise(Mean = round(mean(value), 2),
                    SD = round(sd(value), 2),
-                   .by = c(Variable,vs)) \%>\%
-  mutate(vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))) \%>\%
-  flextable_row_title("vs")
+                   .by = c(Variable,vs)) |>
+  dplyr::mutate(vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))) |>
+  apa_flextable(row_title_column= "vs",  row_title_align = "center") |>
+  align(j = 2:3, align = "center")
 
 }
