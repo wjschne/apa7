@@ -16,13 +16,12 @@ author:
 abstract: "The flextable and apa7 packages were used to recreate the sample tables form the APA Manual (7th Edition)."
 floatsintext: true
 keywords: [APA Style, Tables]
-bibliography: refs.bib
+# bibliography: refs.bib
 format:
   apaquarto-html: 
     toc: true
-  apaquarto-docx: default
 execute: 
-  cache: true
+  cache: false
   message: false
   echo: true
 ---
@@ -30,7 +29,6 @@ execute:
 ```{r}
 #| label: setup
 #| include: false
-library(tidyverse)
 library(apa7)
 library(flextable)
 library(ftExtra)
@@ -38,12 +36,18 @@ library(signs)
 library(parameters)
 library(performance)
 library(lme4)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(forcats)
+library(stringr)
+library(tibble)
 set_flextable_defaults(theme_fun = theme_apa, 
                        font.family = "Times New Roman")
 
 ```
 
-When I write a research manuscript in APA style [@americanpsychologicalassociationPublicationManualAmerican2020], I have twin goals that are sometimes at odds: 1) I want the document to be fully reproducible, including the tables. 2) I want the formatting to be not only correct but aesthetically pleasing.
+When I write a research manuscript in APA style, I have twin goals that are sometimes at odds: 1) I want the document to be fully reproducible, including the tables. 2) I want the formatting to be not only correct but aesthetically pleasing.
 
 The final frontier of reproducibility in APA style, for me, has been getting the tables right. At long last, I am getting close to where I want to be. My process usually goes like this:
 

@@ -587,7 +587,7 @@ apa_cor <- function(data,
       gt::fmt_markdown(columns = -1)
 
     if (is.null(note)) {
-      if (significance_note && any(ct$p <= p_value)) {
+      if (significance_note && any(ct$p <= p_value[1])) {
         my_note <- paste0(
           "*Note*. Correlations significant at *p* < ",
           gsub(
@@ -1395,10 +1395,12 @@ apa_style.flextable <- function(
     for (ch in x$col_keys) {
       if (!("chunk" %in% class(dt$header$content$data[[1,ch]]))) {
         hh <- c(hh, ch)
+
       }
     }
     if (length(hh) > 0) {
       x <- ftExtra::colformat_md(x, j = dplyr::all_of(!!hh), part = "header")
+
       }
     }
   if (markdown_body) {
