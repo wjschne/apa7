@@ -16,6 +16,7 @@ knitr:
 library(apa7)
 library(dplyr)
 library(flextable)
+library(ftExtra)
 ```
 
 
@@ -63,7 +64,6 @@ apa_chisq(d, note = "This is a *custom* note written in **markdown** $x > \\omeg
 There are a lot of options out there. The flextable package has the `proc_freq` function, which has the ability to include row, column, and total percentages in the table. 
 
 ```{r}
-
 mtcars %>% 
   proc_freq(row = "gear", 
             col = "vs")  %>%

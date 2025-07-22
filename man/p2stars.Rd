@@ -4,14 +4,25 @@
 \alias{p2stars}
 \title{Convert p-values to stars}
 \usage{
-p2stars(p, alpha = c(0.05, 0.01, 0.001), superscript = FALSE, prefix = "\\\\")
+p2stars(
+  p,
+  alpha = c(0.05, 0.01, 0.001),
+  first_alpha_marginal = FALSE,
+  superscript = FALSE,
+  add_trailing_space = FALSE,
+  prefix = "\\\\"
+)
 }
 \arguments{
 \item{p}{vector of numbers}
 
 \item{alpha}{vector of thresholds}
 
+\item{first_alpha_marginal}{if TRUE, the first alpha value is treated as marginal and gets a dagger instead of a star}
+
 \item{superscript}{make as superscript}
+
+\item{add_trailing_space}{if TRUE, adds a trailing space after the stars (default: FALSE)}
 
 \item{prefix}{usually backslashes to prevent markdown from interpreting asterisks as bullets or italics}
 }

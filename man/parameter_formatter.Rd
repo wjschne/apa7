@@ -14,7 +14,7 @@ parameter_formatter(
 )
 }
 \arguments{
-\item{.data}{list of \code{apa_column} objects}
+\item{.data}{list of \code{column_format} objects}
 
 \item{accuracy}{numeric (passed to scales::number)}
 
@@ -24,13 +24,13 @@ parameter_formatter(
 
 \item{variable_labels}{named vector of variable names (with vector names as labels). For example, c(\verb{Parental Income} = "parental_income", \verb{Number of Siblings} = "n_siblings")}
 
-\item{custom_columns}{named list of apa_columns to add or replace existing columns}
+\item{custom_columns}{named list of column_formats to add or replace existing columns}
 }
 \value{
 parameter_formatter
 }
 \description{
-Create a set of column formats
+Returns an S7 object that contains a list of \code{column_format} objects that can be used to format parameters in APA style.
 }
 \section{Slots}{
 

@@ -1,6 +1,6 @@
 Package: apa7
 Title: Write Documents in APA Style 7th Edition
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
@@ -17,6 +17,7 @@ Suggests:
     ggplot2,
     knitr,
     R.utils,
+    quarto,
     rmarkdown,
     snakecase,
     spelling,
@@ -27,25 +28,20 @@ Imports:
     effectsize,
     flextable,
     ftExtra,
-    fs,
     gt,
     psych,
     purrr,
-    quarto,
     purrr,
-    rstudioapi,
     scales,
     signs,
     stringr,
     tibble,
     tidyr,
-    utils,
     rlang,
     parameters,
     performance,
     S7,
-    glue,
-    zip
+    glue
 Depends: 
     R (>= 4.1.0)
 VignetteBuilder: knitr, quarto

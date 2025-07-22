@@ -10,7 +10,7 @@ align_chr(
   trim_leading_zeros = FALSE,
   add_plusses = FALSE,
   padding_character = " ",
-  center = "\\\\.",
+  center = ".",
   format_integers = FALSE,
   side = c("both", "left", "right"),
   NA_value = "",

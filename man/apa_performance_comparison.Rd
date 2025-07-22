@@ -2,13 +2,13 @@
 % Please edit documentation in R/tables.R
 \name{apa_performance_comparison}
 \alias{apa_performance_comparison}
-\title{format model comparrison metrics in APA style}
+\title{format model comparison metrics in APA style}
 \usage{
 apa_performance_comparison(
   ...,
   metrics = c("R2", "deltaR2", "F", "p"),
   starred = NA,
-  column_formatter = NULL
+  parameter_formatter = NULL
 )
 }
 \arguments{
@@ -18,18 +18,17 @@ apa_performance_comparison(
 
 \item{starred}{columns to star with significant p_values}
 
-\item{column_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
+\item{parameter_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
 }
 \value{
 tibble
 }
 \description{
-format model comparrison metrics in APA style
+format model comparison metrics in APA style
 }
 \examples{
 m1 <- lm(mpg ~ cyl, data = mtcars)
 m2 <- lm(mpg ~ cyl + wt, data = mtcars)
 apa_performance_comparison(list(`Model 1` =m1, `Model 3` =m2)) |>
-   apa_flextable() |>
-   ftExtra::colformat_md(part = "all")
+   apa_flextable()
 }

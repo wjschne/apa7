@@ -4,7 +4,12 @@
 \alias{pretty_widths}
 \title{Use flextable::dim_pretty to fit column widths}
 \usage{
-pretty_widths(x, min_width = 0.1, unit = c("in", "cm", "mm"))
+pretty_widths(
+  x,
+  min_width = 0.05,
+  unit = c("in", "cm", "mm"),
+  table_width = 6.5
+)
 }
 \arguments{
 \item{x}{flextable}
@@ -12,6 +17,8 @@ pretty_widths(x, min_width = 0.1, unit = c("in", "cm", "mm"))
 \item{min_width}{minimum width of columns}
 
 \item{unit}{Can be \verb{in}, \code{cm}, or \code{mm}}
+
+\item{table_width}{width of table}
 }
 \value{
 flextable

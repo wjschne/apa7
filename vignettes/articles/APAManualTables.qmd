@@ -37,6 +37,7 @@ library(ftExtra)
 library(signs)
 library(parameters)
 library(performance)
+library(lme4)
 set_flextable_defaults(theme_fun = theme_apa, 
                        font.family = "Times New Roman")
 
@@ -67,7 +68,7 @@ Things I usually change, but I do not mess with here:
 
 <hr>
 
-## Table 7.1
+## APA Table 7.1
 
 :::{.callout-note}
 # Highlights
@@ -179,7 +180,7 @@ ft_71 |>
 
 ```
 
-## Tables Notes
+### Tables Notes
 
 APA style distinguishes between three types of table notes, each of which need to be in separate paragraphs:
 
@@ -261,9 +262,11 @@ add_footer_lines(
 
 In some formats (e.g., .pdf), long table notes can mess with the column widths and make the table unreadable.
 
-If you are rendering with the apaquarto extension, you can append table notes with the `apa-note` chunk option. After version 5.0.2, apaquarto can separate `apa-note` text into multiple paragraphs with the `|` separator.
+If you are rendering with the apaquarto extension, you can append table notes with the `apa-note` chunk option. After version 5.0.2, apaquarto can separate `apa-note` text into multiple paragraphs as shown in the chunk below.
 
 Also, it bothers me that the footnote symbols mess up the number alignment. I decided to add them in myself. In the same columns that have footnotes, I padded the numbers that do not have footnotes with the `numbsp;` character (Figure Space) to maintain the alignment. 
+
+As a final polishing move, I rejiggered the column widths to make everything center correctly.
 
 ```{r}
 #| label: tbl-71c
@@ -305,12 +308,15 @@ d_citizenship |>
   apa_flextable(row_title_column = "Wave", 
                 row_title_prefix = "Wave", 
                 table_width = 1, 
-                line_spacing = 1.5) 
+                line_spacing = 1.5, 
+                layout = "fixed") |> 
+  width(width = c(1.34, 1.28, 1.28, .05, 1.28, 1.28)) 
+
 ```
 
 <hr>
 
-## Table 7.2
+## APA Table 7.2
 
 :::{.callout-note}
 # Highlights
@@ -338,8 +344,8 @@ Does flextable already have decimal alignment? [Yes](https://github.com/davidgoh
 #| label: tbl-72
 #| tbl-cap: Sociodemographic Characteristics of Participants at Baseline
 #| apa-note: 
-#|   - "*N* = 150 (*n* = 50 for each condition). Participants 
-#|      were on average 39.5 years old (SD = 10.1), and 
+#|   - "*N*&nbsp;=&nbsp;150 (*n*&nbsp;=&nbsp;50 for each condition). Participants 
+#|      were on average 39.5 years old (SD&nbsp;=&nbsp;10.1), and 
 #|      participant age did not differ by condition."
 #|   - "^a\u00A0^Reflects the number and percentage of
 #|      participants answering “yes” to this question."
@@ -416,19 +422,19 @@ d |>
     line_spacing = 1.5, 
     layout = "fixed", 
     horizontal_padding = 0, 
-    auto_format_columns = T
+    auto_format_columns = T,
+    font_size = 10.5
   ) |>
   align(j = 1, align = "left") |>
   padding(j = 1, 
           i = ~ is.na(row_title), 
           padding.left = 15) |> 
-  width(j = 1, width = 2)
-
+  width(width = c(1.55, rep(c(.6, .6, .05), 4)[-12]))
 ```
 
 <hr>
 
-## Table 7.3
+## APA Table 7.3
 
 :::{.callout-note}
 # Highlights
@@ -482,28 +488,33 @@ d |>
           i = ~!stringr::str_ends(Scale, "total score"), 
           padding.left = 20) |> 
   width(width = 1.1) |> 
-  width(j = 1, 2.2)
+  width(j = 1, 2.1)
 ```
 
 <hr>
 
-## Table 7.5
+## APA Table 7.4
 
 I skipped APA Manual Table 7.4 because it is simple and is not entirely visible. It merely shows repeated headers across pages, which is not relevant in the html display here. Tables made in flextable have repeated headers by default when rendered to .docx.
+
+## APA Table 7.5
 
 ![Screenshot of the *APA Manual*'s Table 7.5](table75.png){#fig-75 width="100%"}
 
 Reproducing APA Manual Table 7.5 shown in @fig-75 is mostly straightforward. The main trick was to indent all rows that were not row titles.
 
 ```{r}
-#| label: tbl-74
+#| label: tbl-75
 #| echo: fenced
 #| tbl-cap: Summary of Designs of Experiments 1–4
-#| apa-note: "A, X, Y, and B = tone, clicker, steady light, and flashing 
-#|           light, respectively (counterbalanced), with the constraint 
-#|           that A and B are drawn from one modality and X and Y from 
-#|           another (counterbalanced); plus sign (+) = shock to floor of 
-#|           rat chamber; minus sign (–) = absence of shock."
+#| apa-note: "A, X, Y, and B&nbsp;=&nbsp;tone, clicker, 
+#|           steady light, and flashing light, respectively 
+#|           (counterbalanced), with the constraint that 
+#|           A and B are drawn from one modality and X and 
+#|           Y from another (counterbalanced); plus sign 
+#|           (+)&nbsp;=&nbsp;shock to floor of 
+#|           rat chamber; minus sign 
+#|           (–)&nbsp;=&nbsp;absence of shock."
 
 # Make data
 d <- tibble(
@@ -535,16 +546,20 @@ d |>
   apa_flextable(row_title_column = "Experiment", 
                 row_title_prefix = "Experiment", 
                 row_title_align = "left",
-                table_width = 1) |> 
+                layout = "fixed", 
+                line_spacing = 1.5) |> 
   align(align = "center") |> 
   align(j = 1, align = "left") |> 
-  padding(j = 1, i = ~is.na(row_title), padding.left = 15)
+  padding(j = 1, 
+          i = ~is.na(row_title), 
+          padding.left = 15) |> 
+  width(width = c(1.7, rep(1.2, 4)))
 
 ```
 
 <hr>
 
-## Table 7.6
+## APA Table 7.6
 
 :::{.callout-note}
 # Highlights
@@ -562,14 +577,16 @@ To simply enter the data from this table would be a straightforward process. To 
 #| echo: fenced
 #| tbl-cap: Means and Standard Deviations of Scores on Baseline Measures
 #| apa-note: Standard deviations are presented in parentheses. 
-#|           BAS = Behavioral Activation System; BAS-T = Behavioral 
-#|           Activation System–Total scores from the Behavioral 
-#|           Inhibition System/Behavioral Activation System Scales; 
-#|           SR = Sensitivity to Reward scores from the Sensitivity 
+#|           BAS&nbsp;=&nbsp;Behavioral Activation System; 
+#|           BAS-T&nbsp;=&nbsp;Behavioral Activation System–Total 
+#|           scores from the Behavioral Inhibition System/Behavioral 
+#|           Activation System Scales; SR&nbsp;=&nbsp;Sensitivity 
+#|           to Reward scores from the Sensitivity 
 #|           to Punishment and Sensitivity to Reward Questionnaire; 
-#|           BDI = Beck Depression Inventory scores; ASRM = Altman 
-#|           Self-Rating Mania Scale scores; M-SRM = Modified Social 
-#|           Rhythm Metric Regularity scores.
+#|           BDI&nbsp;=&nbsp;Beck Depression Inventory scores; 
+#|           ASRM&nbsp;=&nbsp;Altman Self-Rating Mania Scale scores; 
+#|           M-SRM&nbsp;=&nbsp;Modified Social Rhythm Metric 
+#|           Regularity scores.
 set.seed(12)
 
 # make data
@@ -621,22 +638,27 @@ d <- d |>
 
 # Make table
 d |> 
-  apa_flextable(table_width = 1) 
+  apa_flextable(table_width = 1, 
+                layout = "fixed", 
+                line_spacing = 1.5) |>
+  width(width = rep(6.5/4, 4))
 
 
 ```
 
 <hr>
 
-## Table 7.7
+## APA Table 7.7
 
 ![Screenshot of the *APA Manual*'s Table 7.7](table77.png){#fig-77 width="100%"}
 
 ```{r}
 #| label: tbl-77
 #| echo: fenced
-#| tbl-cap: "Frequencies and Chi-Square Results for Belief Perseverance in Attitudes Toward Celebrities (*N*\u00A0=\u00A0201)"
-# make data
+#| tbl-cap: "Frequencies and Chi-Square Results for 
+#|           Belief Perseverance in Attitudes Toward 
+#|           Celebrities (*N*&nbsp;=&nbsp;201)"
+# Make data
 d <- "
 Source                       	Do not believe	Unsure	Believe	chi   
 Media reports                	17            	140   	44    	124.75
@@ -667,18 +689,18 @@ d <- d |>
 
 # Make table
 d |> 
-  apa_flextable(table_width = 1) |>
+  apa_flextable(table_width = 1, layout = "fixed") |>
   footnote(j = "&chi;^2^(2)",
            value = as_paragraph_md("*p* < .001"),
            ref_symbol = "*") |>
   align(align = "center") |>
-  align(j = 1, align = "left")
-
+  align(j = 1, align = "left") |> 
+  width(width = c(1.6, rep(c(.65,.65, .05), 3)[-9], .9))
 ```
 
 <hr>
 
-## Table 7.8
+## APA Table 7.8
 
 ![Screenshot of the *APA Manual*'s Table 7.8](table78.png){#fig-78 width="100%"}
 
@@ -699,7 +721,7 @@ Normally, I would respect the direction of the effect, but @fig-78 makes *t* and
 #|           The slope represents the rate of change in the 
 #|           function measured at the crossover. Mean parameter 
 #|           values for each of the analyses are shown for the 
-#|           9-year-olds (*n* = 24) and 16-year-olds (*n* = 18), 
+#|           9-year-olds (*n*&nbsp;=&nbsp;24) and 16-year-olds (*n*&nbsp;=&nbsp;18), 
 #|           as well as the results of t tests (assuming unequal 
 #|           variance) comparing the parameter estimates between 
 #|           the two ages."
@@ -784,14 +806,18 @@ d |>
 
 <hr>
 
-## Table 7.9
+## APA Table 7.9
 
 ![Screenshot of the *APA Manual*'s Table 7.9](table79.png){#fig-79 width="100%"}
 
 ```{r}
 #| label: tbl-79
-#| tbl-cap: Analyses for the Interaction of Professor Type and Timing of Response on Perceptions of Professor Traits
-#| apa-note: "Means with different subscripts differ at the *p* = .05 level by Duncan’s new multiple range test."
+#| tbl-cap: "Analyses for the Interaction of Professor 
+#|           Type and Timing of Response on Perceptions 
+#|           of Professor Traits"
+#| apa-note: "Means with different subscripts differ at 
+#|            the *p*&nbsp;=&nbsp;.05 level by Duncan’s 
+#|            new multiple range test."
 #| echo: fenced
 
 # Descriptives
@@ -833,8 +859,9 @@ Insensitive       	8.12   	0.01	0.06" |>
 
 # Format data
 d <- d_mean |>
-  mutate(Semester = paste0(Semester, 
-                           " of semester\\\nprofessor type")) |>
+  mutate(Semester = paste0(
+    Semester, 
+    " of semester\\\nprofessor type")) |>
   mutate(Mean = scales::number(Mean, accuracy = .001),
          Subscript = paste0("~", Subscript, "~")) |>
   unite(Mean, c(Mean, Subscript), sep = "") |>
@@ -842,7 +869,9 @@ d <- d_mean |>
   pivot_wider(names_from = Semester, 
               values_from = Mean) |>
   left_join(d_test, by = join_by(`Professor trait`)) |>
-  mutate(`Professor trait` = hanging_indent(`Professor trait`, width = 8)) |> 
+  mutate(`Professor trait` = hanging_indent(
+    `Professor trait`, 
+    width = 8)) |> 
   add_break_columns(3)
 
 # custom formatter
@@ -855,12 +884,12 @@ my_formatter$F@header <- "*F* ratio"
 # Make table
 apa_flextable(d, 
               table_width = 1, 
-              column_formatter = my_formatter) 
+              parameter_formatter = my_formatter) 
 ```
 
 <hr>
 
-## Table 7.10
+## APA Table 7.10
 
 :::{.callout-note}
 # Highlights
@@ -932,7 +961,9 @@ d_t |>
     p_value = c(.05, .01)) |>   
   set_table_properties() |> 
   width(j = 1, width = 1.5) |> 
-  width(j = paste0(colnames(d_t), "apa7starcolumn"), width = .2) |>
+  width(j = paste0(colnames(d_t), 
+                   "apa7starcolumn"), 
+        width = .2) |>
   width(j = as.character(1:7), width = .4) |>
   align(j = 1:4, align = "center", part = "header") |> 
   footnote(
@@ -947,7 +978,14 @@ d_t |>
     i = 3, 
     j = 1, 
     value = as_paragraph(
-      "A linear transformation was performed on the starting salary values to maintain pay practice confidentiality. The standard deviation (0.27) can be interpreted as 27% of the average starting salary for all managers. Thus, ±1 SD includes a range of starting salaries from 73% (i.e., 1.00 – 0.27) to 127% (i.e., 1.00 + 0.27) of the average starting salaries for all managers."), 
+      paste("A linear transformation was performed on",
+      "the starting salary values to maintain pay practice",
+      "confidentiality. The standard deviation (0.27) can",
+      "be interpreted as 27% of the average starting salary",
+      "for all managers. Thus, ±1 SD includes a range of",
+      "starting salaries from 73% (i.e., 1.00 – 0.27) to",
+      "127% (i.e., 1.00 + 0.27) of the average starting",
+      "salaries for all managers.")), 
     ref_symbols = "b ", 
     inline = TRUE, 
     sep = " ") |> 
@@ -960,14 +998,13 @@ d_t |>
     inline = TRUE, 
     sep = " ") |> 
   add_footer_lines(
-    as_paragraph_md("^\\*&numsp;^*p* < .05. ^\\*\\*&numsp;^*p* < .01."))
-
-
+    as_paragraph_md(
+      "^\\*&numsp;^*p* < .05. ^\\*\\*&numsp;^*p* < .01."))
 ```
 
 <hr>
 
-## Table 7.11
+## APA Table 7.11
 
 :::{.callout-note}
 # Highlights
@@ -982,7 +1019,7 @@ This correlation matrix is different above and below the diagonal. A correctable
 ```{r}
 #| label: tbl-711
 #| tbl-cap: Intercorrelations for Study Variables Disaggregated by Gender
-#| apa-note: "The results for the female sample (*n* = 199) are shown above the diagonal. The results for the male sample (*n* = 120) are shown below the diagonal."
+#| apa-note: "The results for the female sample (*n*&nbsp;=&nbsp;199) are shown above the diagonal. The results for the male sample (*n*&nbsp;=&nbsp;120) are shown below the diagonal."
 
 "
 Variable             	1    	2    	3    	4
@@ -1001,8 +1038,9 @@ Age                  	.10  	.21* 	−.15 	—" |>
 
 ```
 
+<hr>
 
-## Table 7.12
+## APA Table 7.12
 
 ![Screenshot of the *APA Manual*'s Table 7.12](table712.png){#fig-712 width="100%"}
 
@@ -1012,7 +1050,7 @@ Age                  	.10  	.21* 	−.15 	—" |>
 
 # Make data
 d <- "
-Measure             	Urban_*M*	Urban_*SD*	Rural_*M*	Rural_*SD*	*F*(1, 294)	&eta;^2^
+Measure             	Urban_M	Urban_SD	Rural_M	Rural_SD	*F*(1, 294)	&eta;^2^
 Self-esteem         	2.91     	0.49      	3.35     	0.35      	68.87      	0.19    
 Social support      	4.22     	1.50      	5.56     	1.20      	62.60      	0.17    
 Cognitive appraisals	 NA      	 NA       	 NA      	 NA       	 NA        	 NA     
@@ -1026,25 +1064,28 @@ Self-efficacy       	2.65     	0.79      	3.53     	0.92      	56.35      	0.16 
 # Format data
 d <- d |> 
   mutate(across(
-    -(Measure:`Rural_*SD*`), 
+    -(Measure:`Rural_SD`), 
     \(x) align_chr(
       x,
       trim_leading_zeros = T, 
       accuracy = .01) )) |> 
-  add_break_columns(`Urban_*SD*`)
+  add_break_columns(`Urban_SD`)
 
 # Make table
 d |> 
-  apa_flextable(table_width = 1) |> 
-  align(j = 1) |> 
+  apa_flextable(table_width = 1,
+                layout = "fixed") |> 
   padding(i = 4:6, j = 1, padding.left = 20) |> 
   footnote(i = (1:6)[-3],
            j = "*F*(1, 294)", 
            ref_symbols = "***", 
-           value = as_paragraph_md("*p* < .001."))
+           value = as_paragraph_md("*p* < .001.")) |> 
+  width(width = c(1.65,.8,.8,.05,.8,.8,.9,.7))
 ```
 
-## Table 7.13
+<hr>
+
+## APA Table 7.13
 
 ![Screenshot of the *APA Manual*'s Table 7.13](table713.png){#fig-713 width="100%"}
 
@@ -1053,7 +1094,7 @@ d |>
 #| label: tbl-713
 #| tbl-cap: Means, Standard Deviations, and Two-Way ANOVA for Study Variables
 #| apa-note:
-#|   - "*N* = 153. ANOVA = analysis of variance; SMT = stress management training group; Control = wait-list control group; G = group; T = time."
+#|   - "*N*&nbsp;=&nbsp;153. ANOVA&nbsp;=&nbsp;analysis of variance; SMT&nbsp;=&nbsp;stress management training group; Control&nbsp;=&nbsp;wait-list control group; G&nbsp;=&nbsp;group; T&nbsp;=&nbsp;time."
 #|   - "^\\*&nbsp;^*p* < .05. ^\\*\\*&nbsp;^*p* < .01. "
 set.seed(6)
 
@@ -1154,19 +1195,18 @@ d |>
                 row_title_align  = "left",
                 table_width = .5, 
                 layout = "fixed") |>
-  align(align = "center") |> 
-  align(j = c("Variable"), align = "left") |> 
   padding(i = ~is.na(row_title), j = 1, padding.left = 20)  |> 
   width(j = 1, width = 1.5) 
 ```
 
+<hr>
 
-## Table 7.14
+## APA Table 7.14
 
 :::{.callout-note}
 # Highlights
 
-* Aligning to only the left side of a decimal using the `side` paramater of the `align_chr` function
+* Aligning to only the left side of a decimal using the `side` parameter of the `align_chr` function
 * Bold markdown with `bold_md`
 * Use of non-breaking space (`&nbsp;`) to prevent markdown from treating numbered text as ordered lists
 
@@ -1183,7 +1223,7 @@ The factor loadings need to be bolded selectively (if > .3). The `flextable::bol
 ```{r}
 #| label: tbl-714
 #| tbl-cap: Results From a Factor Analysis of the Parental Care and Tenderness (PCAT) Questionnaire
-#| apa-note: "*N* = 307. The extraction method was principal axis factoring with an oblique (promax with Kaiser Normalization) rotation. Factor loadings above .30 are in bold. Reverse-scored items are denoted with (R). Adapted from “Individual Differences in Activation of the Parental Care Motivational System: Assessment, Prediction, and Implications,” by E. E. Buckels, A. T. Beall, M. K. Hofer, E. Y. Lin, Z. Zhou, and M. Schaller, 2015, *Journal of Personality and Social Psychology, 108*(3), p. 501 ([https://doi.org/10.1037/pspp0000023](https://doi.org/10.1037/pspp0000023)). Copyright 2015 by the American Psychological Association."
+#| apa-note: "*N*&nbsp;=&nbsp;307. The extraction method was principal axis factoring with an oblique (promax with Kaiser Normalization) rotation. Factor loadings above .30 are in bold. Reverse-scored items are denoted with (R). Adapted from “Individual Differences in Activation of the Parental Care Motivational System: Assessment, Prediction, and Implications,” by E. E. Buckels, A. T. Beall, M. K. Hofer, E. Y. Lin, Z. Zhou, and M. Schaller, 2015, *Journal of Personality and Social Psychology, 108*(3), p. 501 ([https://doi.org/10.1037/pspp0000023](https://doi.org/10.1037/pspp0000023)). Copyright 2015 by the American Psychological Association."
 
 # Make data
 d <- tibble(
@@ -1242,15 +1282,9 @@ d |>
 
 ```
 
+<hr>
 
-## Table 7.15
-
-:::{.callout-note}
-# Highlights
-
-
-
-:::
+## APA Table 7.15
 
 ![Screenshot of the *APA Manual*'s Table 7.15](table715.png){#fig-715 width="100%"}
 
@@ -1259,6 +1293,7 @@ I love the easystats ecosystem. It provides a coherent framework for  data-analy
 First, lets simulate some data that resembles the data underlying the models in @fig-715, and create regression models for Models 1 and 2.
 
 ```{r}
+#| label: make715
 set.seed(1)
 # sample size
 n <- 88
@@ -1277,12 +1312,14 @@ m2 <- lm(charisma ~ leader_gender + leader_sleep_condition, data = d)
 The `parameters::parameters` function from easystats ecosystem displays information about regression predictors.
 
 ```{r}
+#| label: parametersm2
 parameters(m2) 
 ```
 
-That is a really nice display. However, if we convert it with flextable, we get something far less polished.
+That is a really nice display. However, if we convert it directly to flextable, we get something far less polished.
 
 ```{r}
+#| label: parametersm2flextable
 parameters(m2) |> 
   flextable()
 ```
@@ -1291,66 +1328,69 @@ parameters(m2) |>
 As it turns out, the output of the `parameters` function undergoes a fair bit of processing before it prints. The output is a `data.frame` with a `parameters_model` class  and many attributes that can be used by the easystats formatting functions. If we want to see the underlying data, we can convert the output to a `data.frame` or `tibble`.
 
 ```{r}
+#| label: parametersm2tibble
 parameters(m2) |> 
   as_tibble()
+  
 ```
 
-If we really want just the output of `parameter` as it displays, we use the `format` function.
+If we really want just the output of `parameter` as it displays, we use the `format_table` function.
 
 ```{r}
-parameters(m2) |> 
-  format() 
+#| label: parametersm2format
+parameters(m2,ci = .95) |> 
+  insight::format_table() |> 
+  apa_flextable()
 ```
 
-This gets us closer to APA style, but not quite all the way there. Notice that the output is all text. In a few places, it takes us a few steps backwards. The `format` function for this output has a number of options that can get us closer to APA style, but not quite all the way there.
+This gets us closer to APA style, but not quite all way there. Notice that the output is all text. We would like things to be nearly automatic and yet be able to fine-tune the output. Behold!
 
 ```{r}
-parameters(m2) |> 
-  format(digits = 2, ci_brackets = c("[", "]"), zap_small = T) 
-```
-
-Even so, we would like things to be nearly automatic and yet be able to fine-tune the output. Behold!
-
-```{r}
+#| label: apaparamtersm2
 apa_parameters(m2)
 ```
 
-Applying `apa_flextable` looks like APA style:
+The `apa_parameters` function is a wrapper around the `parameters` function with defaults that produce APA style output via markdown syntax. The columns are decimal aligned, statistics are italicized, the intercept is called a "Constant", and the variable names are printed in title case. 
+Applying `apa_flextable` to the output gives us perfect APA style:
 
 ```{r}
+#| label: apaparamtersm2flextable
 apa_parameters(m2) |> 
-  apa_flextable() |> 
-  align(j = -1, align = "center")
+  apa_flextable() 
 ```
 
-What if I want my coefficient estimate to always be a lowercase italicized *b* and its standard error to be *se~b~*? Suppose I want all the numeric columns to be rounded to 3 decimals of precision instead of 2? I can do that with the `parameter_formatter` function.
+Suppose the default formatting is not quite right. The `apa_parameters` function makes use of the default output of `parameter_formatter` function to make its changes. 
 
 The current parameter formatter is available for inspection like so:
 
 ```{r}
+#| label: parameterformatter
 parameter_formatter()
 ```
 
-This object is not really a tibble, but a list of parameters with formatting instructions for the headers and a formatting function for the columns under those headers.
+When printed, this object looks like a tibble, but it is actually a specialized object that contains formatting instructions for the headers and a formatting function for the columns under those headers.
 
 We can save these defaults to an object and take a look inside.
 
 ```{r}
+#| label: myformats
 my_formats <- parameter_formatter()
 ```
 
 This object has various properties accessible with `@` 
 
 ```{r}
+#| label: myformatsproperties
 my_formats@accuracy
 my_formats@intercept_text
 my_formats@get_headers
 my_formats@get_latex
 ```
 
-The properties not starting with `get_` are settable. Suppose I want the default accuracy of the column formatter functions to be .001 instead of .01:
+The properties starting with `get_` are read-only. The others can be set. Suppose I want the default accuracy of the column formatter functions to be .001 instead of .01:
 
 ```{r}
+#| label: myformatsaccuracy
 my_formats@accuracy <- .001
 ```
 
@@ -1358,13 +1398,18 @@ my_formats@accuracy <- .001
 The columns are a list with specific columns accessible with the `$` operator or `[` or `[[`:
 
 ```{r}
-my_formats$Coefficient
-my_formats["R2"]
+#| label: myformatscolumns
+# Returns a named list of column_formats
+my_formats[c("R2", "eta2")]
+# Returns a single column_format
+my_formats[["R2"]]
+my_formats$R2
 ```
 
-In this case, `Coefficient` is an `apa_column` object, which has 4 properties, `@name`, `@header`, `@latex`, and `@formatter`.
+In this case, `Coefficient` is an `column_format` object, which has 4 properties, `@name`, `@header`, `@latex`, and `@formatter`.
 
 ```{r}
+#| label: myformatscoefficient
 my_formats$Coefficient@name
 my_formats$Coefficient@header
 my_formats$Coefficient@latex
@@ -1374,6 +1419,7 @@ my_formats$Coefficient@formatter
 Here we set the formats something other than the defaults.
 
 ```{r}
+#| label: myformatsset
 my_formats$Coefficient@header <- "*b*"
 my_formats$SE@header <- "*se~b~*"
 my_formats$Std_Coefficient@formatter = \(x) align_chr(
@@ -1381,19 +1427,21 @@ my_formats$Std_Coefficient@formatter = \(x) align_chr(
   accuracy = .01, 
   trim_leading_zeros = TRUE)
 
-apa_parameters(m2, column_formatter = my_formats) |> 
+apa_parameters(m2, parameter_formatter = my_formats) |> 
   apa_flextable()
 ```
 
 If we want this to be the new within-session default, we can set it like so:
 
 ```{r}
+#| label: myformatssetdefault
 apa7_defaults(parameter_formatter = my_formats, accuracy = .001)
 ```
 
 Now the new defaults need not be specified each time:
 
 ```{r}
+#| label: apa_parametersflextable
 apa_parameters(m2) |> 
   apa_flextable()
 ```
@@ -1401,12 +1449,14 @@ apa_parameters(m2) |>
 The "default" defaults can be reset like so:
 
 ```{r}
+#| label: apa7defaultsreset
 apa7_defaults(reset = TRUE)
 ```
 
 Thus, the columns are back to what they were before:
 
 ```{r}
+#| label: apa_parametersflextable2
 apa_parameters(m2) |> 
   apa_flextable()
 ```
@@ -1414,19 +1464,12 @@ apa_parameters(m2) |>
 
 The `apa_format_columns` function and a few others like `apa_parameters`, `apa_performance`, and `apa_compare_performance` can process tables with 
 
-
-
 ```{r}
 #| label: tbl-715
 #| tbl-cap: Regression Coefficients of Leader Sleep on Charismatic Leadership
 
-
-
-pf <- apa7::parameter_formatter()
+pf <- parameter_formatter()
 pf$SE@header <- "*SE*"
-
-
-
 
 m <- list(`Model 1` = m1, 
           `Model 2` = m2) 
@@ -1434,11 +1477,11 @@ m <- list(`Model 1` = m1,
 d_parameters <- apa_parameters(
   m, 
   predictor_parameters = c("Coefficient", "Std_Coefficient", "SE"), 
-  column_formatter = pf)
+  parameter_formatter = pf)
 
 d_performance <- apa_performance_comparison(
   m,
-  performance_metrics = c("R2", "deltaR2"),
+  metrics = c("R2", "deltaR2"),
   starred = "deltaR2") |> 
   pivot_longer(-Model, names_to = "Variable") |> 
   mutate(Model = paste0(Model, "_&beta;")) |> 
@@ -1461,42 +1504,971 @@ d_parameters |>
   apa_flextable(table_width = 1) |> 
   colformat_md(part = "all") |>
   align(j = 1, align = "left") |> 
-  flextable::add_footer_lines(values = as_paragraph_md("*Note*. *N* = 88. We examined the impact of leader sleep condition (control vs. sleep deprived) on ratings of charismatic leadership. In Models 1 and 2, we entered the control variable of leader gender to predict leader charisma.")) |> 
-  footnote(i = 2, j = 1, value = as_paragraph("Male = 1, female = 2. "), ref_symbols = "a ") |>
-    footnote(i = 3, j = 1, value = as_paragraph("Control condition = 0, sleep-deprived condition = 1"), ref_symbols = "b ", inline = T, sep = ".") |> 
-  add_footer_lines(values = as_paragraph_md("\\* *p* < .05. \\*\\* *p* < .01."))
+  flextable::add_footer_lines(values = as_paragraph_md("*Note*. *N*&nbsp;=&nbsp;88. We examined the impact of leader sleep condition (control vs. sleep deprived) on ratings of charismatic leadership. In Models 1 and 2, we entered the control variable of leader gender to predict leader charisma.")) |> 
+  footnote(i = 2, 
+           j = 1, 
+           value = as_paragraph("Male = 1, female = 2. "), 
+           ref_symbols = "a ") |>
+    footnote(i = 3, 
+             j = 1, 
+             value = as_paragraph(
+               "Control condition = 0, sleep-deprived condition = 1"), 
+             ref_symbols = "b ", 
+             inline = T, 
+             sep = ".") |> 
+  add_footer_lines(
+    values = as_paragraph_md("\\* *p* < .05. \\*\\* *p* < .01."))
 ```
+
+<hr>
+
+## APA Table 7.16
+
+:::{.callout-note}
+# Highlights
+
+* Two levels of grouping with `flextable::as_grouped_data`
+
+:::
+
+![Screenshot of the *APA Manual*'s Table 7.16](table716.png){#fig-716 width="100%"}
 
 ```{r}
+#| label: tbl-716
+#| tbl-cap: "Regressions of Associations Between Marital 
+#|           Satisfaction and Average Levels of Marital Behavior"
+#| apa-note: "CI&nbsp;=&nbsp;confidence interval; H → H&nbsp;=&nbsp;husband-as-actor 
+#|           effect on the husband’s own marital satisfaction; 
+#|           W → W&nbsp;=&nbsp;wife-as-actor effect on the wife's own marital 
+#|           satisfaction; W → H&nbsp;=&nbsp;wife-as-partner effect on the 
+#|           husband’s satisfaction; H → W&nbsp;=&nbsp;husband-as-partner 
+#|           effect on the wife's satisfaction."
+#| echo: fenced
+set.seed(123)
+# Make Coefficients
+d_coefficients <- tibble::tribble(
+        ~Dependent,    ~Group, ~Predictor,     ~b,
+  "Angry Behavior",   "Actor",       "H_H",  -98.9,
+  "Angry Behavior",   "Actor",       "W_W", -87.11,
+  "Angry Behavior", "Partner",       "W_H", -76.18,
+  "Angry Behavior", "Partner",       "H_W",  -91.8,
+       "Disregard",   "Actor",       "H_H", -38.62,
+       "Disregard",   "Actor",       "W_W", -47.54,
+       "Disregard", "Partner",       "W_H", -82.81,
+       "Disregard", "Partner",       "H_W", -79.36,
+      "Distancing",   "Actor",       "H_H", -47.42,
+      "Distancing",   "Actor",       "W_W",   3.04,
+      "Distancing", "Partner",       "W_H",  -0.05,
+      "Distancing", "Partner",       "H_W",  -53.5
+  ) 
 
-mtcars2 <- within(mtcars, {
-   vs <- factor(vs, labels = c("V", "S"))
-   am <- factor(am, labels = c("automatic", "manual"))
-   cyl  <- ordered(cyl)
-   gear <- ordered(gear)
-   carb <- ordered(carb)
-})
+# Make Model
+model <- d_coefficients |> 
+  mutate(b = b / 100) |>
+  unite(Predictor, c(Group, Predictor)) |> 
+  mutate(across(c(Dependent, Predictor), snakecase::to_snake_case)) |> 
+  unite(b, c(b, Predictor), sep = " * ") |> 
+  summarise(b = paste(b, collapse = " + "), .by = Dependent) |> 
+  unite(Model, c(Dependent, b), sep = " ~ ") |> 
+  pull(Model) 
 
-model <- lm(Sepal.Length ~ Species * Sepal.Width, data = iris)
-model
-fit <- lm(mpg ~ cyl + wt + I(wt^2), data = mtcars2)
-
-apa_parameters(fit)
-parameters_type(fit)
-parameters::format_parameters(fit)
-apa_parameters(fit, starred = "Coefficient")
-# parameters_type(model, ...)
-lm(mpg ~ cyl * wt, data = mtcars2) |>
-  parameters() |>
+# Make data
+d <- lavaan::simulateData(model, sample.nobs = 50) |> 
   as_tibble() |> 
-  mutate(Parameter = Parameter |> 
-           
-           str_replace_all("\\:", "_:_") |>
-           snakecase::to_title_case(abbreviations = c(":"
-  )) |> str_replace_all("\\:", " \u00D7 ")) |> 
-  # apa_format_columns() |>
-  flextable() |>
-  colformat_md(part = "header") |>
-  align(j = 1)
+  mutate(id = row_number(), .before = 0) |> 
+  pivot_longer(angry_behavior:distancing, 
+               values_to = "y", names_to = "Dependent") |> 
+  mutate(y = y  * 100) |> 
+  nest(data = -Dependent)
+
+
+# Analyze data
+d <- d |> 
+  mutate(
+    fit = map(data, \(d) {
+      lm(y ~ ., data = d |> select(-id))
+      }),
+    tbl = map(fit, parameters::parameters))
+  
+# Format data
+d <- d |> 
+  select(Dependent, tbl) |> 
+  unnest(tbl) |> 
+  apa_format_columns() |> 
+  filter(Variable != "Constant") |> 
+  separate(Variable, c("Type", "i", "d")) |> 
+  mutate(across(c(i,d), toupper)) |> 
+  unite(Variable, c(i, d), sep = c(" \u2192 ")) |> 
+  relocate(`95% CI`, .after = last_col()) |> 
+  as_grouped_data(groups = c("Dependent", "Type")) |> 
+  mutate(across(c(Type, Variable), \(x) tidyr::replace_na(x, ""))) |> 
+  mutate(Variable = paste0(Type, Variable, recycle0 = TRUE),
+         Dependent = snakecase::to_sentence_case(Dependent)) |> 
+  fill(Dependent) |> 
+  filter(Variable != "") |> 
+  select(-Type)
+
+# Make Table
+d |> 
+  apa_flextable(row_title_column = "Dependent", 
+                layout = "fixed",
+                line_spacing = 1.5) |> 
+  padding(j = 1, 
+          i = ~`*B*` != "", 
+          padding.left = 20) |> 
+  width(width = c(1.1, rep(.85, 4), 2)) 
 ```
 
+<hr>
+
+## APA Table 7.17
+
+:::{.callout-note}
+# Highlights
+
+* Confidence intervals in two columns
+
+:::
+
+![Screenshot of the *APA Manual*'s Table 7.17](table717.png){#fig-717 width="100%"}
+
+```{r}
+#| label: tbl-717
+#| tbl-cap: "Moderator Analysis: Types of Measurement and Study Year"
+#| apa-note: 
+#|   - "Number of studies&nbsp;=&nbsp;120, number of
+#|     effects&nbsp;=&nbsp;782, total 
+#|     *N*&nbsp;=&nbsp;52,578. CI&nbsp;=&nbsp;confidence 
+#|     interval; *LL*&nbsp;=&nbsp;lower limit; 
+#|     *UL*&nbsp;=&nbsp;upper limit."
+#|   - "^a&nbsp;^0&nbsp;=&nbsp;self-report, 
+#|     1&nbsp;=&nbsp;test. ^b&nbsp;^ 0&nbsp;= test, 
+#|     1&nbsp;=&nbsp;grade point average. ^c&nbsp;^Study 
+#|     year was grand centered. ^d&nbsp;^0&nbsp;=&nbsp;other, 
+#|     1&nbsp;=&nbsp;yes. ^e&nbsp;^0&nbsp;= no, 
+#|     1&nbsp;=&nbsp;yes."
+#| echo: fenced
+
+
+
+# Make data
+d <- tibble(
+  effect_type = c(
+    "Fixed effects",
+    "Fixed effects",
+    "Fixed effects",
+    "Fixed effects",
+    "Fixed effects",
+    "Fixed effects",
+    "Random effects",
+    "Random effects"
+  ),
+  Effect = c(
+    "Intercept",
+    "Creativity measurement^&thinsp;a^",
+    "Academic achievement measurement^&thinsp;b^",
+    "Study year^&thinsp;c^",
+    "Goal^&thinsp;d^",
+    "Published^&thinsp;e^",
+    "Within-study variance",
+    "Between-study variance"
+  ),
+  Estimate = c(0.119, 0.097, -0.039, 2e-04, 
+               -0.003, 0.054, 0.009, 0.018),
+  SE = c(0.04, 0.028, 0.018, 0.001, 
+         0.029, 0.03, 0.001, 0.003),
+  `95% CI_*LL*` = c(0.041, 0.042, -0.074, -0.001, 
+                    -0.06, -0.005, 0.008, 0.012),
+  `95% CI_*UL*` = c(0.198, 0.153, -0.004, 0.002, 
+                    0.054, 0.114, 0.011, 0.023),
+  p = c(0.003, 0.001, 0.03, 0.76, 
+        0.91, 0.07, 9e-04, 9e-04)
+) 
+
+# Format data
+d <- d |> 
+  mutate(Estimate = align_chr(
+    Estimate, 
+    accuracy = .0001, 
+    drop0trailing = TRUE, 
+    trim_leading_zeros = TRUE)) |> 
+  mutate(across(
+    c(Estimate:`95% CI_*UL*`), 
+    \(x) align_chr(
+      x, 
+      accuracy = .001, 
+      trim_leading_zeros = TRUE))) |> 
+  mutate(Effect = hanging_indent(Effect, width = 35)) |> 
+  apa_format_columns()
+
+# Make table
+d |> 
+  apa_flextable(row_title_column = "effect_type",
+                layout = "fixed") |> 
+  align(j = 1) |> 
+  padding(j = 1, 
+          padding.left = c(0, 
+                           15, 
+                           rep(30, 5), 
+                           0, 
+                           rep(15, 2))) |> 
+  width(width = c(2.5, rep(.8, 5)))
+
+
+```
+
+
+## APA Table 7.18
+
+:::{.callout-note}
+# Highlights
+
+* Two levels of grouping with `flextable::as_grouped_data`
+
+:::
+
+![Screenshot of the *APA Manual*'s Table 7.18](table718.png){#fig-718 width="100%"}
+
+```{r}
+#| label: tbl-718
+#| tbl-cap: "Hierarchical Regression: Results for Well-Being"
+#| echo: fenced
+#| apa-note: 
+#|   - "CI = confidence interval; *LL*&nbsp;=&nbsp;lower limit; 
+#|   *UL*&nbsp;=&nbsp;upper limit; familismo = the collective 
+#|   importance of family unity that emphasizes interdependence
+#|   and solidarity; Mex Am margin&nbsp;=&nbsp;Mexican 
+#|   American marginalization."
+#|   - "^\\*^*p* < .05. ^\\*\\*^*p* < .01. ^\\*\\*\\*^*p* < .001."
+set.seed(7)
+# Make coefficients
+d_coefficients <- tibble::tribble(
+  ~Step,                ~Variable, ~beta,    ~b,
+     1L, "Perceived social class",  0.31,  0.45,
+     1L,       "Generation level", -0.01, -0.01,
+     2L,              "Familismo",  0.23,  0.37,
+     2L,          "Acculturation",  0.05,  0.11,
+     2L,          "Enculturation",  0.24,  0.35,
+     2L,        "Mex {Am} margin", -0.17, -0.23,
+     3L,   "Masculinity ideology", -0.18, -0.05
+  ) |> 
+  mutate(vname = snakecase::to_any_case(
+    Variable, 
+    case = "parsed") |> fct_inorder(),
+    Variable = fct_inorder(Variable))
+
+# Make data
+d <- d_coefficients |> 
+  unite(vname, c(beta, vname), 
+        sep = " * ") |> 
+  pull(vname) |> 
+  paste(collapse = " + ") |> 
+  {\(x) paste0("y ~ ", x)}() |> 
+  lavaan::simulateData(standardized = TRUE, sample.nobs = 200) |> 
+  mutate(y = y + 4) |> 
+  as_tibble()
+
+# Rescale data
+for (i in seq_len(nrow(d_coefficients))) {
+  d[,d_coefficients[i,]$vname] <- d[,d_coefficients[i,]$vname] * 
+    d_coefficients[i,]$beta / 
+    d_coefficients[i,]$beta
+}
+
+# Analyze data
+d_analysis <- d_coefficients |>
+  select(Step, vname) |>
+  crossing(Model = 1:3) |>
+  arrange(Model, Step) |>
+  filter(Step <= Model) |>
+  select(-Step) |>
+  summarise(f = paste0(vname, collapse = " + "), 
+            .by = Model) |>
+  mutate(
+    eq = paste0("y ~ ", f) |> map(formula),
+    fit = map(eq, lm, data = d),
+    Model = paste("Model", Model)
+  )
+
+# Format data
+d <- d_analysis |>
+  mutate(
+    parameters = map(fit, model_parameters),
+    std_parameters = map(fit, 
+                         model_parameters, 
+                         standardize  = "basic") |> 
+      map(\(d) select(d, Std_Coefficient))
+  ) |>
+  select(Model, parameters, std_parameters) |>
+  unnest(c(parameters, std_parameters)) |>
+  select(-CI, -t, -df_error) |>
+  rename(pp = p) |>
+  relocate(SE, .before = Std_Coefficient) |>
+  apa_format_columns() |>
+  rename(`95% CI for *B*_*LL*` = LL,
+         `95% CI for *B*_*UL*` = UL) |>
+  as_grouped_data("Model") |>
+  left_join(
+    d_analysis |>
+      pull(fit) |>
+      apa_performance_comparison(
+        starred = "deltaR2", 
+        metrics = c("R2", "deltaR2")),
+    by = join_by(Model)
+  ) |>
+  tidyr::replace_na(list(Model = "", Variable = "")) |>
+  unite(Variable, c(Variable, Model), sep = "") |>
+  mutate(
+    papa7starcolumn = p2stars(pp, superscript = T),
+    p2apa7starcolumn = papa7starcolumn,
+    .after = `*B*`
+  ) |>
+  relocate(p2apa7starcolumn, .after = `&beta;`) |>
+  select(-pp) |>
+  mutate(Variable = str_replace(Variable, "^Model", "Step") |> 
+           snakecase::to_sentence_case() |> 
+           str_replace(" am ", " Am ")) 
+
+# Make table
+d |> 
+  apa_flextable(line_spacing = 1.5, 
+                layout = "fixed") |>
+  padding(i = ~!is.na(`*B*`), 
+          j = 1, 
+          padding.left = 15) |>
+  surround(i = ~is.na(`*B*`), 
+           border.top = fp_border_default(color = "gray30")) |> 
+  width(width = 6.5 * c(3, .6,.4, 1,1, 1, .6,.4, 1,1) / 10)
+  
+
+```
+
+<hr>
+
+## APA Table 7.19
+
+
+![Screenshot of the *APA Manual*'s Table 7.19](table719.png){#fig-719 width="100%"}
+
+In the recreated table, the hanging indent for *Modified latent change* was omitted because the text is shorter than *Simplex contemporaneous*, which does not have a hanging indent.
+
+```{r}
+#| label: tbl-719
+#| tbl-cap: "Comparison of Fit Indices in Models Fitted to Simulated Data Across Longitudinal Mediation Model Types"
+#| echo: fenced
+#| apa-note: "AIC and BIC differences are relative to the simplex 
+#|   lagged model. RMSEA&nbsp;=&nbsp;root-mean-square error of 
+#|   approximation; CI&nbsp;=&nbsp;confidence interval; 
+#|   AIC&nbsp;=&nbsp;Akaike information criterion; 
+#|   BIC&nbsp;=&nbsp;Bayesian information criterion."
+tibble(
+             Model = c("Simplex lagged",
+                       "Simplex contemporaneous",
+                       "Latent growth",
+                       "Modified latent change"),
+  `&chi;^2^_Value` = c(63.3, 58, 65, 26.2),
+     `&chi;^2^_df` = c(28L, 29L, 33L, 33L),
+      `&chi;^2^_p` = c(1e-04, 0.001, 1e-04, 0.79),
+       RMSEA_Value = c(0.044, 0.04, 0.039, 0),
+    `RMSEA_95% CI` = c("[.030, .059]","[.024, .054]",
+                       "[.025, .053]","[.000, .020]"),
+           RMSEA_p = c(0.72, 0.87, 0.9, 0.999),
+               AIC = c(13479, 13472, 13471, 13432),
+               BIC = c(13658, 13646, 13627, 13588),
+      `deltaAIC` = c(NA, -7L, -8L, -47L),
+      `deltaBIC` = c(NA, -12L, -31L, -70L)
+) |> 
+  add_break_columns(RMSEA_Value, .before = T) |> 
+  mutate(RMSEA_Value = align_chr(
+    RMSEA_Value, 
+    accuracy = .001, 
+    trim_leading_zeros = TRUE)) |> 
+  apa_flextable(markdown_body = TRUE,
+                layout = "fixed", 
+                font_size = 11) |> 
+  width(width = c(1.8, .45, .35, .45, .05, .4, .85,.35, .5, .5, .4, .4)) 
+```
+
+<hr>
+
+## APA Table 7.20
+
+
+![Screenshot of the *APA Manual*'s Table 7.20](table720.png){#fig-720 width="100%"}
+
+
+### Level 1
+
+$$
+\begin{aligned}
+Y_{ij} &= b_{0j} + b_{1j}Time_{ij} + b_{2j}Time_{ij}^2 + e_{ij}\\
+e_{ij}&\sim\mathcal{N}\left(0,\tau_1\right)
+\end{aligned}
+$$
+
+### Level 2
+
+$$
+\begin{aligned}
+b_{0j} &= b_{00}+b_{01}PBS_j+b_{02}SFB_j+e_{0j}\\
+b_{1j} &= b_{10}+b_{11}PBS_j+b_{12}SFB_j+e_{1j}\\
+b_{2j} &= b_{20}+b_{21}PBS_j+b_{22}SFB_j+e_{2j}\\
+e_2&=\begin{bmatrix}
+e_{0j}\\
+e_{1j}\\
+e_{2j}
+\end{bmatrix}\\
+\tau_2&=\begin{bmatrix}
+\tau_{00}&0&0\\
+0&\tau_{11}&0\\
+0&0&\tau_{22}\\
+\end{bmatrix}\\
+e_2&\sim\mathcal{N}\left(0,\tau_2\right)
+\end{aligned}
+$$
+
+```{r}
+#| label: tbl-720
+#| tbl-cap: Model Parameters and Goodness of Fit for Linear and Quadratic Changes in Emotions by Behavior Type
+#| warning: false
+#| apa-note: 
+#|   - "Standard errors are in parentheses. All p values in this table are two tailed. In Model 1 (unconditional quadratic growth), the intercept parameter estimate (γ~00~) represents the average positive or negative emotions score at posttest across the sample. In Model 2 (prosocial and self-focused behavior vs. control), the intercept parameter estimate (γ~00~) represents the average positive or negative emotions score in the control condition at posttest, γ~02~ represents the difference at posttest between the prosocial behavior conditions and the control condition, and γ~03~ represents the difference at posttest between the self-focused behavior condition and the control condition. γ~10~ represents the average linear rate of change in the control condition, γ11 represents additional effects of prosocial behavior on linear rate of change, and γ~12~ represents additional effects of self-focused behavior on linear rate of change. Finally, γ~20~ represents the average quadratic rate of change in the control condition, γ~21~ represents additional effects of prosocial behavior on quadratic rate of change, and γ~22~ represents additional effects of self-focused behavior on quadratic rate of change. In all models, the intercept, linear slope (time), and quadratic slope (time2) were free to vary."
+#|   - "^\\*&nbsp;^*p* < .05. ^\\*\\*&nbsp;^*p* < .01. ^\\*\\*\\*&nbsp;^*p* < .001."
+set.seed(123)
+# Number of people
+n_2 <- 400
+# Number of time points
+n_1 <- 15
+
+d_parameter <- tibble::tibble(
+  symbol = c(
+    "b_00","b_01","b_02",
+    "b_10","b_11","b_12",
+    "b_20","b_21","b_22",
+    "s_e","s_0","s_1","s_2"),
+  Positive = c(
+    3.34,0.39,0.26,-0.002,-0.06,0.001,
+    -0.001,-0.03,-0.01,0.52,1.31,0.04,0.03),
+  Negative = c(
+    1.82,-0.36,-0.16,0.01,0.02,-0.04,0.02,
+    0.01,-0.01,0.51,1,0.02,0.02),
+  Parameter = c(
+     "(Intercept)",
+     "PBS",
+     "SFB",
+     "Time",
+     "PBS:Time",
+     "Time:SFB",
+     "I(Time^2)",
+     "PBS:I(Time^2)",
+     "I(Time^2):SFB",
+     "SD (Observations)",
+     "SD (Intercept)",
+     "SD (Time)", 
+     "SD (I(Time^2))"),
+  pname = c(
+    "Intercept",
+    "Prosocial behavior",
+    "Self-focused behavior",
+    "Time",
+    "Prosocial behavior", 
+    "Self-focused behavior",
+    "Time^2",
+    "Prosocial behavior", 
+    "Self-focused behavior",
+    "Level 1",
+    "Level 2",
+    "Level 2",
+    "Level 2"),
+  l2 = c(
+    rep("Status at postest, &pi;~0j~", 3),
+    rep("Linear rate of change, &pi;~1j~", 3),
+    rep("Quadratic rate of change, &pi;~2j~", 3),
+    rep("Variance components", 4)),
+  effecttype = c(
+    rep("Fixed", 9),
+    rep("Random",4))
+) |> 
+  mutate(symbol = fct_inorder(symbol),
+         pname = fct_inorder(pname))
+
+# Level 1 variances
+tau_1 <- d_parameter |> 
+  filter(symbol == "s_e") |> 
+  select(symbol, Positive, Negative) |>
+  pivot_longer(-symbol) |> 
+  select(name, value) |> 
+  deframe()
+
+# Level 2 variances
+tau_2 <- d_parameter |> 
+  filter(str_starts(symbol, "s_")) |> 
+  filter(symbol != "s_e") |> 
+  select(symbol, Positive, Negative) |>
+  pivot_longer(-symbol) |>
+  select(-symbol) |> 
+  nest(value = -name) |> 
+  mutate(value = map(
+    value, 
+    \(x) unlist(x) |> diag())) |> 
+  deframe()
+
+# Fixed effects
+d_parameter_fixed <- d_parameter |> 
+  filter(effecttype == "Fixed") |> 
+  select(symbol, Positive, Negative) |> 
+  pivot_longer(-symbol, 
+               names_to = "dv", 
+               values_to = "b") |>
+  pivot_wider(names_from = symbol, 
+              values_from = b)
+
+# Level 2 simulated data
+d_2 <- tibble(
+  id = seq_len(n_2),
+  Intercept = 1,
+  PBS = rnorm(n_2),
+  SFB = rnorm(n_2)
+) |> 
+  crossing(
+    dv = fct_inorder(c("Positive", 
+                       "Negative"))) |> 
+  nest(data = -dv) |> 
+    mutate(
+      tau_2 = tau_2, 
+      e_2 = map(
+        tau_2, 
+        \(x) {
+          mvtnorm::rmvnorm(
+            n = n_2, 
+            mean = c(
+              e_0j = 0, 
+              e_1j = 0, 
+              e_2j = 0), 
+            sigma = x) |> 
+            as_tibble()
+        })) |> 
+    select(-tau_2) |> 
+    unnest(c(data, e_2)) |> 
+  left_join(d_parameter_fixed, by = join_by(dv)) |> 
+  mutate(b_0j = b_00 + b_01 * PBS + b_02 * SFB + e_0j,
+         b_1j = b_10 + b_11 * PBS + b_12 * SFB + e_1j,
+         b_2j = b_20 + b_21 * PBS + b_22 * SFB + e_2j)
+
+# Level 1 simulated data
+d_1 <- d_2 |> 
+  crossing(
+    Time = seq(0, n_1 - 1)
+  ) |> 
+  nest(data = -dv) |> 
+  mutate(tau_1 = tau_1,
+         e_ij = map2(tau_1, data, \(tau, d) {
+           rnorm(nrow(d), sd = sqrt(tau))
+           })) |> 
+  unnest(c(data, e_ij)) |>
+  mutate(
+    y = b_0j + b_1j * Time + b_2j * Time^2 + e_ij) |> 
+  select(dv, id, PBS, SFB, Time, y) 
+
+# Analyze data
+fit <- d_1 |> 
+  nest(data = -dv) |> 
+  mutate(
+    `Model 1` = map(
+      data, 
+      \(d) {
+        lmer(y ~ 1 + Time + I(Time^2) + 
+               (1 + Time + I(Time^2) || id), 
+             data = d)
+      }),
+    `Model 2` = map(
+      data, 
+      \(d) {
+        lmer(y ~ 1 + PBS * Time + PBS * I(Time^2) + 
+               SFB * Time + SFB * I(Time^2) + 
+               (1 + Time + I(Time^2) || id), 
+             data = d)
+        })
+      ) |> 
+  select(-data) |> 
+  pivot_longer(-c(dv), 
+               names_to = "Model", 
+               values_to = "fit") |> 
+  mutate(
+    parameters = map(
+      fit, parameters::parameters, 
+      include_sigma = T))
+
+# Peformance statistics
+d_performance <- fit |> 
+  select(dv, fit) |> 
+  summarise(fit = list(fit), .by = dv) |> 
+  mutate(p = map(fit, \(f1) {
+    anova(f1[[1]], f1[[2]]) |> 
+      as_tibble() |> 
+      rename(Deviance = `-2*log(L)`, 
+             deltachi2 = Chisq,
+             df_diff = Df,
+             p = `Pr(>Chisq)`) |> 
+      mutate(Model = paste0("Model ", 1:2),
+             chistar = p2stars(p),
+             Deviance = align_chr(Deviance)) |> 
+      select(
+        Model, 
+        Deviance, 
+        deltachi2, 
+        df_diff, 
+        chistar) |> 
+      apa_format_columns() |> 
+      unite(`&Delta;&chi;^2^`, 
+            `&Delta;&chi;^2^`, 
+            chistar, 
+            sep = "")
+    })) |> 
+  select(-fit) |> 
+  arrange(desc(dv)) |> 
+  unnest(p) |> 
+  mutate(dv = paste0(dv, " emotions")) |>
+  unite(dv, c(dv, Model)) |> 
+  mutate(dv = fct_inorder(dv)) |> 
+  pivot_longer(-dv, names_to = "Effect") |> 
+  pivot_wider(names_from = dv) |> 
+  mutate(effecttype = "Goodness of fit") |> 
+  suppressMessages()
+  
+# Format data
+d <- fit |> 
+  unnest(parameters) |> 
+  select(dv, Model, Parameter, Coefficient, SE, p) |> 
+  mutate(stars = p2stars(p, superscript = T),
+         Coefficient = paste0(signs::signs(Coefficient, 
+                                    accuracy = .01), 
+                              stars),
+         SE = align_chr(SE, 
+                                    accuracy = .01) |> 
+           tagger(" (", ")"), 
+         b = paste0(Coefficient, SE),
+         dv = fct_inorder(paste(dv, "emotions"))) |> 
+  select(dv, Model, Parameter, b) |> 
+  unite(dv, c(dv, Model)) |> 
+  pivot_wider(names_from = dv, values_from = b) |> 
+  left_join(
+    d_parameter |> 
+      select(Parameter, 
+             symbol, 
+             pname, 
+             l2, 
+             effecttype), 
+    by = join_by(Parameter)) |> 
+  arrange(symbol) |> 
+  rename(Effect = pname) |> 
+  select(-Parameter) |> 
+  relocate(Effect, symbol, .before = 0) |> 
+  mutate(symbol = as.character(symbol) |> 
+           str_replace_all(
+             c(`s_` = "&sigma;~",
+               `b_` = "&gamma;~")) |> 
+           paste0("~", ifelse(
+             str_detect(symbol, "^s"), 
+             "^2^", 
+             ""))) |> 
+  mutate(Effect = as.character(Effect)) |> 
+  mutate(across(-c(symbol, Effect), 
+                \(x) str_trim(x))) |> 
+  as_grouped_data(c("effecttype", "l2"))  |> 
+  mutate(Effect = ifelse(is.na(l2), Effect, l2)) |> 
+  select(-l2) |> 
+  tidyr::fill(effecttype) |> 
+  filter(!is.na(Effect))  |> 
+  mutate(
+    across(
+      c(starts_with("Negative"),
+        starts_with("Positive")), 
+      \(x) {align_chr(str_trim(x), 
+                      side = "left")})) |> 
+  bind_rows(d_performance) |> 
+  mutate(across(
+    everything(), 
+    \(x) replace_na(x, replace = ""))) |> 
+  rename(`Parameter ` = symbol) |> 
+  add_break_columns(`Negative emotions_Model 2`)
+
+# Make table
+d |> 
+  apa_flextable(
+    row_title_column = "effecttype", 
+    font_size = 10, 
+    line_spacing = 1.5, 
+    layout = "fixed") |> 
+  align(j = 1, i = ~is.na(row_title)) |> 
+  padding(
+    j = 1, 
+    i = ~(is.na(row_title) & 
+            `Parameter ` != ""), 
+    padding.left = 15) |> 
+  merge_v(j = "Effect") |> 
+  width(width = c(1.75,.7,1,1,.05, 1,1))
+```
+
+<hr>
+
+## APA Table 7.21
+
+I did not have enough information to simulate the three models, so I input the data directly. This made it comparatively easy to recreate. Adding the star column by the $\chi^2$ column
+
+![Screenshot of the *APA Manual*'s Table 7.20](table721.png){#fig-721 width="100%"}
+
+```{r}
+#| label: tbl-721
+#| tbl-cap: "Results of Confirmatory Factor Analysis for the 
+#|   Relationships Among Three Types of Intelligence"
+#| echo: fenced
+#| apa-note: 
+#|   - "Structural equation modeling was used for the analysis. 
+#|     NFI&nbsp;=&nbsp;normed fit index; 
+#|     CFI&nbsp;=&nbsp;comparative fit index; 
+#|     RMSEA&nbsp;=&nbsp;root-mean-square error of 
+#|     approximation."
+#|   - "^a&thinsp;^In Model A, all 57 items of social 
+#|    intelligence, emotional intelligence, and cultural 
+#|    intelligence were loaded onto one factor. ^b&thinsp;^ 
+#|    In Model B, the 21 items of social intelligence were 
+#|    loaded onto one factor, and the 16 items of emotional 
+#|    intelligence and the 20 items of cultural intelligence 
+#|    were loaded onto another factor. ^c&thinsp;^ In Model C, 
+#|    the 21 items of social intelligence were loaded onto one 
+#|    factor, the 16 items of emotional intelligence were 
+#|    loaded onto a second factor, and the 20 items of 
+#|    cultural intelligence were loaded onto a third factor."
+#|   - "^\\*\\*\\*^*p* < .001."
+tibble(
+  Model = c(
+    "A: One-intelligence model^&thinsp;a^",
+    "B: Two-intelligences mode^&thinsp;b^",
+    "C: Three-intelligences model^&thinsp;c^"),
+  Chi2 = c(10994.664, 10091.236, 8640.066),
+  df = c(1539L, 1538L, 1536L),
+  NFI = c(0.296, 0.354, 0.447),
+  CFI = c(0.326, 0.39, 0.494),
+  RMSEA = c(0.115, 0.109, 0.1)
+) |> 
+  mutate(
+    Chi2 = paste0(align_chr(Chi2, accuracy = 0.001),"^\\*\\*\\*^")) |> 
+
+  apa_flextable(
+    parameter_formatter = parameter_formatter(accuracy = 0.001),
+    layout = "fixed") |> 
+  width(width = c(2.15,1.15,rep(3.2 / 4, 4)))
+
+```
+
+<hr>
+
+## APA Table 7.22
+
+This was relatively straightforward, except that I needed to play with the column widths and hanging indents until they fit in table 6.5 inches wide.
+
+![Screenshot of the *APA Manual*'s Table 7.22](table722.png){#fig-722 width="100%"}
+
+```{r}
+#| label: tbl-722
+#| tbl-cap: "Master Narrative Voices: Struggle and
+#|           Success and Emancipation"
+#| echo: fenced
+tibble(
+  theme = c(
+    "Struggle and success",
+    "Struggle and success",
+    "Emancipation",
+    "Emancipation"),
+  `Discourse and dimension` = c(
+    paste("Self actualization as a member of a larger",
+          "gay community is the end goal of healthy sexual",
+          "identity development or \"coming out\""),
+    paste("Maintaining healthy sexual identity entails",
+          "vigilance against internalization of",
+          "societal discrimination"),
+    paste("Open exploration of an individually fluid",
+          "sexual self is the goal of healthy sexual",
+          "identity development"),
+    paste("Questioning discrete, monolithic categories of",
+          "sexual identity")),
+  `Example quote` = c(
+    paste(
+      "\"My path of gayness...going from denial to saying,",
+      "'well, this is it,' and then the process of coming",
+      "out, and the process of just sort of looking around",
+      "and seeing, well where do I stand in the world? And",
+      "sort of having, uh, political feelings.\"",
+      "(Carl, age 50)"),
+    paste("\"When I'm, like, thinking of criticisms of",
+      "more mainstream gay culture, I try to...make sure",
+      "it's coming from an appropriate place and not, like,",
+      "a place of self loathing.\" (Patrick,age 20)"),
+    paste("\"[For heterosexuals] the man penetrates the",
+      "woman, whereas with gay people, I feel like there",
+      "is this potential for really playing around with",
+      "that model a lot, you know, and just experimenting",
+      "and exploring.\" (Orion, age 31)"),
+    paste("\"LGBTQI, you know, and added on so many letters.",
+      "It does start to raise the question about what the",
+      "terms mean and whether...any term can adequately be",
+      "descriptive.\" (Bill, age 50 )"))
+) |> 
+  mutate(
+    `Discourse and dimension` = hanging_indent(
+      `Discourse and dimension`,
+      width = 30),
+        `Example quote` = hanging_indent(
+      `Example quote`,
+      width = 55)
+    ) |> 
+  apa_flextable(
+    row_title_column = "theme", 
+    row_title_align = "left",
+    layout = "fixed",
+    line_spacing = 1.5) |> 
+  align() |> 
+  width(width = c(2.5, 4)) |> 
+  padding(j = 1, 
+          i = ~!is.na(`Discourse and dimension`), 
+          padding.left = 15)
+```
+
+
+
+<hr>
+
+## APA Table 7.23
+
+This was relatively straightforward, except that I needed to play with the column widths and hanging indents until they fit in table 6.5 inches wide.
+
+![Screenshot of the *APA Manual*'s Table 7.23](table723.png){#fig-723 width="100%"}
+
+```{r}
+#| label: tbl-723
+#| tbl-cap: "Reasons Why Individuals Chose to Watch
+#|           the Royal Wedding (*N* = 45)"
+#| echo: fenced
+
+tibble(
+   `Reason for interest` = c(
+     "Royal family and its history",
+     NA,
+     "Fashion and pop culture",
+     NA,
+     "Fairy tales and love stories",
+     NA,
+     "To pass time/it was on TV",
+     NA),
+   `Example quote` = c(
+     paste(
+       "\"I love all things British. I studied abroad in",
+       "the U.K. I also watched the weddings of Charles",
+       "& Diana and Andrew & Fergie. I watched Diana's",
+       "funeral. Watching William & Kate get married",
+       "seemed like the natural thing to do.\""),
+     paste(
+       "\"I find the royal family and their practices",
+       "and traditions fascinating. I'm a big fan of",
+       "tradition in any capacity (graduation ceremonies,",
+       "weddings, etc.) and enjoy watching traditions",
+       "older than our country (the U.S.).\""),
+     paste(
+       "\"When big pop culture things happen, I tend to",
+       "want to watch so I'm 'in on it.' Also, when I was",
+       "little my mom made us get up to watch Princess",
+       "Diana get married, so it felt a little like",
+       "tradition. \""),
+     paste(
+       "\"I was curious. Wanted to see her dress and how",
+       "the other people who attended dressed. Like pomp",
+       "and ceremony. \""),
+     paste(
+       "\"I watched his mom and dad get married, watched",
+       "him grow up. Plus I love a fairy tale that comes",
+       "true. I believe in love and romance\""),
+     paste(
+       "\"I am a romantic and I think this is a great",
+       "love story.\""),
+     paste(
+       "\"I was at the airport and it was broadcasting on",
+       "TV when I was waiting for my flight.\""),
+     paste("\"It was on CNN when I got up. \"")),
+  `Frequency, *n* (%)` = c(
+    "16 (35.6)",NA,
+    "13 (28.9)",NA,
+    "11 (24.4)",NA,
+    "5 (11.1)",NA)
+) |> 
+  mutate(`Reason for interest` = hanging_indent(`Reason for interest`, width = 16),
+         `Example quote` = hanging_indent(`Example quote`, width = 50),
+         `Frequency, *n* (%)` = align_chr(`Frequency, *n* (%)`)) |> 
+  apa_flextable(layout = "fixed", line_spacing = 1.5) |> 
+  align(j = 1:2) |> 
+  width(width = c(1.4, 3.8, 1.3)) 
+```
+
+<hr>
+
+## APA Table 7.24
+
+This was relatively straightforward, except that I needed to play with the column widths and hanging indents until they fit in table 6.5 inches wide.
+
+![Screenshot of the *APA Manual*'s Table 7.24](table724.png){#fig-724 width="100%"}
+
+```{r}
+#| label: tbl-724
+#| tbl-cap: "Integrated Results Matrix for the Effect of
+#|           Topic Familiarity on Reliance on Author Expertise"
+#| echo: fenced
+#| apa-note: "We integrated quantitative data (whether
+#|            students selected a card about nuclear power
+#|            or about climate change) and qualitative data
+#|            (interviews with students) to provide a more
+#|            comprehensive description of students’ card
+#|            selections between the two topics."
+
+tibble(
+  `Quantitative result` = c(
+    paste("When the topic was more (climate change) and", 
+          "cards were more relevant, participants placed", 
+          "less value on author expertise."),
+    paste("When the topic is less familiar (nuclear power)", 
+          "and cards were more relevant, participants", 
+          "placed more value on author expertise.")),
+   `Qualitative result` = c(
+     paste("When an assertion was considered to be more", 
+          "familiar and to be general knowledge,", 
+          "participants perceived less need to rely on", 
+          "author expertise."),
+     paste("When an assertion was considered to be less", 
+          "familiar and not general knowledge,", 
+          "participants perceived more need to rely on", 
+          "offer as brief expertise author expertise.")),
+  `Example quote` = c(
+    paste("Participant 144: \"I feel that I know more", 
+          "about climate, and there are several things", 
+          "on climate cards that are obvious, and that", 
+          "if I sort of know it already, then the source", 
+          "is not so critical... whereas with nuclear", 
+          "energy. I don't know so much, so then I may", 
+          "be more interested in who says what.\""),
+    paste("Participant 3: \"[Nuclear power], which I know", 
+          "much, much less about, I would back up my", 
+          "arguments more with what I trust from the", 
+          "professors.\""))
+) |> 
+  mutate(
+    `Quantitative result` = hanging_indent(
+      `Quantitative result`, width = 22),
+    `Qualitative result` = hanging_indent(
+      `Qualitative result`, width = 22),
+    `Example quote` = hanging_indent(
+      `Example quote`, width = 29)) |>
+  apa_flextable(layout = "fixed", line_spacing = 1.5) |>
+  align() |>
+  width(width = c(2,2,2.5))
+  
+
+```

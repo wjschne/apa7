@@ -11,7 +11,8 @@ apa_parameters(
   predictor_parameters = c("Coefficient", "SE", "Std_Coefficient", "t", "df_error", "p"),
   starred = NULL,
   bolded = NULL,
-  column_formatter = NULL
+  parameter_formatter = NULL,
+  t_with_df = TRUE
 )
 
 \method{apa_parameters}{lm}(
@@ -19,7 +20,8 @@ apa_parameters(
   predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
   starred = NA,
   bolded = NA,
-  column_formatter = NULL
+  parameter_formatter = NULL,
+  t_with_df = TRUE
 )
 
 \method{apa_parameters}{list}(
@@ -27,7 +29,8 @@ apa_parameters(
   predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
   starred = NA,
   bolded = NA,
-  column_formatter = NULL
+  parameter_formatter = NULL,
+  t_with_df = TRUE
 )
 }
 \arguments{
@@ -39,7 +42,9 @@ apa_parameters(
 
 \item{bolded}{columns to bold, if significant}
 
-\item{column_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
+\item{parameter_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
+
+\item{t_with_df}{if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.}
 }
 \value{
 tibble
@@ -50,6 +55,5 @@ format model parameters in APA style
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
    apa_parameters() |>
-   apa_flextable() |>
-   ftExtra::colformat_md(part = "all")
+   apa_flextable()
 }

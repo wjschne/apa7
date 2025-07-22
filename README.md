@@ -26,24 +26,47 @@ remotes::install_github("wjschne/apa7")
 
 ## Tables
 
+The package provides functions to create APA-style tables, including
+correlation matrices and regression tables. The tables can be formatted
+using the `flextable` package.
+
 ``` r
 library(apa7)
-apa_chisq(mtcars[, c("am", "gear")])
-#> Registered S3 method overwritten by 'ftExtra':
-#>   method                  from     
-#>   as_flextable.data.frame flextable
+# Correlation matrix 
+apa_cor(trees, star_significant = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+<img src="man/figures/README-showtables-1.png" width="100%" />
 
 ``` r
-apa_cor(trees)
+# Make regression model, format parameters, and display flextable
+lm(Volume ~ Girth + Height, data = trees) |> 
+  apa_parameters() |> 
+  apa_flextable()
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
-
-## Install apaquarto extension
+<img src="man/figures/README-showtables-2.png" width="100%" />
 
 ``` r
-apa7::install_apaquarto()
+
+# Contingency table with chi-square test of independence
+d <- mtcars[, c("am", "gear")]
+colnames(d) <- c("Transmission", "Gears")
+d$Transmission <- factor(d$Transmission, 
+                         levels = c(0, 1), 
+                         labels = c("Automatic", "Manual"))
+apa_chisq(d)
+```
+
+<img src="man/figures/README-showtables-3.png" width="100%" />
+
+## Formatting functions
+
+The package provides functions to format p-values, numbers, and other
+statistical results according to APA Style.
+
+``` r
+# Format p-values
+apa_p(c(0.0007, 0.001, 0.0081, 0.024, 0.454))
+#> [1] "<.001" ".001"  ".008"  ".02"   ".45"
 ```

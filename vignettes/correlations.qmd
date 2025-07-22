@@ -22,6 +22,7 @@ vignette: >
 library(apa7)
 library(dplyr)
 library(flextable)
+library(ftExtra)
 ```
 
 ```{r loading}
@@ -51,16 +52,7 @@ trees |>
 ```
 
 
-If you prefer to work with [gt tables](https://gt.rstudio.com/), set `output` function to `gt`.
-
-```{r}
-#| label: tbl-treesgt
-#| tbl-cap: Correlation table using gt via `apa_cor`
-trees |> 
-  apa_cor(output = "gt") 
-```
-
-If you want to use some other table package, you can output a tibble instead and then process the table however you want. 
+If you want to use another table package, you can output a tibble instead and then process the table however you want. 
 
 ```{r}
 #| label: tbl-treeskable
@@ -106,7 +98,6 @@ trees |>
           star_significant = TRUE, 
           significance_note = TRUE,
           summary_functions = my_summaries,
-          output = "flextable", 
           font_family = "Arial", 
           font_size = 10, 
           text_color = "darkred",
@@ -120,27 +111,14 @@ To remove summary statistics entirely, set `summary_functions` to `NA` or `NULL`
 ```{r nosummary}
 x <- apa_cor(trees, 
         summary_functions = NA, 
-        bold_significant = FALSE, output = "gt") 
+        bold_significant = FALSE) 
   
 ```
 
 # Customization
 
-The styling options for `apa_cor` are minimal, but flexable and gt tables allow for all kinds of customization. Just place whatever code from flextable or gt you want after `apa_cor`. For example, gt tables usually span 100% of the width in a space. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
+The styling options for `apa_cor` are minimal, but flexable  allows for all kinds of customization. Just place whatever code from flextable or gt you want after `apa_cor`. For example, gt tables usually span 100% of the width in a space. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
 
-```{r altgt}
-apa_cor(trees, 
-        output = "gt", 
-        significance_note = T, ) |> 
-  gt::tab_options(table.width = gt::pct(50), 
-                  table.align = "left") |> 
-  gt::tab_footnote("This is a footnote.", 
-                   locations = gt::cells_body(
-                     columns = "Variable", 
-                     rows = 2)) 
-```
-
-Here I do the same with flextable:
 
 ```{r altflextable}
 apa_cor(trees) |>

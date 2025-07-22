@@ -5,7 +5,7 @@
 \alias{bold_md}
 \alias{italic_md}
 \alias{superscript_md}
-\alias{subcript_md}
+\alias{subscript_md}
 \alias{header_md}
 \title{Surrounds text with tags unless empty}
 \usage{
@@ -17,7 +17,7 @@ italic_md(x)
 
 superscript_md(x)
 
-subcript_md(x)
+subscript_md(x)
 
 header_md(x, level = 1)
 }

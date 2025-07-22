@@ -30,7 +30,7 @@ apa_flextable(
   markdown_header = markdown,
   markdown_body = markdown,
   auto_format_columns = TRUE,
-  column_formatter = NULL,
+  parameter_formatter = NULL,
   ...
 )
 }
@@ -82,6 +82,10 @@ apa_flextable(
 \item{markdown_header}{apply markdown formatting to header}
 
 \item{markdown_body}{apply markdown formatting to body}
+
+\item{auto_format_columns}{if true, will attempt to format some columns automatically}
+
+\item{parameter_formatter}{an apa_parameter_formatter object}
 
 \item{...}{arguments passed to \code{apa_style}}
 }

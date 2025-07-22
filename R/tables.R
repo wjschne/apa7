@@ -65,7 +65,79 @@ add_break_columns <- function(d,
 
 }
 
+#' Add columns that separate significance stars from numbers
+#'
+#' @param data data.frame or tibble
+#' @param ... column names or tidyselect function
+#' @param superscript make stars superscript
+#' @param star character to use for stars (default: "\\*")
+#' @param star_replace character to replace stars with (default: "\\\\*")
+#'
+#' @returns data.frame or tibble
+#' @export
+#'
+#' @examples
+#' tibble::tibble(x = c(".45", ".58*", ".68**"),
+#'                y = c(1,2,3),
+#'                z = 4:6) |>
+#'                add_star_column(x)
+add_star_column <- function(data, ..., superscript = TRUE, star = "\\*", star_replace = "\\\\*") {
+  .dots <- rlang::expr(...)
+  apa7rownumber <- apa7starvalue <- apa7starname <- apa7starcolumn <- NULL
 
+  if (missing(.dots)) .dots = colnames(data)
+  ss <- ifelse(superscript, "^", "")
+
+  d <- data |>
+    dplyr::mutate(dplyr::across({{ .dots }}, as.character)) |>
+    dplyr::mutate(apa7rownumber = dplyr::row_number()) |>
+    tidyr::pivot_longer(cols = c({{ .dots }}, -apa7rownumber),
+                        names_to = "apa7starname",
+                        values_to = "apa7starvalue") |>
+    dplyr::mutate(
+      apa7starcolumn = stringr::str_extract(
+        apa7starvalue,
+        paste0("[",star, "]+")) |>
+        stringr::str_replace_all(star, star_replace),
+      apa7starvalue = stringr::str_remove_all(apa7starvalue, star)) |>
+    dplyr::mutate(apa7starcolumn = ifelse(
+      is.na(apa7starcolumn),
+      apa7starcolumn,
+      paste0(ss, apa7starcolumn, ss))) |>
+    tidyr::pivot_wider(names_from = apa7starname,
+                       values_from = c(apa7starvalue,
+                                       apa7starcolumn),
+                       names_glue = "{apa7starname}_{.value}",
+                       names_vary = "slowest") |>
+    dplyr::select(-apa7rownumber) |>
+    dplyr::rename_with(\(.x) stringr::str_remove(.x, "_apa7starvalue")) |>
+    dplyr::rename_with(\(.x) stringr::str_replace(.x, "_apa7starcolumn", "apa7starcolumn"))
+
+  # names of star columns
+  star_keys <- d |>
+    dplyr::select(dplyr::ends_with("apa7starcolumn")) |>
+    colnames()
+
+  # names of  variable with accompanying star columns
+  r_keys <- stringr::str_remove(star_keys, "apa7starcolumn$")
+
+  # all columns
+  c_names <- colnames(data)
+
+  # reordered columns with star columns
+  c_names_reordered <- purrr::map(c_names, \(cn) {
+    if (cn %in% r_keys) {
+      paste0(cn, c("", "apa7starcolumn"))
+    } else {
+      cn
+    }
+  }) |>
+    unlist()
+
+  # Return reordered columns
+  dplyr::select(d, dplyr::all_of(c_names_reordered))
+
+}
 
 #' Make contingency table with chi-square test of independence
 #'
@@ -105,9 +177,6 @@ apa_chisq <- function(x,
   }
 
   ef <- effectsize::effectsize(fit, type = "cramers_v")
-
-
-
 
   dd <- tbl |>
     tibble::as_tibble() |>
@@ -277,12 +346,9 @@ apa_cor <- function(data,
     p[nchar(p) > 0] <- paste0("^", p[nchar(p) > 0], "^")
 
     Rstar <- matrix(p, nrow = length(v_names))
-    print(Rstar)
 
     colnames(Rstar) <- star_names
     rownames(Rstar) <- star_names
-
-
 
     Rstar[upper.tri(Rstar, diag = TRUE)] <- ""
     Rstar <- tibble::as_tibble(Rstar)
@@ -394,6 +460,7 @@ apa_cor <- function(data,
   column_percent <- 100 * max_char / sum(max_char)
 
   k_functions <- ncol(d_msd)
+  d_msd <- apa_format_columns(d_msd)
 
   d_R <- dplyr::bind_cols(d_msd, R) |>
     dplyr::mutate(
@@ -412,6 +479,8 @@ apa_cor <- function(data,
                 border_color = border_color,
                 border_width = border_width,
                 line_spacing = line_spacing) |>
+      flextable::align(align = "center",
+                       part = "all") |>
       flextable::align(j = "Variable",
                        align = "left",
                        part = "all") |>
@@ -420,11 +489,7 @@ apa_cor <- function(data,
                        part = "all") |>
       flextable::align(j = star_names,
                        align = "left",
-                       part = "all") |>
-      flextable::italic(j = colnames(d_msd)[-1],
-                        part = "header",
-                        italic = TRUE) |>
-      ftExtra::colformat_md(j = -dplyr::ends_with("apa7starcolumn"))
+                       part = "all")
 
     if (star_significant) {
       d <- d |>
@@ -491,7 +556,6 @@ apa_cor <- function(data,
                                 space = line_spacing) |>
         flextable::color(part = "footer",
                          color = text_color)
-
     }
 
     d_R <- flextable::autofit(d, add_w = 0, add_h = 0)
@@ -603,6 +667,8 @@ apa_cor <- function(data,
 #' @param cheight initial cell height in inches
 #' @param apastyle apply `apa_style` function (default: `TRUE`)
 #' @param separate_headers separate header rows (default: `TRUE`)
+#' @param auto_format_columns if true, will attempt to format some columns automatically
+#' @param parameter_formatter an apa_parameter_formatter object
 #' @inheritParams apa_style
 #' @param ... arguments passed to `apa_style`
 
@@ -652,11 +718,11 @@ apa_flextable <- function(data,
                           markdown_header = markdown,
                           markdown_body = markdown,
                           auto_format_columns = TRUE,
-                          column_formatter = NULL,
+                          parameter_formatter = NULL,
                           ...) {
-  column_n <- row_title <- value <- name <- NULL
+  column_n <- row_title <- value <- name <- newname <- NULL
 
-  if (is.null(column_formatter)) column_formatter <- the$column_formatter
+  if (is.null(parameter_formatter)) parameter_formatter <- the$parameter_formatter
 
   if (row_title_prefix == "")  {
     row_title_sep <- ""
@@ -668,21 +734,16 @@ apa_flextable <- function(data,
 
   if (auto_format_columns) {
     cn_before <- colnames(data)
-    data <- apa_format_columns(data, formatter = column_formatter)
+    data <- apa_format_columns(data, parameter_formatter = parameter_formatter)
     cn_after <- colnames(data)
     kv <- tibble::tibble(name = cn_before,
                          newname = cn_after)
 
     col_keys <- tibble::tibble(name = col_keys) |>
-      dplyr::left_join(kv, by = join_by(name)) |>
+      dplyr::left_join(kv, by = dplyr::join_by(name)) |>
       dplyr::mutate(newname = ifelse(is.na(newname), name, newname)) |>
       dplyr::pull(newname)
-
   }
-
-
-
-
 
   is_docx <- knitr::pandoc_to("docx")
 
@@ -693,19 +754,21 @@ apa_flextable <- function(data,
   }
 
   if (is.null(row_title_column)) {
-    ft <- flextable::flextable(d,
-                               col_keys = col_keys[!(col_keys %in% row_title_column)],
-                               cwidth = cwidth,
-                               cheight = cheight,
-                               theme_fun = flextable::theme_apa)
+    ft <- flextable::flextable(
+      d,
+      col_keys = col_keys[!(col_keys %in% row_title_column)],
+      cwidth = cwidth,
+      cheight = cheight,
+      theme_fun = flextable::theme_apa)
   } else {
-
     d <- flextable::as_grouped_data(d, groups = row_title_column)
 
     d$row_title <- d[, row_title_column]
     d <- tidyr::fill(d, !!row_title_column)
 
-    d <- d |> dplyr::mutate(column_n = dplyr::n(), .by = !!row_title_column) |> dplyr::filter(column_n > 2 | is.na(row_title )) |>
+    d <- d |>
+      dplyr::mutate(column_n = dplyr::n(), .by = !!row_title_column) |>
+      dplyr::filter(column_n > 2 | is.na(row_title )) |>
       dplyr::select(-column_n)
 
     ft <- flextable::flextable(
@@ -730,7 +793,6 @@ apa_flextable <- function(data,
         )
     }
 
-
   }
 
   if (separate_headers) ft <- flextable::separate_header(ft,split = "[_]")
@@ -744,7 +806,6 @@ apa_flextable <- function(data,
   if (length(center_me) > 0) {
     ft <- flextable::align(ft, j = center_me, align = "center")
   }
-
 
   if (apastyle) {
     ft <- apa_style(ft,
@@ -764,7 +825,6 @@ apa_flextable <- function(data,
                     ...)
   }
 
-
   if ("row_title" %in% colnames(d)) {
     ft <- flextable::align(ft, i = ~ !is.na(row_title),
                            align = row_title_align,
@@ -777,20 +837,14 @@ apa_flextable <- function(data,
   ft
 }
 
-
-
-
-
-
-
-
 #' format model parameters in APA style
 #'
 #' @param fit model fit object
 #' @param predictor_parameters predictor parameters to display. If named vector, column names will be vector names
 #' @param starred columns to star with significant p_values
 #' @param bolded columns to bold, if significant
-#' @param column_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
+#' @param parameter_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
+#' @param t_with_df if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.
 #'
 #' @returns tibble
 #' @export
@@ -798,8 +852,7 @@ apa_flextable <- function(data,
 #' @examples
 #' lm(mpg ~ cyl + wt, data = mtcars) |>
 #'    apa_parameters() |>
-#'    apa_flextable() |>
-#'    ftExtra::colformat_md(part = "all")
+#'    apa_flextable()
 apa_parameters <- function(
     fit,
     predictor_parameters = c("Coefficient",
@@ -810,7 +863,8 @@ apa_parameters <- function(
                              "p"),
     starred = NULL,
     bolded = NULL,
-    column_formatter = NULL) {
+    parameter_formatter = NULL,
+    t_with_df = TRUE) {
   UseMethod("apa_parameters")
 }
 
@@ -827,21 +881,18 @@ apa_parameters.lm <- function(
       "p"),
    starred = NA,
    bolded = NA,
-   column_formatter = NULL
+   parameter_formatter = NULL,
+   t_with_df = TRUE
    ) {
   pstar <- NULL
   Parameter <- Std_Coefficient <- df_error <- header <- name <- NULL
-  if (is.null(column_formatter)) column_formatter <- the$parameter_formatter
+  if (is.null(parameter_formatter)) parameter_formatter <- the$parameter_formatter
 
   if (!("Parameter" %in% predictor_parameters)) {
     predictor_parameters <- c("Parameter", predictor_parameters)
   }
 
   names(predictor_parameters) <- NULL
-
-
-
-
 
   d_b <- parameters::model_parameters(fit) |>
     tibble::as_tibble() |>
@@ -859,36 +910,35 @@ apa_parameters.lm <- function(
 
   d_b_new <- d_b
 
-  if (all(c("t", "df_error") %in% colnames(d_b)) &&
-      !is.null(column_formatter$CI) && ("t" %in% predictor_parameters)) {
-    df <- paste0("(", align_chr(max(d_b$df_error, na.rm = TRUE), accuracy = the$accuracy), ")")
-    column_formatter$t@header <- paste0(column_formatter$t@header, df)
+  if (t_with_df) {
 
-    if (stringr::str_detect(column_formatter$t@latex, "\\$")) {
-      column_formatter$t@latex <- stringr::str_replace(
-        column_formatter$t@latex,
+  if (all(c("t", "df_error") %in% colnames(d_b)) &&
+      !is.null(parameter_formatter$CI) && ("t" %in% predictor_parameters)) {
+    df <- paste0("(", align_chr(max(d_b$df_error, na.rm = TRUE), accuracy = the$accuracy), ")")
+    parameter_formatter$t@header <- paste0(parameter_formatter$t@header, df)
+
+    if (stringr::str_detect(parameter_formatter$t@latex, "\\$")) {
+      parameter_formatter$t@latex <- stringr::str_replace(
+        parameter_formatter$t@latex,
         "\\$$",
         paste0(df, "$"))
     } else {
-      column_formatter$t@latex <- paste0(column_formatter$t@latex, df)
+      parameter_formatter$t@latex <- paste0(parameter_formatter$t@latex, df)
     }
 
     d_b_new <- d_b_new |>
       dplyr::select(-df_error)
-
-
-  }
+  }}
 
   for (pr in predictor_parameters) {
-    if (!is.null(column_formatter[[pr]])) {
+    if (!is.null(parameter_formatter[[pr]])) {
       # formals(mean)
       d_b_new <- dplyr::mutate(
         d_b_new,
         dplyr::across(
           dplyr::any_of(pr),
-          column_formatter[[pr]]@formatter))
+          parameter_formatter[[pr]]@formatter))
     }
-
   }
 
   if (length(starred > 0) & !is.na(starred) & (starred != "")) {
@@ -907,17 +957,13 @@ apa_parameters.lm <- function(
           \(x) tagger(x, my_bold)))
   }
 
-  prs <- column_formatter@get_tibble
-
+  prs <- parameter_formatter@get_tibble
 
   pr_selector <- tibble::tibble(name = predictor_parameters) |>
     dplyr::left_join(prs, by = "name") |>
     dplyr::select(header, name) |>
     dplyr::mutate(header = ifelse(is.na(header), name, header)) |>
     tibble::deframe()
-
-
-
 
   d_b_new |>
     dplyr::select(dplyr::any_of(pr_selector))
@@ -936,19 +982,19 @@ apa_parameters.list <- function(
       "p"),
     starred = NA,
     bolded = NA,
-    column_formatter = NULL) {
+    parameter_formatter = NULL,
+    t_with_df = TRUE) {
   if (is.null(names(fit))) {
     names(fit) <- paste("Model", seq(1, length(fit)))
   }
-  purrr::map_df(fit, \(f1) apa_parameters(f1, predictor_parameters = predictor_parameters, column_formatter = column_formatter), .id = "Model")
+  purrr::map_df(fit, \(f1) apa_parameters(f1, predictor_parameters = predictor_parameters, parameter_formatter = parameter_formatter), .id = "Model")
 }
-
 
 #' format model performance metrics in APA style
 #'
 #' @param fit model fit object
 #' @param metrics performance metrics. Default is R2 and Sigma
-#' @param column_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
+#' @param parameter_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
 #'
 #' @returns tibble
 #' @export
@@ -956,12 +1002,11 @@ apa_parameters.list <- function(
 #' @examples
 #' lm(mpg ~ cyl + wt, data = mtcars) |>
 #'    apa_performance() |>
-#'    apa_flextable() |>
-#'    ftExtra::colformat_md(part = "all")
+#'    apa_flextable()
 apa_performance <- function(
     fit,
     metrics = c("R2", "Sigma"),
-    column_formatter = NULL) {
+    parameter_formatter = NULL) {
   UseMethod("apa_performance")
 }
 
@@ -970,54 +1015,48 @@ apa_performance <- function(
 apa_performance.lm <- function(
     fit,
     metrics = c("R2", "Sigma"),
-    column_formatter = NULL) {
+    parameter_formatter = NULL) {
   header <- name <- NULL
 
-  if (is.null(column_formatter)) column_formatter <- the$parameter_formatter
+  if (is.null(parameter_formatter)) parameter_formatter <- the$parameter_formatter
 
   names(metrics) <- NULL
 
-  prs <- column_formatter@get_tibble
-
-
+  prs <- parameter_formatter@get_tibble
 
   d <- performance::model_performance(fit) |>
     tibble::as_tibble()
 
   d_new <- d
 
-
-
   for (pr in metrics) {
-    if (!is.null(column_formatter[[pr]])) {
-    d_new <- dplyr::mutate(
-      d_new,
-      dplyr::across(
-        dplyr::any_of(pr),
-        column_formatter[[pr]]@formatter))
-  }
+    if (!is.null(parameter_formatter[[pr]])) {
+      d_new <- dplyr::mutate(
+        d_new,
+        dplyr::across(dplyr::any_of(pr),
+                      parameter_formatter[[pr]]@formatter))
+    }
   }
 
   pr_selector <- tibble::tibble(name = metrics) |>
     dplyr::left_join(prs, by = "name") |>
     dplyr::select(header, name) |>
-    dplyr::mutate(header = ifelse(is.na(header), name, header)) |>
+    dplyr::mutate(header = ifelse(
+      is.na(header),
+      name,
+      header)) |>
     tibble::deframe()
 
   d_new |>
     dplyr::select(dplyr::any_of(pr_selector))
-
 }
 
-
-
-
-#' format model comparrison metrics in APA style
+#' format model comparison metrics in APA style
 #'
 #' @param ... model fit objects
 #' @param metrics performance metrics. Default is R2, deltaR2, F, and p
 #' @param starred columns to star with significant p_values
-#' @param column_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
+#' @param parameter_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
 #'
 #' @returns tibble
 #' @export
@@ -1026,20 +1065,19 @@ apa_performance.lm <- function(
 #' m1 <- lm(mpg ~ cyl, data = mtcars)
 #' m2 <- lm(mpg ~ cyl + wt, data = mtcars)
 #' apa_performance_comparison(list(`Model 1` =m1, `Model 3` =m2)) |>
-#'    apa_flextable() |>
-#'    ftExtra::colformat_md(part = "all")
+#'    apa_flextable()
 apa_performance_comparison <- function(
     ...,
     metrics = c("R2", "deltaR2", "F", "p"),
     starred = NA,
-    column_formatter = NULL) {
+    parameter_formatter = NULL) {
   R2 <- Model <- pstar <- df <- df_diff <- Name <- NULL
 
-  if (is.null(column_formatter)) column_formatter <- the$parameter_formatter
+  if (is.null(parameter_formatter)) {
+    parameter_formatter <- the$parameter_formatter
+    }
 
   .dots <- rlang::list2(...)
-
-
 
  t_wald <- performance::test_wald(...) |>
    tibble::as_tibble()
@@ -1049,7 +1087,11 @@ apa_performance_comparison <- function(
 
  if ("deltaR2" %in% metrics) {
    cp <- cp |>
-     dplyr::mutate(deltaR2 = ifelse(is.na(dplyr::lag(R2)), R2, R2 - dplyr::lag(R2)))
+     dplyr::mutate(
+       deltaR2 = ifelse(
+         is.na(dplyr::lag(R2)),
+         R2,
+         R2 - dplyr::lag(R2)))
  }
 
  cp <- cp |>
@@ -1059,8 +1101,14 @@ apa_performance_comparison <- function(
      p_empty <- is.na(cp$p)
      cp <- cp |>
        dplyr::mutate(pstar = p2stars(cp$p, superscript = T)) |>
-       dplyr::mutate(dplyr::across(dplyr::any_of(starred), column_formatter[[starred]]@formatter)) |>
-       tidyr::unite({{ starred }}, c({{ starred }}, pstar), na.rm = T, sep = "")
+       dplyr::mutate(
+         dplyr::across(dplyr::any_of(starred),
+                       parameter_formatter[[starred]]@formatter)) |>
+       tidyr::unite(
+         {{ starred }},
+         c({{ starred }}, pstar),
+         na.rm = T,
+         sep = "")
      cp[p_empty, starred] <- NA
    }
 
@@ -1075,90 +1123,10 @@ apa_performance_comparison <- function(
        tidyr::unite(df, c(df, df_diff), sep = ",")
    }
 
-
-
-
  cp |>
    dplyr::select(Model = Name, dplyr::any_of(metrics)) |>
-   apa_format_columns(column_formatter)
-
-
-
+   apa_format_columns(parameter_formatter)
 }
-
-
-
-#' Add columns that separate significance stars from numbers
-#'
-#' @param data data.frame or tibble
-#' @param ... column names or tidyselect function
-#' @param superscript make stars superscript
-#' @param star character to use for stars (default: "\\*")
-#' @param star_replace character to replace stars with (default: "\\\\*")
-#'
-#' @returns data.frame or tibble
-#' @export
-#'
-#' @examples
-#' tibble::tibble(x = c(".45", ".58*", ".68**"),
-#'                y = c(1,2,3),
-#'                z = 4:6) |>
-#'                add_star_column(x)
-add_star_column <- function(data, ..., superscript = TRUE, star = "\\*", star_replace = "\\\\*") {
-  .dots <- rlang::expr(...)
-  apa7rownumber <- apa7starvalue <- apa7starname <- apa7starcolumn <- NULL
-
-  if (missing(.dots)) .dots = colnames(data)
-  ss <- ifelse(superscript, "^", "")
-
-  d <- data |>
-    dplyr::mutate(dplyr::across({{ .dots }}, as.character)) |>
-    dplyr::mutate(apa7rownumber = dplyr::row_number()) |>
-    tidyr::pivot_longer(cols = c({{ .dots }}, -apa7rownumber),
-                        names_to = "apa7starname",
-                        values_to = "apa7starvalue") |>
-    dplyr::mutate(apa7starcolumn = stringr::str_extract(apa7starvalue, paste0("[",star, "]+")) |> stringr::str_replace_all(star, star_replace),
-                  apa7starvalue = stringr::str_remove_all(apa7starvalue, star)) |>
-    dplyr::mutate(apa7starcolumn = ifelse(
-      is.na(apa7starcolumn),
-      apa7starcolumn,
-      paste0(ss, apa7starcolumn, ss))) |>
-    tidyr::pivot_wider(names_from = apa7starname,
-                       values_from = c(apa7starvalue,
-                                       apa7starcolumn),
-                       names_glue = "{apa7starname}_{.value}",
-                       names_vary = "slowest") |>
-    dplyr::select(-apa7rownumber) |>
-    dplyr::rename_with(\(.x) stringr::str_remove(.x, "_apa7starvalue")) |>
-    dplyr::rename_with(\(.x) stringr::str_replace(.x, "_apa7starcolumn", "apa7starcolumn"))
-
-  # names of star columns
-  star_keys <- d |>
-    dplyr::select(dplyr::ends_with("apa7starcolumn")) |>
-    colnames()
-
-  # names of  variable with accompanying star columns
-  r_keys <- stringr::str_remove(star_keys, "apa7starcolumn$")
-
-  # all columns
-  c_names <- colnames(data)
-
-  # reordered columns with star columns
-  c_names_reordered <- purrr::map(c_names, \(cn) {
-    if (cn %in% r_keys) {
-      paste0(cn, c("", "apa7starcolumn"))
-    } else {
-      cn
-    }
-  }) |>
-    unlist()
-
-  # Return reordered columns
-  dplyr::select(d, dplyr::all_of(c_names_reordered))
-
-}
-
-
 
 #' Style object with APA style
 #'
@@ -1205,29 +1173,41 @@ apa_style <- function(x,
 
 #' @export
 #' @rdname apa_style
-apa_style.gt_tbl <- function(x,
-                             font_family = NULL,
-                             font_size = 12,
-                             text_color = "black",
-                             border_color = "black",
-                             border_width = 0.5,
-                             line_spacing = 2,
-                             horizontal_padding = 3,
-                             table_align = "left",
-                             layout = "autofit",
-                             table_width = 0,
-                             markdown = TRUE,
-                             markdown_header = markdown,
-                             markdown_body = markdown) {
-  if (is.null(font_family)) font_family = the$font_family
-
+apa_style.gt_tbl <- function(
+    x,
+    font_family = NULL,
+    font_size = 12,
+    text_color = "black",
+    border_color = "black",
+    border_width = 0.5,
+    line_spacing = 2,
+    horizontal_padding = 3,
+    table_align = "left",
+    layout = "autofit",
+    table_width = 0,
+    markdown = TRUE,
+    markdown_header = markdown,
+    markdown_body = markdown) {
+  if (is.null(font_family)) {
+    font_family = the$font_family
+    }
 
   pd <- (line_spacing - 1) * font_size * 2 / 3
   k <- nrow(x$`_data`)
 
   x |>
-    gt::tab_style(gt::cell_borders(style = "solid", sides = c("bottom", "top"),color = border_color, weight = gt::px(border_width)), locations = gt::cells_column_labels()) |>
-    gt::tab_style(style = gt::cell_borders(style = "hidden", sides = "bottom"), locations = gt::cells_body()) |>
+    gt::tab_style(
+      gt::cell_borders(
+        style = "solid",
+        sides = c("bottom", "top"),
+        color = border_color,
+        weight = gt::px(border_width)),
+      locations = gt::cells_column_labels()) |>
+    gt::tab_style(
+      style = gt::cell_borders(
+        style = "hidden",
+        sides = "bottom"),
+      locations = gt::cells_body()) |>
     gt::tab_options(
       heading.border.bottom.color = border_color,
       column_labels.border.bottom.color = border_color,
@@ -1250,46 +1230,73 @@ apa_style.gt_tbl <- function(x,
       grand_summary_row.border.width = 0,
       quarto.disable_processing = TRUE
     ) |>
-    gt::tab_style(style = gt::cell_borders(sides = "bottom", color = border_color, style = "solid", weight = gt::px(border_width)), locations = gt::cells_body(rows = k)) |>
-    gt::opt_table_font(font = font_family, color = text_color, size = gt::px(font_size * 4 / 3)) |>
-    gt::tab_options(data_row.padding = gt::px(pd),
-                    heading.padding = gt::px(pd),
-                    column_labels.padding = gt::px(pd),
-                    footnotes.padding = gt::px(pd),
-                    row_group.padding = gt::px(pd),
-                    summary_row.padding  = gt::px(pd),
-                    grand_summary_row.padding = gt::px(pd),
-                    source_notes.padding = gt::px(pd),
-                    data_row.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-                    heading.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-                    column_labels.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-                    footnotes.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-                    row_group.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-                    summary_row.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-                    grand_summary_row.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-                    source_notes.padding.horizontal = gt::px(horizontal_padding * 4 / 3),
-    ) |>
+    gt::tab_style(
+      style = gt::cell_borders(
+        sides = "bottom",
+        color = border_color,
+        style = "solid",
+        weight = gt::px(border_width)),
+      locations = gt::cells_body(rows = k)) |>
+    gt::opt_table_font(
+      font = font_family,
+      color = text_color,
+      size = gt::px(font_size * 4 / 3)) |>
+    gt::tab_options(
+      data_row.padding = gt::px(pd),
+      heading.padding = gt::px(pd),
+      column_labels.padding = gt::px(pd),
+      footnotes.padding = gt::px(pd),
+      row_group.padding = gt::px(pd),
+      summary_row.padding  = gt::px(pd),
+      grand_summary_row.padding = gt::px(pd),
+      source_notes.padding = gt::px(pd),
+      data_row.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      heading.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      column_labels.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      footnotes.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      row_group.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      summary_row.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      grand_summary_row.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      source_notes.padding.horizontal = gt::px(
+        horizontal_padding * 4 / 3),
+      ) |>
     gt::sub_missing(missing_text = "")
 }
 
 #' @export
 #' @rdname apa_style
-apa_style.flextable <- function(x,
-                                font_family = NULL,
-                                font_size = 12,
-                                text_color = "black",
-                                border_color = "black",
-                                border_width = 0.5,
-                                line_spacing = 2,
-                                horizontal_padding = 3,
-                                table_align = "left",
-                                layout = "autofit",
-                                table_width = 0,
-                                markdown = TRUE,
-                                markdown_header = markdown,
-                                markdown_body = markdown) {
-  if (is.null(font_family)) font_family = the$font_family
-  myborder <- list(color = border_color, width = border_width, style = "solid")
+apa_style.flextable <- function(
+    x,
+    font_family = NULL,
+    font_size = 12,
+    text_color = "black",
+    border_color = "black",
+    border_width = 0.5,
+    line_spacing = 2,
+    horizontal_padding = 3,
+    table_align = "left",
+    layout = "autofit",
+    table_width = 0,
+    markdown = TRUE,
+    markdown_header = markdown,
+    markdown_body = markdown) {
+
+  if (is.null(font_family)) {
+    font_family = the$font_family
+    }
+
+  myborder <- list(
+    color = border_color,
+    width = border_width,
+    style = "solid")
+
   pd <- (line_spacing - 1) * font_size * 2 / 3
 
   break_keys <- x$col_keys[grepl("^apa7breakcolumn", x$col_keys)]
@@ -1302,8 +1309,7 @@ apa_style.flextable <- function(x,
   r_keys <- x$col_key[r_match]
 
   if (flextable::nrow_part(x, "header") == 1) {
-    x <- x |>
-      flextable::separate_header(split = "[_]")
+    x <- flextable::separate_header(x, split = "[_]")
   }
 
   x <- x |>
@@ -1368,9 +1374,10 @@ apa_style.flextable <- function(x,
   }
 
   if (length(star_keys) > 0) {
-    x <- flextable::void(x,
-                         j = star_keys,
-                         part = "header")
+    x <- flextable::void(
+      x,
+      j = star_keys,
+      part = "header")
   }
 
   x <- flextable::set_table_properties(
@@ -1378,29 +1385,62 @@ apa_style.flextable <- function(x,
     layout = layout,
     align = table_align,
     width = table_width,
-    opts_word = list(keep_with_next = TRUE))
+    opts_word = list(keep_with_next = TRUE)
+    )
 
-  if (markdown_header) x <- ftExtra::colformat_md(x, part = "header")
-  if (markdown_body) x <- ftExtra::colformat_md(x, part = "body")
+  if (markdown_header) {
+    # Make sure content is not already formatted
+    dt <- x$header$content$data
+    hh <- character(0)
+    for (ch in x$col_keys) {
+      if (!("chunk" %in% class(dt$header$content$data[[1,ch]]))) {
+        hh <- c(hh, ch)
+      }
+    }
+    if (length(hh) > 0) {
+      x <- ftExtra::colformat_md(x, j = dplyr::all_of(!!hh), part = "header")
+      }
+    }
+  if (markdown_body) {
+    dt <- x$body$content$data
+    hh <- character(0)
+    for (ch in x$col_keys) {
+      if (!("chunk" %in% class(dt$body$content$data[[1,ch]]))) {
+        hh <- c(hh, ch)
+      }
+    }
+    if (length(hh) > 0) x <- ftExtra::colformat_md(x, j = dplyr::all_of(!!hh), part = "body")
+    }
   if (x$col_keys[1] == "Variable" || x$col_keys[1] == "Predictor") {
     x <- flextable::align(x, j = 1, align = "left", part = "body")
   }
   x
 }
 
-
-
 #' Use flextable::dim_pretty to fit column widths
 #'
 #' @param x flextable
+#' @param table_width width of table
 #' @param min_width minimum width of columns
 #' @param unit Can be `in`, `cm`, or `mm`
 #' @returns flextable
 #' @export
-pretty_widths <- function(x, min_width = .1, unit = c("in", "cm", "mm")) {
+pretty_widths <- function(
+    x,
+    min_width = 0.05,
+    unit = c("in", "cm", "mm"),
+    table_width = 6.5) {
   unit <- match.arg(unit, choices = c("in", "cm", "mm"))
   pwidth <- flextable::dim_pretty(x, unit = unit)$widths
   pwidth[pwidth < min_width] <- min_width
-  flextable::width(x, width = flextable::dim_pretty(x)$widths, unit = unit)
-}
+  if (is.null(table_width) || is.na(table_width) || table_width == 0) {
 
+  } else {
+    pwidth <- pwidth / sum(pwidth) * table_width
+  }
+  flextable::set_table_properties(x, layout = "fixed", width = 1) |>
+    flextable::width(
+      width = pwidth,
+      unit = unit)
+
+}

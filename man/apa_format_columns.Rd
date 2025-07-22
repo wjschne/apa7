@@ -6,7 +6,7 @@
 \usage{
 apa_format_columns(
   data,
-  formatter = NULL,
+  parameter_formatter = NULL,
   columns = NULL,
   rename_headers = TRUE,
   latex_headers = FALSE,
@@ -18,7 +18,7 @@ apa_format_columns(
 \arguments{
 \item{data}{data set (data.frame or tibble)}
 
-\item{formatter}{\code{apa_parameter_formatter} object. If NULL, the current default formatter set with \code{\link[=apa7_defaults]{apa7_defaults()}} will be used.}
+\item{parameter_formatter}{\code{apa_parameter_formatter} object. If NULL, the current default formatter set with \code{\link[=apa7_defaults]{apa7_defaults()}} will be used.}
 
 \item{columns}{(optional) vector of columns to format}
 
