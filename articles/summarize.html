@@ -10,7 +10,10 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Summarize Data">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="summarize_files/libs/quarto-html/popper.min.js"></script><script src="summarize_files/libs/quarto-html/tippy.umd.min.js"></script><link href="summarize_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="summarize_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="summarize_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="summarize_files/libs/tabwid-1.1.3/tabwid.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Summarize Data">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">apa7</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,8 +37,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/chisquare.html">Contingency Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/correlations.html">Correlations</a></li>
     <li><a class="dropdown-item" href="../articles/summarize.html">Summarize Data</a></li>
-    <li><a class="dropdown-item" href="../articles/tables.html">Correlation Tables</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -50,208 +53,261 @@
 
 
   </div>
-</nav><div class="container template-article">
-
-
-
-<link href="summarize_files/tabwid-1.1.3/tabwid.css" rel="stylesheet">
-<script src="summarize_files/tabwid-1.1.3/tabwid.js"></script><div class="row">
+</nav><div class="container template-quarto">
+<div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Summarize Data</h1>
-            
-      
-      <small class="dont-index">Source: <a href="https://github.com/wjschne/apa7/blob/main/vignettes/summarize.Rmd" class="external-link"><code>vignettes/summarize.Rmd</code></a></small>
-      <div class="d-none name"><code>summarize.Rmd</code></div>
+
+
+
+
+      <small class="dont-index">Source: <a href="https://github.com/wjschne/apa7/blob/main/vignettes/summarize.qmd" class="external-link"><code>vignettes/summarize.qmd</code></a></small>
+      <div class="d-none name"><code></code></div>
     </div>
 
-    
-    
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+
+
+
+
+
+    <div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wjschne/apa7" class="external-link">apa7</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/flextable-book/" class="external-link">flextable</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gt.rstudio.com" class="external-link">gt</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span></code></pre></div>
-<p>The flextable and gt packages have many, many options and helper
-functions. The <code>tabulator</code>, <code>summarizor</code>, and
-<code>proc_freq</code> functions from the flextable package are
-particularly powerful ways of summarizing and describing data. Functions
-that automate your descriptive statistics tables for you (e.g., the
-amazing <a href="https://www.danieldsjoberg.com/gtsummary/index.html" class="external-link">gtsummary
-package</a>) inevitably entail some level of compromise. It is
-unreasonable for a single function to anticipate the diversity of needs
-out there. Sometimes you need a table to be a particular way, and you
-need to do the heaving lifting yourself. After all that, the
-<code>apa_style</code> function will get a flextable or gt table close
-to APA style. You may need to do some additional styling with flextable
-or gt as well.</p>
-<p>Here I create a table of means, standard deviations, and sample sizes
-for several variables across groups. The particulars are not so
-important here, just that flextable and gt can do most of the rest after
-that. Flextable has a <code>theme_apa</code> function that can get
-things very close to full APA style. The apa7 <code>apa_style</code>
-function provides a little more flexibility with respect to fonts,
-colors, and border widths. Getting gt to have APA style borders took me
-a long time to figure out because of the complex rules by which borders
-overwrite each other. The <code>apa_style</code> function saves me from
-having to figure it all out repeatedly when working with gt tables.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">iris</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>The flextable and gt packages have many, many options and helper functions. The <code>tabulator</code>, <code>summarizor</code>, and <code>proc_freq</code> functions from the flextable package are particularly powerful ways of summarizing and describing data. Functions that automate your descriptive statistics tables for you (e.g., the amazing <a href="https://www.danieldsjoberg.com/gtsummary/index.html" class="external-link">gtsummary package</a>) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the <code>apa_style</code> function will get a flextable or gt table close to APA style. You may need to do some additional styling with flextable or gt as well.</p>
+<p>Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that flextable and gt can do most of the rest after that.</p>
+<section class="section level2"><h2 id="data-setup">Data Setup<a class="anchor" aria-label="anchor" href="#data-setup"></a>
+</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">diamonds</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cut</span>, <span class="va">price</span>, <span class="va">carat</span>, <span class="va">depth</span>, <span class="va">table</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cut</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename_with</a></span><span class="op">(</span><span class="va">str_to_title</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"Variable"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Species <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_relabel.html" class="external-link">fct_relabel</a></span><span class="op">(</span><span class="va">Species</span>, <span class="fu">stringr</span><span class="fu">::</span><span class="va"><a href="https://stringr.tidyverse.org/reference/case.html" class="external-link">str_to_title</a></span><span class="op">)</span>,</span>
-<span>         Variable <span class="op">=</span> <span class="fu">snakecase</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/snakecase/man/caseconverter.html" class="external-link">to_title_case</a></span><span class="op">(</span><span class="va">Variable</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
 <span>    M <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">value</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>    SD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">value</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>    n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Variable</span>, <span class="va">Species</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>    <span class="co"># tabulator(rows = "Variable", columns = "Species") %&gt;% </span></span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">M</span>, <span class="va">SD</span>,<span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unite.html" class="external-link">unite</a></span><span class="op">(</span><span class="va">Species</span>, <span class="va">Species</span>, <span class="va">name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">Species</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">ends_with</a></span><span class="op">(</span><span class="st">"_n"</span><span class="op">)</span>, .fns <span class="op">=</span> <span class="va">as.integer</span><span class="op">)</span><span class="op">)</span></span>
+<span>    .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Variable</span>, <span class="va">Cut</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">M</span>, <span class="va">SD</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unite.html" class="external-link">unite</a></span><span class="op">(</span><span class="va">Variable</span>, <span class="va">Variable</span>, <span class="va">name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">Variable</span><span class="op">)</span> </span></code></pre></div>
+</div>
+</section><section class="section level2"><h2 id="flextable">Flextable<a class="anchor" aria-label="anchor" href="#flextable"></a>
+</h2>
+<p>The flextable package has a <code>theme_apa</code> function that can get things very close to full APA style. The apa7 <code>apa_style</code> function provides a little more flexibility with respect to fonts, colors, and border widths.</p>
+<p>To get flextable to have small breaks in the header, a little extra work is needed to insert extra blank columns, but the results are really nice.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Where are the columns that end in _n?</span></span>
+<span><span class="va">blank_column</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">ends_with</a></span><span class="op">(</span><span class="st">"_SD"</span>, vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">n_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">[</span><span class="va">blank_column</span><span class="op">]</span></span>
 <span></span>
+<span><span class="co"># Remove last break</span></span>
+<span><span class="va">blank_column</span> <span class="op">&lt;-</span> <span class="va">blank_column</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">blank_column</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
-<span><span class="co"># Where are the columns that end in _n?</span></span>
-<span><span class="va">ats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">endsWith</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, <span class="st">"_n"</span><span class="op">)</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Blank column header names</span></span>
+<span><span class="va">blank_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"apabreak"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">blank_column</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Insert break columns after _n variables</span></span>
 <span><span class="va">keys</span> <span class="op">&lt;-</span> <span class="fu">R.utils</span><span class="fu">::</span><span class="fu"><a href="https://henrikbengtsson.github.io/R.utils/reference/insert.html" class="external-link">insert</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, </span>
-<span>                        ats <span class="op">=</span> <span class="va">ats</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ats</span><span class="op">)</span><span class="op">]</span> <span class="op">+</span> <span class="fl">1</span>, </span>
-<span>                        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"break"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># Flextable</span></span>
-<span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span><span class="va">d</span>, col_keys <span class="op">=</span> <span class="va">keys</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>                        ats <span class="op">=</span> <span class="va">blank_column</span> <span class="op">+</span> <span class="fl">1</span>, </span>
+<span>                        values <span class="op">=</span> <span class="va">blank_names</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Table</span></span>
+<span><span class="va">d</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></span><span class="op">(</span>col_keys <span class="op">=</span> <span class="va">keys</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/colformat_double.html" class="external-link">colformat_double</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/separate_header.html" class="external-link">separate_header</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/empty_blanks.html" class="external-link">empty_blanks</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/align.html" class="external-link">align</a></span><span class="op">(</span>align <span class="op">=</span> <span class="st">"center"</span>, part <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/align.html" class="external-link">align</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">1</span>, align <span class="op">=</span> <span class="st">"left"</span>, part <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/align.html" class="external-link">align</a></span><span class="op">(</span>align <span class="op">=</span> <span class="st">"center"</span>, part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/align.html" class="external-link">align</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">1</span>, align <span class="op">=</span> <span class="st">"left"</span>, part <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/italic.html" class="external-link">italic</a></span><span class="op">(</span>i <span class="op">=</span> <span class="fl">2</span>, part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/set_table_properties.html" class="external-link">set_table_properties</a></span><span class="op">(</span>layout <span class="op">=</span> <span class="st">"autofit"</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/apa_style.html">apa_style</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="tabwid">
-<style>.cl-69b7c8e4{table-layout:auto;width:100%;}.cl-69b064d2{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-69b064dc{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-69b064dd{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-69b3dd10{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:3pt;padding-right:3pt;line-height: 2;background-color:transparent;}.cl-69b3dd1a{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:3pt;padding-right:3pt;line-height: 2;background-color:transparent;}.cl-69b3fade{background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3fadf{background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3fae8{background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3fae9{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3faea{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3faf2{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3faf3{background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3faf4{background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-69b3faf5{background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
-<table data-quarto-disable-processing="true" class="table cl-69b7c8e4">
+<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/italic.html" class="external-link">italic</a></span><span class="op">(</span>j <span class="op">=</span> <span class="st">"n"</span>, part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/compose.html" class="external-link">mk_par</a></span><span class="op">(</span>j <span class="op">=</span> <span class="va">blank_names</span>, part <span class="op">=</span> <span class="st">"header"</span>, value <span class="op">=</span> <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/as_paragraph.html" class="external-link">as_paragraph</a></span><span class="op">(</span><span class="st">" "</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/colformat_double.html" class="external-link">colformat_double</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Price_M"</span>, <span class="st">"Price_SD"</span><span class="op">)</span>, </span>
+<span>                              prefix <span class="op">=</span> <span class="st">"$"</span>, </span>
+<span>                              digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="../reference/apa_style.html">apa_style</a></span><span class="op">(</span>horizontal_padding <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/valign.html" class="external-link">valign</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, valign <span class="op">=</span> <span class="st">"bottom"</span>, part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'ftExtra':</span></span>
+<span><span class="co">#&gt;   method                  from     </span></span>
+<span><span class="co">#&gt;   as_flextable.data.frame flextable</span></span></code></pre></div>
+<div id="tbl-flextable" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-flextable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 1: Price, Carat, Depth, Table Using Flextable
+</figcaption><div aria-describedby="tbl-flextable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid tabwid_left">
+<style>.cl-c477080e{table-layout:auto;}.cl-c46fd264{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-c46fd278{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-c472d0a4{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:8pt;padding-right:8pt;line-height: 1;background-color:transparent;}.cl-c472d0ae{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:8pt;padding-right:8pt;line-height: 1;background-color:transparent;}.cl-c472d0b8{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:8pt;padding-right:8pt;line-height: 1;background-color:transparent;}.cl-c472d0b9{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:8pt;padding-right:8pt;line-height: 1;background-color:transparent;}.cl-c472f02a{background-color:transparent;vertical-align: bottom;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c472f034{background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c472f03e{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c472f03f{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c472f040{background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c472f041{background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-c477080e">
 <thead>
 <tr style="overflow-wrap:break-word;">
-<th rowspan="2" class="cl-69b3fade"><p class="cl-69b3dd10"><span class="cl-69b064d2">Variable</span></p></th>
-<th colspan="3" class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064d2">Setosa</span></p></th>
-<th rowspan="2" class="cl-69b3fae8"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></th>
-<th colspan="3" class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064d2">Versicolor</span></p></th>
-<th rowspan="2" class="cl-69b3fae8"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></th>
-<th colspan="3" class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064d2">Virginica</span></p></th>
+<th rowspan="2" class="cl-c472f02a"><p class="cl-c472d0a4"><span class="cl-c46fd264">Cut</span></p></th>
+<th rowspan="2" class="cl-c472f02a"><p class="cl-c472d0a4"><span class="cl-c46fd278">n</span></p></th>
+<th colspan="2" class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd264">Price</span></p></th>
+<th rowspan="2" class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd264"></span></p></th>
+<th colspan="2" class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd264">Carat</span></p></th>
+<th rowspan="2" class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd264"></span></p></th>
+<th colspan="2" class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd264">Depth</span></p></th>
+<th rowspan="2" class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd264"></span></p></th>
+<th colspan="2" class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd264">Table</span></p></th>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">M</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">SD</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">n</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">M</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">SD</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">n</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">M</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">SD</span></p></th>
-<th class="cl-69b3fadf"><p class="cl-69b3dd1a"><span class="cl-69b064dd">n</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">M</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">SD</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">M</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">SD</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">M</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">SD</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">M</span></p></th>
+<th class="cl-c472f034"><p class="cl-c472d0ae"><span class="cl-c46fd278">SD</span></p></th>
 </tr>
 </thead>
 <tbody>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-69b3fae9"><p class="cl-69b3dd10"><span class="cl-69b064d2">Sepal Length</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">5.01</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.35</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf2"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">5.94</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.52</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf2"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">6.59</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.64</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264">Fair</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">1,610</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$4,358.76</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$3,560.39</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">1.05</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.52</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">64.04</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">3.64</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">59.05</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">3.95</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-69b3fae9"><p class="cl-69b3dd10"><span class="cl-69b064d2">Sepal Width</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">3.43</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.38</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf2"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">2.77</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.31</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf2"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">2.97</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.32</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264">Good</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">4,906</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$3,928.86</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$3,681.59</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.85</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.45</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">62.37</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">2.17</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">58.69</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">2.85</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-69b3fae9"><p class="cl-69b3dd10"><span class="cl-69b064d2">Petal Length</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">1.46</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.17</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf2"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">4.26</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.47</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf2"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">5.55</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.55</span></p></td>
-<td class="cl-69b3faea"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264">Very</span><span class="cl-c46fd264"> </span><span class="cl-c46fd264">Good</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">12,082</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$3,981.76</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$3,935.86</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.81</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.46</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">61.82</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">1.38</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">57.96</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">2.12</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-69b3faf3"><p class="cl-69b3dd10"><span class="cl-69b064d2">Petal Width</span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.25</span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.11</span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf5"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">1.33</span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.20</span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
-<td class="cl-69b3faf5"><p class="cl-69b3dd1a"><span class="cl-69b064dc"></span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">2.03</span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">0.27</span></p></td>
-<td class="cl-69b3faf4"><p class="cl-69b3dd1a"><span class="cl-69b064d2">50</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264">Premium</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">13,791</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$4,584.26</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">$4,349.20</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.89</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.52</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">61.26</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">1.16</span></p></td>
+<td class="cl-c472f03e"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">58.75</span></p></td>
+<td class="cl-c472f03f"><p class="cl-c472d0b9"><span class="cl-c46fd264">1.48</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c472f040"><p class="cl-c472d0b8"><span class="cl-c46fd264">Ideal</span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">21,551</span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">$3,457.54</span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">$3,808.40</span></p></td>
+<td class="cl-c472f040"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.70</span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.43</span></p></td>
+<td class="cl-c472f040"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">61.71</span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">0.72</span></p></td>
+<td class="cl-c472f040"><p class="cl-c472d0b8"><span class="cl-c46fd264"></span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">55.95</span></p></td>
+<td class="cl-c472f041"><p class="cl-c472d0b9"><span class="cl-c46fd264">1.25</span></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span>  </span>
-<span><span class="co"># gt</span></span>
-<span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section><section class="section level2"><h2 id="gt">gt<a class="anchor" aria-label="anchor" href="#gt"></a>
+</h2>
+<p>Getting gt to have APA style borders took me a long time to figure out because of the complex rules by which borders overwrite each other. The <code>apa_style</code> function saves me from having to figure it all out repeatedly when working with gt tables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://gt.rstudio.com/reference/fmt_number.html" class="external-link">fmt_number</a></span><span class="op">(</span>decimals <span class="op">=</span> <span class="fl">2</span>, columns <span class="op">=</span> <span class="va">is.double</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/tab_spanner_delim.html" class="external-link">tab_spanner_delim</a></span><span class="op">(</span>delim <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/cols_align.html" class="external-link">cols_align</a></span><span class="op">(</span>align <span class="op">=</span> <span class="st">"center"</span>, columns <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/tab_style.html" class="external-link">tab_style</a></span><span class="op">(</span><span class="fu"><a href="https://gt.rstudio.com/reference/cell_text.html" class="external-link">cell_text</a></span><span class="op">(</span>style <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span>, locations <span class="op">=</span> <span class="fu"><a href="https://gt.rstudio.com/reference/cells_column_labels.html" class="external-link">cells_column_labels</a></span><span class="op">(</span><span class="op">-</span><span class="va">Variable</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/tab_options.html" class="external-link">tab_options</a></span><span class="op">(</span>table.width <span class="op">=</span> <span class="fu"><a href="https://gt.rstudio.com/reference/pct.html" class="external-link">pct</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/apa_style.html">apa_style</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div id="mwlefoodfi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#mwlefoodfi table {
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/fmt_number.html" class="external-link">fmt_number</a></span><span class="op">(</span>columns <span class="op">=</span> <span class="va">is.integer</span>, decimals <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/fmt_currency.html" class="external-link">fmt_currency</a></span><span class="op">(</span>columns <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"Price"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/tab_spanner_delim.html" class="external-link">tab_spanner_delim</a></span><span class="op">(</span>delim <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/cols_align.html" class="external-link">cols_align</a></span><span class="op">(</span>align <span class="op">=</span> <span class="st">"center"</span>, columns <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/cols_align.html" class="external-link">cols_align</a></span><span class="op">(</span>align <span class="op">=</span> <span class="st">"left"</span>, columns <span class="op">=</span> <span class="st">"Cut"</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/tab_style.html" class="external-link">tab_style</a></span><span class="op">(</span><span class="fu"><a href="https://gt.rstudio.com/reference/cell_text.html" class="external-link">cell_text</a></span><span class="op">(</span>style <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span>, </span>
+<span>            locations <span class="op">=</span> <span class="fu"><a href="https://gt.rstudio.com/reference/cells_column_labels.html" class="external-link">cells_column_labels</a></span><span class="op">(</span><span class="op">-</span><span class="va">Cut</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/tab_style.html" class="external-link">tab_style</a></span><span class="op">(</span><span class="fu"><a href="https://gt.rstudio.com/reference/cell_text.html" class="external-link">cell_text</a></span><span class="op">(</span>align <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span>, </span>
+<span>            locations <span class="op">=</span> <span class="fu"><a href="https://gt.rstudio.com/reference/cells_body.html" class="external-link">cells_body</a></span><span class="op">(</span><span class="op">-</span><span class="va">Cut</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/apa_style.html">apa_style</a></span><span class="op">(</span>horizontal_padding <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/tab_options.html" class="external-link">tab_options</a></span><span class="op">(</span>table.align <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span></code></pre></div>
+<div id="tbl-gt" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-gt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 2: Price, Carat, Depth, Table Using gt
+</figcaption><div aria-describedby="tbl-gt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="rcreujqhjd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#rcreujqhjd table {
   font-family: 'Times New Roman', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#mwlefoodfi thead, #mwlefoodfi tbody, #mwlefoodfi tfoot, #mwlefoodfi tr, #mwlefoodfi td, #mwlefoodfi th {
+#rcreujqhjd thead, #rcreujqhjd tbody, #rcreujqhjd tfoot, #rcreujqhjd tr, #rcreujqhjd td, #rcreujqhjd th {
   border-style: none;
 }
 
-#mwlefoodfi p {
+#rcreujqhjd p {
   margin: 0;
   padding: 0;
 }
 
-#mwlefoodfi .gt_table {
+#rcreujqhjd .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
-  margin-left: auto;
+  margin-left: 0;
   margin-right: auto;
   color: #000000;
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
   background-color: #FFFFFF;
-  width: 100%;
+  width: auto;
   border-top-style: solid;
   border-top-width: 0px;
   border-top-color: #A8A8A8;
@@ -266,36 +322,36 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-left-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_caption {
+#rcreujqhjd .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#mwlefoodfi .gt_title {
+#rcreujqhjd .gt_title {
   color: #000000;
   font-size: 125%;
   font-weight: initial;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   border-bottom-color: #FFFFFF;
   border-bottom-width: 0;
 }
 
-#mwlefoodfi .gt_subtitle {
+#rcreujqhjd .gt_subtitle {
   color: #000000;
   font-size: 85%;
   font-weight: initial;
   padding-top: 7px;
   padding-bottom: 9px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
 
-#mwlefoodfi .gt_heading {
+#rcreujqhjd .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -307,13 +363,13 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-right-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_bottom_border {
+#rcreujqhjd .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 0px;
   border-bottom-color: #000000;
 }
 
-#mwlefoodfi .gt_col_headings {
+#rcreujqhjd .gt_col_headings {
   border-top-style: solid;
   border-top-width: 0.5px;
   border-top-color: #000000;
@@ -328,7 +384,7 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-right-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_col_heading {
+#rcreujqhjd .gt_col_heading {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -343,12 +399,12 @@ having to figure it all out repeatedly when working with gt tables.</p>
   vertical-align: bottom;
   padding-top: 8px;
   padding-bottom: 9px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   overflow-x: hidden;
 }
 
-#mwlefoodfi .gt_column_spanner_outer {
+#rcreujqhjd .gt_column_spanner_outer {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -360,15 +416,15 @@ having to figure it all out repeatedly when working with gt tables.</p>
   padding-right: 4px;
 }
 
-#mwlefoodfi .gt_column_spanner_outer:first-child {
+#rcreujqhjd .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mwlefoodfi .gt_column_spanner_outer:last-child {
+#rcreujqhjd .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mwlefoodfi .gt_column_spanner {
+#rcreujqhjd .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 0.5px;
   border-bottom-color: #000000;
@@ -380,15 +436,15 @@ having to figure it all out repeatedly when working with gt tables.</p>
   width: 100%;
 }
 
-#mwlefoodfi .gt_spanner_row {
+#rcreujqhjd .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#mwlefoodfi .gt_group_heading {
+#rcreujqhjd .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -410,7 +466,7 @@ having to figure it all out repeatedly when working with gt tables.</p>
   text-align: left;
 }
 
-#mwlefoodfi .gt_empty_group_heading {
+#rcreujqhjd .gt_empty_group_heading {
   padding: 0.5px;
   color: #000000;
   background-color: #FFFFFF;
@@ -425,19 +481,19 @@ having to figure it all out repeatedly when working with gt tables.</p>
   vertical-align: middle;
 }
 
-#mwlefoodfi .gt_from_md > :first-child {
+#rcreujqhjd .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mwlefoodfi .gt_from_md > :last-child {
+#rcreujqhjd .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mwlefoodfi .gt_row {
+#rcreujqhjd .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   margin: 10px;
   border-top-style: solid;
   border-top-width: 0px;
@@ -452,7 +508,7 @@ having to figure it all out repeatedly when working with gt tables.</p>
   overflow-x: hidden;
 }
 
-#mwlefoodfi .gt_stub {
+#rcreujqhjd .gt_stub {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -461,11 +517,11 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-right-style: solid;
   border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
 }
 
-#mwlefoodfi .gt_stub_row_group {
+#rcreujqhjd .gt_stub_row_group {
   color: #000000;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -474,83 +530,83 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-right-style: solid;
   border-right-width: 0px;
   border-right-color: #D3D3D3;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   vertical-align: top;
 }
 
-#mwlefoodfi .gt_row_group_first td {
+#rcreujqhjd .gt_row_group_first td {
   border-top-width: 0px;
 }
 
-#mwlefoodfi .gt_row_group_first th {
+#rcreujqhjd .gt_row_group_first th {
   border-top-width: 0px;
 }
 
-#mwlefoodfi .gt_summary_row {
+#rcreujqhjd .gt_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
 }
 
-#mwlefoodfi .gt_first_summary_row {
+#rcreujqhjd .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_first_summary_row.thick {
+#rcreujqhjd .gt_first_summary_row.thick {
   border-top-width: 0px;
 }
 
-#mwlefoodfi .gt_last_summary_row {
+#rcreujqhjd .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   border-bottom-style: solid;
   border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_grand_summary_row {
+#rcreujqhjd .gt_grand_summary_row {
   color: #000000;
   background-color: #FFFFFF;
   text-transform: inherit;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
 }
 
-#mwlefoodfi .gt_first_grand_summary_row {
+#rcreujqhjd .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   border-top-style: double;
   border-top-width: 0px;
   border-top-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_last_grand_summary_row_top {
+#rcreujqhjd .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
   border-bottom-style: double;
   border-bottom-width: 0px;
   border-bottom-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_striped {
+#rcreujqhjd .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mwlefoodfi .gt_table_body {
+#rcreujqhjd .gt_table_body {
   border-top-style: solid;
   border-top-width: 0px;
   border-top-color: #D3D3D3;
@@ -559,7 +615,7 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_footnotes {
+#rcreujqhjd .gt_footnotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -573,16 +629,16 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-right-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_footnote {
+#rcreujqhjd .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
 }
 
-#mwlefoodfi .gt_sourcenotes {
+#rcreujqhjd .gt_sourcenotes {
   color: #000000;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -596,164 +652,266 @@ having to figure it all out repeatedly when working with gt tables.</p>
   border-right-color: #D3D3D3;
 }
 
-#mwlefoodfi .gt_sourcenote {
+#rcreujqhjd .gt_sourcenote {
   font-size: 90%;
   padding-top: 8px;
   padding-bottom: 8px;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 13.33333px;
+  padding-right: 13.33333px;
 }
 
-#mwlefoodfi .gt_left {
+#rcreujqhjd .gt_left {
   text-align: left;
 }
 
-#mwlefoodfi .gt_center {
+#rcreujqhjd .gt_center {
   text-align: center;
 }
 
-#mwlefoodfi .gt_right {
+#rcreujqhjd .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mwlefoodfi .gt_font_normal {
+#rcreujqhjd .gt_font_normal {
   font-weight: normal;
 }
 
-#mwlefoodfi .gt_font_bold {
+#rcreujqhjd .gt_font_bold {
   font-weight: bold;
 }
 
-#mwlefoodfi .gt_font_italic {
+#rcreujqhjd .gt_font_italic {
   font-style: italic;
 }
 
-#mwlefoodfi .gt_super {
+#rcreujqhjd .gt_super {
   font-size: 65%;
 }
 
-#mwlefoodfi .gt_footnote_marks {
+#rcreujqhjd .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#mwlefoodfi .gt_asterisk {
+#rcreujqhjd .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#mwlefoodfi .gt_indent_1 {
+#rcreujqhjd .gt_indent_1 {
   text-indent: 5px;
 }
 
-#mwlefoodfi .gt_indent_2 {
+#rcreujqhjd .gt_indent_2 {
   text-indent: 10px;
 }
 
-#mwlefoodfi .gt_indent_3 {
+#rcreujqhjd .gt_indent_3 {
   text-indent: 15px;
 }
 
-#mwlefoodfi .gt_indent_4 {
+#rcreujqhjd .gt_indent_4 {
   text-indent: 20px;
 }
 
-#mwlefoodfi .gt_indent_5 {
+#rcreujqhjd .gt_indent_5 {
   text-indent: 25px;
 }
 
-#mwlefoodfi .katex-display {
+#rcreujqhjd .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#mwlefoodfi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#rcreujqhjd div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
-<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="table gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_col_headings gt_spanner_row">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Variable">Variable</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="spanner-Setosa_M">
-        <div class="gt_column_spanner">Setosa</div>
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Cut">Cut</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="2" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="n">n</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="spanner-Price_M">
+        <div class="gt_column_spanner">Price</div>
       </th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="spanner-Versicolor_M">
-        <div class="gt_column_spanner">Versicolor</div>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="spanner-Carat_M">
+        <div class="gt_column_spanner">Carat</div>
       </th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="spanner-Virginica_M">
-        <div class="gt_column_spanner">Virginica</div>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="spanner-Depth_M">
+        <div class="gt_column_spanner">Depth</div>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="spanner-Table_M">
+        <div class="gt_column_spanner">Table</div>
       </th>
     </tr>
 <tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Setosa_M">M</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Setosa_SD">SD</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Setosa_n">n</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Versicolor_M">M</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Versicolor_SD">SD</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Versicolor_n">n</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Virginica_M">M</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Virginica_SD">SD</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Virginica_n">n</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Price_M">M</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Price_SD">SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Carat_M">M</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Carat_SD">SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Depth_M">M</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Depth_SD">SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Table_M">M</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="font-style: italic; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black; border-top-width: 0.5px; border-top-style: solid; border-top-color: black;" scope="col" id="Table_SD">SD</th>
     </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">Sepal Length</td>
-<td headers="Setosa_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">5.01</td>
-<td headers="Setosa_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.35</td>
-<td headers="Setosa_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
-<td headers="Versicolor_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">5.94</td>
-<td headers="Versicolor_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.52</td>
-<td headers="Versicolor_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
-<td headers="Virginica_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">6.59</td>
-<td headers="Virginica_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.64</td>
-<td headers="Virginica_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
+<td headers="Cut" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">Fair</td>
+<td headers="n" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">1,610</td>
+<td headers="Price_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$4,358.76</td>
+<td headers="Price_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$3,560.39</td>
+<td headers="Carat_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">1.05</td>
+<td headers="Carat_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.52</td>
+<td headers="Depth_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">64.04</td>
+<td headers="Depth_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">3.64</td>
+<td headers="Table_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">59.05</td>
+<td headers="Table_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">3.95</td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">Sepal Width</td>
-<td headers="Setosa_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">3.43</td>
-<td headers="Setosa_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.38</td>
-<td headers="Setosa_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
-<td headers="Versicolor_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">2.77</td>
-<td headers="Versicolor_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.31</td>
-<td headers="Versicolor_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
-<td headers="Virginica_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">2.97</td>
-<td headers="Virginica_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.32</td>
-<td headers="Virginica_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
+<td headers="Cut" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">Good</td>
+<td headers="n" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">4,906</td>
+<td headers="Price_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$3,928.86</td>
+<td headers="Price_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$3,681.59</td>
+<td headers="Carat_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.85</td>
+<td headers="Carat_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.45</td>
+<td headers="Depth_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">62.37</td>
+<td headers="Depth_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">2.17</td>
+<td headers="Table_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">58.69</td>
+<td headers="Table_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">2.85</td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">Petal Length</td>
-<td headers="Setosa_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">1.46</td>
-<td headers="Setosa_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.17</td>
-<td headers="Setosa_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
-<td headers="Versicolor_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">4.26</td>
-<td headers="Versicolor_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.47</td>
-<td headers="Versicolor_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
-<td headers="Virginica_M" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">5.55</td>
-<td headers="Virginica_SD" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.55</td>
-<td headers="Virginica_n" class="gt_row gt_center" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">50</td>
+<td headers="Cut" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">Very Good</td>
+<td headers="n" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">12,082</td>
+<td headers="Price_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$3,981.76</td>
+<td headers="Price_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$3,935.86</td>
+<td headers="Carat_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.81</td>
+<td headers="Carat_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.46</td>
+<td headers="Depth_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">61.82</td>
+<td headers="Depth_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">1.38</td>
+<td headers="Table_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">57.96</td>
+<td headers="Table_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">2.12</td>
 </tr>
 <tr>
-<td headers="Variable" class="gt_row gt_left" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">Petal Width</td>
-<td headers="Setosa_M" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">0.25</td>
-<td headers="Setosa_SD" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">0.11</td>
-<td headers="Setosa_n" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">50</td>
-<td headers="Versicolor_M" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">1.33</td>
-<td headers="Versicolor_SD" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">0.20</td>
-<td headers="Versicolor_n" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">50</td>
-<td headers="Virginica_M" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">2.03</td>
-<td headers="Virginica_SD" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">0.27</td>
-<td headers="Virginica_n" class="gt_row gt_center" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">50</td>
+<td headers="Cut" class="gt_row gt_left" style="border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">Premium</td>
+<td headers="n" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">13,791</td>
+<td headers="Price_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$4,584.26</td>
+<td headers="Price_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">$4,349.20</td>
+<td headers="Carat_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.89</td>
+<td headers="Carat_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">0.52</td>
+<td headers="Depth_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">61.26</td>
+<td headers="Depth_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">1.16</td>
+<td headers="Table_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">58.75</td>
+<td headers="Table_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 1px; border-bottom-style: hidden; border-bottom-color: #000000;">1.48</td>
+</tr>
+<tr>
+<td headers="Cut" class="gt_row gt_left" style="border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">Ideal</td>
+<td headers="n" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">21,551</td>
+<td headers="Price_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">$3,457.54</td>
+<td headers="Price_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">$3,808.40</td>
+<td headers="Carat_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">0.70</td>
+<td headers="Carat_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">0.43</td>
+<td headers="Depth_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">61.71</td>
+<td headers="Depth_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">0.72</td>
+<td headers="Table_M" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">55.95</td>
+<td headers="Table_SD" class="gt_row gt_center" style="text-align: right; border-bottom-width: 0.5px; border-bottom-style: solid; border-bottom-color: black;">1.25</td>
 </tr>
 </tbody>
 </table>
 </div>
-  </main>
 </div>
-
+</div>
+</figure>
+</div>
+</div>
+</section><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config);
+    }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script></main>
+</div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -761,7 +919,7 @@ having to figure it all out repeatedly when working with gt tables.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">apa7</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,8 +19,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/chisquare.html">Contingency Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/correlations.html">Correlations</a></li>
     <li><a class="dropdown-item" href="../articles/summarize.html">Summarize Data</a></li>
-    <li><a class="dropdown-item" href="../articles/tables.html">Correlation Tables</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -50,6 +50,30 @@
 
       <dl><dt>
 
+          <code><a href="add_break_columns.html">add_break_columns()</a></code>
+
+        </dt>
+        <dd>Add break columns</dd>
+      </dl><dl><dt>
+
+          <code><a href="add_star_column.html">add_star_column()</a></code>
+
+        </dt>
+        <dd>Add columns that separate significance stars from numbers</dd>
+      </dl><dl><dt>
+
+          <code><a href="align_chr.html">align_chr()</a></code>
+
+        </dt>
+        <dd>Align text on center text (default is decimal)</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa7_defaults.html">apa7_defaults()</a></code>
+
+        </dt>
+        <dd>Set defaults for apa7 package</dd>
+      </dl><dl><dt>
+
           <code><a href="apa_chisq.html">apa_chisq()</a></code>
 
         </dt>
@@ -62,10 +86,46 @@
         <dd>APA-formatted correlation table</dd>
       </dl><dl><dt>
 
+          <code><a href="apa_flextable.html">apa_flextable()</a></code>
+
+        </dt>
+        <dd>Make flextable with merged row titles according to selected column</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_format_columns.html">apa_format_columns()</a></code>
+
+        </dt>
+        <dd>Format data columns</dd>
+      </dl><dl><dt>
+
           <code><a href="apa_p.html">apa_p()</a></code>
 
         </dt>
         <dd>p-value in APA format</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_p_star_note.html">apa_p_star_note()</a></code>
+
+        </dt>
+        <dd>Make star notes for p-values</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_parameters.html">apa_parameters()</a></code>
+
+        </dt>
+        <dd>format model parameters in APA style</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_performance.html">apa_performance()</a></code>
+
+        </dt>
+        <dd>format model performance metrics in APA style</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_performance_comparison.html">apa_performance_comparison()</a></code>
+
+        </dt>
+        <dd>format model comparison metrics in APA style</dd>
       </dl><dl><dt>
 
           <code><a href="apa_style.html">apa_style()</a></code>
@@ -74,10 +134,58 @@
         <dd>Style object with APA style</dd>
       </dl><dl><dt>
 
-          <code><a href="install_apaquarto.html">install_apaquarto()</a></code>
+          <code><a href="column_format.html">column_format()</a></code>
 
         </dt>
-        <dd>install the apaquarto extension from https://github.com/wjschne/apaquarto</dd>
+        <dd>Column format class</dd>
+      </dl><dl><dt>
+
+          <code><a href="hanging_indent.html">hanging_indent()</a></code>
+
+        </dt>
+        <dd>Return markdown text with hanging indent</dd>
+      </dl><dl><dt>
+
+          <code><a href="is_numeric_like.html">is_numeric_like()</a></code>
+
+        </dt>
+        <dd>Tests if a character vector contains numeric-like values</dd>
+      </dl><dl><dt>
+
+          <code><a href="num_pad.html">num_pad()</a></code>
+
+        </dt>
+        <dd>Pads text on the left or right so that the width is the same for each element of the vector</dd>
+      </dl><dl><dt>
+
+          <code><a href="p2stars.html">p2stars()</a></code>
+
+        </dt>
+        <dd>Convert p-values to stars</dd>
+      </dl><dl><dt>
+
+          <code><a href="parameter_formatter.html">parameter_formatter()</a></code>
+
+        </dt>
+        <dd>Create a set of column formats</dd>
+      </dl><dl><dt>
+
+          <code><a href="pretty_widths.html">pretty_widths()</a></code>
+
+        </dt>
+        <dd>Use flextable::dim_pretty to fit column widths</dd>
+      </dl><dl><dt>
+
+          <code><a href="star_balance.html">star_balance()</a></code>
+
+        </dt>
+        <dd>Prefix text with figure spaces to balance star text</dd>
+      </dl><dl><dt>
+
+          <code><a href="tagger.html">tagger()</a></code> <code><a href="tagger.html">bold_md()</a></code> <code><a href="tagger.html">italic_md()</a></code> <code><a href="tagger.html">superscript_md()</a></code> <code><a href="tagger.html">subscript_md()</a></code> <code><a href="tagger.html">header_md()</a></code>
+
+        </dt>
+        <dd>Surrounds text with tags unless empty</dd>
       </dl></div>
   </main></div>
 
@@ -87,7 +195,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
