@@ -376,14 +376,14 @@ d <- tibble(
     "Unemployed","Student","Employed",
     "Self-employed","Retired","Yes","No","Yes","No"),
     `Guided self-help` = c(
-      25L,25L,13L,35L,1L,1L,26L,24L,37L,13L,
-      0L,22L,27L,3L,8L,30L,9L,0L,17L,33L,6L,44L),
+      25L, 25L, 13L, 35L, 1L, 1L, 26L, 24L, 37L, 13L,
+      0L, 22L, 27L, 3L, 8L, 30L, 9L, 0L, 17L, 33L, 6L, 44L),
   `Unguided self-help` = c(
-    20L,30L,11L,38L,1L,0L,26L,24L,36L,14L,1L,
-    17L,30L,5L,7L,29L,7L,2L,18L,32L,13L,37L),
+    20L, 30L, 11L, 38L, 1L, 0L, 26L, 24L, 36L, 14L, 1L,
+    17L, 30L, 5L, 7L, 29L, 7L, 2L, 18L, 32L, 13L, 37L),
    `Wait-list control` = c(
-     23L,27L,17L,28L,4L,1L,22L,28L,26L,24L,
-     1L,13L,32L,2L,3L,40L,5L,0L,24L,26L,11L,39L)
+     23L, 27L, 17L, 28L, 4L, 1L, 22L, 28L, 26L, 24L, 
+     1L, 13L, 32L, 2L, 3L, 40L, 5L, 0L, 24L, 26L, 11L, 39L)
 ) 
 
 # format data
@@ -645,7 +645,7 @@ d |>
   apa_flextable(table_width = 1, 
                 layout = "fixed", 
                 line_spacing = 1.5) |>
-  width(width = rep(6.5/4, 4))
+  width(width = rep(6.5 / 4, 4))
 
 
 ```
@@ -670,7 +670,7 @@ Family reports               	47            	106   	48    	34.06
 Friends' reports             	42            	112   	47    	45.52 
 Caught by media              	19            	82    	100   	54.00 
 Celebrity display of behavior	12            	61    	128   	101.22" |>
-  readr::read_tsv(show_col_types = F)
+  readr::read_tsv(show_col_types = FALSE)
 
 # Format data
 d <- d |> 
@@ -770,8 +770,8 @@ d <- d |>
   select(-t_fit) |> 
   mutate(data = pmap(
     list(d = data, 
-         round_digits = c(3,0,4),
-         sig_digits = c(3,3,1)), 
+         round_digits = c(3, 0, 4),
+         sig_digits = c(3, 3, 1)), 
     \(d, round_digits, sig_digits) {
       d |> 
         summarise(M = mean(x), 
@@ -879,16 +879,16 @@ d <- d_mean |>
   add_break_columns(3)
 
 # custom formatter
-my_formatter <-  parameter_formatter()
+my_formatter <-  column_formats()
 ## change p column's accuracy to 0.001
-my_formatter$p@formatter  = my_formatter$p@formatter |> 
+my_formatter$p@formatter <- my_formatter$p@formatter |> 
   purrr::partial(accuracy = .001)
 my_formatter$F@header <- "*F* ratio"
 
 # Make table
 apa_flextable(d, 
               table_width = 1, 
-              parameter_formatter = my_formatter) 
+              column_formats = my_formatter) 
 ```
 
 <hr>
@@ -1060,8 +1060,8 @@ Social support      	4.22     	1.50      	5.56     	1.20      	62.60      	0.17
 Cognitive appraisals	 NA      	 NA       	 NA      	 NA       	 NA        	 NA     
 Threat              	2.78     	0.87      	1.99     	0.88      	56.35      	0.20    
 Challenge           	2.48     	0.88      	2.83     	1.20      	7.87       	0.03    
-Self-efficacy       	2.65     	0.79      	3.53     	0.92      	56.35      	0.16    " %>%
-	readr::read_tsv() |> 
+Self-efficacy       	2.65     	0.79      	3.53     	0.92      	56.35      	0.16    " |>
+  readr::read_tsv() |>
   suppressMessages()
 
 
@@ -1071,8 +1071,8 @@ d <- d |>
     -(Measure:`Rural_SD`), 
     \(x) align_chr(
       x,
-      trim_leading_zeros = T, 
-      accuracy = .01) )) |> 
+      trim_leading_zeros = TRUE, 
+      accuracy = .01))) |> 
   add_break_columns(`Urban_SD`)
 
 # Make table
@@ -1084,7 +1084,7 @@ d |>
            j = "*F*(1, 294)", 
            ref_symbols = "***", 
            value = as_paragraph_md("*p* < .001.")) |> 
-  width(width = c(1.65,.8,.8,.05,.8,.8,.9,.7))
+  width(width = c(1.65, .8, .8, .05, .8, .8, .9, .7))
 ```
 
 <hr>
@@ -1184,7 +1184,7 @@ d <- d |>
   rename(Variable = Time) |> 
   mutate(`F` = align_chr(`F`, 
                                  accuracy = .01),
-         `papa7starcolumn` = p2stars(p, superscript = T), 
+         `papa7starcolumn` = p2stars(p, superscript = TRUE), 
          .after = `F`) |>
   unite(`*F* ratio`, c(`F`, papa7starcolumn), sep = "") |> 
   mutate(`*F* ratio` = star_balance(`*F* ratio`)) |> 
@@ -1253,12 +1253,15 @@ d <- tibble(
                   "15. I would use any means necessary to protect a child, even if I had to hurt others.",
                   "4. I would feel compelled to punish anyone who tried to hurt a child.",
                   "9. I would sooner go to bed hungry than let a child go without food."),
-          `Factor loading_1` = c(0.86,0.85,0.84,0.77,0.7,-0.01,-0.12,
-                  0.04,0.11,0.08,-0.13,0,0.06,0.07,0.46),
-          `Factor loading_2` = c(0.04,-0.02,-0.06,0.05,0.1,0.95,0.83,
-                  0.72,0.7,0.58,-0.02,-0.05,0.08,0.03,-0.03),
-          `Factor loading_3` = c(0.01,-0.01,0,-0.07,-0.03,0.06,-0.03,
-                  0.01,-0.01,-0.02,0.95,0.74,0.72,0.68,0.36)
+    `Factor loading_1` = c(
+      0.86, 0.85, 0.84, 0.77, 0.7, -0.01, -0.12,
+      0.04, 0.11, 0.08, -0.13, 0.0, 0.06, 0.07, 0.46),
+    `Factor loading_2` = c(
+      0.04, -0.02, -0.06, 0.05, 0.1, 0.95, 0.83,
+      0.72, 0.7, 0.58, -0.02, -0.05, 0.08, 0.03, -0.03),
+    `Factor loading_3` = c(
+      0.01, -0.01, 0, -0.07, -0.03, 0.06, -0.03,
+      0.01, -0.01, -0.02, 0.95, 0.74, 0.72, 0.68, 0.36)
 ) 
 
 # Format data
@@ -1270,7 +1273,7 @@ d <- d |>
     across(
       starts_with("Factor loading"), 
       \(x) {
-        y <- align_chr(x, trim_leading_zeros = T)
+        y <- align_chr(x, trim_leading_zeros = TRUE)
         ifelse(abs(x) > .3, bold_md(y), y)
         }
       )
@@ -1342,7 +1345,7 @@ If we really want just the output of `parameter` as it displays, we use the `for
 
 ```{r}
 #| label: parametersm2format
-parameters(m2,ci = .95) |> 
+parameters(m2, ci = .95) |> 
   insight::format_table() |> 
   apa_flextable()
 ```
@@ -1363,13 +1366,13 @@ apa_parameters(m2) |>
   apa_flextable() 
 ```
 
-Suppose the default formatting is not quite right. The `apa_parameters` function makes use of the default output of `parameter_formatter` function to make its changes. 
+Suppose the default formatting is not quite right. The `apa_parameters` function makes use of the default output of `column_formats` function to make its changes. 
 
 The current parameter formatter is available for inspection like so:
 
 ```{r}
-#| label: parameterformatter
-parameter_formatter()
+#| label: column_formats
+column_formats()
 ```
 
 When printed, this object looks like a tibble, but it is actually a specialized object that contains formatting instructions for the headers and a formatting function for the columns under those headers.
@@ -1378,7 +1381,7 @@ We can save these defaults to an object and take a look inside.
 
 ```{r}
 #| label: myformats
-my_formats <- parameter_formatter()
+my_formats <- column_formats()
 ```
 
 This object has various properties accessible with `@` 
@@ -1426,12 +1429,11 @@ Here we set the formats something other than the defaults.
 #| label: myformatsset
 my_formats$Coefficient@header <- "*b*"
 my_formats$SE@header <- "*se~b~*"
-my_formats$Std_Coefficient@formatter = \(x) align_chr(
-  x, 
-  accuracy = .01, 
-  trim_leading_zeros = TRUE)
+my_formats$Std_Coefficient@formatter <- \(x) {
+  align_chr(x, accuracy = .01, trim_leading_zeros = TRUE)
+}
 
-apa_parameters(m2, parameter_formatter = my_formats) |> 
+apa_parameters(m2, column_formats = my_formats) |>
   apa_flextable()
 ```
 
@@ -1439,7 +1441,7 @@ If we want this to be the new within-session default, we can set it like so:
 
 ```{r}
 #| label: myformatssetdefault
-apa7_defaults(parameter_formatter = my_formats, accuracy = .001)
+apa7_defaults(column_formats = my_formats, accuracy = .001)
 ```
 
 Now the new defaults need not be specified each time:
@@ -1472,7 +1474,7 @@ The `apa_format_columns` function and a few others like `apa_parameters`, `apa_p
 #| label: tbl-715
 #| tbl-cap: Regression Coefficients of Leader Sleep on Charismatic Leadership
 
-pf <- parameter_formatter()
+pf <- column_formats()
 pf$SE@header <- "*SE*"
 
 m <- list(`Model 1` = m1, 
@@ -1481,7 +1483,7 @@ m <- list(`Model 1` = m1,
 d_parameters <- apa_parameters(
   m, 
   predictor_parameters = c("Coefficient", "Std_Coefficient", "SE"), 
-  parameter_formatter = pf)
+  column_formats = pf)
 
 d_performance <- apa_performance_comparison(
   m,
@@ -1696,13 +1698,12 @@ d <- d |>
     accuracy = .0001, 
     drop0trailing = TRUE, 
     trim_leading_zeros = TRUE)) |> 
-  mutate(across(
-    c(Estimate:`95% CI_*UL*`), 
-    \(x) align_chr(
-      x, 
-      accuracy = .001, 
-      trim_leading_zeros = TRUE))) |> 
-  mutate(Effect = hanging_indent(Effect, width = 35)) |> 
+  mutate(across(c(Estimate:`95% CI_*UL*`), \(x) {
+    align_chr(x, 
+              accuracy = .001, 
+              trim_leading_zeros = TRUE)
+  })) |>
+  mutate(Effect = hanging_indent(Effect, width = 35)) |>
   apa_format_columns()
 
 # Make table
@@ -1767,7 +1768,9 @@ d <- d_coefficients |>
         sep = " * ") |> 
   pull(vname) |> 
   paste(collapse = " + ") |> 
-  {\(x) paste0("y ~ ", x)}() |> 
+  {
+    \(x) paste0("y ~ ", x)
+    }() |> 
   lavaan::simulateData(standardized = TRUE, sample.nobs = 200) |> 
   mutate(y = y + 4) |> 
   as_tibble()
@@ -1823,7 +1826,7 @@ d <- d_analysis |>
   tidyr::replace_na(list(Model = "", Variable = "")) |>
   unite(Variable, c(Variable, Model), sep = "") |>
   mutate(
-    papa7starcolumn = p2stars(pp, superscript = T),
+    papa7starcolumn = p2stars(pp, superscript = TRUE),
     p2apa7starcolumn = papa7starcolumn,
     .after = `*B*`
   ) |>
@@ -1842,7 +1845,8 @@ d |>
           padding.left = 15) |>
   surround(i = ~is.na(`*B*`), 
            border.top = fp_border_default(color = "gray30")) |> 
-  width(width = 6.5 * c(3, .6,.4, 1,1, 1, .6,.4, 1,1) / 10)
+  width(width = 6.5 * c(3, .6, .4, 1, 1, 1, 
+                           .6, .4, 1, 1) / 10)
   
 
 ```
@@ -1874,15 +1878,15 @@ tibble(
      `&chi;^2^_df` = c(28L, 29L, 33L, 33L),
       `&chi;^2^_p` = c(1e-04, 0.001, 1e-04, 0.79),
        RMSEA_Value = c(0.044, 0.04, 0.039, 0),
-    `RMSEA_95% CI` = c("[.030, .059]","[.024, .054]",
-                       "[.025, .053]","[.000, .020]"),
+    `RMSEA_95% CI` = c("[.030, .059]", "[.024, .054]",
+                       "[.025, .053]", "[.000, .020]"),
            RMSEA_p = c(0.72, 0.87, 0.9, 0.999),
                AIC = c(13479, 13472, 13471, 13432),
                BIC = c(13658, 13646, 13627, 13588),
       `deltaAIC` = c(NA, -7L, -8L, -47L),
       `deltaBIC` = c(NA, -12L, -31L, -70L)
 ) |> 
-  add_break_columns(RMSEA_Value, .before = T) |> 
+  add_break_columns(RMSEA_Value, .before = TRUE) |> 
   mutate(RMSEA_Value = align_chr(
     RMSEA_Value, 
     accuracy = .001, 
@@ -1890,7 +1894,8 @@ tibble(
   apa_flextable(markdown_body = TRUE,
                 layout = "fixed", 
                 font_size = 11) |> 
-  width(width = c(1.8, .45, .35, .45, .05, .4, .85,.35, .5, .5, .4, .4)) 
+  width(width = c(1.80, .45, .35, .45, .05, .40, 
+                   .85, .35, .50, .50, .40, .40)) 
 ```
 
 <hr>
@@ -1946,16 +1951,16 @@ n_1 <- 15
 
 d_parameter <- tibble::tibble(
   symbol = c(
-    "b_00","b_01","b_02",
-    "b_10","b_11","b_12",
-    "b_20","b_21","b_22",
-    "s_e","s_0","s_1","s_2"),
+    "b_00", "b_01", "b_02",
+    "b_10", "b_11", "b_12",
+    "b_20", "b_21", "b_22",
+    "s_e", "s_0", "s_1", "s_2"),
   Positive = c(
-    3.34,0.39,0.26,-0.002,-0.06,0.001,
-    -0.001,-0.03,-0.01,0.52,1.31,0.04,0.03),
+    3.34, 0.39, 0.26, -0.002, -0.06, 0.001,
+    -0.001, -0.03, -0.01, 0.52, 1.31, 0.04, 0.03),
   Negative = c(
-    1.82,-0.36,-0.16,0.01,0.02,-0.04,0.02,
-    0.01,-0.01,0.51,1,0.02,0.02),
+    1.82, -0.36, -0.16, 0.01, 0.02, -0.04, 0.02, 
+    0.01, -0.01, 0.51, 1, 0.02, 0.02),
   Parameter = c(
      "(Intercept)",
      "PBS",
@@ -1991,7 +1996,7 @@ d_parameter <- tibble::tibble(
     rep("Variance components", 4)),
   effecttype = c(
     rep("Fixed", 9),
-    rep("Random",4))
+    rep("Random", 4))
 ) |> 
   mutate(symbol = fct_inorder(symbol),
          pname = fct_inorder(pname))
@@ -2014,7 +2019,7 @@ tau_2 <- d_parameter |>
   nest(value = -name) |> 
   mutate(value = map(
     value, 
-    \(x) unlist(x) |> diag())) |> 
+    \(x) diag(unlist(x)))) |>
   deframe()
 
 # Fixed effects
@@ -2101,7 +2106,7 @@ fit <- d_1 |>
   mutate(
     parameters = map(
       fit, parameters::parameters, 
-      include_sigma = T))
+      include_sigma = TRUE))
 
 # Peformance statistics
 d_performance <- fit |> 
@@ -2144,7 +2149,7 @@ d_performance <- fit |>
 d <- fit |> 
   unnest(parameters) |> 
   select(dv, Model, Parameter, Coefficient, SE, p) |> 
-  mutate(stars = p2stars(p, superscript = T),
+  mutate(stars = p2stars(p, superscript = TRUE),
          Coefficient = paste0(signs::signs(Coefficient, 
                                     accuracy = .01), 
                               stars),
@@ -2188,8 +2193,10 @@ d <- fit |>
     across(
       c(starts_with("Negative"),
         starts_with("Positive")), 
-      \(x) {align_chr(str_trim(x), 
-                      side = "left")})) |> 
+      \(x) {
+        align_chr(str_trim(x), 
+                      side = "left")
+        })) |> 
   bind_rows(d_performance) |> 
   mutate(across(
     everything(), 
@@ -2211,7 +2218,7 @@ d |>
             `Parameter ` != ""), 
     padding.left = 15) |> 
   merge_v(j = "Effect") |> 
-  width(width = c(1.75,.7,1,1,.05, 1,1))
+  width(width = c(1.75, .7, 1, 1, .05, 1, 1))
 ```
 
 <hr>
@@ -2256,13 +2263,13 @@ tibble(
   CFI = c(0.326, 0.39, 0.494),
   RMSEA = c(0.115, 0.109, 0.1)
 ) |> 
-  mutate(
-    Chi2 = paste0(align_chr(Chi2, accuracy = 0.001),"^\\*\\*\\*^")) |> 
-
-  apa_flextable(
-    parameter_formatter = parameter_formatter(accuracy = 0.001),
-    layout = "fixed") |> 
-  width(width = c(2.15,1.15,rep(3.2 / 4, 4)))
+  mutate(Chi2 = paste0(
+    align_chr(Chi2, accuracy = 0.001), "^\\*\\*\\*^")) |>
+  
+  apa_flextable(column_formats = column_formats(
+    accuracy = 0.001),
+    layout = "fixed") |>
+  width(width = c(2.15, 1.15, rep(3.2 / 4, 4)))
 
 ```
 

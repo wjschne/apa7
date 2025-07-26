@@ -6,7 +6,7 @@
 #' @param omit_first omit the first break column
 #' @param omit_last omit the last break column
 #'
-#' @returns data.frame or tibble
+#' @return data.frame or tibble
 #' @export
 #'
 #' @examples
@@ -73,7 +73,7 @@ add_break_columns <- function(d,
 #' @param star character to use for stars (default: "\\*")
 #' @param star_replace character to replace stars with (default: "\\\\*")
 #'
-#' @returns data.frame or tibble
+#' @return data.frame or tibble
 #' @export
 #'
 #' @examples
@@ -85,7 +85,7 @@ add_star_column <- function(data, ..., superscript = TRUE, star = "\\*", star_re
   .dots <- rlang::expr(...)
   apa7rownumber <- apa7starvalue <- apa7starname <- apa7starcolumn <- NULL
 
-  if (missing(.dots)) .dots = colnames(data)
+  if (missing(.dots)) .dots <- colnames(data)
   ss <- ifelse(superscript, "^", "")
 
   d <- data |>
@@ -146,7 +146,7 @@ add_star_column <- function(data, ..., superscript = TRUE, star = "\\*", star_re
 #' @inheritParams apa_style
 #' @param suppress_warnings Suppress any warnings if true.
 #'
-#' @returns flextable
+#' @return flextable
 #' @export
 #' @importFrom rlang .data
 #'
@@ -162,7 +162,7 @@ apa_chisq <- function(x,
                       border_width = .5,
                       suppress_warnings = TRUE
 ) {
-  if (is.null(font_family)) font_family = the$font_family
+  if (is.null(font_family)) font_family <- the$font_family
   if (!inherits(x, "data.frame")) stop("x must be a data.frame or tibble.")
   if (ncol(x) != 2) stop('x must have 2 columns. Select the 2 variables you wish to test before passing them to this function. For example:\nx <- mtcars[, c("am", "cyl")]\nor\nx <- dplyr::select(mtcars, am, cyl)')
 
@@ -263,7 +263,7 @@ apa_chisq <- function(x,
 #' @param ... <[`data-masking`][rlang::args_data_masking]> parameters passed to psych::corTest
 #' @importFrom rlang .data
 #'
-#' @returns flextable, gt, or tibble
+#' @return flextable, gt, or tibble
 #' @export
 #'
 #' @examples
@@ -291,7 +291,7 @@ apa_cor <- function(data,
 
 ) {
   value <- name <- Variable <- NULL
-  if (is.null(font_family)) font_family = the$font_family
+  if (is.null(font_family)) font_family <- the$font_family
   output <- match.arg(output)
   v_names <- colnames(data)
   v_seq <- seq(ncol(data))
@@ -336,7 +336,7 @@ apa_cor <- function(data,
       ii <- ii + 1
       p_note[ii] <- paste0(
         "^",
-        paste0(rep("\\*",ii), collapse = ""),
+        paste0(rep("\\*", ii), collapse = ""),
         "\u00A0^*p*&nbsp;<&nbsp;",
         stringr::str_remove(as.character(pv), "^0"))
 
@@ -665,14 +665,15 @@ apa_cor <- function(data,
 #' @param col_keys column keys passed to flextable (defaults data column names)
 #' @param cwidth initial cell width in inches
 #' @param cheight initial cell height in inches
-#' @param apastyle apply `apa_style` function (default: `TRUE`)
+#' @param apa_style apply `apa_style` function (default: `TRUE`)
 #' @param separate_headers separate header rows (default: `TRUE`)
 #' @param auto_format_columns if true, will attempt to format some columns automatically
-#' @param parameter_formatter an apa_parameter_formatter object
+#' @param column_formats a column_formats object
+#' @param pretty_widths apply `pretty_widths` function
 #' @inheritParams apa_style
 #' @param ... arguments passed to `apa_style`
 
-#' @returns flextable
+#' @return flextable
 #' @export
 #'
 #' @examples
@@ -703,7 +704,7 @@ apa_flextable <- function(data,
                           cwidth = .75,
                           cheight = .25,
                           separate_headers = TRUE,
-                          apastyle = TRUE,
+                          apa_style = TRUE,
                           font_family = NULL,
                           font_size = 12,
                           text_color = "black",
@@ -718,23 +719,25 @@ apa_flextable <- function(data,
                           markdown_header = markdown,
                           markdown_body = markdown,
                           auto_format_columns = TRUE,
-                          parameter_formatter = NULL,
+                          column_formats = NULL,
+                          pretty_widths = TRUE,
                           ...) {
   column_n <- row_title <- value <- name <- newname <- NULL
 
-  if (is.null(parameter_formatter)) parameter_formatter <- the$parameter_formatter
+  if (is.null(column_formats)) column_formats <- the$column_formats
 
   if (row_title_prefix == "")  {
     row_title_sep <- ""
   }
 
+  # Convert data that are like integers into integers
   data <- dplyr::mutate(
     data,
     dplyr::across(dplyr::where(\(x) rlang::is_integerish(x) & !is.factor(x)), as.integer))
 
   if (auto_format_columns) {
     cn_before <- colnames(data)
-    data <- apa_format_columns(data, parameter_formatter = parameter_formatter)
+    data <- apa_format_columns(data, column_formats = column_formats)
     cn_after <- colnames(data)
     kv <- tibble::tibble(name = cn_before,
                          newname = cn_after)
@@ -807,7 +810,7 @@ apa_flextable <- function(data,
     ft <- flextable::align(ft, j = center_me, align = "center")
   }
 
-  if (apastyle) {
+  if (apa_style) {
     ft <- apa_style(ft,
                     font_family = font_family,
                     font_size = font_size,
@@ -833,6 +836,9 @@ apa_flextable <- function(data,
     ft <- flextable::align(ft, j = 1, part = "body"
     )
   )
+  if (pretty_widths) {
+    ft <- pretty_widths(ft, table_width = table_width * 6.5)
+  }
 
   ft
 }
@@ -843,10 +849,10 @@ apa_flextable <- function(data,
 #' @param predictor_parameters predictor parameters to display. If named vector, column names will be vector names
 #' @param starred columns to star with significant p_values
 #' @param bolded columns to bold, if significant
-#' @param parameter_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
+#' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #' @param t_with_df if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.
 #'
-#' @returns tibble
+#' @return tibble
 #' @export
 #'
 #' @examples
@@ -863,11 +869,12 @@ apa_parameters <- function(
                              "p"),
     starred = NULL,
     bolded = NULL,
-    parameter_formatter = NULL,
+    column_formats = NULL,
     t_with_df = TRUE) {
   UseMethod("apa_parameters")
 }
 
+#' @export apa_parameters.lm
 #' @export
 #' @rdname apa_parameters
 apa_parameters.lm <- function(
@@ -881,12 +888,12 @@ apa_parameters.lm <- function(
       "p"),
    starred = NA,
    bolded = NA,
-   parameter_formatter = NULL,
+   column_formats = NULL,
    t_with_df = TRUE
    ) {
   pstar <- NULL
   Parameter <- Std_Coefficient <- df_error <- header <- name <- NULL
-  if (is.null(parameter_formatter)) parameter_formatter <- the$parameter_formatter
+  if (is.null(column_formats)) column_formats <- the$column_formats
 
   if (!("Parameter" %in% predictor_parameters)) {
     predictor_parameters <- c("Parameter", predictor_parameters)
@@ -913,17 +920,17 @@ apa_parameters.lm <- function(
   if (t_with_df) {
 
   if (all(c("t", "df_error") %in% colnames(d_b)) &&
-      !is.null(parameter_formatter$CI) && ("t" %in% predictor_parameters)) {
+      !is.null(column_formats$CI) && ("t" %in% predictor_parameters)) {
     df <- paste0("(", align_chr(max(d_b$df_error, na.rm = TRUE), accuracy = the$accuracy), ")")
-    parameter_formatter$t@header <- paste0(parameter_formatter$t@header, df)
+    column_formats$t@header <- paste0(column_formats$t@header, df)
 
-    if (stringr::str_detect(parameter_formatter$t@latex, "\\$")) {
-      parameter_formatter$t@latex <- stringr::str_replace(
-        parameter_formatter$t@latex,
+    if (stringr::str_detect(column_formats$t@latex, "\\$")) {
+      column_formats$t@latex <- stringr::str_replace(
+        column_formats$t@latex,
         "\\$$",
         paste0(df, "$"))
     } else {
-      parameter_formatter$t@latex <- paste0(parameter_formatter$t@latex, df)
+      column_formats$t@latex <- paste0(column_formats$t@latex, df)
     }
 
     d_b_new <- d_b_new |>
@@ -931,20 +938,22 @@ apa_parameters.lm <- function(
   }}
 
   for (pr in predictor_parameters) {
-    if (!is.null(parameter_formatter[[pr]])) {
+    if (!is.null(column_formats[[pr]])) {
       # formals(mean)
       d_b_new <- dplyr::mutate(
         d_b_new,
         dplyr::across(
           dplyr::any_of(pr),
-          parameter_formatter[[pr]]@formatter))
+          column_formats[[pr]]@formatter))
     }
   }
 
-  if (length(starred > 0) & !is.na(starred) & (starred != "")) {
+  if (length(starred > 0) && !is.na(starred) && all(starred != "")) {
     d_b_new <- d_b_new |>
-      dplyr::mutate(pstar = p2stars(d_b$p, superscript = T)) |>
-      tidyr::unite({{ starred }}, c({{ starred}}, pstar), na.rm = T, sep = "") |>
+      dplyr::mutate(pstar = p2stars(d_b$p, superscript = TRUE)) |>
+      tidyr::unite({{ starred }}, c({{ starred}}, pstar),
+                   na.rm = TRUE,
+                   sep = "") |>
       dplyr::mutate(dplyr::across(dplyr::any_of(starred), align_chr))
   }
 
@@ -957,7 +966,7 @@ apa_parameters.lm <- function(
           \(x) tagger(x, my_bold)))
   }
 
-  prs <- parameter_formatter@get_tibble
+  prs <- column_formats@get_tibble
 
   pr_selector <- tibble::tibble(name = predictor_parameters) |>
     dplyr::left_join(prs, by = "name") |>
@@ -982,21 +991,21 @@ apa_parameters.list <- function(
       "p"),
     starred = NA,
     bolded = NA,
-    parameter_formatter = NULL,
+    column_formats = NULL,
     t_with_df = TRUE) {
   if (is.null(names(fit))) {
     names(fit) <- paste("Model", seq(1, length(fit)))
   }
-  purrr::map_df(fit, \(f1) apa_parameters(f1, predictor_parameters = predictor_parameters, parameter_formatter = parameter_formatter), .id = "Model")
+  purrr::map_df(fit, \(f1) apa_parameters(f1, predictor_parameters = predictor_parameters, column_formats = column_formats), .id = "Model")
 }
 
 #' format model performance metrics in APA style
 #'
 #' @param fit model fit object
 #' @param metrics performance metrics. Default is R2 and Sigma
-#' @param parameter_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
+#' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
-#' @returns tibble
+#' @return tibble
 #' @export
 #'
 #' @examples
@@ -1006,7 +1015,7 @@ apa_parameters.list <- function(
 apa_performance <- function(
     fit,
     metrics = c("R2", "Sigma"),
-    parameter_formatter = NULL) {
+    column_formats = NULL) {
   UseMethod("apa_performance")
 }
 
@@ -1015,14 +1024,14 @@ apa_performance <- function(
 apa_performance.lm <- function(
     fit,
     metrics = c("R2", "Sigma"),
-    parameter_formatter = NULL) {
+    column_formats = NULL) {
   header <- name <- NULL
 
-  if (is.null(parameter_formatter)) parameter_formatter <- the$parameter_formatter
+  if (is.null(column_formats)) column_formats <- the$column_formats
 
   names(metrics) <- NULL
 
-  prs <- parameter_formatter@get_tibble
+  prs <- column_formats@get_tibble
 
   d <- performance::model_performance(fit) |>
     tibble::as_tibble()
@@ -1030,11 +1039,11 @@ apa_performance.lm <- function(
   d_new <- d
 
   for (pr in metrics) {
-    if (!is.null(parameter_formatter[[pr]])) {
+    if (!is.null(column_formats[[pr]])) {
       d_new <- dplyr::mutate(
         d_new,
         dplyr::across(dplyr::any_of(pr),
-                      parameter_formatter[[pr]]@formatter))
+                      column_formats[[pr]]@formatter))
     }
   }
 
@@ -1056,9 +1065,9 @@ apa_performance.lm <- function(
 #' @param ... model fit objects
 #' @param metrics performance metrics. Default is R2, deltaR2, F, and p
 #' @param starred columns to star with significant p_values
-#' @param parameter_formatter parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.
+#' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
-#' @returns tibble
+#' @return tibble
 #' @export
 #'
 #' @examples
@@ -1070,11 +1079,11 @@ apa_performance_comparison <- function(
     ...,
     metrics = c("R2", "deltaR2", "F", "p"),
     starred = NA,
-    parameter_formatter = NULL) {
+    column_formats = NULL) {
   R2 <- Model <- pstar <- df <- df_diff <- Name <- NULL
 
-  if (is.null(parameter_formatter)) {
-    parameter_formatter <- the$parameter_formatter
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
     }
 
   .dots <- rlang::list2(...)
@@ -1103,7 +1112,7 @@ apa_performance_comparison <- function(
        dplyr::mutate(pstar = p2stars(cp$p, superscript = T)) |>
        dplyr::mutate(
          dplyr::across(dplyr::any_of(starred),
-                       parameter_formatter[[starred]]@formatter)) |>
+                       column_formats[[starred]]@formatter)) |>
        tidyr::unite(
          {{ starred }},
          c({{ starred }}, pstar),
@@ -1125,7 +1134,7 @@ apa_performance_comparison <- function(
 
  cp |>
    dplyr::select(Model = Name, dplyr::any_of(metrics)) |>
-   apa_format_columns(parameter_formatter)
+   apa_format_columns(column_formats)
 }
 
 #' Style object with APA style
@@ -1145,7 +1154,7 @@ apa_performance_comparison <- function(
 #' @param layout table layout ("autofit", "fixed")
 #' @param table_width table width (in pixels, 0 for auto)
 #' @name apa_style
-#' @returns object
+#' @return object
 #' @export
 #'
 #' @examples
@@ -1189,7 +1198,7 @@ apa_style.gt_tbl <- function(
     markdown_header = markdown,
     markdown_body = markdown) {
   if (is.null(font_family)) {
-    font_family = the$font_family
+    font_family <- the$font_family
     }
 
   pd <- (line_spacing - 1) * font_size * 2 / 3
@@ -1289,7 +1298,7 @@ apa_style.flextable <- function(
     markdown_body = markdown) {
 
   if (is.null(font_family)) {
-    font_family = the$font_family
+    font_family <- the$font_family
     }
 
   myborder <- list(
@@ -1425,7 +1434,7 @@ apa_style.flextable <- function(
 #' @param table_width width of table
 #' @param min_width minimum width of columns
 #' @param unit Can be `in`, `cm`, or `mm`
-#' @returns flextable
+#' @return flextable
 #' @export
 pretty_widths <- function(
     x,
@@ -1438,9 +1447,18 @@ pretty_widths <- function(
   if (is.null(table_width) || is.na(table_width) || table_width == 0) {
 
   } else {
-    pwidth <- pwidth / sum(pwidth) * table_width
+    break_keys <- grepl("^apa7breakcolumn", x$col_keys)
+    nbreaks <- sum(break_keys)
+    pwidth[!break_keys] <- pwidth[!break_keys] /
+      sum(pwidth[!break_keys]) *
+      (table_width - nbreaks * min_width)
+    pwidth[break_keys] <- min_width
+
   }
-  flextable::set_table_properties(x, layout = "fixed", width = 1) |>
+  x_props <- x$properties
+  x_props$layout <- "fixed"
+  x_props$width <- 1
+  rlang::inject(flextable::set_table_properties(x, !!!x_props)) |>
     flextable::width(
       width = pwidth,
       unit = unit)

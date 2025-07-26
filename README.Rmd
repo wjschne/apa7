@@ -35,15 +35,22 @@ remotes::install_github("wjschne/apa7")
 
 The package provides functions to create APA-style tables, including correlation matrices and regression tables. The tables can be formatted using the `flextable` package.
 
-```{r showtables, message = FALSE, warning = FALSE}
+```{r showcor, message = FALSE, warning = FALSE, fig.alt="A correlation matrix in APA style."}
 library(apa7)
 # Correlation matrix 
 apa_cor(trees, star_significant = TRUE)
+
+```
+
+
+```{r showlm, message = FALSE, warning = FALSE, fig.alt="A regression table in APA style."}
 # Make regression model, format parameters, and display flextable
 lm(Volume ~ Girth + Height, data = trees) |> 
   apa_parameters() |> 
   apa_flextable()
+```
 
+```{r showcontingence, message = FALSE, warning = FALSE, fig.alt="A contigency table with a chi-square test of independence e in APA style."}
 # Contingency table with chi-square test of independence
 d <- mtcars[, c("am", "gear")]
 colnames(d) <- c("Transmission", "Gears")

@@ -25,3 +25,5 @@ asdf.*
 inst/doc
 math-rendered-by-lua-filter.html
 **/.quarto/
+/doc/
+/Meta/

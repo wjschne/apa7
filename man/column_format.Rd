@@ -20,6 +20,9 @@ column_format(
 
 \item{formatter}{function that formats the column values. It should take a vector of values and return a character vector of formatted values.}
 }
+\value{
+column_format object
+}
 \description{
 This class is used to define the format of columns in tables, including the name, header, latex representation, and a formatter function.
 }

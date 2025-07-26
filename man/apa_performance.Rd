@@ -5,16 +5,16 @@
 \alias{apa_performance.lm}
 \title{format model performance metrics in APA style}
 \usage{
-apa_performance(fit, metrics = c("R2", "Sigma"), parameter_formatter = NULL)
+apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 
-\method{apa_performance}{lm}(fit, metrics = c("R2", "Sigma"), parameter_formatter = NULL)
+\method{apa_performance}{lm}(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 }
 \arguments{
 \item{fit}{model fit object}
 
 \item{metrics}{performance metrics. Default is R2 and Sigma}
 
-\item{parameter_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
+\item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 }
 \value{
 tibble

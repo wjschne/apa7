@@ -36,7 +36,7 @@ library(apa7)
 apa_cor(trees, star_significant = TRUE)
 ```
 
-<img src="man/figures/README-showtables-1.png" width="100%" />
+<img src="man/figures/README-showcor-1.png" alt="A correlation matrix in APA style." width="100%" />
 
 ``` r
 # Make regression model, format parameters, and display flextable
@@ -45,10 +45,9 @@ lm(Volume ~ Girth + Height, data = trees) |>
   apa_flextable()
 ```
 
-<img src="man/figures/README-showtables-2.png" width="100%" />
+<img src="man/figures/README-showlm-1.png" alt="A regression table in APA style." width="100%" />
 
 ``` r
-
 # Contingency table with chi-square test of independence
 d <- mtcars[, c("am", "gear")]
 colnames(d) <- c("Transmission", "Gears")
@@ -58,7 +57,7 @@ d$Transmission <- factor(d$Transmission,
 apa_chisq(d)
 ```
 
-<img src="man/figures/README-showtables-3.png" width="100%" />
+<img src="man/figures/README-showcontingence-1.png" alt="A contigency table with a chi-square test of independence e in APA style." width="100%" />
 
 ## Formatting functions
 

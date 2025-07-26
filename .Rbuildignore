@@ -16,3 +16,6 @@ math-rendered-by-lua-filter.html
 ^\.vscode$
 ^vignettes/\.quarto$
 ^vignettes/*_files$
+^dev$
+^doc$
+^Meta$

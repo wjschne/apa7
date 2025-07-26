@@ -1,0 +1,263 @@
+---
+title: "Getting Started with apa7"
+knitr:
+  opts_chunk: 
+    collapse: true
+    comment: '#>'
+    dev: "ragg_png"
+format: 
+  html:
+    toc: true
+    html-math-method: katex
+vignette: >
+  %\VignetteIndexEntry{apa7}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+# Tables
+
+The package provides functions to create APA-style tables, including correlation matrices and regression tables. The functions return flextable objects that can be processed further using the [flextable](https://ardata-fr.github.io/flextable-book/) package. Although there are other fantastic packages for creating tables (e.g., [gt](https://gt.rstudio.com/),
+[tinytable](https://vincentarelbundock.github.io/tinytable/), and [kableExtra](https://haozhu233.github.io/kableExtra/)), the [flextable](https://ardata-fr.github.io/flextable-book/) package has the fullest support for the .docx format, which is essential for anyone working in APA style. Almost anything that can be done in a .docx table, flextable can handle it.
+
+```{r setup, include = FALSE, cache = FALSE}
+library(apa7)
+library(flextable)
+library(ftExtra)
+library(dplyr)
+library(tibble)
+set_flextable_defaults(theme_fun = theme_apa, 
+                       font.family = "Times New Roman", text.align = "center")
+```
+
+```{r setupdisplay}
+<<setup>>
+```
+
+
+Suppose we have a table we want to format. As a raw tibble, it looks like this:
+
+```{r rawdata}
+d <- tibble(
+  Model = paste("Model", c(rep(1,2), rep(2, 3))),
+  Predictor = c(
+    "Constant", "Socioeconomic status", 
+    "Constant", "Socioeconomic status", "Age"),
+  b = c(-4.5, 1.23, 
+        -5.1, 1.45, -.23),
+  beta = c(NA, .24, 
+           NA, .31, .031),
+  t = c(-18.457, 2.345, 
+        -22.457, 2.114, .854),
+  df = c(85,85, 
+         84, 84, 84),
+  p = c(.0001, .0245, 
+        .0001, .0341, .544))
+
+d
+```
+
+If we use flextable with the `thema_apa` function set as the default, we get something close to what we want:
+
+```{r tbl-flextable}
+set_flextable_defaults(
+  theme_fun = theme_apa, 
+  font.family = "Times New Roman", 
+  text.align = "center")
+
+flextable(d) 
+```
+
+Unfortunately, there are some polishing moves that can take a long time to get right.
+
+* Left align the Predictor columns
+* Make Predictor column wider
+* Make negative numbers with real minus signs instead of hyphens.
+* Decimal align numbers
+* Format p-values
+* Remove leading zeroes for beta and p
+* Italicize statistic headings * 
+* Make row titles
+
+There are a number of flextable functions that can do these things, but applying them repeatedly is tedious. The `apa_flextable` tries to take care of all of these issues with minimal fuss.
+
+```{r apa_flextable}
+apa_flextable(d, row_title_column = "Model") 
+```
+
+A common problem with table formatting functions is that they try to do too everything in one function and make it difficult to customize the output. Like the entire flextable ecosystem, the `apa_flextable` function is designed to be flexible in terms of its inputs and allows for further customization afterwards.
+
+The `apa_flextable` function returns a flextable object that can be further processed with flextable functions, if needed. For example, suppose we wanted to bold the beta coefficient for the first predictor:
+
+```{r selectivebold}
+apa_flextable(d) |> 
+  bold(i = 2, j = 3)
+```
+
+Some flextable functions that take care of common formatting problems. All of these can be applied to specific column names/positions or row positions. The row positions can be selected conditionally based on data in each row.
+
+```{r flextablefunctions}
+#| echo: false
+tibble::tribble(
+  ~Target,      ~Function,               ~Purpose,
+   "Cell",        "align", "Horizontal alignment",
+   "Cell",           "bg",     "Background color",
+   "Cell", "line_spacing",         "Line spacing",
+   "Cell",      "padding",         "Cell padding",
+   "Cell",       "valign",   "Vertical alignment",
+   "Cell",       "rotate",          "Rotate text",
+   "Cell",     "surround",         "Cell borders",
+   "Cell",        "width",         "Column width",
+   "Text",         "font",          "Font family",
+   "Text",     "fontsize",            "Font size",
+   "Text",       "italic",       "Italicize text",
+   "Text",         "bold",            "Bold text",
+   "Text",        "color",           "Color text",
+   "Text",    "highlight",      "Highlight color"
+  ) |> 
+  arrange(desc(Target), Function) |> 
+  mutate(
+    Function = paste0("[", tagger(Function, "`"), "](https://davidgohel.github.io/flextable/reference/", Function, ".html)"),
+    Target = bold_md(Target)) |> 
+  # as_grouped_data() |> 
+  apa_flextable(row_title_column = "Target", 
+                table_width = .5, table_align = "left") |> 
+  align_text_col() |> 
+  padding(j = 1, i = ~!is.na(Purpose), padding.left = 15)
+```
+
+
+
+## Automatic formatting
+
+The `apa_flextable` function formats the headers and columns of any headings it recognizes. This feature can be turned off:
+
+```{r autooff}
+apa_flextable(d, 
+              row_title_column = "Model", 
+              auto_format_columns = FALSE)
+```
+
+It is also possible to modify the automatic formatting. For example, suppose we want any column called "Predictor" to be renamed to "Variable" and to make all variables to be upper case (i.e., capital letters). 
+
+The `column_format` function creates an object for a single column. 
+
+```{r collumnformat}
+column_format(
+  name = "Predictor", 
+  header = "Variable",
+  latex = "Variable",
+  formatter = stringr::str_to_upper)
+```
+
+
+
+The `column_formats` function creates a default list of `column_format` objects.
+
+We can also set the rounding accuracy of all columns to .001 instead of the default of .01.
+
+```{r myformats}
+
+my_formats <- column_formats(accuracy = .001)
+my_formats$Predictor <- column_format(
+  name = "Predictor", 
+  header = "Variable",
+  latex = "Variable",
+  formatter = stringr::str_to_upper)
+
+my_formats$beta <- NULL
+
+apa_flextable(d, 
+              row_title_column = "Model", 
+              column_formats = my_formats)
+```
+
+The `my_formats` object is a list of `column_format` objects. Each column_format object can specify the name, header, formatter, and other options for a column. The `column_formats` function creates a list of column_format objects with default settings that can be modified as needed.
+
+```{r formattibble}
+my_formats@get_tibble |> 
+  select(-formatter) |>
+  dplyr::arrange(name, .locale = "en") |> 
+  apa_flextable(markdown_body = F)
+```
+The `apa_flextable` function performs a number of formatting operations on the data before and after the data are sent to `flextable`. Roughly speaking, `apa_flextable`, by default, performs these operations.
+
+1. Apply `as_grouped_data` and restructure row titles, if `row_title` is specified.
+2. Format data with `apa_format_columns` if `auto_format_columns = TRUE`
+3. Separate headers into multiple rows if `separate_headers = TRUE`
+4. Apply `flextable`
+5. Apply `apa_style` function (table formatting and markdown conversion) if `apa_style = TRUE`
+6. Apply `pretty_widths` if `pretty_widths = TRUE`
+
+Each of these steps can be applied separately. For example, if you want to see what `my_formats` is doing to the data before it is sent to `flextable`, you can pre-format the data.
+
+Data before formatting
+
+```{r preformat}
+d
+```
+
+Data after automatic formatting
+
+```{r afterformat}
+d1 <- apa_format_columns(d) 
+d1
+```
+
+Initial table
+
+```{r afterflextable}
+d2 <- flextable::flextable(d1)
+d2
+```
+
+Table after apa styling and markdown conversion
+
+```{r afterstyling}
+d3 <- apa_style(d2) 
+d3
+```
+
+Table after pretty widths (defaults to 6.5in for .docx paper width)
+
+```{r prettywidths}
+pretty_widths(d3) 
+```
+# APA format with full control
+
+Sometimes you want a table to be particular way, and no package can anticipate the exact formatting required. With a combination of tidyverse, apa7, and flextable functions, it is possible to get flextable to output almost any kind of APA table you need.
+
+Here I would like the unstandardized and standardized regression coefficients with the two models side by side. I want the p-values converted to stars and appended to the unstandardized coefficients.
+
+```{r fullcontrol}
+d |> 
+  # # decimal align b and append p-value stars
+  mutate(b = paste0(
+    align_chr(b), 
+    p2stars(p))) |> 
+  # deselect t, df, and p
+  select(-c(t,df, p)) |> 
+  # restructure data
+  tidyr::pivot_wider(
+    names_from = Model, 
+    values_from = c(b, beta), 
+    names_glue = "{Model}_{.value}",
+    names_vary = "slowest") |> 
+  # add break column between 2 models
+  add_break_columns(`Model 1_beta`) |> 
+  # convert to flextable
+  apa_flextable() |> 
+  # add footnotes
+  add_footer_lines(
+    values = as_paragraph_md(
+      c(paste(
+        "*Note*. *b* = unstandardized regression coefficient.",
+        "&beta; = standardized regression coefficient."),
+        apa_p_star_note()))) |>  
+  # align footnote
+  align(part = "footer", align = "left") |> 
+  # Make column widths even
+  width(width = c(2.45,1,1,.05, 1,1))
+```
+

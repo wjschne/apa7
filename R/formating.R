@@ -1,5 +1,3 @@
-library(S7)
-
 #' Align text on center text (default is decimal)
 #'
 #' @param x vector (numeric or character)
@@ -13,7 +11,7 @@ library(S7)
 #' @param NA_value value to replace NA
 #' @param ... additional arguments passed to `signs::signs()`
 #'
-#' @returns character vector
+#' @return character vector
 #' @export
 #'
 #' @examples
@@ -217,7 +215,7 @@ apa_p <- function(p,
 #' @param x vector of alpha values (p-value thresholds)
 #' @inheritParams p2stars
 #'
-#' @returns character vector
+#' @return character vector
 #' @export
 #'
 #' @examples
@@ -243,7 +241,7 @@ apa_p_star_note <- function(x = c(.05, .01, .001), first_alpha_marginal = FALSE)
 #' @param newline text for creating new line
 #' @param whitespace_only wrapping spaces only
 #'
-#' @returns character vector
+#' @return character vector
 #' @export
 #'
 #' @examples
@@ -268,7 +266,7 @@ hanging_indent <- function(
 #'
 #' @param x character vector
 #' @param elementwise if `TRUE`, returns a logical vector for each element, otherwise returns a single logical value indicating if all elements are numeric-like (default: `FALSE`)
-#' @returns logical vector
+#' @return logical vector
 #' @export
 #'
 #' @examples
@@ -294,7 +292,7 @@ is_numeric_like <- function(x, elementwise = FALSE) {
 #' @param padding_character character to use for padding, default is `&numsp;` (figure space)
 #' @param NA_value value to replace NA
 #'
-#' @returns character vector
+#' @return character vector
 #' @export
 #'
 #' @examples
@@ -334,7 +332,7 @@ num_pad <- function(x,
 #' @param superscript make as superscript
 #' @param add_trailing_space if TRUE, adds a trailing space after the stars (default: FALSE)
 #'
-#' @returns character vector
+#' @return character vector
 #' @export
 #'
 #' @examples
@@ -363,7 +361,7 @@ p2stars <- function(p,
     }
 
   }
-  trailing_space = ifelse(add_trailing_space, "\u2009", "")
+  trailing_space <- ifelse(add_trailing_space, "\u2009", "")
   if (superscript) {
     pstars[nchar(pstars) > 0] <- paste0(
       "^",
@@ -386,7 +384,7 @@ p2stars(.10, alpha = c(.10, .05, .01, .001), first_alpha_marginal = F)
 #' @param tag opening tag, e.g., `<span>`
 #' @param right_tag closing tag, e.g., `</span>`. Defaults to the same value as the opening tag.
 #'
-#' @returns character vector
+#' @return character vector
 #' @export
 #'
 #' @examples
@@ -438,7 +436,7 @@ header_md <- function(x, level = 1) {
 }
 
 
-
+# Column format ----
 #' Column format class
 #'
 #' This class is used to define the format of columns in tables, including the name, header, latex representation, and a formatter function.
@@ -447,6 +445,7 @@ header_md <- function(x, level = 1) {
 #' @param latex latex representation of header name
 #' @param formatter function that formats the column values. It should take a vector of values and return a character vector of formatted values.
 #' @export
+#' @return column_format object
 #' @examples
 #' R2 <- column_format(
 #'          "R2",
@@ -468,12 +467,21 @@ column_format <- new_class("column_format", properties = list(
   formatter = class_function
 ))
 
+
+as_tibble <- S7::new_external_generic(package = "tibble", name = "as_tibble", dispatch_args = "x")
+
+
+method(as_tibble, column_format) <- function(x, ...) {
+  tibble::tibble(
+    name = x@name,
+    header = x@header,
+    latex = ifelse(is.null(x@latex), NA, x@latex),
+    formatter = list(x@formatter))
+}
+
 method(str, column_format) <- function(object, ...) {
   cli::cli_h2(S7_class(object)@name)
-  print(tibble::tibble(name = object@name,
-         header = object@header,
-         latex = object@latex,
-         formatter = list(object@formatter)))
+  print(tibble::as_tibble(object))
   invisible(object)
 }
 
@@ -505,10 +513,10 @@ the$number_formatter <- \(x, accuracy = the$accuracy, ...) {
   align_chr(x, accuracy = accuracy, ...)
 }
 the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
-  max_digits = 3
-  min_digits = round(-log10(accuracy))
+  max_digits <- 3
+  min_digits <- round(-log10(accuracy))
   if (max_digits < min_digits) {
-    max_digits = min_digits
+    max_digits <- min_digits
   }
   align_chr(
     apa_p(
@@ -543,6 +551,22 @@ the$columns <- list(
     header = "*AICc*",
     latex = "$AICc$",
     formatter = the$number_formatter
+  ),
+  B = column_format(
+    name = "B",
+    header = "*B*",
+    latex = "$B$",
+    formatter = the$number_formatter),
+  b = column_format(
+    name = "b",
+    header = "*b*",
+    latex = "$b$",
+    formatter = the$number_formatter),
+  beta = column_format(
+    name = "beta",
+    header = "&beta;",
+    latex = "$\\beta$",
+    formatter = the$trim_leading_zero
   ),
   BIC = column_format(
     name = "BIC",
@@ -805,7 +829,7 @@ the$columns <- list(
   )
 )
 
-# parameter_formatter ----
+# column_formats ----
 #' Create a set of column formats
 #'
 #' Returns an S7 object that contains a list of `column_format` objects that can be used to format parameters in APA style.
@@ -823,15 +847,15 @@ the$columns <- list(
 #' @slot get_header_rename_latex getter for column names with latex headers as names
 #' @slot get_tibble getter for tibble with column names, headers, latex headers, and formatters
 #'
-#' @returns parameter_formatter
+#' @return column_formats
 #' @export
 #'
 #' @examples
-#' my_formatter <- parameter_formatter()
+#' my_formatter <- column_formats()
 #' my_formatter$Coefficient@formatter <- \(x) round(x, 2)
 #' my_formatter$Coefficient@formatter(2.214)
-parameter_formatter <- new_class(
-  name = "parameter_formatter",
+column_formats <- new_class(
+  name = "column_formats",
   parent = class_list,
   properties = list(
     accuracy = new_property(name = "accuracy",
@@ -859,7 +883,7 @@ parameter_formatter <- new_class(
         purrr::map_chr(S7_data(self), "header")
     }),
     get_latex = new_property(getter = \(self) {
-      purrr::map_chr(S7_data(self), "latex")
+      purrr::map_chr(S7_data(self), \(ap) ifelse(is.null(ap@latex), ap@name, ap@latex))
     }),
     get_formatters = new_property(getter = \(self) {
       purrr::map(S7_data(self), "formatter")
@@ -921,7 +945,7 @@ parameter_formatter <- new_class(
   }
 )
 
-method(str, parameter_formatter) <- function(object, ...) {
+method(str, column_formats) <- function(object, ...) {
   cat("<", S7_class(object)@name, ">\n", sep = "")
   cat("\tColumns\n")
   print(object@get_tibble)
@@ -932,25 +956,29 @@ method(str, parameter_formatter) <- function(object, ...) {
   invisible(object)
 }
 
-method(print, parameter_formatter) <- function(x, ...) {
+method(print, column_formats) <- function(x, ...) {
   cli::cli_h2(S7_class(x)@name)
   print(x@get_tibble)
   invisible(x)
 }
 
-the$parameter_formatter <- parameter_formatter()
+method(as_tibble, column_formats) <- function(x, ...) {
+  x@get_tibble
+}
+
+the$column_formats <- column_formats()
 
 #' Set defaults for apa7 package
 #'
 #' @param accuracy numeric (default: .01)
 #' @param font_family font family
 #' @param intercept_text what to call the intercept
-#' @param parameter_formatter column formatting functions
+#' @param column_formats column formatting functions
 #' @param number_formatter default function to format numbers
 #' @param trim_leading_zero default function to trim leading zeros from numbers
 #' @param reset if `TRUE`, reset all defaults (except as specified)
 #'
-#' @returns previous defaults
+#' @return previous defaults
 #' @export
 #'
 #' @examples
@@ -960,44 +988,44 @@ the$parameter_formatter <- parameter_formatter()
 apa7_defaults <- function(accuracy = NULL,
                           font_family = NULL,
                           intercept_text = NULL,
-                          parameter_formatter = NULL,
+                          column_formats = NULL,
                           number_formatter = NULL,
                           trim_leading_zero = NULL,
                           reset = FALSE) {
   old <- the
   if (reset) {
-    the$accuracy = .01
-    the$parameter_formatter <- parameter_formatter()
+    the$accuracy <- .01
+    the$column_formats <- column_formats()
     the$intercept_text <- "Constant"
-    the$font_family = "Times New Roman"
-    the$number_formatter = \(x, accuracy = the$accuracy, ...) align_chr(
+    the$font_family <- "Times New Roman"
+    the$number_formatter <- \(x, accuracy = the$accuracy, ...) align_chr(
       x,
       accuracy = accuracy,
       ...
     )
-    the$trim_leading_zero = \(x, accuracy = the$accuracy, ...) align_chr(
+    the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) align_chr(
       x,
       accuracy = accuracy,
       trim_leading_zeros = TRUE,
       ...
     )
-    the$pvalue_formatter = \(x, accuracy = the$accuracy, ...) {
-      max_digits = 3
-      min_digits = round(-log10(accuracy))
+    the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
+      max_digits <- 3
+      min_digits <- round(-log10(accuracy))
       if (max_digits < min_digits) {
-        max_digits = min_digits
+        max_digits <- min_digits
       }
       align_chr(apa_p(x,
                       min_digits = min_digits,
                       max_digits = max_digits, ...))}
   }
 
-  if (!is.null(accuracy)) the$accuracy = accuracy
-  if (!is.null(font_family)) the$font_family = font_family
-  if (!is.null(intercept_text)) the$intercept_text = intercept_text
-  if (!is.null(parameter_formatter)) the$parameter_formatter = parameter_formatter
-  if (!is.null(number_formatter)) the$number_formatter = number_formatter
-  if (!is.null(trim_leading_zero)) the$trim_leading_zero = trim_leading_zero
+  if (!is.null(accuracy)) the$accuracy <- accuracy
+  if (!is.null(font_family)) the$font_family <- font_family
+  if (!is.null(intercept_text)) the$intercept_text <- intercept_text
+  if (!is.null(column_formats)) the$column_formats <- column_formats
+  if (!is.null(number_formatter)) the$number_formatter <- number_formatter
+  if (!is.null(trim_leading_zero)) the$trim_leading_zero <- trim_leading_zero
 
   invisible(old)
 }
@@ -1005,7 +1033,7 @@ apa7_defaults <- function(accuracy = NULL,
 #' Format data columns
 #'
 #' @param data data set (data.frame or tibble)
-#' @param parameter_formatter `apa_parameter_formatter` object. If NULL, the current default formatter set with [apa7_defaults()] will be used.
+#' @param column_formats `column_formats` object. If NULL, the current default formatter set with [apa7_defaults()] will be used.
 #' @param columns (optional) vector of columns to format
 #' @param rename_headers if `TRUE`, rename headers with markdown or latex
 #' @param latex_headers if `TRUE`, rename headers with latex instead of markdown
@@ -1014,7 +1042,7 @@ apa7_defaults <- function(accuracy = NULL,
 #' @param accuracy numeric (default: NULL, uses the current default accuracy set with [apa7_defaults()]). If not NULL, sets the accuracy for the formatter.
 #' @importFrom rlang :=
 #'
-#' @returns tibble
+#' @return tibble
 #' @export
 #'
 #' @examples
@@ -1023,7 +1051,7 @@ apa7_defaults <- function(accuracy = NULL,
 #'   apa_format_columns() |>
 #'   apa_flextable()
 apa_format_columns <- function(data,
-                               parameter_formatter = NULL,
+                               column_formats = NULL,
                                columns = NULL,
                                rename_headers = TRUE,
                                latex_headers = FALSE,
@@ -1032,18 +1060,18 @@ apa_format_columns <- function(data,
                                accuracy = NULL) {
   CI_low <- CI_high <- df_error <- name <- header <- column <- group <- value <- pattern_1 <- pattern_2 <- replace_1 <- replace_2 <- pattern <- type <- should_replace <- id <- replacer <- formatter <- NULL
 
-  if (is.null(parameter_formatter)) {
-    parameter_formatter <- the$parameter_formatter
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
   }
 
   if (!is.null(accuracy)) {
-    parameter_formatter@accuracy <- accuracy
+    column_formats@accuracy <- accuracy
   }
 
   data <- tibble::as_tibble(data)
 
   data_names <- colnames(data)
-  format_names <- names(parameter_formatter)
+  format_names <- names(column_formats)
 
   temp_fix_names <- stringr::str_replace_all(
     string = format_names,
@@ -1051,7 +1079,7 @@ apa_format_columns <- function(data,
     replacement = "apa7separator") |>
     `names<-`(format_names)
 
-  d_formatter <- parameter_formatter@get_tibble
+  d_formatter <- column_formats@get_tibble
 
   d_names <- tibble::tibble(column = data_names, name = data_names)
 
@@ -1078,7 +1106,7 @@ apa_format_columns <- function(data,
   ci <- .95
 
   if (all(c("CI", "CI_low", "CI_high") %in% d_names$name) &&
-      !is.null(parameter_formatter$CI) & ("CI" %in% cls)) {
+      !is.null(column_formats$CI) & ("CI" %in% cls)) {
 
     d_ci <- d_names |>
       dplyr::mutate(group = stringr::str_remove(column, paste0(sep, name, "$"))) |>
@@ -1097,13 +1125,13 @@ apa_format_columns <- function(data,
       if (all(ci_names %in% colnames(data))) {
         ci <- max(data[, ci_names[1]], na.rm = TRUE)
 
-        d_names[d_names$column == d_ci[[i, "column"]], "header"] <- glue::glue(parameter_formatter$CI@header) |>
+        d_names[d_names$column == d_ci[[i, "column"]], "header"] <- glue::glue(column_formats$CI@header) |>
           as.character()
 
-        data[, ci_names[1]] <- parameter_formatter$CI@formatter(
+        data[, ci_names[1]] <- column_formats$CI@formatter(
           dplyr::pull(data, dplyr::any_of(ci_names[2])),
           dplyr::pull(data, dplyr::any_of(ci_names[3])),
-          accuracy = parameter_formatter@accuracy
+          accuracy = column_formats@accuracy
         )
         data[, ci_names[2]] <- NULL
         data[, ci_names[3]] <- NULL
@@ -1120,12 +1148,12 @@ apa_format_columns <- function(data,
                 accuracy = the$accuracy),
       ")")
 
-    parameter_formatter$t@header <- paste0(parameter_formatter$t@header, df)
+    column_formats$t@header <- paste0(column_formats$t@header, df)
 
-    if (stringr::str_detect(parameter_formatter$t@latex, "\\$")) {
-      parameter_formatter$t@latex <- stringr::str_replace(parameter_formatter$t@latex, "\\$$", paste0(df, "$"))
+    if (stringr::str_detect(column_formats$t@latex, "\\$")) {
+      column_formats$t@latex <- stringr::str_replace(column_formats$t@latex, "\\$$", paste0(df, "$"))
     } else {
-      parameter_formatter$t@latex <- paste0(parameter_formatter$t@latex, df)
+      column_formats$t@latex <- paste0(column_formats$t@latex, df)
     }
 
     data <- data |>
@@ -1150,9 +1178,9 @@ apa_format_columns <- function(data,
 
   if (rename_headers) {
     if (latex_headers) {
-      rcls <- parameter_formatter@get_latex
+      rcls <- column_formats@get_latex
     } else {
-      rcls <- parameter_formatter@get_headers
+      rcls <- column_formats@get_headers
     }
 
     if (nrow(d_names) > 0) {
@@ -1198,7 +1226,7 @@ apa_format_columns <- function(data,
 #' @param star star text
 #' @param superscript Place superscript text if `TRUE`
 #'
-#' @returns character vector
+#' @return character vector
 #' @export
 #'
 #' @examples

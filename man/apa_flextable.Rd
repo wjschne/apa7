@@ -15,7 +15,7 @@ apa_flextable(
   cwidth = 0.75,
   cheight = 0.25,
   separate_headers = TRUE,
-  apastyle = TRUE,
+  apa_style = TRUE,
   font_family = NULL,
   font_size = 12,
   text_color = "black",
@@ -30,7 +30,8 @@ apa_flextable(
   markdown_header = markdown,
   markdown_body = markdown,
   auto_format_columns = TRUE,
-  parameter_formatter = NULL,
+  column_formats = NULL,
+  pretty_widths = TRUE,
   ...
 )
 }
@@ -55,7 +56,7 @@ apa_flextable(
 
 \item{separate_headers}{separate header rows (default: \code{TRUE})}
 
-\item{apastyle}{apply \code{apa_style} function (default: \code{TRUE})}
+\item{apa_style}{apply \code{apa_style} function (default: \code{TRUE})}
 
 \item{font_family}{font family}
 
@@ -85,7 +86,9 @@ apa_flextable(
 
 \item{auto_format_columns}{if true, will attempt to format some columns automatically}
 
-\item{parameter_formatter}{an apa_parameter_formatter object}
+\item{column_formats}{a column_formats object}
+
+\item{pretty_widths}{apply \code{pretty_widths} function}
 
 \item{...}{arguments passed to \code{apa_style}}
 }

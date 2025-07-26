@@ -26,6 +26,7 @@ formatters
 getter
 gtsummary
 ij
+kableExtra
 mathcal
 num
 pre
@@ -36,3 +37,4 @@ th
 tibble
 tidyselect
 tidyverse
+tinytable

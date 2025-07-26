@@ -4,47 +4,48 @@ Version: 0.0.0.9002
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
-Description: Functions to create APA Style 7th Edition documents. 
+Description: Functions to create APA Style 7th Edition documents.
 License: CC0
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-URL: https://github.com/wjschne/apa7,
-     https://wjschne.github.io/apa7/
+URL: https://github.com/wjschne/apa7, https://wjschne.github.io/apa7/
 BugReports: https://github.com/wjschne/apa7/issues
-Suggests: 
-    forcats,
-    ggplot2,
-    knitr,
-    R.utils,
-    quarto,
-    rmarkdown,
-    snakecase,
-    spelling,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+Depends: 
+    R (>= 4.1.0)
 Imports:
     cli,
     dplyr,
     effectsize,
     flextable,
     ftExtra,
+    glue,
     gt,
+    parameters,
+    performance,
     psych,
     purrr,
     purrr,
+    rlang,
+    S7,
     scales,
     signs,
     stringr,
     tibble,
-    tidyr,
-    rlang,
-    parameters,
-    performance,
-    S7,
-    glue
-Depends: 
-    R (>= 4.1.0)
-VignetteBuilder: knitr, quarto
-Language: en-US
+    tidyr
+Suggests: 
+    forcats,
+    ggplot2,
+    knitr,
+    quarto,
+    R.utils,
+    rmarkdown,
+    snakecase,
+    spelling,
+    testthat (>= 3.0.0)
+VignetteBuilder: 
+    knitr,
+    quarto
 Config/Needs/website: quarto
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

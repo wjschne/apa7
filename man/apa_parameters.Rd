@@ -11,7 +11,7 @@ apa_parameters(
   predictor_parameters = c("Coefficient", "SE", "Std_Coefficient", "t", "df_error", "p"),
   starred = NULL,
   bolded = NULL,
-  parameter_formatter = NULL,
+  column_formats = NULL,
   t_with_df = TRUE
 )
 
@@ -20,7 +20,7 @@ apa_parameters(
   predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
   starred = NA,
   bolded = NA,
-  parameter_formatter = NULL,
+  column_formats = NULL,
   t_with_df = TRUE
 )
 
@@ -29,7 +29,7 @@ apa_parameters(
   predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
   starred = NA,
   bolded = NA,
-  parameter_formatter = NULL,
+  column_formats = NULL,
   t_with_df = TRUE
 )
 }
@@ -42,7 +42,7 @@ apa_parameters(
 
 \item{bolded}{columns to bold, if significant}
 
-\item{parameter_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
+\item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 
 \item{t_with_df}{if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.}
 }

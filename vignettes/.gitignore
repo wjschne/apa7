@@ -1,5 +1,6 @@
 *.html
 *.R
 *_files
-
+*_cache
+_freeze
 /.quarto/

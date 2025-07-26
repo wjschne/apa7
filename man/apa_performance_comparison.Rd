@@ -8,7 +8,7 @@ apa_performance_comparison(
   ...,
   metrics = c("R2", "deltaR2", "F", "p"),
   starred = NA,
-  parameter_formatter = NULL
+  column_formats = NULL
 )
 }
 \arguments{
@@ -18,7 +18,7 @@ apa_performance_comparison(
 
 \item{starred}{columns to star with significant p_values}
 
-\item{parameter_formatter}{parameter_formatter object to format columns. If NULL, the default parameter_formatter is used.}
+\item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 }
 \value{
 tibble

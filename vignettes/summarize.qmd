@@ -9,6 +9,8 @@ format:
   html:
     toc: true
     html-math-method: katex
+execute:
+  cache: true
 vignette: >
   %\VignetteIndexEntry{summarize}
   %\VignetteEngine{quarto::html}
@@ -18,7 +20,9 @@ vignette: >
 ```{r}
 #| label: presetup
 #| include: false
+#| cache: false
 library(apa7)
+library(ftExtra)
 library(flextable)
 library(gt)
 library(dplyr)
@@ -29,14 +33,7 @@ library(purrr)
 ```
 
 ```{r setup}
-library(apa7)
-library(flextable)
-library(gt)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(stringr)
-library(purrr)
+<<presetup>>
 ```
 
 The flextable and gt packages have many, many options and helper functions. The `tabulator`, `summarizor`, and `proc_freq` functions from the flextable package are particularly powerful ways of summarizing and describing data. Functions that automate your descriptive statistics tables for you (e.g., the amazing [gtsummary package](https://www.danieldsjoberg.com/gtsummary/index.html)) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the `apa_style` function will get a flextable or gt table close to APA style. You may need to do some additional styling with flextable or gt as well.
@@ -61,58 +58,56 @@ d <- diamonds %>%
   pivot_wider(names_from = Variable) 
 ```
 
-
-
 # Flextable
 
-The flextable package has a `theme_apa` function that can get things very close to full APA style. The apa7 `apa_style` function provides a little more flexibility with respect to fonts, colors, and border widths. 
-
-To get flextable to have small breaks in the header, a little extra work is needed to insert extra blank columns, but the results are really nice.
+The flextable package has a `theme_apa` function that can get things very close to full APA style. With a little extra care, the formatting in @tbl-flextable is pretty much perfect. 
 
 ```{r}
 #| label: tbl-flextable
-#| tbl-cap: Price, Carat, Depth, Table Using Flextable
-
-# Where are the columns that end in _n?
-blank_column <- dplyr::ends_with("_SD", vars = colnames(d))
-n_names <- colnames(d)[blank_column]
-
-# Remove last break
-blank_column <- blank_column[-length(blank_column)]
-
-# Blank column header names
-blank_names <- paste0("apabreak", seq_along(blank_column))
-
-# Insert break columns after _n variables
-keys <- R.utils::insert(colnames(d), 
-                        ats = blank_column + 1, 
-                        values = blank_names)
-
-
-# Table
-d %>% 
-  flextable(col_keys = keys) %>% 
-  colformat_double(digits = 2) %>% 
-  separate_header() %>% 
-  align(align = "center", part = "header") %>%
-  align(j = 1, align = "left", part = "all") %>%
-  italic(i = 2, part = "header") %>%
-  italic(j = "n", part = "header") %>%
-  mk_par(j = blank_names, part = "header", value = as_paragraph(" ")) %>% 
-  flextable::colformat_double(j = c("Price_M", "Price_SD"), 
-                              prefix = "$", 
-                              digits = 2) %>% 
-  apa_style(horizontal_padding = 8) %>% 
-  valign(j = 1:2, valign = "bottom", part = "header")
+#| tbl-cap: Price, Carat, Depth, Table Using `flextable`
+flextable::flextable(d) |>
+  theme_apa() |>
+  flextable::separate_header() |>
+  colformat_double(j = 3:4,
+                   prefix = "$",
+                   digits = 2) |>
+  italic(j = -1, i = 2, part = "header") |>
+  italic(j = 2, i = 1, part = "header") |>
+  align(align = "center", part = "header") |>
+  align(j = 1) |>
+  surround(
+    i = 2,
+    part = "header",
+    border.top = flextable::fp_border_default(
+      color = "black",
+      width = 1)
+  ) 
 
 ```
 
 
+
+## The `apa_flextable` function
+
+I prefer related columns to separated by a small break in the headers, so I use the `add_break_columns` function to insert the breaks after each column ending with `_SD` (omitting the last instance). The `apa_flextable` function handles the rest automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
+
+```{r loadftextra, include=FALSE}
+library(ftExtra)
+```
+
+```{r}
+#| label: tbl-apaflextable
+#| tbl-cap: Price, Carat, Depth, Table Using `apa_flextable`
+d |> 
+  add_break_columns(ends_with("_SD"), omit_last = TRUE) |>
+  apa_flextable() |> 
+  colformat_char(j = 3:4, prefix = "$") 
+
+```
+
 # gt
 
-Getting gt to have APA style borders took me a long time to figure out because of the complex rules by which borders overwrite each other. The `apa_style` function saves me from having to figure it all out repeatedly when working with gt tables.
-
-
+The gt package is not really supported by the apa7 package, but I include this here because I did not want to delete my initial efforts. Getting gt to have APA style borders took me a long time to figure out because of the complex rules by which borders overwrite each other. The `apa_style` function saves me from having to figure it all out repeatedly when working with gt tables.
 
 ```{r}
 #| label: tbl-gt
@@ -130,6 +125,5 @@ gt(d) %>%
             locations = cells_body(-Cut)) %>%
   apa_style(horizontal_padding = 10) %>% 
   tab_options(table.align = "left")
-  
 ```
 

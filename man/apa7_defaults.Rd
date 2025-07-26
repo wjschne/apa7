@@ -8,7 +8,7 @@ apa7_defaults(
   accuracy = NULL,
   font_family = NULL,
   intercept_text = NULL,
-  parameter_formatter = NULL,
+  column_formats = NULL,
   number_formatter = NULL,
   trim_leading_zero = NULL,
   reset = FALSE
@@ -21,7 +21,7 @@ apa7_defaults(
 
 \item{intercept_text}{what to call the intercept}
 
-\item{parameter_formatter}{column formatting functions}
+\item{column_formats}{column formatting functions}
 
 \item{number_formatter}{default function to format numbers}
 
