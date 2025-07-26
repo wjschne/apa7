@@ -8,7 +8,7 @@ hanging_indent(
   x,
   indent = 4,
   width = 30,
-  space = " ",
+  space = NULL,
   newline = "\\\\\\\\\\n",
   whitespace_only = FALSE
 )
@@ -20,7 +20,7 @@ hanging_indent(
 
 \item{width}{number of characters to break lines}
 
-\item{space}{indenting space character}
+\item{space}{indenting space character (defaults to non-breaking space)}
 
 \item{newline}{text for creating new line}
 

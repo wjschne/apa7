@@ -19,3 +19,4 @@ math-rendered-by-lua-filter.html
 ^dev$
 ^doc$
 ^Meta$
+^cran-comments\.md$

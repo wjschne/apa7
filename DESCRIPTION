@@ -22,7 +22,6 @@ Imports:
     performance,
     psych,
     purrr,
-    purrr,
     rlang,
     S7,
     scales,

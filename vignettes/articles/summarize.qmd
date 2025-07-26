@@ -9,8 +9,6 @@ format:
   html:
     toc: true
     html-math-method: katex
-execute:
-  cache: true
 vignette: >
   %\VignetteIndexEntry{summarize}
   %\VignetteEngine{quarto::html}

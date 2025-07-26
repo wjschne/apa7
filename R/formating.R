@@ -21,14 +21,16 @@ align_chr <- function(
     accuracy = NULL,
     trim_leading_zeros = FALSE,
     add_plusses = FALSE,
-    padding_character = "\u2007", # figure space
+    padding_character = NULL, # figure space
     center = ".",
     format_integers = FALSE,
     side = c("both", "left", "right"),
     NA_value = "",
     ...) {
 
-
+  if (is.null(padding_character)) {
+    padding_character <- "\u2007"
+  }
   center1 <- center
   if (center1 == ".") center1 <- "\\."
 
@@ -237,7 +239,7 @@ apa_p_star_note <- function(x = c(.05, .01, .001), first_alpha_marginal = FALSE)
 #' @param x text
 #' @param indent number of spaces to indent
 #' @param width number of characters to break lines
-#' @param space indenting space character
+#' @param space indenting space character (defaults to non-breaking space)
 #' @param newline text for creating new line
 #' @param whitespace_only wrapping spaces only
 #'
@@ -250,9 +252,12 @@ hanging_indent <- function(
     x,
     indent = 4,
     width = 30,
-    space = "\u00A0",
+    space = NULL,
     newline = "\\\\\n",
     whitespace_only = FALSE) {
+  if (is.null(space)) {
+    space <- "\u00A0" # non-breaking space
+  }
   indent_chr <- paste0(rep(space, indent), collapse = "")
 
   stringr::str_replace_all(x, "\u2007", "\u2057") |>

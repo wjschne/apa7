@@ -91,8 +91,8 @@ A common problem with table formatting functions is that they try to do too ever
 The `apa_flextable` function returns a flextable object that can be further processed with flextable functions, if needed. For example, suppose we wanted to bold the beta coefficient for the first predictor:
 
 ```{r selectivebold}
-apa_flextable(d) |> 
-  bold(i = 2, j = 3)
+apa_flextable(d, row_title_column = "Model") |> 
+  bold(i = 3, j = 3)
 ```
 
 Some flextable functions that take care of common formatting problems. All of these can be applied to specific column names/positions or row positions. The row positions can be selected conditionally based on data in each row.
@@ -198,32 +198,50 @@ Data before formatting
 d
 ```
 
+After grouping and restructuring
+
+```{r groupeddata}
+d1 <- flextable::as_grouped_data(d, "Model") |> 
+  mutate(across(c(Model, Predictor), \(x) tidyr::replace_na(x, ""))) |> 
+  tidyr::unite(Predictor, Predictor, Model, sep = "") |> 
+  rename_with(\(x) {
+    header <- ifelse(x %in% c("b", "beta"), "Coefficient_", "Significant test_")
+    paste0(header, x)
+  }, -Predictor)
+d1
+```
+
+
 Data after automatic formatting
 
 ```{r afterformat}
-d1 <- apa_format_columns(d) 
-d1
+d2 <- apa_format_columns(d1) 
+d2
 ```
 
 Initial table
 
 ```{r afterflextable}
-d2 <- flextable::flextable(d1)
-d2
+d3 <- flextable::flextable(d2)
+d3
 ```
 
 Table after apa styling and markdown conversion
 
 ```{r afterstyling}
-d3 <- apa_style(d2) 
-d3
+d4 <- apa_style(d3) |> 
+  align(j = 1, align = "left") |> 
+  padding(j = 1, i = ~(`Coefficient_*b*` != ""), padding.left = 15) |> 
+  surround(i = ~(`Coefficient_*b*` == ""), border.top = flextable::fp_border_default())
+d4
 ```
 
 Table after pretty widths (defaults to 6.5in for .docx paper width)
 
 ```{r prettywidths}
-pretty_widths(d3) 
+pretty_widths(d4) 
 ```
+
 # APA format with full control
 
 Sometimes you want a table to be particular way, and no package can anticipate the exact formatting required. With a combination of tidyverse, apa7, and flextable functions, it is possible to get flextable to output almost any kind of APA table you need.

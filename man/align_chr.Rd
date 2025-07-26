@@ -9,7 +9,7 @@ align_chr(
   accuracy = NULL,
   trim_leading_zeros = FALSE,
   add_plusses = FALSE,
-  padding_character = " ",
+  padding_character = NULL,
   center = ".",
   format_integers = FALSE,
   side = c("both", "left", "right"),
