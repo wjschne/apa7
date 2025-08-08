@@ -5,21 +5,62 @@
 \title{Make contingency table with chi-square test of independence}
 \usage{
 apa_chisq(
-  x,
+  data,
   note = NULL,
+  row_title_column = NULL,
+  row_title_prefix = "",
+  row_title_sep = " ",
+  row_title_align = "center",
+  row_title_border = list(color = "gray20", style = "solid", width = 1),
+  left_column_padding = 20,
+  cwidth = 0.75,
+  cheight = 0.25,
+  separate_headers = TRUE,
+  apa_style = TRUE,
   font_family = NULL,
   font_size = 12,
   text_color = "black",
-  line_spacing = 2,
   border_color = "black",
   border_width = 0.5,
-  suppress_warnings = TRUE
+  line_spacing = 2,
+  horizontal_padding = 3,
+  table_align = "left",
+  layout = "autofit",
+  table_width = 1,
+  markdown = TRUE,
+  markdown_header = markdown,
+  markdown_body = markdown,
+  auto_format_columns = TRUE,
+  column_formats = NULL,
+  pretty_widths = TRUE,
+  suppress_warnings = TRUE,
+  ...
 )
 }
 \arguments{
-\item{x}{A two-column data.frame or tibble}
+\item{data}{A two-column data.frame or tibble}
 
 \item{note}{Custom note (overrides automatic note.)}
+
+\item{row_title_column}{quoted column name to group rows}
+
+\item{row_title_prefix}{text to be added to each title}
+
+\item{row_title_sep}{separator for prefix}
+
+\item{row_title_align}{alignment of row title ("left", "center", "right")}
+
+\item{row_title_border}{list of flextable styles}
+
+\item{left_column_padding}{Number of points the left column is padded (only relevant when there is a \code{row_title_column} and \code{row_title_align = "left"})}
+
+\item{cwidth}{initial cell width in inches}
+
+\item{cheight}{initial cell height in inches}
+
+\item{separate_headers}{separate header rows (default: \code{TRUE})}
+
+\item{apa_style}{apply \code{apa_style} function (default: \code{TRUE})}
 
 \item{font_family}{font family}
 
@@ -27,13 +68,35 @@ apa_chisq(
 
 \item{text_color}{text color}
 
-\item{line_spacing}{spacing between lines}
-
 \item{border_color}{border color}
 
 \item{border_width}{border width in pixels}
 
+\item{line_spacing}{spacing between lines}
+
+\item{horizontal_padding}{horizontal padding (in pixels)}
+
+\item{table_align}{table alignment ("left", "center", "right")}
+
+\item{layout}{table layout ("autofit", "fixed")}
+
+\item{table_width}{table width (in pixels, 0 for auto)}
+
+\item{markdown}{apply markdown formatting to header and body}
+
+\item{markdown_header}{apply markdown formatting to header}
+
+\item{markdown_body}{apply markdown formatting to body}
+
+\item{auto_format_columns}{if true, will attempt to format some columns automatically}
+
+\item{column_formats}{a column_formats object}
+
+\item{pretty_widths}{apply \code{pretty_widths} function}
+
 \item{suppress_warnings}{Suppress any warnings if true.}
+
+\item{...}{arguments passed to \code{apa_style}}
 }
 \value{
 flextable

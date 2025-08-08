@@ -5,6 +5,7 @@ knitr:
     collapse: true
     comment: '#>'
     dev: "ragg_png"
+    cache: false
 format: 
   html:
     toc: true
@@ -18,8 +19,10 @@ vignette: >
 
 # Tables
 
-The package provides functions to create APA-style tables, including correlation matrices and regression tables. The functions return flextable objects that can be processed further using the [flextable](https://ardata-fr.github.io/flextable-book/) package. Although there are other fantastic packages for creating tables (e.g., [gt](https://gt.rstudio.com/),
+The apa7 package provides functions to create APA-style tables, including correlation matrices and regression tables. The functions return flextable objects that can be processed further using the [flextable](https://ardata-fr.github.io/flextable-book/) package. Although there are other fantastic packages for creating tables (e.g., [gt](https://gt.rstudio.com/),
 [tinytable](https://vincentarelbundock.github.io/tinytable/), and [kableExtra](https://haozhu233.github.io/kableExtra/)), the [flextable](https://ardata-fr.github.io/flextable-book/) package has the fullest support for the .docx format, which is essential for anyone working in APA style. Almost anything that can be done in a .docx table, flextable can handle it.
+
+# Load Packages and Set Defaults
 
 ```{r setup, include = FALSE, cache = FALSE}
 library(apa7)
@@ -27,14 +30,19 @@ library(flextable)
 library(ftExtra)
 library(dplyr)
 library(tibble)
+library(tidyr)
+library(stringr)
 set_flextable_defaults(theme_fun = theme_apa, 
-                       font.family = "Times New Roman", text.align = "center")
+                       font.family = "Times New Roman", 
+                       text.align = "center", 
+                       table_align = "left")
 ```
 
 ```{r setupdisplay}
 <<setup>>
 ```
 
+# Make Data
 
 Suppose we have a table we want to format. As a raw tibble, it looks like this:
 
@@ -58,13 +66,16 @@ d <- tibble(
 d
 ```
 
+# Initial Results with `flextable`
+
 If we use flextable with the `thema_apa` function set as the default, we get something close to what we want:
 
 ```{r tbl-flextable}
 set_flextable_defaults(
   theme_fun = theme_apa, 
   font.family = "Times New Roman", 
-  text.align = "center")
+  text.align = "center",
+  table_align = "left")
 
 flextable(d) 
 ```
@@ -78,15 +89,19 @@ Unfortunately, there are some polishing moves that can take a long time to get r
 * Format p-values
 * Remove leading zeroes for beta and p
 * Italicize statistic headings * 
-* Make row titles
+* Make row titles (i.e., Model 1, Model 2)
 
 There are a number of flextable functions that can do these things, but applying them repeatedly is tedious. The `apa_flextable` tries to take care of all of these issues with minimal fuss.
+
+# Polished table with `apa_flextable`
 
 ```{r apa_flextable}
 apa_flextable(d, row_title_column = "Model") 
 ```
 
-A common problem with table formatting functions is that they try to do too everything in one function and make it difficult to customize the output. Like the entire flextable ecosystem, the `apa_flextable` function is designed to be flexible in terms of its inputs and allows for further customization afterwards.
+# Conditional Formatting
+
+A common problem with table formatting functions is that they try to do too much in one function, making it difficult to customize the output. Like the entire flextable ecosystem, the `apa_flextable` function is designed to be flexible in terms of its inputs and allows for further customization afterwards.
 
 The `apa_flextable` function returns a flextable object that can be further processed with flextable functions, if needed. For example, suppose we wanted to bold the beta coefficient for the first predictor:
 
@@ -122,12 +137,10 @@ tibble::tribble(
     Target = bold_md(Target)) |> 
   # as_grouped_data() |> 
   apa_flextable(row_title_column = "Target", 
-                table_width = .5, table_align = "left") |> 
-  align_text_col() |> 
-  padding(j = 1, i = ~!is.na(Purpose), padding.left = 15)
+                row_title_align = "left",
+                table_width = .5) |> 
+  align()
 ```
-
-
 
 ## Automatic formatting
 
@@ -144,11 +157,13 @@ It is also possible to modify the automatic formatting. For example, suppose we 
 The `column_format` function creates an object for a single column. 
 
 ```{r collumnformat}
-column_format(
+cf_predictor <- column_format(
   name = "Predictor", 
   header = "Variable",
   latex = "Variable",
   formatter = stringr::str_to_upper)
+
+cf_predictor
 ```
 
 
@@ -158,14 +173,13 @@ The `column_formats` function creates a default list of `column_format` objects.
 We can also set the rounding accuracy of all columns to .001 instead of the default of .01.
 
 ```{r myformats}
-
+# Make new formatter object with default accuracy of .001
 my_formats <- column_formats(accuracy = .001)
-my_formats$Predictor <- column_format(
-  name = "Predictor", 
-  header = "Variable",
-  latex = "Variable",
-  formatter = stringr::str_to_upper)
 
+# Add Predictor column formatter
+my_formats$Predictor <- cf_predictor
+
+# Remove formatter for beta column
 my_formats$beta <- NULL
 
 apa_flextable(d, 
@@ -187,64 +201,253 @@ The `apa_flextable` function performs a number of formatting operations on the d
 2. Format data with `apa_format_columns` if `auto_format_columns = TRUE`
 3. Separate headers into multiple rows if `separate_headers = TRUE`
 4. Apply `flextable`
-5. Apply `apa_style` function (table formatting and markdown conversion) if `apa_style = TRUE`
-6. Apply `pretty_widths` if `pretty_widths = TRUE`
+5. Apply `surround` to make borders to separate row groups, if any.
+6. Apply `apa_style` function (table formatting and markdown conversion) if `apa_style = TRUE`
+7. Apply `pretty_widths` if `pretty_widths = TRUE`
 
-Each of these steps can be applied separately. For example, if you want to see what `my_formats` is doing to the data before it is sent to `flextable`, you can pre-format the data.
+For the intrepid, these steps can be applied sequentially without `apa_flextable`. Here is what that might look like.
 
-Data before formatting
-
-```{r preformat}
-d
+```{r intrepid}
+# Adding variables with underscores to illustrate column spanners
+d |> 
+  add_break_columns(beta) |> 
+  rename_with(.cols = c(b, beta), \(x) paste0("Coefficients_", x)) |> 
+  rename_with(.cols = c(t, df, p), \(x) paste0("Significance Test_", x)) |> 
+  as_grouped_data("Model") |> # Step 1
+  mutate(row_title = Model, .before = 1) |>
+  fill(Model) |>
+  apa_format_columns() %>% # Step 2
+  flextable(col_keys = colnames(
+    select(., -Model, -row_title))) |> # Step 3
+  mk_par(i = ~ !is.na(row_title), value = as_paragraph(row_title)) |>
+  merge_h(i = ~ !is.na(row_title)) |>
+  flextable::separate_header() |> # Step 4 
+  surround(
+    i = ~ !is.na(row_title),
+    border.top = list(
+      color = "gray20",
+      style = "solid",
+      width = 1
+    )
+  ) |> # Step 5 
+  apa_style() |> # Step 6
+  align(j = 1, i = ~is.na(row_title)) |> 
+  align(i = ~!is.na(row_title), align = "center") |> 
+  pretty_widths() # Step 7
 ```
 
-After grouping and restructuring
 
-```{r groupeddata}
-d1 <- flextable::as_grouped_data(d, "Model") |> 
-  mutate(across(c(Model, Predictor), \(x) tidyr::replace_na(x, ""))) |> 
-  tidyr::unite(Predictor, Predictor, Model, sep = "") |> 
-  rename_with(\(x) {
-    header <- ifelse(x %in% c("b", "beta"), "Coefficient_", "Significant test_")
-    paste0(header, x)
-  }, -Predictor)
-d1
+# Helper functions
+
+## Break columns
+
+Groups of related variables can be separated by adding break columns. Here we take the `diamonds` data set and calculate the means and standard deviations of several variables, separated by `Cut` 
+
+```{r diamonds}
+d_diamonds <- ggplot2::diamonds %>% 
+  select(cut, carat, depth, table) %>% 
+  arrange(cut) %>% 
+  rename_with(str_to_title) %>% 
+  pivot_longer(where(is.numeric), names_to = "Variable") %>% 
+  summarise(
+    M = mean(value, na.rm = TRUE),
+    SD = sd(value, na.rm = TRUE),
+    .by = c(Variable, Cut)) %>% 
+  pivot_longer(c(M, SD)) %>% 
+  unite(Variable, Variable, name) %>%
+  pivot_wider(names_from = Variable) 
+d_diamonds
+```
+
+The `apa_flextable` function, by default, assumes that separated headers are desired when column names have underscores. Under the hood, it calls `flextable::separate_header` and inserts interior borders.This feature can be turned off by setting `separate_headers = FALSE`.
+
+```{r flexdiamonds}
+apa_flextable(d_diamonds)
+```
+
+It would be nice to give head grouping some separation. The `add_break_columns` function insert break columns before or after any variable. As input, it can take any quoted or unquoted variable name, or any [tidyselect function](https://tidyselect.r-lib.org/reference/index.html) (e.g., `starts_with`, `ends_with`, `contains`,`where`, `everything).
+
+We can insert breaks after `Carat_SD` and `Depth_SD` directly like so:
+
+```{r breakdiamonds}
+d_diamonds |> 
+  add_break_columns(Carat_SD, Depth_SD)
+```
+
+Alternately, we can add a break column after each variable ending with "SD" except for the last one.
+
+```{r endswithdiamonds}
+d_diamonds |> 
+  add_break_columns(ends_with("SD"), 
+                    omit_last = TRUE)
+```
+
+The `apa_flextable` function knows to treat any column beginning with `apa7breakcolumn` as a break column.
+
+```{r breakflexdiamonds}
+d_diamonds |> 
+  add_break_columns(ends_with("SD"), 
+                    omit_last = TRUE) |> 
+  apa_flextable()
+```
+
+## Column Spanners and Deckered Heads
+
+The flextable package has functions like [`add_header_row`](https://davidgohel.github.io/flextable/reference/add_header_row.html) and [`add_header`](https://davidgohel.github.io/flextable/reference/add_header.html) for adding header rows after a flextable has been made. It also has the [`separate_headers`](https://davidgohel.github.io/flextable/reference/set_header_labels.html) function for creating header rows from the variable names. Both approaches are needed at times, but I like using  `separate_headers` because it is usually easier to manipulate the column names before the table is made than it is afterwards.
+
+By default, `separate_headers` converts names with underscores into column spanners (header labels that span multiple columns, usually at higher rows in the header) and deckered heads (single-column labels under the column spanners). Each underscore separates labels in separate header rows.
+
+One can make column spanner labels by hand, with custom functions, or with the `column_spanner` function. It adds the same spanner label to multiple columns, using quoted or unquoted variable names (combined in a vector with `c`) or tidyselect functions like `starts_with`, `ends_with`, or `contains`. Any selected variables will be relocated after the first selected variable, in the order selected. The relocation can be prevented by setting `relocate = FALSE`.
+
+```{r}
+d |> 
+  add_break_columns(beta) |> 
+  column_spanner_label("Coefficients", starts_with("b")) |> 
+  column_spanner_label("Significance test", c(t,df,p)) |> 
+  apa_flextable(row_title_column = "Model", row_title_align = "left")
+  
 ```
 
 
-Data after automatic formatting
+## Decimal/Character alignment
 
-```{r afterformat}
-d2 <- apa_format_columns(d1) 
-d2
+The `align_chr` function does three things:
+
+1. Rounds to a desired accuracy (default = .01) via `scales:number`
+2. Replaces minus signs with a true text minus sign via `signs::signs`
+3. Pads numbers (via `apa7::num_pad`) with figure spaces (`\u2007`) on both sides of the decimal (or any other character) so that all numbers in the column have the same width.
+
+```{r alighchr}
+tibble(x = align_chr(c(2.431, -0.4, -10, 101))) |> 
+  apa_flextable(table_width = .2) |> 
+  align(align = "center")
 ```
 
-Initial table
+Trailing zeros can be dropped, and leading zeros can be trimmed.
 
-```{r afterflextable}
-d3 <- flextable::flextable(d2)
-d3
+```{r zeroes}
+tibble(x = align_chr(c(2.431, -0.4, -10, 101),
+                     drop0trailing = TRUE,
+                     trim_leading_zeros = TRUE)) |>
+  apa_flextable(table_width = .2) |>
+  align(align = "center")
 ```
 
-Table after apa styling and markdown conversion
+## Hanging indent
 
-```{r afterstyling}
-d4 <- apa_style(d3) |> 
-  align(j = 1, align = "left") |> 
-  padding(j = 1, i = ~(`Coefficient_*b*` != ""), padding.left = 15) |> 
-  surround(i = ~(`Coefficient_*b*` == ""), border.top = flextable::fp_border_default())
-d4
+The `hanging_indent` function is a hack, but a necessary one. Sometimes we need paragraphs to be indented in one way or another, and flextable does not have exactly what we need. So `hanging_indent` splits the text (via `stringr::str_wrap`) and indents it as specified with figure spaces `\u2007`.
+
+Note that `align_chr` aligns the text on the decimal, but pads the left side only so that the right side of the text can be of variable width.
+
+```{r quotetable}
+d_quote <- tibble(
+  Quote = c(
+    "Believe those who are seeking the truth. Doubt those who find it.",
+    "Resentment is like drinking poison and waiting for the other person to die.",
+    "What you read when you don’t have to, determines what you will be when you can’t help it.",
+    "Advice is what we ask for when we already know the answer but wish we didn’t.",
+    "Do not ask whether a statement is true until you know what it means.",
+    "Tact is the art of making a point without making an enemy.",
+    "Short cuts make long delays.",
+    "The price one pays for pursuing any profession or calling is an intimate knowledge of its ugly side.",
+    "There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me",
+    "There is a crack in everything, that’s how the light gets in.",
+    "If you choose to dig a rather deep hole, someday you will have no choice but to keep on digging, even with tears.",
+    "We long for self-confidence, till we look at the people who have it.",
+    "Writing is a way to end up thinking something you couldn’t have started out thinking.",
+    "A little inaccuracy sometimes saves tons of explanation.",
+    "Each snowflake in an avalanche pleads not guilty.",
+    "What I write is smarter than I am. Because I can rewrite it."
+  ),
+  Attribution = c(
+    "Andre Gide",
+    "Carrie Fisher",
+    "Charles Francis Potter",
+    "Erica Jong",
+    "Errett Bishop",
+    "Howard W. Newton",
+    "J.R.R. Tolkien",
+    "James Baldwin",
+    "Jane Austin",
+    "Leonard Cohen",
+    "Liyun Chen",
+    "Mignon McLaughlin",
+    "Peter Elbow",
+    "Saki",
+    "Stanislaw J. Lec",
+    "Susan Sontag"
+  )
+) |> 
+  arrange(nchar(Quote))
+
+d_quote |> 
+  mutate(Quote = paste0(seq_along(Quote), 
+                        ".\u2007",
+                        Quote) |> 
+           align_chr(side = "left") |> 
+           hanging_indent(width = 55, indent = 7)) |> 
+  apa_flextable() |> 
+  align(j = "Attribution", part = "all") |> 
+  width(width = c(4.5, 2))
 ```
 
-Table after pretty widths (defaults to 6.5in for .docx paper width)
+## Creating a numbered list
 
-```{r prettywidths}
-pretty_widths(d4) 
+```{r}
+d_quote |> 
+  add_list_column(Quote) |> 
+  apa_flextable() |> 
+  align(j = "Attribution", part = "all") |>
+  width(width = c(.3, 4.2, 2))
 ```
+
+It is also possible to make the list lettered (upper or lowercase) or with Roman numerals (upper or lowercase). Set the `type` argument to "A", "a", "I", or "i".
+
+```{r}
+d_quote |> 
+  add_list_column(Quote, type = "A", sep = ") ") |> 
+  apa_flextable() |> 
+  align(j = "Attribution", part = "all") |>
+  width(width = c(.3, 4.2, 2))
+```
+
+
+## Stars
+
+When data is supplied to `apa_flextable`, any variable that ends with `apa7starcolumn` will be left aligned, and the variable to its immediate left will be right aligned. Here we convert the `p` column to stars, placing `baba7starcolumn` after column `b`.
+
+```{r addstar}
+d_star <- tibble(
+  Predictor = c("Constant", "Socioeconomic status"),
+  b = c(.45,.55),
+  p = c(.02, .0002)) |> 
+  add_star_column(b, p) 
+
+d_star
+
+apa_flextable(d_star)
+```
+
+Suppose that the stars are already appended to some numbers. We can separate them into a new `apa7starcolumn` using `separate_star_column`. 
+
+```{r separatestarcolumn}
+d_star <- tibble(Predictor = c("Constant", "Socioeconomic status"),
+                 b = c("1.10***", "2.32*"),
+                 beta = c(NA, .34)) |> 
+  separate_star_column(b)
+
+d_star
+
+apa_flextable(d_star)
+```
+
+## pivot_wider_name_value
+
+
 
 # APA format with full control
 
-Sometimes you want a table to be particular way, and no package can anticipate the exact formatting required. With a combination of tidyverse, apa7, and flextable functions, it is possible to get flextable to output almost any kind of APA table you need.
+Sometimes you want a table to be particular way, and no package can anticipate the exact structure and formatting required. With a combination of tidyverse,  flextable, and apa7 functions, it is possible to get flextable to output almost any kind of APA table you need.
 
 Here I would like the unstandardized and standardized regression coefficients with the two models side by side. I want the p-values converted to stars and appended to the unstandardized coefficients.
 
@@ -257,11 +460,8 @@ d |>
   # deselect t, df, and p
   select(-c(t,df, p)) |> 
   # restructure data
-  tidyr::pivot_wider(
-    names_from = Model, 
-    values_from = c(b, beta), 
-    names_glue = "{Model}_{.value}",
-    names_vary = "slowest") |> 
+  pivot_wider_name_value(names_from = Model, 
+                      values_from = c(b, beta)) |> 
   # add break column between 2 models
   add_break_columns(`Model 1_beta`) |> 
   # convert to flextable
@@ -276,6 +476,123 @@ d |>
   # align footnote
   align(part = "footer", align = "left") |> 
   # Make column widths even
-  width(width = c(2.45,1,1,.05, 1,1))
+  width(width = c(2.05, 1.1, 1.1, .05, 1.1, 1.1))
 ```
+
+
+# Specialized tables
+
+## Regression
+
+Single model (via `parameters::parameters`)
+
+```{r apaparameters}
+fit <- lm(price ~ carat, data = ggplot2::diamonds) 
+
+fit |> 
+  apa_parameters() |> 
+  apa_flextable()
+```
+
+Performance (via `performance:performance`)
+
+By default, just `R2` (Coefficient of variation) and `Sigma` (standard error of the estimate) are displayed.
+
+```{r apaperformance}
+apa_performance(fit) |> 
+  apa_flextable()
+```
+
+One can request additional metrics (from `AIC`, `AICc`, `BIC`, `R2`, `R2_adjusted`, `RMSE`, and `Sigma`):
+
+```{r metrics}
+apa_performance(fit, metrics = c("R2", "Sigma", "AIC", "BIC")) |>
+  apa_flextable()
+```
+
+One can request them all: 
+
+```{r allmetrics}
+apa_performance(fit, metrics = "all") |> 
+  apa_flextable() 
+```
+
+
+
+Multiple models in a list 
+
+```{r fit3}
+fit_3 <- list(
+  lm(price ~ cut, data = ggplot2::diamonds),
+  lm(price ~ cut + table, data = ggplot2::diamonds),
+  lm(price ~ cut + table + carat, data = ggplot2::diamonds)
+)
+
+fit_3 |> 
+  apa_parameters() |>
+  apa_flextable(row_title_column = "Model", row_title_align = "left")
+```
+
+Performance comparison (via `performance::compare_performance`)
+
+Available metrics: `AIC`, `AIC_wt`, `AICc`, `AICc_wt`, `BIC`, `BIC_wt`, `deltaR2`, `F`, `p`, `R2`, `R2_adjusted`, `RMSE`, and `Sigma`
+
+```{r comparison}
+fit_3 |> 
+  apa_performance_comparison() |> 
+  apa_flextable()
+```
+
+## Correlation
+
+```{r correlation}
+ggplot2::diamonds |> 
+  select(table,  carat, length = x, width = y , depth = z) |> 
+  apa_cor() 
+```
+
+## Cross-tabulation with Chi-square Test of Independence
+
+```{r chidiamons}
+ggplot2::diamonds |> 
+  select(Cut = cut, Color = color ) |> 
+  apa_chisq()
+```
+
+It is not a bad table for so little effort, but the pattern is not easily visible. A plot reveals the direction of the effect such that stones with better cuts tend to have less color.
+
+```{r ggdiamonds}
+#| fig-width: 8
+#| fig-height: 8
+library(ggplot2)
+ggplot2::diamonds |>
+  select(Cut = cut, Color = color) |>
+  count(Cut, Color) |>
+  mutate(p = scales::percent(n / sum(n), accuracy = .1), .by = Cut) |>
+  ggplot(aes(Cut, n, fill = Color)) +
+  geom_col(position = position_fill(),
+           alpha = .6,
+           width = .96) +
+  geom_text(
+    aes(label = paste0(p, " (", n, ")")),
+    position = position_fill(vjust = .5),
+    size.unit = "pt",
+    size = 17 * .8,
+    color = "gray10"
+  ) +
+  theme_minimal(base_family = "Roboto Condensed", base_size = 17) +
+  scale_y_continuous(
+    "Cumulative Proportion",
+    expand = expansion(c(0, .025)),
+    labels = \(x) scales::percent(x, accuracy = 1)
+  ) +
+  scale_x_discrete(expand = expansion()) +
+  theme(panel.grid.major.x = element_blank())
+```
+
+## More to Follow...
+
+# Limitations
+
+By default, `apa_flextable` calls `ftExtra:col_format_md` on the entire table. This makes formatting easy and consistent, but the process is a little slow. It is not so bad with only a few tables, but a document with many tables can take a while to render. If possible, setting `markdown = FALSE` will speed things up, if needed. It is possible to prevent markdown formatting selectively with `markdown_body = FALSE` or `markdown_header`. I usually just live with it or cache code chunks with finished tables so that I do not have to wait every time I render the document.
 

@@ -38,17 +38,17 @@ By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/fle
 #| tbl-cap: Correlation table using flextable via `apa_cor`
 #| message: false
 trees |> 
-  apa_cor(star_significant = T)
+  apa_cor()
 ```
 
-Significant correlations can be starred instead.
+Significant correlations can be bolded instead.
 
 ```{r}
 #| label: tbl-stars
-#| tbl-cap: Starring significant correlations
+#| tbl-cap: Bolding significant correlations
 #| message: false
 trees |> 
-  apa_cor(star_significant = TRUE)
+  apa_cor(bold_significant = TRUE)
 ```
 
 
@@ -58,8 +58,8 @@ If you want to use another table package, you can output a tibble instead and th
 #| label: tbl-treeskable
 #| tbl-cap: Correlation table using `kable` via `apa_cor`
 options(knitr.kable.NA = '')
-trees |> 
-  apa_cor(output = "tibble") |> 
+trees |>
+  apa_cor(output = "tibble", bold_significant = T) |>
   knitr::kable(align = "lrrrrr")
 ```
 
@@ -70,10 +70,10 @@ Your styling options include:
 * `note` A custom markdown formatted note. Overrides automatic note about bolded correlations being significant. Default: `NULL`
 * `p_value` Significance value. Default: `.05`
 * `digits` Number of digits for rounding. Default: `2`
-* `bold_significant` Whether to bold significant correlations. Default:  `TRUE`
-* `star_significant` Whether to star significant correlations. Default: `FALSE`
+* `bold_significant` Whether to bold significant correlations. Default:  `FALSE`
+* `star_significant` Whether to star significant correlations. Default: `TRUE`
 * `significance_note` Whether note about bolding correlations appears. Overridden by a custom note. Also, the automatic note will not appear if no correlations are significant. Default:  `TRUE`
-* `output` Options are `flextable`, `gt` or `tibble`. Default: `flextable`
+* `output` Options are `flextable` or `tibble`. Default: `flextable`
 * `family` Font family (typeface). Default: `Times New Roman`
 * `font_size` Font size (in points). Default: `12`
 * `text_color` Text color. Default: `black`
@@ -85,39 +85,38 @@ Your styling options include:
 For example, 
 
 ```{r altstyle}
-# List of descriptive functions
-my_summaries <- list(
-                     n = function(x) sum(!is.na(x)),
-                     M = mean,
-                     SD = sd,
-                     Skewness = psych::skew,
-                     Kurtosis = psych::kurtosi)
-trees |> 
-  apa_cor(p_value = .001, 
-          digits = 2,
-          star_significant = TRUE, 
-          significance_note = TRUE,
-          summary_functions = my_summaries,
-          font_family = "Arial", 
-          font_size = 10, 
-          text_color = "darkred",
-          border_color = "royalblue4", 
-          border_width = 1, 
-          line_spacing = 2)
+# Named list of descriptive functions
+my_summaries <- list(Median = median, "Interquartile Range" = IQR)
+
+apa_cor(trees, summary_functions = my_summaries)
+# or a vector descriptives
+my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
+
+trees |>
+  apa_cor(
+    p_value = .001,
+    digits = 2,
+    bold_significant = TRUE,
+    significance_note = TRUE,
+    summary_functions = my_summaries,
+    font_family = "Arial",
+    font_size = 10,
+    text_color = "darkred",
+    border_color = "royalblue4",
+    border_width = 1,
+    line_spacing = 2
+  )
 ```
 
 To remove summary statistics entirely, set `summary_functions` to `NA` or `NULL`.
 
 ```{r nosummary}
-x <- apa_cor(trees, 
-        summary_functions = NA, 
-        bold_significant = FALSE) 
-  
+apa_cor(trees, summary_functions = NA, bold_significant = FALSE)
 ```
 
 # Customization
 
-The styling options for `apa_cor` are minimal, but flexable  allows for all kinds of customization. Just place whatever code from flextable or gt you want after `apa_cor`. For example, gt tables usually span 100% of the width in a space. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
+The styling options for `apa_cor` are minimal, but flextable allows for all kinds of customization. Just place whatever code from flextable you want after `apa_cor`. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
 
 
 ```{r altflextable}
@@ -129,8 +128,9 @@ apa_cor(trees) |>
     part = "body"
   ) |>
   flextable::set_table_properties(
-    width = .5, 
-    align = "left")
+    width = .5,
+    align = "left"
+  )
 
 ```
 

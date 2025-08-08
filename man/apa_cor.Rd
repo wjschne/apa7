@@ -9,18 +9,20 @@ apa_cor(
   note = NULL,
   p_value = c(0.05, 0.01, 0.001),
   digits = 2,
-  bold_significant = TRUE,
-  star_significant = FALSE,
+  bold_significant = FALSE,
+  star_significant = TRUE,
   significance_note = TRUE,
-  output = c("flextable", "gt", "tibble"),
+  output = c("flextable", "tibble"),
   font_family = NULL,
   font_size = 12,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
+  table_width = 6.5,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
+  column_formats = NULL,
   ...
 )
 }
@@ -39,7 +41,7 @@ apa_cor(
 
 \item{significance_note}{If TRUE, place note at bottom of table that significant correlations are bolded.}
 
-\item{output}{output type. Can be "flextable" "gt" or "tibble"}
+\item{output}{output type. Can be "flextable" or "tibble"}
 
 \item{font_family}{font family}
 
@@ -52,6 +54,8 @@ apa_cor(
 \item{border_width}{border width in pixels}
 
 \item{line_spacing}{spacing between lines}
+
+\item{table_width}{table width (in pixels, 0 for auto)}
 
 \item{keep_empty_star_columns}{Keep remove empty star columns (Default: \code{TRUE})}
 
@@ -67,6 +71,5 @@ APA-formatted correlation table
 }
 \examples{
 apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "flextable")
-apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "gt")
 apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "tibble")
 }

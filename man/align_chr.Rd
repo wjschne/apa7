@@ -8,6 +8,7 @@ align_chr(
   x,
   accuracy = NULL,
   trim_leading_zeros = FALSE,
+  drop0trailing = FALSE,
   add_plusses = FALSE,
   padding_character = NULL,
   center = ".",
@@ -23,6 +24,8 @@ align_chr(
 \item{accuracy}{number to round to. If NULL, the current default accuracy set with \code{\link[=apa7_defaults]{apa7_defaults()}} will be used.}
 
 \item{trim_leading_zeros}{if TRUE (default), trims leading zeros, otherwise keeps them}
+
+\item{drop0trailing}{Drop trailing zeros}
 
 \item{add_plusses}{if TRUE (default), adds a plus to positive numbers}
 

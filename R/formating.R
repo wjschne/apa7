@@ -3,6 +3,7 @@
 #' @param x vector (numeric or character)
 #' @param accuracy number to round to. If NULL, the current default accuracy set with [apa7_defaults()] will be used.
 #' @param trim_leading_zeros if TRUE (default), trims leading zeros, otherwise keeps them
+#' @param drop0trailing Drop trailing zeros
 #' @param add_plusses if TRUE (default), adds a plus to positive numbers
 #' @param padding_character character to use for padding, default is `&numsp;` (figure space)
 #' @param center text on which to align text. Center on decimal by default, but can be any text.
@@ -20,6 +21,7 @@ align_chr <- function(
     x,
     accuracy = NULL,
     trim_leading_zeros = FALSE,
+    drop0trailing = FALSE,
     add_plusses = FALSE,
     padding_character = NULL, # figure space
     center = ".",
@@ -58,6 +60,7 @@ align_chr <- function(
         add_plusses = add_plusses,
         big.mark = ",",
         trim_leading_zeros = trim_leading_zeros,
+        drop0trailing = drop0trailing,
         ...)
     }
 
@@ -380,7 +383,7 @@ p2stars <- function(p,
   }
   pstars
 }
-p2stars(.10, alpha = c(.10, .05, .01, .001), first_alpha_marginal = F)
+# p2stars(.10, alpha = c(.10, .05, .01, .001), first_alpha_marginal = F)
 
 
 #' Surrounds text with tags unless empty
@@ -498,10 +501,32 @@ variable_name_formatter <- function(x,
   x <- stringr::str_replace_all(x, "\\:", " : ") |>
     stringr::str_replace_all("\\^", "_^_") |>
     stringr::str_replace_all("(Intercept)", the$intercept_text) |>
-    snakecase::to_title_case(abbreviations = c(":", "\u00D7", "\\^")) |>
+    stringr::str_replace_all("\\.\u2007", "apasevendotspace") |>
+    stringr::str_replace_all("\u2007", "apasevenfigsp") |>
+    stringr::str_replace_all("\u00A0", "apasevennbsp") |>
+    stringr::str_replace_all("\u2009", "apaseventhinsp") |>
+    snakecase::to_title_case(abbreviations = c(":", "\u00D7", "\\^", "\\(", "\\)", "\\$", "\\]", "\\[", "s\\)", "\\.\u2007", "\u2007", "\\\\\\\n", "\u00A0", "\u2007", "&thinsp;", "&figsp;", "&nbsp;","apasevendotspace", "apasevenfigsp", "apasevennbsp", "apaseventhinsp", "\t", "\n")) |>
+    stringr::str_replace_all(" Apasevendotspace", "apasevendotspace") |>
+    stringr::str_replace_all(" apasevendotspace", "apasevendotspace") |>
+    stringr::str_replace_all("Apasevendotspace", ".\u2007") |>
+    stringr::str_replace_all("apasevendotspace", ".\u2007") |>
+    stringr::str_replace_all("Apasevenfigsp", "\u2007") |>
+    stringr::str_replace_all("apasevenfigsp", "\u2007") |>
+    stringr::str_replace_all("Apasevennbsp", "\u00A0") |>
+    stringr::str_replace_all("apasevennbsp", "\u00A0") |>
+    stringr::str_replace_all("Apaseventhinsp", "\u2009") |>
+    stringr::str_replace_all("apaseventhinsp", "\u2009") |>
+    stringr::str_replace("\\(", " (") |>
+    stringr::str_replace("^ \\(", "(") |>
+    stringr::str_replace("\\)", ") ") |>
+    stringr::str_replace("\\) $", ")") |>
     stringr::str_replace_all(" \u00D7 ", "\u00D7") |>
     stringr::str_replace_all("\u00D7", " \u00D7 ") |>
-    stringr::str_replace_all("\\^(\\d)", "^\\1^")
+    stringr::str_replace_all("\\^(\\d)", "^\\1^") |>
+    stringr::str_remove(" Linear$") |>
+    stringr::str_replace_all(" Quadratic$", "^2") |>
+    stringr::str_replace_all(" Cubic$", "\\^3") |>
+    stringr::str_replace_all("(\\d) Th Degree$", "\\^\\1")
 
   if (!is.null(pattern) && !is.null(replacement)) {
     x <- stringr::str_replace_all(x, pattern, replacement)
@@ -536,6 +561,7 @@ the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) {
             accuracy = accuracy,
             trim_leading_zeros = TRUE,
             ...)}
+the$variable_name_formatter <- variable_name_formatter
 
 # Columns ----
 the$columns <- list(
@@ -555,6 +581,18 @@ the$columns <- list(
     name = "AICc",
     header = "*AICc*",
     latex = "$AICc$",
+    formatter = the$number_formatter
+  ),
+  AIC_wt = column_format(
+    name = "AIC_wt",
+    header = "*AIC* weight",
+    latex = "$AIC$ weight",
+    formatter = the$number_formatter
+  ),
+  AICc_wt = column_format(
+    name = "AICc_wt",
+    header = "*AICc* weight",
+    latex = "$AICc$ weight",
     formatter = the$number_formatter
   ),
   B = column_format(
@@ -583,6 +621,12 @@ the$columns <- list(
     name = "BICc",
     header = "*BICc*",
     latex = "$BICc$",
+    formatter = the$number_formatter
+  ),
+  BIC_wt = column_format(
+    name = "BIC_wt",
+    header = "*BIC* weight",
+    latex = "$BIC$ weight",
     formatter = the$number_formatter
   ),
   Chi2 = column_format(
@@ -636,6 +680,16 @@ the$columns <- list(
     latex = "UL",
     formatter = the$number_formatter
   ),
+  cohens_d = column_format(
+    name = "cohens_d",
+    header = "Cohen's *d*",
+    latex = "Cohen's $d$",
+    formatter = the$number_formatter),
+  Cohens_d = column_format(
+    name = "Cohens_d",
+    header = "Cohen's *d*",
+    latex = "Cohen's $d$",
+    formatter = the$number_formatter),
   Coefficient = column_format(
     name = "Coefficient",
     header = "*B*",
@@ -660,7 +714,7 @@ the$columns <- list(
     formatter = the$number_formatter
   ),
   deltaBIC = column_format(
-    name = "deltaR2",
+    name = "deltaBIC",
     header = "&Delta;*BIC*",
     latex = "$\\Delta BIC$",
     formatter = the$number_formatter
@@ -681,6 +735,12 @@ the$columns <- list(
     name = "df_diff",
     header = "&Delta;*df*",
     latex = "$\\Delta df$",
+    formatter = the$number_formatter
+  ),
+  df_error = column_format(
+    name = "df",
+    header = "*df*",
+    latex = "$df$",
     formatter = the$number_formatter
   ),
   eta2 = column_format(
@@ -753,13 +813,7 @@ the$columns <- list(
     name = "Parameter",
     header = "Variable",
     latex = "Variable",
-    formatter = \(x) stringr::str_replace_all(x, "\\:", " : ") |>
-      stringr::str_replace_all("\\^", "_^_") |>
-      stringr::str_replace_all("(Intercept)", the$intercept_text) |>
-      snakecase::to_title_case(abbreviations = c(":", "\u00D7", "\\^")) |>
-      stringr::str_replace_all(" \u00D7 ", "\u00D7") |>
-      stringr::str_replace_all("\u00D7", " \u00D7 ") |>
-      stringr::str_replace_all("\\^(\\d)", "^\\1^")
+    formatter = the$variable_name_formatter
   ),
   r = column_format(
     name = "r",
@@ -831,6 +885,12 @@ the$columns <- list(
     header = "*t*",
     latex = "$t$",
     formatter = the$number_formatter
+  ),
+  Variable = column_format(
+    name = "Variable",
+    header = "Variable",
+    latex = "Variable",
+    formatter = the$variable_name_formatter
   )
 )
 
@@ -1246,5 +1306,61 @@ star_balance <- function(x, star = "\\*", superscript = TRUE) {
 }
 
 
+the$summary_functions <- list(
+  IQR = IQR,
+  `Interquartile Range` = IQR,
+  Kurtosis = psych::kurtosi,
+  MAD = mad,
+  `Median Absolute Deviation` = mad,
+  M = mean,
+  Mean = mean,
+  Med = median,
+  Median = median,
+  n = function(x) sum(!is.na(x)),
+  N = function(x) sum(!is.na(x)),
+  Quantile = quantile,
+  Range = range,
+  SD = sd,
+  Skewness = psych::skew,
+  Var = var,
+  Variance = var)
 
+
+#' Prepend column spanner labels to data column labels
+#'
+#' @param data data.frame or tibble
+#' @param label character of column spanner
+#' @param ... columns (i.e., one or more tidyselect functions and/or a vector of quoted or unquoted variable names)
+#' @param relocate
+#'
+#' @return data.frame or tibble
+#' @export
+#'
+#' @examples
+#' d <- data.frame(y = 1:3, x1 = 2:4, x2 = 3:5)
+#'
+#' # Unquoted variable names
+#' column_spanner_label(d, "Label", c(x1, x2))
+#' # Character values (quoted variable names)
+#' column_spanner_label(d, "Label", c("x1", "x2"))
+#' # Tidyselect function (e.g., starts_with, ends_with, contains)
+#' column_spanner_label(d, "Label", dplyr::starts_with("x"))
+#' # Tidyselect range
+#' column_spanner_label(d, "Label", x1:x2)
+#' # Selected variables are relocated after the first selected variable
+#' column_spanner_label(d, "Label", c(x2, y))
+column_spanner_label <- function(data, label, ..., relocate = TRUE) {
+  cnames <- dplyr::select(data, ...) |> colnames()
+  if (length(cnames) > 0) {
+    if (relocate) {
+      data <- dplyr::relocate(.data = data, dplyr::any_of(cnames), .after = cnames[1])
+    }
+      dplyr::rename_with(
+        .data = data,
+        .fn = \(x) paste0(label, "_", x),
+        .cols = dplyr::any_of(cnames))
+  } else {
+    data
+  }
+}
 

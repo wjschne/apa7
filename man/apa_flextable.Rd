@@ -11,6 +11,7 @@ apa_flextable(
   row_title_sep = " ",
   row_title_align = "center",
   row_title_border = list(color = "gray20", style = "solid", width = 1),
+  left_column_padding = 20,
   col_keys = colnames(data),
   cwidth = 0.75,
   cheight = 0.25,
@@ -29,6 +30,8 @@ apa_flextable(
   markdown = TRUE,
   markdown_header = markdown,
   markdown_body = markdown,
+  no_markdown_columns = NULL,
+  no_markdown_columns_header = no_markdown_columns,
   auto_format_columns = TRUE,
   column_formats = NULL,
   pretty_widths = TRUE,
@@ -47,6 +50,8 @@ apa_flextable(
 \item{row_title_align}{alignment of row title ("left", "center", "right")}
 
 \item{row_title_border}{list of flextable styles}
+
+\item{left_column_padding}{Number of points the left column is padded (only relevant when there is a \code{row_title_column} and \code{row_title_align = "left"})}
 
 \item{col_keys}{column keys passed to flextable (defaults data column names)}
 
@@ -83,6 +88,10 @@ apa_flextable(
 \item{markdown_header}{apply markdown formatting to header}
 
 \item{markdown_body}{apply markdown formatting to body}
+
+\item{no_markdown_columns}{body columns that should not be treated as markdown}
+
+\item{no_markdown_columns_header}{column headers that should not be treated as markdown}
 
 \item{auto_format_columns}{if true, will attempt to format some columns automatically}
 

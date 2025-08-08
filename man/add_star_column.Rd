@@ -2,36 +2,45 @@
 % Please edit documentation in R/tables.R
 \name{add_star_column}
 \alias{add_star_column}
-\title{Add columns that separate significance stars from numbers}
+\title{Adds stars next to a column based on p-values}
 \usage{
 add_star_column(
   data,
-  ...,
+  col,
+  p = "p",
   superscript = TRUE,
   star = "\\\\*",
-  star_replace = "\\\\\\\\*"
+  alpha = c(0.05, 0.01, 0.001),
+  first_alpha_marginal = FALSE,
+  add_trailing_space = FALSE,
+  prefix = "\\\\"
 )
 }
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{...}{column names or tidyselect function}
+\item{col}{quoted or unquoted column name}
 
-\item{superscript}{make stars superscript}
+\item{p}{quoted or unquoted p-value column name}
 
-\item{star}{character to use for stars (default: "\\*")}
+\item{superscript}{make as superscript}
 
-\item{star_replace}{character to replace stars with (default: "\\\\*")}
+\item{alpha}{vector of thresholds}
+
+\item{first_alpha_marginal}{if TRUE, the first alpha value is treated as marginal and gets a dagger instead of a star}
+
+\item{add_trailing_space}{if TRUE, adds a trailing space after the stars (default: FALSE)}
+
+\item{prefix}{usually backslashes to prevent markdown from interpreting asterisks as bullets or italics}
 }
 \value{
-data.frame or tibble
+data.frame
 }
 \description{
-Add columns that separate significance stars from numbers
+Adds stars next to a column based on p-values
 }
 \examples{
-tibble::tibble(x = c(".45", ".58*", ".68**"),
-               y = c(1,2,3),
-               z = 4:6) |>
-               add_star_column(x)
+data.frame(b = c(1.4,2.2),
+           p = c(.54, .02)) |>
+ add_star_column(b, p)
 }

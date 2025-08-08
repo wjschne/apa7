@@ -21,7 +21,7 @@ format:
   apaquarto-html: 
     toc: true
 execute: 
-  cache: false
+  cache: true
   message: false
   echo: true
 ---
@@ -150,7 +150,7 @@ d_citizenship |>
                     omit_last = TRUE)
 ```
 
-The `apa_flextable` function has two purposes. First, it processes the break columns differently for the docx format so that the breaks do not collapse to zero-width columns. Second, if a `row_title_column` is specified, the data are reconfigured to have row titles merged and centered (via `flextable::as_grouped_data` and additional formatting). The `apa_flextable` function, by default, calls the `apa_style` function for further processing and style, though it can be turned off by setting the `apastyle` argument to `FALSE`.
+The `apa_flextable` function has two purposes. First, it processes the break columns differently for the docx format so that the breaks do not collapse to zero-width columns. Second, if a `row_title_column` is specified, the data are reconfigured to have row titles merged and centered (via `flextable::as_grouped_data` and additional formatting). The `apa_flextable` function, by default, calls the `apa_style` function for further processing and styling, though it can be turned off by setting the `apastyle` argument to `FALSE`.
 
 The `flextable::surround` function can place cell borders selectively by row (or column). @tbl-preliminary71 is close to the final result, but additional notes are needed.
 
@@ -170,7 +170,7 @@ ft_71 <- d_citizenship |>
 ft_71
 ```
 
-The `apa_flextable` function does not delete the column specified in `row_title_column` (i.e., `Wave`), but it does remove it from display. An additional hidden column called `row_title` has data in the row titles but is `NA` in other rows. Both columns are available for programmatic formatting the row titles and row groupings. For example, here I make all the Wave 3 text blue.
+The `apa_flextable` function does not delete the column specified in `row_title_column` (i.e., `Wave`), but it does remove it from display. An additional hidden column called `row_title` has data in the row titles but is `NA` in other rows. Both columns are available for programmatic formatting the row titles and row groupings. For example, here I bold the row titles and make all the Wave 3 text blue and with Arial font. In documents where deviations from strict APA style are allowed, such stylings can be useful to highlight a point.
 
 ```{r}
 #| label: tbl-preliminary72
@@ -394,11 +394,7 @@ d <- d |>
          .by = c(Variable, name)) |>
   mutate(`Full sample_n` = sum(n),
          .by = c(Variable, Group)) |>
-  pivot_wider(
-    values_from = c(n , `%`),
-    names_glue = "{name}_{.value}",
-    names_vary = "slowest"
-  ) |>
+  pivot_wider_name_value(values_from = c(n , `%`)) |> 
   apa7::add_break_columns(ends_with("%")) |>
   relocate(`Full sample_n`, .after = last_col()) |>
   mutate(
@@ -430,9 +426,6 @@ d |>
     font_size = 10.5
   ) |>
   align(j = 1, align = "left") |>
-  padding(j = 1, 
-          i = ~ is.na(row_title), 
-          padding.left = 15) |> 
   width(width = c(1.55, rep(c(.6, .6, .05), 4)[-12]))
 ```
 
@@ -554,9 +547,6 @@ d |>
                 line_spacing = 1.5) |> 
   align(align = "center") |> 
   align(j = 1, align = "left") |> 
-  padding(j = 1, 
-          i = ~is.na(row_title), 
-          padding.left = 15) |> 
   width(width = c(1.7, rep(1.2, 4)))
 
 ```
@@ -680,11 +670,7 @@ d <- d |>
     100 * `n` / sum(`n`), 
     accuracy = .01),
     .by = Source) |>
-  pivot_wider(
-    values_from = c(`n`, `%`),
-    names_glue = "{name}_{.value}",
-    names_vary = "slowest"
-  ) |>
+  pivot_wider_name_value(values_from = c(`n`, `%`)) |>
   relocate(chi, .after = dplyr::last_col()) |>
   rename(`&chi;^2^(2)` = chi) |> 
   mutate(across(-Source, align_chr)) |> 
@@ -758,7 +744,7 @@ d <- d |>
            data = d))) |> 
   unnest(cohen)
 
-# Formate data
+# Format data
 d <- d |> 
   select(-starts_with("CI")) |> 
   mutate(`*t*(40)` = map_dbl(t_fit, "statistic") |> 
@@ -788,23 +774,24 @@ d <- d |>
   mutate(Age = paste0(Age, "-year-olds"), 
          Cohens_d = signs(abs(Cohens_d), 
                                  accuracy = .001)) |> 
-  pivot_wider(values_from = c(M, SD), 
-              names_from = Age,
-              names_glue = "{Age}_*{.value}*",
-              names_vary = "slowest") |> 
+  pivot_wider_name_value(
+    values_from = c(M, SD), 
+    names_from = Age) |> 
   select(`Logistic Parameter`, 
          contains("olds"), 
          everything()) |> 
-  add_break_columns(`9-year-olds_*SD*`) |> 
-  rename(`Cohen's *d*` = Cohens_d) |> 
+  add_break_columns(`9-year-olds_SD`) |> 
   mutate(`Logistic Parameter` = hanging_indent(`Logistic Parameter`)) |> 
-  mutate(across(`*t*(40)`:`Cohen's *d*`, align_chr))
+  mutate(across(`*t*(40)`:Cohens_d, align_chr))
 
 
 # Make table
 d |> 
-  apa_flextable(table_width = 1) |> 
-  align(j = 1, align = "left") 
+  apa_format_columns() |> 
+  mutate(across(contains("olds"), stringr::str_trim)) |> 
+  apa_flextable(table_width = 1, auto_format_columns = FALSE) |> 
+  align(j = 1, align = "left") |> 
+  italic(i = 1, part = "header")
 
 ```
 
@@ -912,7 +899,7 @@ set.seed(1234)
 # Descriptives
 d <- tibble::tribble(
                      ~Variable,    ~n,    ~M,  ~SD,
-    "Internal-external status", 3697L,  0.43, 0.49,
+    "Internal--external status", 3697L,  0.43, 0.49,
      "Manager job performance", 2134L,  3.14, 0.62,
              "Starting salary", 3697L,  1.01, 0.27,
         "Subsequent promotion", 3697L,  0.33, 0.47,
@@ -951,28 +938,21 @@ d_t <- mvtnorm::rmvnorm(
     x[sample(1:k, size = k - n)] <- NA
     x
   }) |> 
-  rename_with(hanging_indent, width = 15) 
+  rename_with(hanging_indent, width = 15, indent = 0)
 
+cf <- column_formats()
+cf$Variable <- NULL
 # Make table
 d_t |> 
   apa_cor(
-    summary_functions = list(
-      n = \(x) as.integer(sum(1 * !is.na(x))),
-      M = \(x) mean(x, na.rm = TRUE),
-      SD = \(x) sd(x, na.rm = TRUE)), 
-    star_significant = TRUE, 
+    summary_functions = c("n", "M", "SD"), 
     significance_note = FALSE, 
     p_value = c(.05, .01)) |>   
-  set_table_properties() |> 
-  width(j = 1, width = 1.5) |> 
-  width(j = paste0(colnames(d_t), 
-                   "apa7starcolumn"), 
-        width = .2) |>
-  width(j = as.character(1:7), width = .4) |>
-  align(j = 1:4, align = "center", part = "header") |> 
+  # set_table_properties() |> 
+  # width(j = "Variable", width = 1.2) |> 
   footnote(
     i = 1, 
-    j = 1, 
+    j = "Variable", 
     value = as_paragraph(
       "0 = internal hires and 1 = external hires."), 
     ref_symbols = "a ",
@@ -980,7 +960,7 @@ d_t |>
     sep = " ") |> 
   footnote(
     i = 3, 
-    j = 1, 
+    j = "Variable", 
     value = as_paragraph(
       paste("A linear transformation was performed on",
       "the starting salary values to maintain pay practice",
@@ -995,7 +975,7 @@ d_t |>
     sep = " ") |> 
   footnote(
     i = c(6,7), 
-    j = 1, 
+    j = "Variable", 
     value = as_paragraph(
       "Values reflect the average across 3 years of data."), 
     ref_symbols = "c ", 
@@ -1012,13 +992,13 @@ d_t |>
 
 :::{.callout-note}
 # Highlights
-* The `add_star_column` function to align numbers with significance stars
+* The `separate_star_column` function to align numbers with significance stars
 :::
 
 ![Screenshot of the *APA Manual*'s Table 7.11](table711.png){#fig-711 width="100%"}
 
 
-This correlation matrix is different above and below the diagonal. A correctable imperfection of the @fig-711 is that the correlations do not align on their decimals due to the minus signs and stars. This can be corrected by separating the correlations from the significance stars with the `add_star_column` function. This function removes any stars from each selected column and places them in an adjacent column. The `apa_style` function then automatically right aligns the selected columns and left aligns the star columns, and removes any padding between them, giving the illusion that they are in the same column with decimal alignment.
+This correlation matrix is different above and below the diagonal. A correctable imperfection of the @fig-711 is that the correlations do not align on their decimals due to the minus signs and stars. This can be corrected by separating the correlations from the significance stars with the `separate_star_column` function. This function removes any stars from each selected column and places them in an adjacent column. The `apa_style` function then automatically right aligns the selected columns and left aligns the star columns, and removes any padding between them, giving the illusion that they are in the same column with decimal alignment.
 
 ```{r}
 #| label: tbl-711
@@ -1033,7 +1013,7 @@ Teacher trust        	.49**	.35**	—    	.20**
 Age                  	.10  	.21* 	−.15 	—" |>
   readr::read_tsv() |>
   suppressMessages() |>
-  add_star_column(-Variable) |>
+  separate_star_column(-Variable) |>
   apa_flextable(
     table_align = "left", 
     layout = "fixed", 
@@ -1142,10 +1122,9 @@ d <- d |>
       summarise(M = mean(x),
                 SD = sd(x), 
                 .by = c(Group, Time)) |> 
-      pivot_wider(names_from = Group,
-                  values_from = c(M, SD), 
-                  names_glue = "{Group}_{.value}", 
-                  names_vary = "slowest") |> 
+      pivot_wider_name_value(
+        names_from = Group,
+        values_from = c(M, SD)) |> 
       mutate(Time = paste("Time", Time))
   }),
          fit = map(data, 
@@ -1197,9 +1176,8 @@ d <- d |>
 d |> 
   apa_flextable(row_title_column = "v", 
                 row_title_align  = "left",
-                table_width = .5, 
-                layout = "fixed") |>
-  padding(i = ~is.na(row_title), j = 1, padding.left = 20)  |> 
+                layout = "fixed", 
+                line_spacing = 1.5) |> 
   width(j = 1, width = 1.5) 
 ```
 
@@ -1283,9 +1261,9 @@ d <- d |>
 d |> 
   apa_flextable(row_title_column = "Factor", 
                 row_title_align = "left", 
-                table_width = 1, line_spacing = 1.5) |> 
-  align(j = 1, align = "left") |> 
-  padding(j = 1, i = ~is.na(row_title), padding.left = 20) 
+                table_width = 1, 
+                line_spacing = 1.5) |> 
+  align(j = 1, align = "left") 
 
 ```
 
@@ -1494,10 +1472,10 @@ d_performance <- apa_performance_comparison(
   pivot_wider(names_from = Model)
 
 d_parameters |> 
-  pivot_wider(id_cols = Variable, 
-              names_from = Model, values_from = 3:5,
-              names_glue = "{Model}_{.value}", 
-              names_vary = "slowest") |> 
+  pivot_wider_name_value(
+    id_cols = Variable, 
+    names_from = Model, 
+    values_from = 3:5) |> 
   mutate(Variable = str_to_sentence(Variable)) |>
   add_row(d_performance) |>
   mutate(across(-Variable, \(x) align_chr(
@@ -2329,10 +2307,10 @@ tibble(
   mutate(
     `Discourse and dimension` = hanging_indent(
       `Discourse and dimension`,
-      width = 30),
+      width = 29, indent = 4),
         `Example quote` = hanging_indent(
       `Example quote`,
-      width = 55)
+      width = 55, indent = 4)
     ) |> 
   apa_flextable(
     row_title_column = "theme", 
@@ -2340,10 +2318,7 @@ tibble(
     layout = "fixed",
     line_spacing = 1.5) |> 
   align() |> 
-  width(width = c(2.5, 4)) |> 
-  padding(j = 1, 
-          i = ~!is.na(`Discourse and dimension`), 
-          padding.left = 15)
+  width(width = c(2.5, 4)) 
 ```
 
 

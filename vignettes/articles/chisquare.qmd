@@ -15,29 +15,39 @@ knitr:
 #| include: false
 library(apa7)
 library(dplyr)
+library(tidyr)
 library(flextable)
 library(ftExtra)
 ```
 
+```{r}
+#| label: setup
+```
+
+# Data
 
 ```{r}
-#| label: import
-<<setup>>
-d <- mtcars |> 
-  select(Gears = gear, Transmission = am) |> 
+#| label: data
+d <- mtcars |>
+  select(Gears = gear, Transmission = am) |>
   mutate(Transmission = factor(Transmission, labels = c("Automatic", "Manual")))
 ```
 
+# The `apa_chisq` contingency table function
 
 The default output of the `apa_chisq` function is a contingency table with a chi-square test of independence in the table note. The output is a flextable, which can be modified with flextable commands.
 
 ```{r}
-apa_chisq(d) 
+#| label: apachisq
+apa_chisq(d)
 ```
+
+# Styling Options
 
 The table can be styled in many ways:
 
 ```{r}
+#| label: options
 apa_chisq(
   d,
   font_size = 16,
@@ -50,85 +60,108 @@ apa_chisq(
 ```
 
 ```{r}
-# Automatic chi square note
-apa_chisq(d)
+#| label: customization
 # No note
 apa_chisq(d, note = NA)
 # Custom note
-apa_chisq(d, note = "This is a *custom* note written in **markdown** $x > \\omega$.")
+apa_chisq(
+  d,
+  note = "This is a *custom* note written in **markdown** $x > \\omega$."
+)
 
 ```
 
 # What if I want something completely different?
 
-There are a lot of options out there. The flextable package has the `proc_freq` function, which has the ability to include row, column, and total percentages in the table. 
+There are a lot of options out there. The flextable package has the `proc_freq` function, which has the ability to include row, column, and total percentages in the table.
 
 ```{r}
-mtcars %>% 
-  proc_freq(row = "gear", 
-            col = "vs")  %>%
+#| label: procfreq
+mtcars %>%
+  proc_freq(row = "gear", col = "vs") %>%
   theme_apa()
 ```
 
 These can be turned off selectively:
 
 ```{r}
-mtcars %>% 
-  proc_freq(row = "gear", 
-            col = "vs",
-            include.row_percent = FALSE, 
-            include.column_percent = FALSE, 
-            include.table_percent = FALSE)  %>%
-  apa_style(table_width = .5) 
+#| label: procfreqoptions
+mtcars %>%
+  proc_freq(
+    row = "gear",
+    col = "vs",
+    include.row_percent = FALSE,
+    include.column_percent = FALSE,
+    include.table_percent = FALSE
+  ) %>%
+  apa_style(table_width = .5)
 ```
 
+The flextable package's `tabulator` function has considerable power in creating a wide variety of descriptive tables. In general, the `tabulator` function requires that you calculate the statistics first, and then you specify where they should go.
 
-What if you want it to look a little different? Unfortunately, you might have to do some heavy lifting yourself. The flextable package's `tabulator` function has considerable power in creating a wide variety of descriptive tables. In general, the `tabulator` function requires that you calculate the statistics first, and then you specify where they should go.
-
-Here I calculate the means, standard deviations, and sample sizes of a variable.
-
+Here I calculate the means, standard deviations, and sample sizes within each cell of a contingency table.
 
 ```{r}
-
-mytable <- warpbreaks %>% 
+warpbreaks |>
   summarise(
     Mean = mean(breaks, na.rm = TRUE),
     stdev = sd(breaks, na.rm = TRUE),
     sample_size = sum(!is.na(breaks)),
     .by = c(wool, tension)
   ) %>%
-  rename(Wool = wool) %>% 
-  mutate(tension = factor(tension, labels = c("Low", "Medium", "High"))) %>% 
+  rename(Wool = wool) |>
+  mutate(
+    tension = factor(
+      tension,
+      labels = paste(c("Low", "Medium", "High"), "Tension")
+    )) |>
   flextable::tabulator(
-    x = .,
     rows = "Wool",
     columns = "tension",
     M = as_paragraph(Mean),
     SD = as_paragraph(stdev),
     n = as_paragraph(sample_size)
-    
-  ) %>% 
-  flextable::as_flextable()
-
-
-my_column_names <- mytable$col_keys
-header_row <- c("", rep("Tension", length(my_column_names) - 1)) %>% 
-  as.list()
-names(header_row) <- my_column_names
-
-mytable %>%   
-flextable::theme_apa() %>% 
-  flextable::italic(i = 2, part = "header") %>% 
-  flextable::add_header(values = header_row) %>% 
-  flextable::merge_h(i = 1, "header") %>% 
-  flextable::border(
-    i = 1, 
-    j = 1, 
-    border.bottom = flextable::fp_border_default(
-      style = "none", 
-      color = "white"), 
-    part = "header")
-
+  ) |>
+  flextable::as_flextable() |>
+  italic(i = 2, part = "header") |>
+  align(j = 1, align = "center") |> 
+  theme_apa()
 ```
+
+# Processing Data Yourself
+
+What if you want it to look a little different? Unfortunately, you might have to do some of the heavy lifting yourself. The `tidyr::pivot_wider` function can save a lot of time, if you know how to use the `names_glue` argument to get the column names in the right order and `names_vary` argument to get the columns in the right order.
+
+A subtle difference in this version of the table is that the columns are decimal aligned, which is evident in the standard deviation column.
+
+Also, whereas previously the Wool column header was middle aligned, it is now top aligned, which is consistent with comparable examples in the *APA Style Manual*. I am not sure if this is a real rule in APA style, and I actually prefer middle alignment for situations like this.
+
+```{r warpbreaks}
+warpbreaks %>%
+  summarise(
+    M = mean(breaks, na.rm = TRUE),
+    SD = sd(breaks, na.rm = TRUE),
+    n = sum(!is.na(breaks)),
+    .by = c(wool, tension)
+  ) %>%
+  rename(Wool = wool) %>%
+  mutate(
+    tension = factor(
+      tension,
+      levels = c("L", "M", "H"),
+      labels = paste(c("Low", "Medium", "High"), "Tension")
+    )
+  ) |>
+  pivot_wider(
+    values_from = c(M, SD, n),
+    names_from = tension,
+    names_glue = "{tension}_{.value}",
+    names_vary = "slowest"
+  ) |>
+  add_break_columns(ends_with("_n"), omit_last = TRUE) |>
+  apa_flextable(column_formats = column_formats(accuracy = .1)) |>
+  align(j = 1, align = "center") 
+```
+
 
 

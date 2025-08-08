@@ -20,7 +20,10 @@ apa_style(
   table_width = 0,
   markdown = TRUE,
   markdown_header = markdown,
-  markdown_body = markdown
+  markdown_body = markdown,
+  no_markdown_columns = NULL,
+  no_markdown_columns_header = no_markdown_columns,
+  separate_headers = TRUE
 )
 
 \method{apa_style}{gt_tbl}(
@@ -37,7 +40,8 @@ apa_style(
   table_width = 0,
   markdown = TRUE,
   markdown_header = markdown,
-  markdown_body = markdown
+  markdown_body = markdown,
+  separate_headers = TRUE
 )
 
 \method{apa_style}{flextable}(
@@ -54,7 +58,10 @@ apa_style(
   table_width = 0,
   markdown = TRUE,
   markdown_header = markdown,
-  markdown_body = markdown
+  markdown_body = markdown,
+  no_markdown_columns = NULL,
+  no_markdown_columns_header = no_markdown_columns,
+  separate_headers = TRUE
 )
 }
 \arguments{
@@ -85,6 +92,10 @@ apa_style(
 \item{markdown_header}{apply markdown formatting to header}
 
 \item{markdown_body}{apply markdown formatting to body}
+
+\item{no_markdown_columns}{body columns that should not be treated as markdown}
+
+\item{no_markdown_columns_header}{column headers that should not be treated as markdown}
 }
 \value{
 object

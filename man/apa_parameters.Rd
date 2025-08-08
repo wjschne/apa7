@@ -17,7 +17,8 @@ apa_parameters(
 
 \method{apa_parameters}{lm}(
   fit,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t",
+    "df_error", "p"),
   starred = NA,
   bolded = NA,
   column_formats = NULL,
@@ -26,7 +27,8 @@ apa_parameters(
 
 \method{apa_parameters}{list}(
   fit,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t", "p"),
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t",
+    "df_error", "p"),
   starred = NA,
   bolded = NA,
   column_formats = NULL,
