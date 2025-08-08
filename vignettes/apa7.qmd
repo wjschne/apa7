@@ -577,10 +577,10 @@ ggplot2::diamonds |>
     aes(label = paste0(p, " (", n, ")")),
     position = position_fill(vjust = .5),
     size.unit = "pt",
-    size = 17 * .8,
+    size = 15 * .8,
     color = "gray10"
   ) +
-  theme_minimal(base_family = "Roboto Condensed", base_size = 17) +
+  theme_minimal(base_family = "Roboto Condensed", base_size = 15) +
   scale_y_continuous(
     "Cumulative Proportion",
     expand = expansion(c(0, .025)),
