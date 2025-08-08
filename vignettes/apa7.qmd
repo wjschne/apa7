@@ -441,7 +441,7 @@ d_star
 apa_flextable(d_star)
 ```
 
-## pivot_wider_name_value
+## pivot_wider_name_first
 
 
 
@@ -460,7 +460,7 @@ d |>
   # deselect t, df, and p
   select(-c(t,df, p)) |> 
   # restructure data
-  pivot_wider_name_value(names_from = Model, 
+  pivot_wider_name_first(names_from = Model, 
                       values_from = c(b, beta)) |> 
   # add break column between 2 models
   add_break_columns(`Model 1_beta`) |> 
@@ -577,10 +577,10 @@ ggplot2::diamonds |>
     aes(label = paste0(p, " (", n, ")")),
     position = position_fill(vjust = .5),
     size.unit = "pt",
-    size = 15 * .8,
+    size = 14 * .8,
     color = "gray10"
   ) +
-  theme_minimal(base_family = "Roboto Condensed", base_size = 15) +
+  theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
   scale_y_continuous(
     "Cumulative Proportion",
     expand = expansion(c(0, .025)),

@@ -1628,7 +1628,7 @@ pretty_widths <- function(
 #' @inheritParams tidyr::pivot_wider
 #' @return data.frame
 #' @export
-pivot_wider_name_value <- function(
+pivot_wider_name_first <- function(
     data,
     ...,
     id_cols = NULL,

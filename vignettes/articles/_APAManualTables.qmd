@@ -394,7 +394,7 @@ d <- d |>
          .by = c(Variable, name)) |>
   mutate(`Full sample_n` = sum(n),
          .by = c(Variable, Group)) |>
-  pivot_wider_name_value(values_from = c(n , `%`)) |> 
+  pivot_wider_name_first(values_from = c(n , `%`)) |> 
   apa7::add_break_columns(ends_with("%")) |>
   relocate(`Full sample_n`, .after = last_col()) |>
   mutate(
@@ -670,7 +670,7 @@ d <- d |>
     100 * `n` / sum(`n`), 
     accuracy = .01),
     .by = Source) |>
-  pivot_wider_name_value(values_from = c(`n`, `%`)) |>
+  pivot_wider_name_first(values_from = c(`n`, `%`)) |>
   relocate(chi, .after = dplyr::last_col()) |>
   rename(`&chi;^2^(2)` = chi) |> 
   mutate(across(-Source, align_chr)) |> 
@@ -774,7 +774,7 @@ d <- d |>
   mutate(Age = paste0(Age, "-year-olds"), 
          Cohens_d = signs(abs(Cohens_d), 
                                  accuracy = .001)) |> 
-  pivot_wider_name_value(
+  pivot_wider_name_first(
     values_from = c(M, SD), 
     names_from = Age) |> 
   select(`Logistic Parameter`, 
@@ -1122,7 +1122,7 @@ d <- d |>
       summarise(M = mean(x),
                 SD = sd(x), 
                 .by = c(Group, Time)) |> 
-      pivot_wider_name_value(
+      pivot_wider_name_first(
         names_from = Group,
         values_from = c(M, SD)) |> 
       mutate(Time = paste("Time", Time))
@@ -1472,7 +1472,7 @@ d_performance <- apa_performance_comparison(
   pivot_wider(names_from = Model)
 
 d_parameters |> 
-  pivot_wider_name_value(
+  pivot_wider_name_first(
     id_cols = Variable, 
     names_from = Model, 
     values_from = 3:5) |> 

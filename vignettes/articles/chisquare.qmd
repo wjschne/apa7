@@ -102,11 +102,11 @@ The flextable package's `tabulator` function has considerable power in creating 
 Here I calculate the means, standard deviations, and sample sizes within each cell of a contingency table.
 
 ```{r}
-warpbreaks |>
+d_tension <- warpbreaks |>
   summarise(
-    Mean = mean(breaks, na.rm = TRUE),
-    stdev = sd(breaks, na.rm = TRUE),
-    sample_size = sum(!is.na(breaks)),
+    m = mean(breaks, na.rm = TRUE),
+    sd = sd(breaks, na.rm = TRUE),
+    n = n(),
     .by = c(wool, tension)
   ) %>%
   rename(Wool = wool) |>
@@ -114,14 +114,16 @@ warpbreaks |>
     tension = factor(
       tension,
       labels = paste(c("Low", "Medium", "High"), "Tension")
-    )) |>
+    )) 
+  
+d_tension |> 
   flextable::tabulator(
-    rows = "Wool",
+    rows = c("Wool"),
     columns = "tension",
-    M = as_paragraph(Mean),
-    SD = as_paragraph(stdev),
-    n = as_paragraph(sample_size)
-  ) |>
+    M = as_paragraph(m),
+    SD = as_paragraph(sd),
+    N = as_paragraph(n)
+  ) |> 
   flextable::as_flextable() |>
   italic(i = 2, part = "header") |>
   align(j = 1, align = "center") |> 
@@ -130,33 +132,18 @@ warpbreaks |>
 
 # Processing Data Yourself
 
-What if you want it to look a little different? Unfortunately, you might have to do some of the heavy lifting yourself. The `tidyr::pivot_wider` function can save a lot of time, if you know how to use the `names_glue` argument to get the column names in the right order and `names_vary` argument to get the columns in the right order.
+What if you want it to look a little different? Unfortunately, you might have to do some of the heavy lifting yourself. The `pivot_wider_name_first` function is a wrapper around `tidyr::pivot_wider` that prints and sorts column names as "name_variable" instead of "variable_name". I wanted a shortcut because I frequently needed to make a shortcut for setting `names_glue = "{tension}_{.value}"` and `names_vary = "slowest"` when `names_from = "tension"`.
 
 A subtle difference in this version of the table is that the columns are decimal aligned, which is evident in the standard deviation column.
 
-Also, whereas previously the Wool column header was middle aligned, it is now top aligned, which is consistent with comparable examples in the *APA Style Manual*. I am not sure if this is a real rule in APA style, and I actually prefer middle alignment for situations like this.
+Also, whereas previously the "stub header" (Wool column) was middle aligned, it is now top aligned, which is consistent with comparable examples in the *APA Style Manual*. I am not sure if this is a real rule in APA style, and I actually prefer middle alignment for situations like this.
 
 ```{r warpbreaks}
-warpbreaks %>%
-  summarise(
-    M = mean(breaks, na.rm = TRUE),
-    SD = sd(breaks, na.rm = TRUE),
-    n = sum(!is.na(breaks)),
-    .by = c(wool, tension)
-  ) %>%
-  rename(Wool = wool) %>%
-  mutate(
-    tension = factor(
-      tension,
-      levels = c("L", "M", "H"),
-      labels = paste(c("Low", "Medium", "High"), "Tension")
-    )
-  ) |>
-  pivot_wider(
+d_tension |> 
+  rename(M = m, SD = sd) |> 
+  pivot_wider_name_first(
     values_from = c(M, SD, n),
-    names_from = tension,
-    names_glue = "{tension}_{.value}",
-    names_vary = "slowest"
+    names_from = tension
   ) |>
   add_break_columns(ends_with("_n"), omit_last = TRUE) |>
   apa_flextable(column_formats = column_formats(accuracy = .1)) |>
