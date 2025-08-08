@@ -47,15 +47,36 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_chisq</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">data</span>,</span>
 <span>  note <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  row_title_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  row_title_prefix <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  row_title_sep <span class="op">=</span> <span class="st">" "</span>,</span>
+<span>  row_title_align <span class="op">=</span> <span class="st">"center"</span>,</span>
+<span>  row_title_border <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray20"</span>, style <span class="op">=</span> <span class="st">"solid"</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  left_column_padding <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  cwidth <span class="op">=</span> <span class="fl">0.75</span>,</span>
+<span>  cheight <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  separate_headers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  apa_style <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  font_family <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">12</span>,</span>
 <span>  text_color <span class="op">=</span> <span class="st">"black"</span>,</span>
-<span>  line_spacing <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  border_color <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>  border_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  suppress_warnings <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  line_spacing <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  horizontal_padding <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  table_align <span class="op">=</span> <span class="st">"left"</span>,</span>
+<span>  layout <span class="op">=</span> <span class="st">"autofit"</span>,</span>
+<span>  table_width <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  markdown <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  markdown_header <span class="op">=</span> <span class="va">markdown</span>,</span>
+<span>  markdown_body <span class="op">=</span> <span class="va">markdown</span>,</span>
+<span>  auto_format_columns <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  column_formats <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pretty_widths <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  suppress_warnings <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -63,12 +84,52 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>A two-column data.frame or tibble</p></dd>
 
 
 <dt id="arg-note">note<a class="anchor" aria-label="anchor" href="#arg-note"></a></dt>
 <dd><p>Custom note (overrides automatic note.)</p></dd>
+
+
+<dt id="arg-row-title-column">row_title_column<a class="anchor" aria-label="anchor" href="#arg-row-title-column"></a></dt>
+<dd><p>quoted column name to group rows</p></dd>
+
+
+<dt id="arg-row-title-prefix">row_title_prefix<a class="anchor" aria-label="anchor" href="#arg-row-title-prefix"></a></dt>
+<dd><p>text to be added to each title</p></dd>
+
+
+<dt id="arg-row-title-sep">row_title_sep<a class="anchor" aria-label="anchor" href="#arg-row-title-sep"></a></dt>
+<dd><p>separator for prefix</p></dd>
+
+
+<dt id="arg-row-title-align">row_title_align<a class="anchor" aria-label="anchor" href="#arg-row-title-align"></a></dt>
+<dd><p>alignment of row title ("left", "center", "right")</p></dd>
+
+
+<dt id="arg-row-title-border">row_title_border<a class="anchor" aria-label="anchor" href="#arg-row-title-border"></a></dt>
+<dd><p>list of flextable styles</p></dd>
+
+
+<dt id="arg-left-column-padding">left_column_padding<a class="anchor" aria-label="anchor" href="#arg-left-column-padding"></a></dt>
+<dd><p>Number of points the left column is padded (only relevant when there is a <code>row_title_column</code> and <code>row_title_align = "left"</code>)</p></dd>
+
+
+<dt id="arg-cwidth">cwidth<a class="anchor" aria-label="anchor" href="#arg-cwidth"></a></dt>
+<dd><p>initial cell width in inches</p></dd>
+
+
+<dt id="arg-cheight">cheight<a class="anchor" aria-label="anchor" href="#arg-cheight"></a></dt>
+<dd><p>initial cell height in inches</p></dd>
+
+
+<dt id="arg-separate-headers">separate_headers<a class="anchor" aria-label="anchor" href="#arg-separate-headers"></a></dt>
+<dd><p>separate header rows (default: <code>TRUE</code>)</p></dd>
+
+
+<dt id="arg-apa-style">apa_style<a class="anchor" aria-label="anchor" href="#arg-apa-style"></a></dt>
+<dd><p>apply <code>apa_style</code> function (default: <code>TRUE</code>)</p></dd>
 
 
 <dt id="arg-font-family">font_family<a class="anchor" aria-label="anchor" href="#arg-font-family"></a></dt>
@@ -83,10 +144,6 @@
 <dd><p>text color</p></dd>
 
 
-<dt id="arg-line-spacing">line_spacing<a class="anchor" aria-label="anchor" href="#arg-line-spacing"></a></dt>
-<dd><p>spacing between lines</p></dd>
-
-
 <dt id="arg-border-color">border_color<a class="anchor" aria-label="anchor" href="#arg-border-color"></a></dt>
 <dd><p>border color</p></dd>
 
@@ -95,8 +152,56 @@
 <dd><p>border width in pixels</p></dd>
 
 
+<dt id="arg-line-spacing">line_spacing<a class="anchor" aria-label="anchor" href="#arg-line-spacing"></a></dt>
+<dd><p>spacing between lines</p></dd>
+
+
+<dt id="arg-horizontal-padding">horizontal_padding<a class="anchor" aria-label="anchor" href="#arg-horizontal-padding"></a></dt>
+<dd><p>horizontal padding (in pixels)</p></dd>
+
+
+<dt id="arg-table-align">table_align<a class="anchor" aria-label="anchor" href="#arg-table-align"></a></dt>
+<dd><p>table alignment ("left", "center", "right")</p></dd>
+
+
+<dt id="arg-layout">layout<a class="anchor" aria-label="anchor" href="#arg-layout"></a></dt>
+<dd><p>table layout ("autofit", "fixed")</p></dd>
+
+
+<dt id="arg-table-width">table_width<a class="anchor" aria-label="anchor" href="#arg-table-width"></a></dt>
+<dd><p>table width (in pixels, 0 for auto)</p></dd>
+
+
+<dt id="arg-markdown">markdown<a class="anchor" aria-label="anchor" href="#arg-markdown"></a></dt>
+<dd><p>apply markdown formatting to header and body</p></dd>
+
+
+<dt id="arg-markdown-header">markdown_header<a class="anchor" aria-label="anchor" href="#arg-markdown-header"></a></dt>
+<dd><p>apply markdown formatting to header</p></dd>
+
+
+<dt id="arg-markdown-body">markdown_body<a class="anchor" aria-label="anchor" href="#arg-markdown-body"></a></dt>
+<dd><p>apply markdown formatting to body</p></dd>
+
+
+<dt id="arg-auto-format-columns">auto_format_columns<a class="anchor" aria-label="anchor" href="#arg-auto-format-columns"></a></dt>
+<dd><p>if true, will attempt to format some columns automatically</p></dd>
+
+
+<dt id="arg-column-formats">column_formats<a class="anchor" aria-label="anchor" href="#arg-column-formats"></a></dt>
+<dd><p>a column_formats object</p></dd>
+
+
+<dt id="arg-pretty-widths">pretty_widths<a class="anchor" aria-label="anchor" href="#arg-pretty-widths"></a></dt>
+<dd><p>apply <code>pretty_widths</code> function</p></dd>
+
+
 <dt id="arg-suppress-warnings">suppress_warnings<a class="anchor" aria-label="anchor" href="#arg-suppress-warnings"></a></dt>
 <dd><p>Suppress any warnings if true.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>arguments passed to <code>apa_style</code></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -110,7 +215,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Registered S3 method overwritten by 'ftExtra':</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   method                  from     </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   as_flextable.data.frame flextable</span>
-<style></style><div class="tabwid"><style>.cl-ad780662{}.cl-ad71707c{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ad717090{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ad717091{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ad717092{font-family:'Times New Roman';font-size:7.2pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.6pt;}.cl-ad74392e{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-ad743938{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-ad743939{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-ad743942{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:0;padding-top:0;padding-left:5pt;padding-right:5pt;line-height: 2;background-color:transparent;}.cl-ad7456c0{width:0.75in;background-color:transparent;vertical-align: bottom;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456ca{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456cb{width:0.185in;background-color:transparent;vertical-align: bottom;border-bottom: 0 solid rgba(102, 102, 102, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456cc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456d4{width:0.75in;background-color:transparent;vertical-align: bottom;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456d5{width:0.185in;background-color:transparent;vertical-align: bottom;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456d6{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456de{width:0.75in;background-color:transparent;vertical-align: bottom;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456df{width:0.185in;background-color:transparent;vertical-align: bottom;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456e0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456e1{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456e8{width:0.185in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456e9{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456f2{width:0.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456f3{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ad7456f4{width:0.185in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="table cl-ad780662"><thead><tr style="overflow-wrap:break-word;"><th class="cl-ad7456c0"><p class="cl-ad74392e"><span class="cl-ad71707c"></span></p></th><th colspan="5" class="cl-ad7456ca"><p class="cl-ad743938"><span class="cl-ad71707c">am</span></p></th></tr><tr style="overflow-wrap:break-word;"><th rowspan="2" class="cl-ad7456d4"><p class="cl-ad74392e"><span class="cl-ad71707c">gear</span></p></th><th colspan="2" class="cl-ad7456ca"><p class="cl-ad743938"><span class="cl-ad71707c">0</span></p></th><th rowspan="2" class="cl-ad7456d5"><p class="cl-ad743939"><span class="cl-ad717090"></span></p></th><th colspan="2" class="cl-ad7456d6"><p class="cl-ad743938"><span class="cl-ad71707c">1</span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-ad7456ca"><p class="cl-ad743938"><span class="cl-ad717091">n</span></p></th><th class="cl-ad7456ca"><p class="cl-ad743938"><span class="cl-ad71707c">%</span></p></th><th class="cl-ad7456ca"><p class="cl-ad743938"><span class="cl-ad717091">n</span></p></th><th class="cl-ad7456ca"><p class="cl-ad743938"><span class="cl-ad71707c">%</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-ad7456e0"><p class="cl-ad743942"><span class="cl-ad71707c">3</span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">15</span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">78.9%</span></p></td><td class="cl-ad7456e8"><p class="cl-ad743938"><span class="cl-ad717090"></span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">0</span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">0.0%</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ad7456e0"><p class="cl-ad743942"><span class="cl-ad71707c">4</span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">4</span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">21.1%</span></p></td><td class="cl-ad7456e8"><p class="cl-ad743938"><span class="cl-ad717090"></span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">8</span></p></td><td class="cl-ad7456e1"><p class="cl-ad743938"><span class="cl-ad71707c">61.5%</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ad7456e9"><p class="cl-ad743942"><span class="cl-ad71707c">5</span></p></td><td class="cl-ad7456d6"><p class="cl-ad743938"><span class="cl-ad71707c">0</span></p></td><td class="cl-ad7456d6"><p class="cl-ad743938"><span class="cl-ad71707c">0.0%</span></p></td><td class="cl-ad7456f2"><p class="cl-ad743938"><span class="cl-ad717090"></span></p></td><td class="cl-ad7456d6"><p class="cl-ad743938"><span class="cl-ad71707c">5</span></p></td><td class="cl-ad7456d6"><p class="cl-ad743938"><span class="cl-ad71707c">38.5%</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-ad7456f3"><p class="cl-ad743942"><span class="cl-ad717091">Note</span><span class="cl-ad71707c">.</span><span class="cl-ad71707c"> </span><span class="cl-ad717091">χ</span><span class="cl-ad717092">2 </span><span class="cl-ad71707c">(2)</span><span class="cl-ad71707c"> </span><span class="cl-ad71707c">=</span><span class="cl-ad71707c"> </span><span class="cl-ad71707c">20.94,</span><span class="cl-ad71707c"> </span><span class="cl-ad717091">p</span><span class="cl-ad71707c"> &lt; .001,</span><span class="cl-ad71707c"> </span><span class="cl-ad71707c">Adj.</span><span class="cl-ad71707c"> </span><span class="cl-ad71707c">Cramer’s</span><span class="cl-ad71707c"> </span><span class="cl-ad717091">V</span><span class="cl-ad71707c"> </span><span class="cl-ad71707c">=</span><span class="cl-ad71707c"> </span><span class="cl-ad71707c">.78</span></p></td></tr></tfoot></table></div></code></pre></div>
+<style></style><div class="tabwid"><style>.cl-8770929c{}.cl-876833f4{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-876833fe{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-87683408{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-87683409{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-87683412{font-family:'DejaVu Sans';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-876b3d7e{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-876b3d92{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-876b3d9c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-876b5dae{width:1.324in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5db8{width:0.924in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5db9{width:1.802in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dc2{width:0.647in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dc3{width:1.324in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dc4{width:0.924in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dcc{width:1.802in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dcd{width:0.647in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dce{width:1.324in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dd6{width:0.924in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dd7{width:1.802in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5de0{width:0.647in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5de1{width:1.324in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5dea{width:0.924in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5deb{width:1.802in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-876b5df4{width:0.647in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="table cl-8770929c"><thead><tr style="overflow-wrap:break-word;"><th rowspan="2" class="cl-876b5dae"><p class="cl-876b3d7e"><span class="cl-876833f4">gear</span></p></th><th colspan="2" class="cl-876b5db8"><p class="cl-876b3d7e"><span class="cl-876833f4">0</span></p></th><th colspan="2" class="cl-876b5dc2"><p class="cl-876b3d7e"><span class="cl-876833f4">1</span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-876b5db8"><p class="cl-876b3d7e"><span class="cl-876833fe">n</span></p></th><th class="cl-876b5db9"><p class="cl-876b3d7e"><span class="cl-876833f4">%</span></p></th><th class="cl-876b5dc2"><p class="cl-876b3d7e"><span class="cl-876833fe">n</span></p></th><th class="cl-876b5db9"><p class="cl-876b3d7e"><span class="cl-876833f4">%</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-876b5dc3"><p class="cl-876b3d92"><span class="cl-876833f4">3</span></p></td><td class="cl-876b5dc4"><p class="cl-876b3d7e"><span class="cl-876833f4">15</span></p></td><td class="cl-876b5dcc"><p class="cl-876b3d7e"><span class="cl-876833f4">78.9%</span></p></td><td class="cl-876b5dcd"><p class="cl-876b3d7e"><span class="cl-876833f4">0</span></p></td><td class="cl-876b5dcc"><p class="cl-876b3d7e"><span class="cl-876833f4">0.0%</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-876b5dc3"><p class="cl-876b3d92"><span class="cl-876833f4">4</span></p></td><td class="cl-876b5dc4"><p class="cl-876b3d7e"><span class="cl-876833f4"> 4</span></p></td><td class="cl-876b5dcc"><p class="cl-876b3d7e"><span class="cl-876833f4">21.1%</span></p></td><td class="cl-876b5dcd"><p class="cl-876b3d7e"><span class="cl-876833f4">8</span></p></td><td class="cl-876b5dcc"><p class="cl-876b3d7e"><span class="cl-876833f4">61.5%</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-876b5dce"><p class="cl-876b3d92"><span class="cl-876833f4">5</span></p></td><td class="cl-876b5dd6"><p class="cl-876b3d7e"><span class="cl-876833f4"> 0</span></p></td><td class="cl-876b5dd7"><p class="cl-876b3d7e"><span class="cl-876833f4">0.0%</span></p></td><td class="cl-876b5de0"><p class="cl-876b3d7e"><span class="cl-876833f4">5</span></p></td><td class="cl-876b5dd7"><p class="cl-876b3d7e"><span class="cl-876833f4">38.5%</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="5" class="cl-876b5de1"><p class="cl-876b3d9c"><span class="cl-87683408">Note</span><span class="cl-87683409">.</span><span class="cl-87683409"> </span><span class="cl-87683408">χ</span><span class="cl-87683412">2 </span><span class="cl-87683409">(2)</span><span class="cl-87683409"> </span><span class="cl-87683409">=</span><span class="cl-87683409"> </span><span class="cl-87683409">20.94,</span><span class="cl-87683409"> </span><span class="cl-87683408">p</span><span class="cl-87683409"> &lt; .001,</span><span class="cl-87683409"> </span><span class="cl-87683409">Adj.</span><span class="cl-87683409"> </span><span class="cl-87683409">Cramer’s</span><span class="cl-87683409"> </span><span class="cl-87683408">V</span><span class="cl-87683409"> </span><span class="cl-87683409">=</span><span class="cl-87683409"> </span><span class="cl-87683409">.78</span></p></td></tr></tfoot></table></div></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

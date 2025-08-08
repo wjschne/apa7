@@ -10,6 +10,7 @@
 <url><loc>https://wjschne.github.io/apa7/index.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/news/index.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/add_break_columns.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/reference/add_list_column.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/add_star_column.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/align_chr.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa7-package.html</loc></url>
@@ -26,12 +27,15 @@
 <url><loc>https://wjschne.github.io/apa7/reference/apa_style.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/column_format.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/column_formats.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/reference/column_spanner_label.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/hanging_indent.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/index.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/is_numeric_like.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/num_pad.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/p2stars.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/reference/pivot_wider_name_value.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/pretty_widths.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/reference/separate_star_column.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/star_balance.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/tagger.html</loc></url>
 </urlset>
