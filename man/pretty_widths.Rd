@@ -21,7 +21,7 @@ pretty_widths(
 \item{table_width}{width of table}
 }
 \value{
-flextable
+flextable::flextable
 }
 \description{
 Use flextable::dim_pretty to fit column widths

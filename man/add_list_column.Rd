@@ -9,7 +9,7 @@ add_list_column(data, ..., type = c("1", "a", "A", "I", "i"), sep = ". ")
 \arguments{
 \item{data}{data.frame ro tibble}
 
-\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> tidyselect function to select columns. Default is first column}
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> <\code{\link[=tidyr_tidy_select]{tidy-select}}> Select columns. Default is first column}
 
 \item{type}{list type. Can be "1" (numeric), "a" (lowercase alphabetical), or "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I" (uppercase Roman numerals)}
 

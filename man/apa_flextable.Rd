@@ -2,14 +2,14 @@
 % Please edit documentation in R/tables.R
 \name{apa_flextable}
 \alias{apa_flextable}
-\title{Make flextable with merged row titles according to selected column}
+\title{Convert data to flextable consistent with APA style}
 \usage{
 apa_flextable(
   data,
   row_title_column = NULL,
+  row_title_align = "left",
   row_title_prefix = "",
   row_title_sep = " ",
-  row_title_align = "center",
   row_title_border = list(color = "gray20", style = "solid", width = 1),
   left_column_padding = 20,
   col_keys = colnames(data),
@@ -32,22 +32,24 @@ apa_flextable(
   markdown_body = markdown,
   no_markdown_columns = NULL,
   no_markdown_columns_header = no_markdown_columns,
+  no_format_columns = NULL,
   auto_format_columns = TRUE,
   column_formats = NULL,
   pretty_widths = TRUE,
+  add_breaks_between_spanners = TRUE,
   ...
 )
 }
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{row_title_column}{quoted column name to group rows}
+\item{row_title_column}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> column to group rows}
+
+\item{row_title_align}{alignment of row title ("left", "center", "right")}
 
 \item{row_title_prefix}{text to be added to each title}
 
 \item{row_title_sep}{separator for prefix}
-
-\item{row_title_align}{alignment of row title ("left", "center", "right")}
 
 \item{row_title_border}{list of flextable styles}
 
@@ -93,6 +95,8 @@ apa_flextable(
 
 \item{no_markdown_columns_header}{column headers that should not be treated as markdown}
 
+\item{no_format_columns}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> selected columns are not formatted}
+
 \item{auto_format_columns}{if true, will attempt to format some columns automatically}
 
 \item{column_formats}{a column_formats object}
@@ -102,10 +106,22 @@ apa_flextable(
 \item{...}{arguments passed to \code{apa_style}}
 }
 \value{
-flextable
+flextable::flextable
 }
 \description{
-Make flextable with merged row titles according to selected column
+The \code{apa_flextable} function performs a number of formatting operations on the data before and after the data are sent to flextable. See Details.
+}
+\details{
+Roughly speaking, \code{apa_flextable} performs these operations by default:
+\enumerate{
+\item Apply as_grouped_data and restructure row titles, if \code{row_title} is specified.
+\item Format data with apa_format_columns if \code{auto_format_columns = TRUE}
+\item Separate headers into multiple header rows if \code{separate_headers = TRUE}
+\item Apply \code{flextable::flextable}
+\item Apply \code{flextable::surround} to make borders to separate row groups, if any.
+\item Apply the \code{apa_style} function (table formatting and markdown conversion) if \code{apa_style = TRUE}
+\item Apply \code{pretty_widths} if \code{pretty_widths = TRUE}
+}
 }
 \examples{
 library(dplyr)
@@ -118,7 +134,6 @@ mtcars \%>\%
                    SD = round(sd(value), 2),
                    .by = c(Variable,vs)) |>
   dplyr::mutate(vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))) |>
-  apa_flextable(row_title_column= "vs",  row_title_align = "center") |>
+  apa_flextable(row_title_column= vs,  row_title_align = "center") |>
   align(j = 2:3, align = "center")
-
 }

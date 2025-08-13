@@ -2,7 +2,7 @@
 % Please edit documentation in R/tables.R
 \name{pivot_wider_name_first}
 \alias{pivot_wider_name_first}
-\title{A wrapper for tidyr::pivot_wider that creates columns names as \code{name_value} instead of \code{value_name}}
+\title{A wrapper for tidyr::pivot_wider that creates columns names as \code{name_variable} instead of \code{variable_name}}
 \usage{
 pivot_wider_name_first(
   data,

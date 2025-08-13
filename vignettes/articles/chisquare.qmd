@@ -145,7 +145,6 @@ d_tension |>
     values_from = c(M, SD, n),
     names_from = tension
   ) |>
-  add_break_columns(ends_with("_n"), omit_last = TRUE) |>
   apa_flextable(column_formats = column_formats(accuracy = .1)) |>
   align(j = 1, align = "center") 
 ```

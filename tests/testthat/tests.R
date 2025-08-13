@@ -178,3 +178,12 @@ test_that("p2stars", {
   ),
   c("\u2020", "\\*"))
 })
+vnf <- apa7:::variable_name_formatter
+
+test_that("variable name formatter", {
+  expect_equal(vnf("a^2^"), "A^2^")
+  expect_equal(vnf("cut [linear]"), "Cut")
+  expect_equal(vnf("cut [quadratic]"), "Cut^2^")
+  expect_equal(vnf("cut [cubic]"), "Cut^3^")
+  expect_equal(vnf("cut [4th degree]"), "Cut^4^")
+})

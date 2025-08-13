@@ -6,8 +6,9 @@
 \usage{
 add_star_column(
   data,
-  col,
+  ...,
   p = "p",
+  merge = FALSE,
   superscript = TRUE,
   star = "\\\\*",
   alpha = c(0.05, 0.01, 0.001),
@@ -19,9 +20,11 @@ add_star_column(
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{col}{quoted or unquoted column name}
+\item{...}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Select columns}
 
-\item{p}{quoted or unquoted p-value column name}
+\item{p}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Select p-value column name}
+
+\item{merge}{merge and balance columns (default: \code{FALSE})}
 
 \item{superscript}{make as superscript}
 

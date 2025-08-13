@@ -1,0 +1,61 @@
+---
+title: "recentarticles"
+format: html
+---
+
+```{r setup}
+library(conflicted)
+library(tidyverse)
+library(apa7)
+library(flextable)
+library(ftExtra)
+conflicts_prefer(dplyr::filter)
+conflicts_prefer(dplyr::lag)
+set_flextable_defaults(
+  font.size = 12,
+  font.family = "Times New Roman")
+```
+
+
+Wilmot, M. P., Wiernik, B. M., & Ones, D. S. (2025). Mapping domains of life success: Insights from meta-analytic criterion profile analysis. Psychological Bulletin, 151(6), 767–818. https://doi.org/10.1037/bul0000476
+
+
+```{r}
+w <- .9
+tibble::tribble(
+              ~dv,                  ~Category, ~Nv, ~psa_M, ~psa_SD, ~csv_M, ~csv_SD,
+     "Individual",     "Psychological health",  20L,   0.79,    0.15,   0.59,    0.27,
+     "Individual",          "Physical health",   8L,   0.97,    0.03,   0.94,    0.07,
+     "Individual",                "Longevity",  13L,   0.93,    0.05,   0.85,     0.1,
+  "Interpersonal",  "Interpersonal relations",   6L,    0.8,    0.15,   0.59,     0.3,
+  "Interpersonal",       "Social environment",  15L,   0.85,    0.15,   0.69,    0.29,
+  "Interpersonal",       "Societal attitudes",  11L,   0.79,    0.11,   0.57,    0.21,
+  "Interpersonal",            "Collaboration",  21L,   0.73,    0.11,   0.46,    0.22,
+  "Interpersonal",               "Leadership",   9L,    0.8,    0.19,   0.61,    0.39,
+  "Interpersonal",         "Family formation",   4L,   0.98,    0.01,   0.96,    0.03,
+  "Institutional", "Institutional adjustment",  10L,    0.7,    0.11,    0.4,    0.21,
+  "Institutional",         "Task environment",   8L,   0.91,    0.09,   0.82,    0.18,
+  "Institutional",           "Work attitudes",  14L,   0.82,    0.15,   0.64,     0.3,
+  "Institutional",              "Performance",  50L,   0.82,    0.14,   0.63,    0.27,
+  "Institutional",        "Extrinsic rewards",  15L,   0.69,    0.14,   0.38,    0.22
+  ) |> 
+  mutate(Nv = align_chr(Nv)) |> 
+  rename(`*N~v~*` = "Nv",
+         `*p~sa~*_M` = "psa_M",
+         `*p~sa~*_SD` = "psa_SD",
+         `*c~sv~*_M` = "csv_M",
+         `*c~sv~*_SD` = "csv_SD") |> 
+  apa_flextable("dv", line_spacing = 1.4, left_column_padding = 15) |> 
+  align(j = "Category") |> 
+  valign(j = 1:2, valign = "bottom", part = "header") |> 
+  add_footer_lines(values = as_paragraph_md("*Note*. *N~v~* = number of variables sorted into each life success category. To quantify agreement among raters, we computed two indices: *proportion of substantive agreement* (*p~sa~*) and *substantive validity coefficient* (*c~sv~*); *p~sa~* ranges from 0 to 1, with 1 attained in the presence of unanimous agreement; *c~sv~* ranges from −1 to 1; the minimum occurs when all raters unanimously misclassify an item, whereas the maximum occurs when all raters unanimously agree on its classification. In evaluating *p~sa~* and *c~sv~* values, we used benchmarks of Colquitt et al. (2019), which indicate that *p~sa~* ≥ .72 and *c~sv~* ≥ .51 reflect moderate or stronger agreement; italicized values indicate weaker agreement (*p~sa~* = .40–.71 and *c~sv~* = .05–.50).")) |> 
+  footnote(j = "Category", 
+           i = 1, 
+           value = as_paragraph_md("*N~v~* = 14 variables were judged as fitting into multiple categories and were subsequently submitted to subject matter expert review. Based on 80% agreement and justification from the scholarly literature, variables were ultimately ceded to their best fitting life success category."),
+           ref_symbols = "a",
+           part = "header") |> 
+  align(align = "justify", part = "footer") |> 
+  flextable::style(part = "footer", pr_p = officer::fp_par(text.align = "justify", padding.top = 2, padding.left = 5, padding.right = 5, line_spacing = 1.15)) |> 
+  width(width = c(2.05, w, w, w, .05, w, w))
+```
+

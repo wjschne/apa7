@@ -7,7 +7,7 @@
 apa_format_columns(
   data,
   column_formats = NULL,
-  columns = NULL,
+  no_format_columns = NULL,
   rename_headers = TRUE,
   latex_headers = FALSE,
   format_separated_headers = TRUE,
@@ -20,7 +20,7 @@ apa_format_columns(
 
 \item{column_formats}{\code{column_formats} object. If NULL, the current default formatter set with \code{\link[=apa7_defaults]{apa7_defaults()}} will be used.}
 
-\item{columns}{(optional) vector of columns to format}
+\item{no_format_columns}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> selected columns are not formatted}
 
 \item{rename_headers}{if \code{TRUE}, rename headers with markdown or latex}
 

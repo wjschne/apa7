@@ -2,4 +2,54 @@ url: https://wjschne.github.io/apa7/
 template:
   bootstrap: 5
   bootswatch: journal
+reference:
+  - title: Create flextables
+    desc: "Convert objects to flextables"
+    contents:
+      - apa_flextable
+      - apa_chisq
+      - apa_cor
+      - apa_parameters
+      - apa_performance
+      - apa_performance_comparison
+  - title: Style flextables
+    desc: "Alter the look of a flextable previously created"
+    contents:
+      - apa_style
+      - pretty_widths
+  - title: Variable Formatters
+    desc: Alter vector variables
+    contents:
+      - align_chr
+      - apa_p
+      - hanging_indent
+      - num_pad
+      - p2stars
+      - star_balance
+      - tagger
+  - title: Automatic formatting
+    desc: Customize how column_headers and data are formatted by apa_style` and `apa_flextable`
+    contents:
+      - apa7_defaults
+      - column_format
+      - column_formats
+  - title: Alter data.frame
+    desc: Change data.frames
+    contents:
+      - apa_format_columns
+      - column_spanner_label
+      - pivot_wider_name_first
+  - subtitle: Create Special Columns
+    desc: Adding specialized columns that are formatted differently by `apa_style` and `apa_flextable`
+    contents:
+      - add_break_columns
+      - add_list_column
+      - add_star_column
+      - separate_star_column
+  - title: Misc
+    desc: Other Functions
+    contents:
+      - apa_p_star_note
+      - is_numeric_like
+
 

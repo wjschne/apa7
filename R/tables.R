@@ -1,7 +1,7 @@
 #' Add break columns
 #'
 #' @param d data.frame or tibble
-#' @param ... unquoted variable names, an expression using a tidyselect function (contains, start_with, ends_with, matches, num_range, all_of, any_of), or a character vector with variable names
+#' @param ... <[`tidy-select`][tidyr_tidy_select]> Select columns
 #' @param .before insert break columns before selected columns (defaults to FALSE)
 #' @param omit_first omit the first break column
 #' @param omit_last omit the last break column
@@ -69,7 +69,7 @@ add_break_columns <- function(d,
 #' Make a column into a list column
 #'
 #' @param data data.frame ro tibble
-#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> tidyselect function to select columns. Default is first column
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> <[`tidy-select`][tidyr_tidy_select]> Select columns. Default is first column
 #' @param type list type. Can be "1" (numeric), "a" (lowercase alphabetical), or "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I" (uppercase Roman numerals)
 #' @param sep separator
 #'
@@ -130,8 +130,9 @@ rep_letters <- function(i, type = c("a", "A")) {
 #' Adds stars next to a column based on p-values
 #'
 #' @param data data.frame or tibble
-#' @param col quoted or unquoted column name
-#' @param p quoted or unquoted p-value column name
+#' @param ... <[`tidy-select`][tidyr_tidy_select]> Select columns
+#' @param p <[`tidy-select`][tidyr_tidy_select]> Select p-value column name
+#' @param merge merge and balance columns (default: `FALSE`)
 #' @inheritParams p2stars
 #'
 #' @return data.frame
@@ -143,8 +144,9 @@ rep_letters <- function(i, type = c("a", "A")) {
 #'  add_star_column(b, p)
 add_star_column <- function(
     data,
-    col,
+    ...,
     p = "p",
+    merge = FALSE,
     superscript = TRUE,
     star = "\\*",
     alpha = c(0.05, .01, .001),
@@ -153,10 +155,7 @@ add_star_column <- function(
     prefix = "\\") {
 
     p_names <-  colnames(dplyr::select(data, {{ p }}))
-
-
-
-    where_names <- colnames(dplyr::select(data, {{ col }}))
+    where_names <- colnames(dplyr::select(data, ...))
 
 
   if (length(p_names) == 0) {
@@ -174,15 +173,24 @@ add_star_column <- function(
                           ats = where_numbers + 1,
                           values = star_names)
   data[,star_names] <- p2stars(data[[p_names]], first_alpha_marginal = first_alpha_marginal, superscript = superscript, alpha = alpha, add_trailing_space = add_trailing_space, prefix = prefix)
-  data[,keys]
+  data <- data[,keys]
 
+  if (merge) {
+    for (wn in where_names) {
+      sn <- paste0(wn, "apa7starcolumn")
+      data[, wn] <- star_balance(
+        paste0(data[[wn]],
+               data[[sn]]))
+      data[sn] <- NULL
+    }
+  }
+  data
 }
-
 
 #' Add columns that separate significance stars from numbers
 #'
 #' @param data data.frame or tibble
-#' @param ... column names or tidyselect function
+#' @param ... <[`tidy-select`][tidyr_tidy_select]> Select columns
 #' @param superscript make stars superscript
 #' @param star character to use for stars (default: "\\*")
 #' @param star_replace character to replace stars with (default: "\\\\*")
@@ -265,7 +273,7 @@ separate_star_column <- function(
 #' @inheritParams apa_flextable
 #' @param suppress_warnings Suppress any warnings if true.
 #'
-#' @return flextable
+#' @return flextable::flextable
 #' @export
 #' @importFrom rlang .data
 #'
@@ -405,7 +413,7 @@ dd |>
 #' @param ... <[`data-masking`][rlang::args_data_masking]> parameters passed to psych::corTest
 #' @importFrom rlang .data
 #'
-#' @return flextable, gt, or tibble
+#' @return flextable::flextable
 #' @export
 #'
 #' @examples
@@ -694,13 +702,25 @@ apa_cor <- function(data,
   d_R
 }
 
-#' Make flextable with merged row titles according to selected column
+#' Convert data to flextable consistent with APA style
 #'
+#'
+#' The `apa_flextable` function performs a number of formatting operations on the data before and after the data are sent to flextable. See Details.
+#'
+#'Roughly speaking, `apa_flextable` performs these operations by default:
+#'
+#' 1. Apply as_grouped_data and restructure row titles, if `row_title` is specified.
+#' 2. Format data with apa_format_columns if `auto_format_columns = TRUE`
+#' 3. Separate headers into multiple header rows if `separate_headers = TRUE`
+#' 3. Apply `flextable::flextable`
+#' 4. Apply `flextable::surround` to make borders to separate row groups, if any.
+#' 5. Apply the `apa_style` function (table formatting and markdown conversion) if `apa_style = TRUE`
+#' 6. Apply `pretty_widths` if `pretty_widths = TRUE`
 #' @param data data.frame or tibble
-#' @param row_title_column quoted column name to group rows
+#' @param row_title_column <[`tidy-select`][tidyr_tidy_select]> column to group rows
+#' @param row_title_align alignment of row title ("left", "center", "right")
 #' @param row_title_prefix text to be added to each title
 #' @param row_title_sep separator for prefix
-#' @param row_title_align alignment of row title ("left", "center", "right")
 #' @param row_title_border list of flextable styles
 #' @param left_column_padding Number of points the left column is padded (only relevant when there is a `row_title_column` and `row_title_align = "left"`)
 #' @param col_keys column keys passed to flextable (defaults data column names)
@@ -711,10 +731,11 @@ apa_cor <- function(data,
 #' @param auto_format_columns if true, will attempt to format some columns automatically
 #' @param column_formats a column_formats object
 #' @param pretty_widths apply `pretty_widths` function
+#' @param no_format_columns <[`tidy-select`][tidyr_tidy_select]> selected columns are not formatted
 #' @inheritParams apa_style
 #' @param ... arguments passed to `apa_style`
 
-#' @return flextable
+#' @return flextable::flextable
 #' @export
 #'
 #' @examples
@@ -728,14 +749,13 @@ apa_cor <- function(data,
 #'                    SD = round(sd(value), 2),
 #'                    .by = c(Variable,vs)) |>
 #'   dplyr::mutate(vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))) |>
-#'   apa_flextable(row_title_column= "vs",  row_title_align = "center") |>
+#'   apa_flextable(row_title_column= vs,  row_title_align = "center") |>
 #'   align(j = 2:3, align = "center")
-#'
 apa_flextable <- function(data,
                           row_title_column = NULL,
+                          row_title_align = "left",
                           row_title_prefix = "",
                           row_title_sep = " ",
-                          row_title_align = "center",
                           row_title_border = list(
                             color = "gray20",
                             style = "solid",
@@ -762,21 +782,62 @@ apa_flextable <- function(data,
                           markdown_body = markdown,
                           no_markdown_columns = NULL,
                           no_markdown_columns_header = no_markdown_columns,
+                          no_format_columns = NULL,
                           auto_format_columns = TRUE,
                           column_formats = NULL,
                           pretty_widths = TRUE,
+                          add_breaks_between_spanners = TRUE,
                           ...) {
+  row_title_column <- dplyr::select(data, {{ row_title_column }}) |> colnames()
+
+  no_markdown_columns_header <- dplyr::select(data, {{ no_markdown_columns_header }}) |> colnames()
+
+  no_format_columns <- dplyr::select(data, {{ no_format_columns }}) |> colnames()
+
+  # Prevent check warning
   column_n <- row_title <- value <- name <- newname <- NULL
 
+  # Get default column formats
   if (is.null(column_formats)) column_formats <- the$column_formats
 
   if (row_title_prefix == "")  {
     row_title_sep <- ""
   }
 
-  no_markdown_columns <- dplyr::select(data, no_markdown_columns) |> colnames()
+  # Use tidyselect to find column names
+  numeric_columns <- dplyr::select(data, where(is.numeric)) |> colnames()
 
-  no_markdown_columns <- dplyr::select(data, no_markdown_columns_header) |> colnames()
+  # if (!is.null(no_markdown_columns)) {
+    no_markdown_columns <- dplyr::select(data, {{ no_markdown_columns }}) |> colnames()
+  # } else {
+    # no_markdown_columns <- character(0)
+  # }
+  no_markdown_columns <- unique(no_markdown_columns, numeric_columns)
+
+  if (!is.null(no_markdown_columns_header)) {
+  no_markdown_columns_header <- dplyr::select(data, {{ no_markdown_columns_header }} ) |> colnames()
+  }
+
+  # Insert breaks between column spanners
+  if (add_breaks_between_spanners && separate_headers) {
+    cf_names <- column_formats@get_column_names
+    cf_names_no_sep <- stringr::str_replace_all(cf_names, "_", "apa7separator")
+    names(cf_names_no_sep) <- cf_names
+
+    brk_col <- tibble::tibble(cnames = colnames(data),
+           cnames_no_sep = stringr::str_replace_all(cnames, cf_names_no_sep)) |>
+      # Split on last underscore
+      dplyr::mutate(spanner_deckered = purrr::map(cnames_no_sep, \(x) stringr::str_split_fixed(x, "_(?=[^_]*$)", 2))) |>
+      dplyr::mutate(spanner = purrr::map_chr(spanner_deckered, 1),
+                    deckered = purrr::map_chr(spanner_deckered, 2)) |>
+      dplyr::mutate(break_column = deckered != "" & lag(deckered) != "" & spanner != lag(spanner)) |>
+      filter(break_column) |>
+      pull(cnames)
+
+    if (length(brk_col) > 0) {
+      data <- add_break_columns(data, brk_col, .before = TRUE)
+    }
+  }
 
   # Convert data that are like integers into integers
   data <- dplyr::mutate(
@@ -785,7 +846,7 @@ apa_flextable <- function(data,
 
   if (auto_format_columns) {
     cn_before <- colnames(data)
-    data <- apa_format_columns(data, column_formats = column_formats)
+    data <- apa_format_columns(data, column_formats = column_formats, no_format_columns = no_format_columns)
     cn_after <- colnames(data)
     kv <- tibble::tibble(name = cn_before,
                          newname = cn_after)
@@ -804,10 +865,12 @@ apa_flextable <- function(data,
     d <- dplyr::select(data, -dplyr::starts_with("apa7breakcolumn"))
   }
 
-  if (is.null(row_title_column)) {
+
+
+  if (length(row_title_column) == 0) {
     ft <- flextable::flextable(
       d,
-      col_keys = col_keys[!(col_keys %in% row_title_column)],
+      col_keys = col_keys,
       cwidth = cwidth,
       cheight = cheight,
       theme_fun = flextable::theme_apa)
@@ -958,20 +1021,25 @@ apa_parameters.lm <- function(
    column_formats = NULL,
    t_with_df = TRUE
    ) {
-  pstar <- NULL
-  Parameter <- Std_Coefficient <- df_error <- header <- name <- NULL
+  # Prevent warnings
+  pstar <- Parameter <- Std_Coefficient <- df_error <- header <- name <- NULL
+
+  # Get column formats
   if (is.null(column_formats)) column_formats <- the$column_formats
 
+  # Make sure Parameter is in the predictor_parameters
   if (!("Parameter" %in% predictor_parameters)) {
     predictor_parameters <- c("Parameter", predictor_parameters)
   }
 
   names(predictor_parameters) <- NULL
 
+  # Get and format parameters
   d_b <- parameters::model_parameters(fit) |>
     tibble::as_tibble() |>
     dplyr::mutate(Parameter = parameters::format_parameters(fit))
 
+  # Get standardized parameters and merge them into other parameters
   if ("Std_Coefficient" %in% predictor_parameters) {
     d_std <- parameters::standardise_parameters(fit, method = "basic") |>
       tibble::as_tibble() |>
@@ -984,6 +1052,7 @@ apa_parameters.lm <- function(
 
   d_b_new <- d_b
 
+  # Put df into t column name
   if (t_with_df) {
 
   if (all(c("t", "df_error") %in% colnames(d_b)) &&
@@ -1004,9 +1073,9 @@ apa_parameters.lm <- function(
       dplyr::select(-df_error)
   }}
 
+  # Format columns
   for (pr in predictor_parameters) {
     if (!is.null(column_formats[[pr]])) {
-      # formals(mean)
       d_b_new <- dplyr::mutate(
         d_b_new,
         dplyr::across(
@@ -1015,6 +1084,7 @@ apa_parameters.lm <- function(
     }
   }
 
+  # add starred column
   if (length(starred > 0) && !is.na(starred) && all(starred != "")) {
     d_b_new <- d_b_new |>
       dplyr::mutate(pstar = p2stars(d_b$p, superscript = TRUE)) |>
@@ -1024,6 +1094,7 @@ apa_parameters.lm <- function(
       dplyr::mutate(dplyr::across(dplyr::any_of(starred), align_chr))
   }
 
+  # bold star
   if (length(bolded > 0) & !is.na(bolded) & (bolded != "")) {
     my_bold <- ifelse(d_b$p <= 0.05, "**", "")
     d_b_new <- d_b_new |>
@@ -1218,7 +1289,7 @@ apa_performance_comparison <- function(
    apa_format_columns(column_formats)
 }
 
-#' Style object with APA style
+#' Style `flextable::flextable` object according to APA style
 #'
 #' @param x object
 #' @param font_family font family
@@ -1243,8 +1314,6 @@ apa_performance_comparison <- function(
 #' @examples
 #' d <- data.frame(x = 1:3, y = 4:6)
 #' flextable::flextable(d) |>
-#'   apa_style()
-#' gt::gt(d) |>
 #'   apa_style()
 apa_style <- function(x,
                       font_family = NULL,
@@ -1529,7 +1598,6 @@ apa_style.flextable <- function(
     # Make sure content is not already formatted
     dt <- x$header$content$data
     hh <- character(0)
-    no_markdown_columns_header
     md_keys <- x$col_keys[!(x$col_keys %in% unique(c(listcolumn_keys, break_keys, no_markdown_columns_header)))]
     for (ch in md_keys) {
       if (!("chunk" %in% class(dt$header$content$data[[1,ch]]))) {
@@ -1572,7 +1640,7 @@ apa_style.flextable <- function(
 #' @param table_width width of table
 #' @param min_width minimum width of columns
 #' @param unit Can be `in`, `cm`, or `mm`
-#' @return flextable
+#' @return flextable::flextable
 #' @export
 pretty_widths <- function(
     x,
@@ -1622,7 +1690,7 @@ pretty_widths <- function(
 
 }
 
-#' A wrapper for tidyr::pivot_wider that creates columns names as `name_value` instead of `value_name`
+#' A wrapper for tidyr::pivot_wider that creates columns names as `name_variable` instead of `variable_name`
 #'
 #' The default for `names_vary` is "slowest" instead of the usual "fastest".
 #' @inheritParams tidyr::pivot_wider

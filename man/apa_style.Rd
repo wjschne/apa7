@@ -4,7 +4,7 @@
 \alias{apa_style}
 \alias{apa_style.gt_tbl}
 \alias{apa_style.flextable}
-\title{Style object with APA style}
+\title{Style \code{flextable::flextable} object according to APA style}
 \usage{
 apa_style(
   x,
@@ -101,12 +101,10 @@ apa_style(
 object
 }
 \description{
-Style object with APA style
+Style \code{flextable::flextable} object according to APA style
 }
 \examples{
 d <- data.frame(x = 1:3, y = 4:6)
 flextable::flextable(d) |>
-  apa_style()
-gt::gt(d) |>
   apa_style()
 }

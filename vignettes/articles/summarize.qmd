@@ -87,7 +87,7 @@ flextable::flextable(d) |>
 
 ## The `apa_flextable` function
 
-I prefer related columns to separated by a small break in the headers, so I use the `add_break_columns` function to insert the breaks after each column ending with `_SD` (omitting the last instance). The `apa_flextable` function handles the rest automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
+The `apa_flextable` function handles most of the formatting automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
 
 ```{r loadftextra, include=FALSE}
 library(ftExtra)
@@ -97,7 +97,6 @@ library(ftExtra)
 #| label: tbl-apaflextable
 #| tbl-cap: Price, Carat, Depth, Table Using `apa_flextable`
 d |> 
-  add_break_columns(ends_with("_SD"), omit_last = TRUE) |>
   apa_flextable() |> 
   colformat_char(j = 3:4, prefix = "$") 
 

@@ -64,7 +64,7 @@ apa_cor(
 \item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> parameters passed to psych::corTest}
 }
 \value{
-flextable, gt, or tibble
+flextable::flextable
 }
 \description{
 APA-formatted correlation table

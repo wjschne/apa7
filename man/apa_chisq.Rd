@@ -42,7 +42,7 @@ apa_chisq(
 
 \item{note}{Custom note (overrides automatic note.)}
 
-\item{row_title_column}{quoted column name to group rows}
+\item{row_title_column}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> column to group rows}
 
 \item{row_title_prefix}{text to be added to each title}
 
@@ -99,7 +99,7 @@ apa_chisq(
 \item{...}{arguments passed to \code{apa_style}}
 }
 \value{
-flextable
+flextable::flextable
 }
 \description{
 Make contingency table with chi-square test of independence

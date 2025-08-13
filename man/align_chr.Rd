@@ -15,6 +15,7 @@ align_chr(
   format_integers = FALSE,
   side = c("both", "left", "right"),
   NA_value = "",
+  format_numeric_character = FALSE,
   ...
 )
 }

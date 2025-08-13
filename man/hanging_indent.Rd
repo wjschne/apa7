@@ -10,7 +10,8 @@ hanging_indent(
   width = 30,
   space = NULL,
   newline = "\\\\\\\\\\n",
-  whitespace_only = FALSE
+  whitespace_only = FALSE,
+  wrap_equal_width = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ hanging_indent(
 \item{newline}{text for creating new line}
 
 \item{whitespace_only}{wrapping spaces only}
+
+\item{wrap_equal_width}{Attempts to split lines to make them of approximately equal width}
 }
 \value{
 character vector
