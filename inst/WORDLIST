@@ -31,6 +31,7 @@ flextable
 formatter
 formatters
 getter
+ggdiagram
 gtsummary
 kableExtra
 sd
