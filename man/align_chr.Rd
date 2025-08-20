@@ -40,6 +40,8 @@ align_chr(
 
 \item{NA_value}{value to replace NA}
 
+\item{format_numeric_character}{format character variables with numeric content}
+
 \item{...}{additional arguments passed to \code{signs::signs()}}
 }
 \value{

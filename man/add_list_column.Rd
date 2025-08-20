@@ -7,9 +7,9 @@
 add_list_column(data, ..., type = c("1", "a", "A", "I", "i"), sep = ". ")
 }
 \arguments{
-\item{data}{data.frame ro tibble}
+\item{data}{data.frame or tibble}
 
-\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}> <\code{\link[=tidyr_tidy_select]{tidy-select}}> Select columns. Default is first column}
+\item{...}{Column name or tidyselect function. Select columns. Default is first column}
 
 \item{type}{list type. Can be "1" (numeric), "a" (lowercase alphabetical), or "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I" (uppercase Roman numerals)}
 
@@ -27,6 +27,6 @@ d <- data.frame(x = letters[1:5], y = letters[2:6])
 add_list_column(d)
 # select any column
 add_list_column(d, y)
-add_list_column(d, type = "abc", sep = ") ") |>
+add_list_column(d, type = "a", sep = ") ") |>
  apa_flextable()
 }

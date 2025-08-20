@@ -9,6 +9,7 @@ reference:
       - apa_flextable
       - apa_chisq
       - apa_cor
+      - apa_loadings
       - apa_parameters
       - apa_performance
       - apa_performance_comparison
@@ -51,5 +52,6 @@ reference:
     contents:
       - apa_p_star_note
       - is_numeric_like
+      - str_wrap_equal
 
 

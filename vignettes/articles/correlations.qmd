@@ -23,6 +23,8 @@ library(apa7)
 library(dplyr)
 library(flextable)
 library(ftExtra)
+library(tidyr)
+library(stringr)
 ```
 
 ```{r loading}
@@ -52,16 +54,7 @@ trees |>
 ```
 
 
-If you want to use another table package, you can output a tibble instead and then process the table however you want. 
 
-```{r}
-#| label: tbl-treeskable
-#| tbl-cap: Correlation table using `kable` via `apa_cor`
-options(knitr.kable.NA = '')
-trees |>
-  apa_cor(output = "tibble", bold_significant = T) |>
-  knitr::kable(align = "lrrrrr")
-```
 
 # Styling options
 
@@ -132,5 +125,23 @@ apa_cor(trees) |>
     align = "left"
   )
 
+```
+
+# Output to tibble
+
+If you need to process the underlying data before converting to flextable (or use another table-creating function from another package), you can output a tibble and then process the table however you want. Here we add a row title.
+
+```{r}
+apa_cor(trees, output = "tibble") |>
+  mutate(apa7listcolumn = str_trim(apa7listcolumn)) |>
+  unite(col = Variable, 
+        apa7listcolumn, 
+        Variable, 
+        sep = "&thinsp;") |>
+  add_row(Variable = "Row title", .before = 1) |>
+  apa_flextable(no_format_columns = "Variable") |>
+  padding(i = 2:4,
+          j = 1,
+          padding.left = 15) 
 ```
 

@@ -15,7 +15,7 @@ add_break_columns(
 \arguments{
 \item{d}{data.frame or tibble}
 
-\item{...}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Select columns}
+\item{...}{Column name or tidyselect function. Select columns}
 
 \item{.before}{insert break columns before selected columns (defaults to FALSE)}
 

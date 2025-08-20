@@ -42,7 +42,7 @@ apa_chisq(
 
 \item{note}{Custom note (overrides automatic note.)}
 
-\item{row_title_column}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> column to group rows}
+\item{row_title_column}{Column name or tidyselect function. column to group rows}
 
 \item{row_title_prefix}{text to be added to each title}
 

@@ -1,14 +1,27 @@
 ---
-title: "recentarticles"
-format: html
+title: "Using apa7 and flextable to Recreate Tables from Recent APA Journal Articles"
+author:
+  - name: W. Joel Schneider
+    affiliations: Temple University
+    email: schneider@temple.edu
+    corresponding: true
+suppress-title-page: true
+format: apaquarto-docx
+bibliography: refs.bib
+floatsintext: true
+execute: 
+  cache: true
 ---
 
-```{r setup}
+```{r}
+#| label: setup
+#| include: false
 library(conflicted)
 library(tidyverse)
 library(apa7)
 library(flextable)
 library(ftExtra)
+library(scales)
 conflicts_prefer(dplyr::filter)
 conflicts_prefer(dplyr::lag)
 set_flextable_defaults(
@@ -17,10 +30,15 @@ set_flextable_defaults(
 ```
 
 
-Wilmot, M. P., Wiernik, B. M., & Ones, D. S. (2025). Mapping domains of life success: Insights from meta-analytic criterion profile analysis. Psychological Bulletin, 151(6), 767–818. https://doi.org/10.1037/bul0000476
+## Recreating Table 5 from @wilmotMappingDomainsLife2025
 
 
 ```{r}
+#| label: tbl-wilmot
+#| tbl-cap: Summary of Results of Content Validation for Life Success Categories
+#| apa-note:
+#|  - "*N~v~* = number of variables sorted into each life success category. To quantify agreement among raters, we computed two indices: *proportion of substantive agreement* (*p~sa~*) and *substantive validity coefficient* (*c~sv~*); *p~sa~* ranges from 0 to 1, with 1 attained in the presence of unanimous agreement; *c~sv~* ranges from −1 to 1; the minimum occurs when all raters unanimously misclassify an item, whereas the maximum occurs when all raters unanimously agree on its classification. In evaluating *p~sa~* and *c~sv~* values, we used benchmarks of Colquitt et al. (2019), which indicate that *p~sa~* ≥ .72 and *c~sv~* ≥ .51 reflect moderate or stronger agreement; italicized values indicate weaker agreement (*p~sa~* = .40–.71 and *c~sv~* = .05–.50)."
+#|  - "^a&thinsp;^*N~v~* = 14 variables were judged as fitting into multiple categories and were subsequently submitted to subject matter expert review. Based on 80% agreement and justification from the scholarly literature, variables were ultimately ceded to their best fitting life success category."
 w <- .9
 tibble::tribble(
               ~dv,                  ~Category, ~Nv, ~psa_M, ~psa_SD, ~csv_M, ~csv_SD,
@@ -52,10 +70,174 @@ tibble::tribble(
   footnote(j = "Category", 
            i = 1, 
            value = as_paragraph_md("*N~v~* = 14 variables were judged as fitting into multiple categories and were subsequently submitted to subject matter expert review. Based on 80% agreement and justification from the scholarly literature, variables were ultimately ceded to their best fitting life success category."),
-           ref_symbols = "a",
+           ref_symbols = "a\u2009",
            part = "header") |> 
   align(align = "justify", part = "footer") |> 
-  flextable::style(part = "footer", pr_p = officer::fp_par(text.align = "justify", padding.top = 2, padding.left = 5, padding.right = 5, line_spacing = 1.15)) |> 
+  flextable::style(part = "footer", pr_p = officer::fp_par(text.align = "justify", padding.top = 2, padding.left = 3, padding.right = 3, line_spacing = 1.4), pr_t = officer::fp_text(font.family = "Times New Roman", font.size = 12)) |> 
   width(width = c(2.05, w, w, w, .05, w, w))
 ```
 
+Fabiano, G. A., Schatz, N. K., Merrill, B. M., Piscitello, J., Hayes, T. B., Jusko, M., Gnagy, E. M., Greiner, A. R., Tower, D., Boeckel, A., Gallo, R., Lupas, K., Gordon, C., Ramos, M., Sikov, J., Caron, S., & Pelham, W. E. (2025). A randomized, controlled trial to evaluate the efficacy of a daily report card intervention to enhance the efficacy of individualized education programs for children with attention-deficit/hyperactivity disorder. *Journal of Consulting and Clinical Psychology, 93*(7), 484–499. https://doi.org/10.1037/ccp0000959
+
+## Recreating Table from @fabianoRandomizedControlledTrial2025
+
+```{r}
+#| label: fabiano
+#| tbl-width: 9
+cf <- column_formats()
+cf$p@formatter <- \(x) apa_p(x, align = TRUE, min_digits = 3)
+tibble::tribble(
+                                ~dv,             ~Model,      ~b,  ~SE,      ~p,
+        "1. DRC × Time → violation",        "Intercept",  "1.77", 0.09, "<.001",
+        "1. DRC × Time → violation",              "Obs",  "0.00", 0.01, "0.867",
+        "1. DRC × Time → violation",             "Time", "−0.04", 0.06, "0.517",
+        "1. DRC × Time → violation",              "DRC",  "0.31", 0.13, "0.013",
+        "1. DRC × Time → violation",              "Mod",      NA,   NA,      NA,
+        "1. DRC × Time → violation",       "Time × DRC", "−0.13", 0.05, "0.012",
+        "1. DRC × Time → violation",       "Time × Mod",      NA,   NA,      NA,
+        "1. DRC × Time → violation",        "DRC × Mod",      NA,   NA,      NA,
+        "1. DRC × Time → violation", "Time × DRC × Mod",      NA,   NA,      NA,
+  "2. Moderator: Medication status",        "Intercept",  "1.84", 0.13, "<.001",
+  "2. Moderator: Medication status",              "Obs",  "0.00", 0.01, "0.943",
+  "2. Moderator: Medication status",             "Time", "−0.01", 0.07, "0.935",
+  "2. Moderator: Medication status",              "DRC",  "0.32", 0.18, "0.072",
+  "2. Moderator: Medication status",              "Mod", "−0.15", 0.18, "0.396",
+  "2. Moderator: Medication status",       "Time × DRC", "−0.01", 0.08, "0.912",
+  "2. Moderator: Medication status",       "Time × Mod", "−0.07", 0.08, "0.438",
+  "2. Moderator: Medication status",        "DRC × Mod", "−0.01", 0.25, "0.974",
+  "2. Moderator: Medication status", "Time × DRC × Mod", "−0.20", 0.11, "0.073",
+              "3. Moderator: Grade",        "Intercept",  "1.90", 0.11, "<.001",
+              "3. Moderator: Grade",              "Obs",  "0.00", 0.01, "0.897",
+              "3. Moderator: Grade",             "Time",  "0.00", 0.06,  "0.99",
+              "3. Moderator: Grade",              "DRC",  "0.25", 0.16, "0.132",
+              "3. Moderator: Grade",              "Mod", "−0.31", 0.18, "0.076",
+              "3. Moderator: Grade",       "Time × DRC", "−0.11", 0.07, "0.112",
+              "3. Moderator: Grade",       "Time × Mod", "−0.10", 0.08, "0.182",
+              "3. Moderator: Grade",        "DRC × Mod",  "0.17", 0.25, "0.514",
+              "3. Moderator: Grade", "Time × DRC × Mod", "−0.07", 0.12, "0.548",
+                "4. Moderator: ODD",        "Intercept",  "1.70", 0.12, "<.001",
+                "4. Moderator: ODD",              "Obs",  "0.00", 0.01, "0.995",
+                "4. Moderator: ODD",             "Time", "−0.03", 0.07, "0.662",
+                "4. Moderator: ODD",              "DRC",  "0.15", 0.18, "0.383",
+                "4. Moderator: ODD",              "Mod",  "0.12", 0.17, "0.464",
+                "4. Moderator: ODD",       "Time × DRC", "−0.01", 0.08, "0.906",
+                "4. Moderator: ODD",       "Time × Mod", "−0.02", 0.08, "0.769",
+                "4. Moderator: ODD",        "DRC × Mod",  "0.38", 0.25, "0.125",
+                "4. Moderator: ODD", "Time × DRC × Mod", "−0.20", 0.11, "0.082",
+                "5. Moderator: IEP",        "Intercept",  "1.75", 0.23, "<.001",
+                "5. Moderator: IEP",              "Obs",  "0.00", 0.01, "0.971",
+                "5. Moderator: IEP",             "Time",  "0.01",  0.1, "0.922",
+                "5. Moderator: IEP",              "DRC",  "0.46", 0.34, "0.183",
+                "5. Moderator: IEP",              "Mod",  "0.07", 0.39, "0.858",
+                "5. Moderator: IEP",       "Time × DRC", "−0.35", 0.12, "0.003",
+                "5. Moderator: IEP",       "Time × Mod", "−0.13", 0.17, "0.453",
+                "5. Moderator: IEP",        "DRC × Mod", "−0.28", 0.56, "0.622",
+                "5. Moderator: IEP", "Time × DRC × Mod",  "0.45", 0.22, "0.043"
+
+  ) |> 
+  mutate(dv = str_replace(dv, " ", "\u2009")) |> 
+  pivot_wider_name_first(names_from = dv, values_from = b:p) |> 
+  apa_flextable(font_size = 8, 
+                line_spacing = 1.2, 
+                column_formats = cf) |> 
+  pretty_widths(table_width = 6.5) |> 
+  width(j = 1, width = 1) |> 
+  valign(valign = "bottom", part = "header") 
+
+
+```
+
+
+@segalRandomizedControlledTrial2025
+
+```{r segal}
+d <- tibble(
+  Variable = c(
+    rep("Deployed relative", 4), 
+    rep("Highest educational level", 3), 
+    rep("Income", 5), 
+    rep("Marital status",4),
+    rep("Children",2)
+  ),
+  Category = c(
+    "Son","Brother","Spouse","More than one relative",
+    "High School","Bachelor's degree","Graduate's degree",
+    "Well below average","Below average","Average","Above average","Well above average",
+    "Single","Married/partnered","Divorced/widowed","Other",
+    "Yes","No"
+  ),
+  `Radical acceptance` = c(
+    1L,1L,38L,3L,
+    8L,24L,11L,
+    10L,15L,8L,8L,2L,
+    0L,43L,0L,0L,
+    26L,17L
+  ),
+  TIP = c(
+    1L,2L,33L,8L,
+    10L,17L,17L,
+    6L,12L,14L,12L,0L,
+    0L,44L,0L,0L,
+    26L,18L),
+  Control = c(
+    0L,2L,35L,6L,
+    5L,27L,11L,
+    11L,10L,12L,8L,2L,
+    1L,42L,0L,0L,
+    26L,17L)
+) |> 
+  pivot_longer(where(is.integer), values_to = "n", names_to = "dv") |> 
+  mutate(p = paste0("(", percent(n/sum(n), accuracy = .01), ")"), .by = c(dv, Variable)) 
+  
+
+d_full <- d |> 
+  summarise(n = sum(n), .by = c(Variable, Category)) |> 
+  mutate(p = paste0("(", percent(n/sum(n), accuracy = .01), ")"), 
+         dv = "Full sample",
+         .by = Variable)
+
+
+d_both <- d |> 
+  bind_rows(d_full) 
+
+dv_levels <- d_both |> 
+  summarise(n = sum(n), .by = c(Variable, dv)) |> 
+  summarise(n = max(n), .by = c(dv)) |> 
+  mutate(l = paste0(dv, " (*",ifelse(dv == "Full sample", "N", "n"),"* = ", n, ")")) |> 
+  select(l, dv) |> 
+  deframe()
+
+d_cateogry <- d_both |> 
+  unite(value, n, p, sep = " ") |> 
+  pivot_wider(names_from = dv) 
+
+d_continuous <- tibble::tribble(
+             ~Variable, ~stat, ~`Radical acceptance`,  ~TIP, ~Control, ~`Full sample`,
+                 "Age",   "m",               32.35,  32.8,       33,        37.86,
+                 "Age",   "s",                8.36,  8.94,     7.25,          8.6,
+  "Number of children",   "m",               1.814, 1.636,    2.279,        2.577,
+  "Number of children",   "s",                1.82,  1.92,     2.58,         1.13
+  ) |> 
+  pivot_longer(-c(Variable, stat), names_to = "dv") |> 
+  pivot_wider(names_from = stat) |> 
+  mutate(value = paste0(m, " (", s, ")")) |> 
+  select(-m, -s) |> 
+  pivot_wider(names_from = dv) |> 
+  mutate(Category = Variable)
+
+
+d_cateogry |>
+  add_row(d_continuous[1, ], .before = 1) |>
+  add_row(d_continuous[2, ] |> mutate(Variable = "Children"), .before = Inf) |> 
+  mutate(across(-c(Variable, Category), \(x) align_chr(x, center = " "))) |> 
+  rename(any_of(dv_levels)) |> 
+  rename(`Baseline characteristic` = Category) |> 
+  apa_flextable("Variable", row_title_border = NA, line_spacing = 1.35, left_column_padding = 15) |> 
+  align(j = 1) |> 
+  padding(j = 1, i = 1, padding.left = 3) |> 
+  pretty_widths(table_width = 9)
+  
+```
+
+
+# References

@@ -1,4 +1,5 @@
 
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # apa7
@@ -9,6 +10,8 @@
 status](https://www.r-pkg.org/badges/version/apa7)](https://CRAN.R-project.org/package=apa7)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![ggdiagram status
+badge](https://wjschne.r-universe.dev/apa7/badges/version)](https://wjschne.r-universe.dev/apa7)
 <!-- badges: end -->
 
 The goal of apa7 is to facilitate writing documents in APA Style (7th
@@ -16,12 +19,10 @@ Edition).
 
 ## Installation
 
-You can install the development version of apa7 from
-[GitHub](https://github.com/) with:
+You can install the development version of apa7 with:
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("wjschne/apa7")
+install.packages("apa7", repos = c('https://wjschne.r-universe.dev'))
 ```
 
 ## Tables
@@ -36,7 +37,8 @@ library(apa7)
 apa_cor(trees, star_significant = TRUE)
 ```
 
-<img src="man/figures/README-showcor-1.png" alt="A correlation matrix in APA style." width="100%" />
+<img src="man/figures/README-showcor-1.png" style="width:100.0%"
+data-fig-alt="A correlation matrix in APA style." />
 
 ``` r
 # Make regression model, format parameters, and display flextable
@@ -45,7 +47,8 @@ lm(Volume ~ Girth + Height, data = trees) |>
   apa_flextable()
 ```
 
-<img src="man/figures/README-showlm-1.png" alt="A regression table in APA style." width="100%" />
+<img src="man/figures/README-showlm-1.png" style="width:100.0%"
+data-fig-alt="A regression table in APA style." />
 
 ``` r
 # Contingency table with chi-square test of independence
@@ -57,7 +60,8 @@ d$Transmission <- factor(d$Transmission,
 apa_chisq(d)
 ```
 
-<img src="man/figures/README-showcontingence-1.png" alt="A contigency table with a chi-square test of independence e in APA style." width="100%" />
+<img src="man/figures/README-showcontingence-1.png" style="width:100.0%"
+data-fig-alt="A contigency table with a chi-square test of independence e in APA style." />
 
 ## Formatting functions
 

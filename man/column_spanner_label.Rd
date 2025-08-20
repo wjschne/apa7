@@ -13,7 +13,7 @@ column_spanner_label(data, label, ..., relocate = TRUE)
 
 \item{...}{columns (i.e., one or more tidyselect functions and/or a vector of quoted or unquoted variable names)}
 
-\item{relocate}{}
+\item{relocate}{relocate columns with same spanner label to be adjacent}
 }
 \value{
 data.frame or tibble

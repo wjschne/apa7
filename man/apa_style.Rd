@@ -2,8 +2,6 @@
 % Please edit documentation in R/tables.R
 \name{apa_style}
 \alias{apa_style}
-\alias{apa_style.gt_tbl}
-\alias{apa_style.flextable}
 \title{Style \code{flextable::flextable} object according to APA style}
 \usage{
 apa_style(
@@ -16,44 +14,7 @@ apa_style(
   line_spacing = 2,
   horizontal_padding = 3,
   table_align = "left",
-  layout = "autofit",
-  table_width = 0,
-  markdown = TRUE,
-  markdown_header = markdown,
-  markdown_body = markdown,
-  no_markdown_columns = NULL,
-  no_markdown_columns_header = no_markdown_columns,
-  separate_headers = TRUE
-)
-
-\method{apa_style}{gt_tbl}(
-  x,
-  font_family = NULL,
-  font_size = 12,
-  text_color = "black",
-  border_color = "black",
-  border_width = 0.5,
-  line_spacing = 2,
-  horizontal_padding = 3,
-  table_align = "left",
-  layout = "autofit",
-  table_width = 0,
-  markdown = TRUE,
-  markdown_header = markdown,
-  markdown_body = markdown,
-  separate_headers = TRUE
-)
-
-\method{apa_style}{flextable}(
-  x,
-  font_family = NULL,
-  font_size = 12,
-  text_color = "black",
-  border_color = "black",
-  border_width = 0.5,
-  line_spacing = 2,
-  horizontal_padding = 3,
-  table_align = "left",
+  header_align_vertical = c("top", "middle", "bottom"),
   layout = "autofit",
   table_width = 0,
   markdown = TRUE,
@@ -83,6 +44,8 @@ apa_style(
 
 \item{table_align}{table alignment ("left", "center", "right")}
 
+\item{header_align_vertical}{vertical alignment of headers. Can be "top", "middle", or "bottom"}
+
 \item{layout}{table layout ("autofit", "fixed")}
 
 \item{table_width}{table width (in pixels, 0 for auto)}
@@ -96,6 +59,8 @@ apa_style(
 \item{no_markdown_columns}{body columns that should not be treated as markdown}
 
 \item{no_markdown_columns_header}{column headers that should not be treated as markdown}
+
+\item{separate_headers}{separate headers into column spanner labels}
 }
 \value{
 object

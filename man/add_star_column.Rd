@@ -20,13 +20,15 @@ add_star_column(
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{...}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Select columns}
+\item{...}{Column name or tidyselect function. Select columns}
 
-\item{p}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Select p-value column name}
+\item{p}{Column name or tidyselect function. Select p-value column name}
 
 \item{merge}{merge and balance columns (default: \code{FALSE})}
 
 \item{superscript}{make as superscript}
+
+\item{star}{text for making stars}
 
 \item{alpha}{vector of thresholds}
 

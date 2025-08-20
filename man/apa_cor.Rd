@@ -61,6 +61,8 @@ apa_cor(
 
 \item{summary_functions}{A named list of functions that summarize data columns (e.g., mean, sd)}
 
+\item{column_formats}{column_formats object}
+
 \item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> parameters passed to psych::corTest}
 }
 \value{

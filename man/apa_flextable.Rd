@@ -15,6 +15,7 @@ apa_flextable(
   col_keys = colnames(data),
   cwidth = 0.75,
   cheight = 0.25,
+  header_align_vertical = c("top", "middle", "bottom"),
   separate_headers = TRUE,
   apa_style = TRUE,
   font_family = NULL,
@@ -31,7 +32,7 @@ apa_flextable(
   markdown_header = markdown,
   markdown_body = markdown,
   no_markdown_columns = NULL,
-  no_markdown_columns_header = no_markdown_columns,
+  no_markdown_columns_header = NULL,
   no_format_columns = NULL,
   auto_format_columns = TRUE,
   column_formats = NULL,
@@ -43,7 +44,7 @@ apa_flextable(
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{row_title_column}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> column to group rows}
+\item{row_title_column}{Column name or tidyselect function. column to group rows}
 
 \item{row_title_align}{alignment of row title ("left", "center", "right")}
 
@@ -60,6 +61,8 @@ apa_flextable(
 \item{cwidth}{initial cell width in inches}
 
 \item{cheight}{initial cell height in inches}
+
+\item{header_align_vertical}{vertical alignment of headers. Can be "top", "middle", or "bottom"}
 
 \item{separate_headers}{separate header rows (default: \code{TRUE})}
 
@@ -95,13 +98,15 @@ apa_flextable(
 
 \item{no_markdown_columns_header}{column headers that should not be treated as markdown}
 
-\item{no_format_columns}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> selected columns are not formatted}
+\item{no_format_columns}{Column name or tidyselect function. selected columns are not formatted}
 
 \item{auto_format_columns}{if true, will attempt to format some columns automatically}
 
 \item{column_formats}{a column_formats object}
 
 \item{pretty_widths}{apply \code{pretty_widths} function}
+
+\item{add_breaks_between_spanners}{add breaks between spanners if TRUE}
 
 \item{...}{arguments passed to \code{apa_style}}
 }

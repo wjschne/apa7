@@ -1,6 +1,6 @@
 Package: apa7
 Title: Write Documents in APA Style 7th Edition
-Version: 0.0.0.9002
+Version: 0.1.0
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
@@ -11,13 +11,11 @@ BugReports: https://github.com/wjschne/apa7/issues
 Depends: 
     R (>= 4.1.0)
 Imports:
-    cli,
     dplyr,
     effectsize,
     flextable,
     ftExtra,
     glue,
-    gt,
     parameters,
     performance,
     psych,
@@ -30,6 +28,7 @@ Imports:
     tibble,
     tidyr
 Suggests: 
+    cli,
     forcats,
     ggplot2,
     knitr,
@@ -38,7 +37,8 @@ Suggests:
     rmarkdown,
     snakecase,
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tidyselect
 VignetteBuilder: 
     knitr,
     quarto

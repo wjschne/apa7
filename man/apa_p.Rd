@@ -4,7 +4,14 @@
 \alias{apa_p}
 \title{p-value in APA format}
 \usage{
-apa_p(p, inline = FALSE, markdown = TRUE, min_digits = 2, max_digits = 3)
+apa_p(
+  p,
+  inline = FALSE,
+  markdown = TRUE,
+  min_digits = 2,
+  max_digits = 3,
+  align = FALSE
+)
 }
 \arguments{
 \item{p}{probability}
@@ -16,6 +23,8 @@ apa_p(p, inline = FALSE, markdown = TRUE, min_digits = 2, max_digits = 3)
 \item{min_digits}{minimum number of digits to round to. Default is 2.}
 
 \item{max_digits}{maximum number of digits to round to. Default is 3.}
+
+\item{align}{decimal alignment if \code{TRUE}}
 }
 \value{
 character vector

@@ -5,11 +5,9 @@ knitr:
     collapse: true
     comment: '#>'
     dev: "ragg_png"
-    cache: true
 format: 
   html:
     toc: true
-    html-math-method: katex
 vignette: >
   %\VignetteIndexEntry{apa7}
   %\VignetteEngine{quarto::html}
@@ -24,7 +22,7 @@ The apa7 package provides functions to create APA-style tables, including correl
 
 # Load Packages and Set Defaults
 
-```{r setup, include = FALSE, cache = FALSE}
+```{r setup, include = FALSE}
 library(apa7)
 library(flextable)
 library(ftExtra)
@@ -32,6 +30,7 @@ library(dplyr)
 library(tibble)
 library(tidyr)
 library(stringr)
+library(psych)
 set_flextable_defaults(theme_fun = theme_apa, 
                        font.family = "Times New Roman", 
                        text.align = "center", 
@@ -103,7 +102,7 @@ apa_flextable(d, row_title_column = Model)
 
 The row titles can be aligned to the left, center, or right.
 
-```{r}
+```{r centeralign}
 apa_flextable(d, 
               row_title_column = Model, 
               row_title_align = "center") 
@@ -111,7 +110,7 @@ apa_flextable(d,
 
 Without a row_title_column specified, the `Model` column can be vertically merged
 
-```{r}
+```{r vmerge}
 d |> 
   mutate(Model = str_remove(Model, "Model ")) |> 
 apa_flextable() |> 
@@ -475,10 +474,6 @@ d_star
 apa_flextable(d_star)
 ```
 
-## pivot_wider_name_first
-
-
-
 # APA format with full control
 
 Sometimes you want a table to be particular way, and no package can anticipate the exact structure and formatting required. With a combination of tidyverse,  flextable, and apa7 functions, it is possible to get flextable to output almost any kind of APA table you need.
@@ -623,7 +618,36 @@ ggplot2::diamonds |>
   theme(panel.grid.major.x = element_blank())
 ```
 
-## More to Follow...
+## Factor Analysis
+
+```{r fa}
+# Get variable names
+rename_items <- psych::bfi.dictionary |>
+  tibble::rownames_to_column("variable") |> 
+  mutate(Item = str_remove(Item, "\\.$")) |> 
+  select(Item, variable) |> 
+  deframe()
+
+# Make data
+d <- psych::bfi |> 
+  select(-gender:-age) |> 
+  rename(any_of(rename_items))
+
+# Analysis
+fit <- fa(d, nfactors = 5, fm = "pa", )
+
+
+# Make table
+fit |>
+  apa_loadings() |> 
+  rename(Extraversion = PA1,
+         Neuroticism = PA2,
+         Conscientiousness = PA3,
+         Openness = PA4,
+         Agreeableness = PA5) |> 
+  apa_flextable(no_format_columns = Variable) 
+```
+
 
 # Limitations
 

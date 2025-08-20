@@ -10,6 +10,7 @@
 #' @param format_integers If TRUE, integers will be formatted with digits
 #' @param side side on which to make text of equal width
 #' @param NA_value value to replace NA
+#' @param format_numeric_character format character variables with numeric content
 #' @param ... additional arguments passed to `signs::signs()`
 #'
 #' @return character vector
@@ -122,6 +123,7 @@ align_chr <- function(
 #' @param markdown By default, outputs text compatible with markdown if TRUE, otherwise prints plain text compatible with latex.
 #' @param min_digits minimum number of digits to round to. Default is 2.
 #' @param max_digits maximum number of digits to round to. Default is 3.
+#' @param align decimal alignment if `TRUE`
 #'
 #' @return character vector
 #' @export
@@ -149,7 +151,8 @@ apa_p <- function(p,
                   inline = FALSE,
                   markdown = TRUE,
                   min_digits = 2,
-                  max_digits = 3) {
+                  max_digits = 3,
+                  align = FALSE) {
   min_p <- 10 ^ (-max_digits)
   min_p_chr <- signs::signs(
     min_p,
@@ -218,6 +221,9 @@ apa_p <- function(p,
 
   pv <- paste0(ifelse(inline, prefix, ""), p_formatted)
   pv[is.na(p)] <- NA
+  if (align) {
+    pv <- align_chr(pv, format_numeric_character = FALSE)
+  }
   pv
 }
 
@@ -284,7 +290,18 @@ hanging_indent <- function(
     stringr::str_replace_all("\u2057", "\u2007")
 }
 
-#' @keywords internal
+
+#' Like `stringr::str_wrap`, but attempts to create lines of equal width
+#'
+#' @param x character
+#' @param max_width maximum line width
+#' @param sep separation character
+#'
+#' @return character
+#' @export
+#'
+#' @examples
+#' str_wrap_equal("This function attempts to split the string into lines with roughly equal width.")
 str_wrap_equal <- function(x, max_width = 30L, sep = "\n") {
   purrr::map_chr(x, \(xi) {
     # Find overall text length
@@ -300,7 +317,7 @@ str_wrap_equal <- function(x, max_width = 30L, sep = "\n") {
       # Optimal line length
       preferred_width <- xlen / k
       # Split text into words
-      words <- stringr::str_split(xi, pattern = " ", simplify = F)[[1]]
+      words <- stringr::str_split(xi, pattern = " ", simplify = FALSE)[[1]]
       # Number of words in text
       k_words <- length(words)
       # Length of each word in text
@@ -446,7 +463,7 @@ p2stars <- function(p,
   }
   pstars
 }
-# p2stars(.10, alpha = c(.10, .05, .01, .001), first_alpha_marginal = F)
+# p2stars(.10, alpha = c(.10, .05, .01, .001), first_alpha_marginal = FALSE)
 
 
 #' Surrounds text with tags unless empty
@@ -557,6 +574,7 @@ method(str, column_format) <- function(object, ...) {
 }
 
 #' @keywords internal
+#' @noRd
 variable_name_formatter <- function(x,
                                     pattern = NULL,
                                     replacement = NULL,
@@ -802,8 +820,8 @@ the$columns <- list(
     formatter = the$number_formatter),
   Cramers_v = column_format(
     name = "Cramers_v",
-    header = "Cramér's *V*",
-    latex = "Cramér's $V$",
+    header = "Cram\u00E9r's *V*",
+    latex = "Cram\u00E9r's $V$",
     formatter = the$trim_leading_zero
   ),
   cronbach = column_format(
@@ -1246,7 +1264,7 @@ apa7_defaults <- function(accuracy = NULL,
 #'
 #' @param data data set (data.frame or tibble)
 #' @param column_formats `column_formats` object. If NULL, the current default formatter set with [apa7_defaults()] will be used.
-#' @param no_format_columns <[`tidy-select`][tidyr_tidy_select]> selected columns are not formatted
+#' @param no_format_columns Column name or tidyselect function. selected columns are not formatted
 #' @param rename_headers if `TRUE`, rename headers with markdown or latex
 #' @param latex_headers if `TRUE`, rename headers with latex instead of markdown
 #' @param format_separated_headers if `TRUE`, format headers with separated names. For example, if the formatter formats column `R2` as `*R*^2^`, then `Model 1_R2` becomes `Model 1_*R*^2^`)
@@ -1270,7 +1288,7 @@ apa_format_columns <- function(data,
                                format_separated_headers = TRUE,
                                sep = "_",
                                accuracy = NULL) {
-  CI_low <- CI_high <- df_error <- name <- header <- column <- group <- value <- pattern_1 <- pattern_2 <- replace_1 <- replace_2 <- pattern <- type <- should_replace <- id <- replacer <- formatter <- NULL
+  CI_low <- CI_high <- df_error <- name <- header <- column <- group <- value <- pattern_1 <- pattern_2 <- replace_1 <- replace_2 <- pattern <- type <- should_replace <- id <- replacer <- formatter <- name1 <- NULL
 
   no_format_columns <- data |>
     dplyr::select({{ no_format_columns }}) |> colnames()
@@ -1292,22 +1310,22 @@ apa_format_columns <- function(data,
   data_names <- colnames(data)
   format_names <- names(cf)
 
-  if (any(str_detect(data_names, "t\\((\\d+)\\)$"))) {
-    t_df <- data_names[str_detect(data_names,
+  if (any(stringr::str_detect(data_names, "t\\((\\d+)\\)$"))) {
+    t_df <- data_names[stringr::str_detect(data_names,
                                   "t\\((\\d+)\\)$")]
 
     new_col <- column_format(
       t_df,
-      header = str_replace(t_df, "t", "*t*"),
-      latex = str_replace(t_df, "t", "$t$"),
+      header = stringr::str_replace(t_df, "t", "*t*"),
+      latex = stringr::str_replace(t_df, "t", "$t$"),
       formatter = cf[["t_df"]]@formatter
     )
 
     cf[[t_df]] <- new_col
   }
 
-  if (any(str_detect(data_names, "(\\d+)\\% CI$"))) {
-    pci <- data_names[str_detect(data_names,
+  if (any(stringr::str_detect(data_names, "(\\d+)\\% CI$"))) {
+    pci <- data_names[stringr::str_detect(data_names,
                                   "(\\d+)\\% CI$")]
 
     if (is.null(cf$CI_percent)) {
@@ -1437,7 +1455,7 @@ apa_format_columns <- function(data,
 
     if (nrow(d_names) > 0) {
       rcls <- d_names |>
-        dplyr::mutate(name1 = str_remove_all(name, c(`\\(` = "\\\\(", `\\)` = "\\\\)"))) |>
+        dplyr::mutate(name1 = stringr::str_remove_all(name, c(`\\(` = "\\\\(", `\\)` = "\\\\)"))) |>
         dplyr::mutate(pattern_1 = paste0("^", name1, "$"),
                       replace_1 = header,
                       pattern_2 = paste0("_",name1,"$"),
@@ -1520,7 +1538,7 @@ the$summary_functions <- list(
 #' @param data data.frame or tibble
 #' @param label character of column spanner
 #' @param ... columns (i.e., one or more tidyselect functions and/or a vector of quoted or unquoted variable names)
-#' @param relocate
+#' @param relocate relocate columns with same spanner label to be adjacent
 #'
 #' @return data.frame or tibble
 #' @export

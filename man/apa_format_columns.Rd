@@ -20,7 +20,7 @@ apa_format_columns(
 
 \item{column_formats}{\code{column_formats} object. If NULL, the current default formatter set with \code{\link[=apa7_defaults]{apa7_defaults()}} will be used.}
 
-\item{no_format_columns}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> selected columns are not formatted}
+\item{no_format_columns}{Column name or tidyselect function. selected columns are not formatted}
 
 \item{rename_headers}{if \code{TRUE}, rename headers with markdown or latex}
 

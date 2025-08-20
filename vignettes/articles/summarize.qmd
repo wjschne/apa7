@@ -22,7 +22,6 @@ vignette: >
 library(apa7)
 library(ftExtra)
 library(flextable)
-library(gt)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -100,27 +99,5 @@ d |>
   apa_flextable() |> 
   colformat_char(j = 3:4, prefix = "$") 
 
-```
-
-# gt
-
-The gt package is not really supported by the apa7 package, but I include this here because I did not want to delete my initial efforts. Getting gt to have APA style borders took me a long time to figure out because of the complex rules by which borders overwrite each other. The `apa_style` function saves me from having to figure it all out repeatedly when working with gt tables.
-
-```{r}
-#| label: tbl-gt
-#| tbl-cap: Price, Carat, Depth, Table Using gt
-gt(d) %>%
-  fmt_number(decimals = 2, columns = is.double) %>%
-  fmt_number(columns = is.integer, decimals = 0) %>%
-  fmt_currency(columns = contains("Price")) %>% 
-  tab_spanner_delim(delim = "_") %>%
-  cols_align(align = "center", columns = -1) %>%
-  cols_align(align = "left", columns = "Cut")  %>%
-  tab_style(cell_text(style = "italic"), 
-            locations = cells_column_labels(-Cut)) %>%
-  tab_style(cell_text(align = "right"), 
-            locations = cells_body(-Cut)) %>%
-  apa_style(horizontal_padding = 10) %>% 
-  tab_options(table.align = "left")
 ```
 

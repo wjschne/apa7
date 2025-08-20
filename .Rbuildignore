@@ -21,3 +21,6 @@ math-rendered-by-lua-filter.html
 ^Meta$
 ^cran-comments\.md$
 ^[.]?air[.]toml$
+^vignettes/_freeze$
+README.qmd
+^CODE_OF_CONDUCT\.md$

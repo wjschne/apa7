@@ -15,7 +15,7 @@ separate_star_column(
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{...}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Select columns}
+\item{...}{Column name or tidyselect function. Select columns}
 
 \item{superscript}{make stars superscript}
 
