@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">apa7</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +46,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_p</span><span class="op">(</span><span class="va">p</span>, inline <span class="op">=</span> <span class="cn">FALSE</span>, markdown <span class="op">=</span> <span class="cn">TRUE</span>, min_digits <span class="op">=</span> <span class="fl">2</span>, max_digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_p</span><span class="op">(</span></span>
+<span>  <span class="va">p</span>,</span>
+<span>  inline <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  markdown <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  min_digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  max_digits <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  align <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,6 +78,10 @@
 
 <dt id="arg-max-digits">max_digits<a class="anchor" aria-label="anchor" href="#arg-max-digits"></a></dt>
 <dd><p>maximum number of digits to round to. Default is 3.</p></dd>
+
+
+<dt id="arg-align">align<a class="anchor" aria-label="anchor" href="#arg-align"></a></dt>
+<dd><p>decimal alignment if <code>TRUE</code></p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">apa7</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,10 +64,9 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of apa7 from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the development version of apa7 with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"wjschne/apa7"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"apa7"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'https://wjschne.r-universe.dev'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="tables">Tables<a class="anchor" aria-label="anchor" href="#tables"></a>
@@ -77,13 +76,13 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wjschne/apa7" class="external-link">apa7</a></span><span class="op">)</span></span>
 <span><span class="co"># Correlation matrix </span></span>
 <span><span class="fu"><a href="reference/apa_cor.html">apa_cor</a></span><span class="op">(</span><span class="va">trees</span>, star_significant <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-showcor-1.png" alt="A correlation matrix in APA style." width="100%"></p>
+<p><img src="reference/figures/README-showcor-1.png" style="width:100.0%" data-fig-alt="A correlation matrix in APA style."></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Make regression model, format parameters, and display flextable</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Volume</span> <span class="op">~</span> <span class="va">Girth</span> <span class="op">+</span> <span class="va">Height</span>, data <span class="op">=</span> <span class="va">trees</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-showlm-1.png" alt="A regression table in APA style." width="100%"></p>
+<p><img src="reference/figures/README-showlm-1.png" style="width:100.0%" data-fig-alt="A regression table in APA style."></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Contingency table with chi-square test of independence</span></span>
 <span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">mtcars</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"am"</span>, <span class="st">"gear"</span><span class="op">)</span><span class="op">]</span></span>
@@ -92,7 +91,7 @@
 <span>                         levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
 <span>                         labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Automatic"</span>, <span class="st">"Manual"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-showcontingence-1.png" alt="A contigency table with a chi-square test of independence e in APA style." width="100%"></p>
+<p><img src="reference/figures/README-showcontingence-1.png" style="width:100.0%" data-fig-alt="A contigency table with a chi-square test of independence e in APA style."></p>
 </div>
 <div class="section level2">
 <h2 id="formatting-functions">Formatting functions<a class="anchor" aria-label="anchor" href="#formatting-functions"></a>
@@ -120,6 +119,13 @@
 </ul>
 </div>
 
+<div class="community">
+<h2 data-toc-skip>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
@@ -140,6 +146,7 @@
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=apa7" class="external-link"><img src="https://www.r-pkg.org/badges/version/apa7" alt="CRAN status"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://wjschne.r-universe.dev/apa7" class="external-link"><img src="https://wjschne.r-universe.dev/apa7/badges/version" alt="ggdiagram status badge"></a></li>
 </ul>
 </div>
 

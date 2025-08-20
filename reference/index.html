@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">apa7</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,9 +39,196 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="create-flextables">Create flextables<a class="anchor" aria-label="anchor" href="#create-flextables"></a></h2>
+
+      <div class="section-desc"><p>Convert objects to flextables</p></div>
 
 
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="apa_flextable.html">apa_flextable()</a></code>
+
+        </dt>
+        <dd>Convert data to flextable consistent with APA style</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_chisq.html">apa_chisq()</a></code>
+
+        </dt>
+        <dd>Make contingency table with chi-square test of independence</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_cor.html">apa_cor()</a></code>
+
+        </dt>
+        <dd>APA-formatted correlation table</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_loadings.html">apa_loadings()</a></code>
+
+        </dt>
+        <dd>print loadings</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_parameters.html">apa_parameters()</a></code>
+
+        </dt>
+        <dd>format model parameters in APA style</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_performance.html">apa_performance()</a></code>
+
+        </dt>
+        <dd>format model performance metrics in APA style</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_performance_comparison.html">apa_performance_comparison()</a></code>
+
+        </dt>
+        <dd>format model comparison metrics in APA style</dd>
+      </dl></div><div class="section level2">
+      <h2 id="style-flextables">Style flextables<a class="anchor" aria-label="anchor" href="#style-flextables"></a></h2>
+
+      <div class="section-desc"><p>Alter the look of a flextable previously created</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="apa_style.html">apa_style()</a></code>
+
+        </dt>
+        <dd>Style <code><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable::flextable</a></code> object according to APA style</dd>
+      </dl><dl><dt>
+
+          <code><a href="pretty_widths.html">pretty_widths()</a></code>
+
+        </dt>
+        <dd>Use flextable::dim_pretty to fit column widths</dd>
+      </dl></div><div class="section level2">
+      <h2 id="variable-formatters">Variable Formatters<a class="anchor" aria-label="anchor" href="#variable-formatters"></a></h2>
+
+      <div class="section-desc"><p>Alter vector variables</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="align_chr.html">align_chr()</a></code>
+
+        </dt>
+        <dd>Align text on center text (default is decimal)</dd>
+      </dl><dl><dt>
+
+          <code><a href="apa_p.html">apa_p()</a></code>
+
+        </dt>
+        <dd>p-value in APA format</dd>
+      </dl><dl><dt>
+
+          <code><a href="hanging_indent.html">hanging_indent()</a></code>
+
+        </dt>
+        <dd>Return markdown text with hanging indent</dd>
+      </dl><dl><dt>
+
+          <code><a href="num_pad.html">num_pad()</a></code>
+
+        </dt>
+        <dd>Pads text on the left or right so that the width is the same for each element of the vector</dd>
+      </dl><dl><dt>
+
+          <code><a href="p2stars.html">p2stars()</a></code>
+
+        </dt>
+        <dd>Convert p-values to stars</dd>
+      </dl><dl><dt>
+
+          <code><a href="star_balance.html">star_balance()</a></code>
+
+        </dt>
+        <dd>Prefix text with figure spaces to balance star text</dd>
+      </dl><dl><dt>
+
+          <code><a href="tagger.html">tagger()</a></code> <code><a href="tagger.html">bold_md()</a></code> <code><a href="tagger.html">italic_md()</a></code> <code><a href="tagger.html">superscript_md()</a></code> <code><a href="tagger.html">subscript_md()</a></code> <code><a href="tagger.html">header_md()</a></code>
+
+        </dt>
+        <dd>Surrounds text with tags unless empty</dd>
+      </dl></div><div class="section level2">
+      <h2 id="automatic-formatting">Automatic formatting<a class="anchor" aria-label="anchor" href="#automatic-formatting"></a></h2>
+
+      <div class="section-desc"><p>Customize how column_headers and data are formatted by apa_style<code>and</code>apa_flextable`</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="apa7_defaults.html">apa7_defaults()</a></code>
+
+        </dt>
+        <dd>Set defaults for apa7 package</dd>
+      </dl><dl><dt>
+
+          <code><a href="column_format.html">column_format()</a></code>
+
+        </dt>
+        <dd>Column format class</dd>
+      </dl><dl><dt>
+
+          <code><a href="column_formats.html">column_formats()</a></code>
+
+        </dt>
+        <dd>Create a set of column formats</dd>
+      </dl></div><div class="section level2">
+      <h2 id="alter-data-frame">Alter data.frame<a class="anchor" aria-label="anchor" href="#alter-data-frame"></a></h2>
+
+      <div class="section-desc"><p>Change data.frames</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="apa_format_columns.html">apa_format_columns()</a></code>
+
+        </dt>
+        <dd>Format data columns</dd>
+      </dl><dl><dt>
+
+          <code><a href="column_spanner_label.html">column_spanner_label()</a></code>
+
+        </dt>
+        <dd>Prepend column spanner labels to data column labels</dd>
+      </dl><dl><dt>
+
+          <code><a href="pivot_wider_name_first.html">pivot_wider_name_first()</a></code>
+
+        </dt>
+        <dd>A wrapper for tidyr::pivot_wider that creates columns names as <code>name_variable</code> instead of <code>variable_name</code></dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="create-special-columns">Create Special Columns<a class="anchor" aria-label="anchor" href="#create-special-columns"></a></h3>
+      <div class="section-desc"><p>Adding specialized columns that are formatted differently by <code>apa_style</code> and <code>apa_flextable</code></p></div>
 
 
     </div><div class="section level2">
@@ -69,100 +256,27 @@
         <dd>Adds stars next to a column based on p-values</dd>
       </dl><dl><dt>
 
-          <code><a href="align_chr.html">align_chr()</a></code>
+          <code><a href="separate_star_column.html">separate_star_column()</a></code>
 
         </dt>
-        <dd>Align text on center text (default is decimal)</dd>
-      </dl><dl><dt>
+        <dd>Add columns that separate significance stars from numbers</dd>
+      </dl></div><div class="section level2">
+      <h2 id="misc">Misc<a class="anchor" aria-label="anchor" href="#misc"></a></h2>
 
-          <code><a href="apa7_defaults.html">apa7_defaults()</a></code>
+      <div class="section-desc"><p>Other Functions</p></div>
 
-        </dt>
-        <dd>Set defaults for apa7 package</dd>
-      </dl><dl><dt>
 
-          <code><a href="apa_chisq.html">apa_chisq()</a></code>
+    </div><div class="section level2">
 
-        </dt>
-        <dd>Make contingency table with chi-square test of independence</dd>
-      </dl><dl><dt>
 
-          <code><a href="apa_cor.html">apa_cor()</a></code>
 
-        </dt>
-        <dd>APA-formatted correlation table</dd>
-      </dl><dl><dt>
 
-          <code><a href="apa_flextable.html">apa_flextable()</a></code>
-
-        </dt>
-        <dd>Make flextable with merged row titles according to selected column</dd>
-      </dl><dl><dt>
-
-          <code><a href="apa_format_columns.html">apa_format_columns()</a></code>
-
-        </dt>
-        <dd>Format data columns</dd>
-      </dl><dl><dt>
-
-          <code><a href="apa_p.html">apa_p()</a></code>
-
-        </dt>
-        <dd>p-value in APA format</dd>
-      </dl><dl><dt>
+      <dl><dt>
 
           <code><a href="apa_p_star_note.html">apa_p_star_note()</a></code>
 
         </dt>
         <dd>Make star notes for p-values</dd>
-      </dl><dl><dt>
-
-          <code><a href="apa_parameters.html">apa_parameters()</a></code>
-
-        </dt>
-        <dd>format model parameters in APA style</dd>
-      </dl><dl><dt>
-
-          <code><a href="apa_performance.html">apa_performance()</a></code>
-
-        </dt>
-        <dd>format model performance metrics in APA style</dd>
-      </dl><dl><dt>
-
-          <code><a href="apa_performance_comparison.html">apa_performance_comparison()</a></code>
-
-        </dt>
-        <dd>format model comparison metrics in APA style</dd>
-      </dl><dl><dt>
-
-          <code><a href="apa_style.html">apa_style()</a></code>
-
-        </dt>
-        <dd>Style object with APA style</dd>
-      </dl><dl><dt>
-
-          <code><a href="column_format.html">column_format()</a></code>
-
-        </dt>
-        <dd>Column format class</dd>
-      </dl><dl><dt>
-
-          <code><a href="column_formats.html">column_formats()</a></code>
-
-        </dt>
-        <dd>Create a set of column formats</dd>
-      </dl><dl><dt>
-
-          <code><a href="column_spanner_label.html">column_spanner_label()</a></code>
-
-        </dt>
-        <dd>Prepend column spanner labels to data column labels</dd>
-      </dl><dl><dt>
-
-          <code><a href="hanging_indent.html">hanging_indent()</a></code>
-
-        </dt>
-        <dd>Return markdown text with hanging indent</dd>
       </dl><dl><dt>
 
           <code><a href="is_numeric_like.html">is_numeric_like()</a></code>
@@ -171,48 +285,13 @@
         <dd>Tests if a character vector contains numeric-like values</dd>
       </dl><dl><dt>
 
-          <code><a href="num_pad.html">num_pad()</a></code>
+          <code><a href="str_wrap_equal.html">str_wrap_equal()</a></code>
 
         </dt>
-        <dd>Pads text on the left or right so that the width is the same for each element of the vector</dd>
-      </dl><dl><dt>
-
-          <code><a href="p2stars.html">p2stars()</a></code>
-
-        </dt>
-        <dd>Convert p-values to stars</dd>
-      </dl><dl><dt>
-
-          <code><a href="pivot_wider_name_first.html">pivot_wider_name_first()</a></code>
-
-        </dt>
-        <dd>A wrapper for tidyr::pivot_wider that creates columns names as <code>name_value</code> instead of <code>value_name</code></dd>
-      </dl><dl><dt>
-
-          <code><a href="pretty_widths.html">pretty_widths()</a></code>
-
-        </dt>
-        <dd>Use flextable::dim_pretty to fit column widths</dd>
-      </dl><dl><dt>
-
-          <code><a href="separate_star_column.html">separate_star_column()</a></code>
-
-        </dt>
-        <dd>Add columns that separate significance stars from numbers</dd>
-      </dl><dl><dt>
-
-          <code><a href="star_balance.html">star_balance()</a></code>
-
-        </dt>
-        <dd>Prefix text with figure spaces to balance star text</dd>
-      </dl><dl><dt>
-
-          <code><a href="tagger.html">tagger()</a></code> <code><a href="tagger.html">bold_md()</a></code> <code><a href="tagger.html">italic_md()</a></code> <code><a href="tagger.html">superscript_md()</a></code> <code><a href="tagger.html">subscript_md()</a></code> <code><a href="tagger.html">header_md()</a></code>
-
-        </dt>
-        <dd>Surrounds text with tags unless empty</dd>
+        <dd>Like <code><a href="https://stringr.tidyverse.org/reference/str_wrap.html" class="external-link">stringr::str_wrap</a></code>, but attempts to create lines of equal width</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
