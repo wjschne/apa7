@@ -24,3 +24,4 @@ math-rendered-by-lua-filter.html
 ^vignettes/_freeze$
 README.qmd
 ^CODE_OF_CONDUCT\.md$
+^CRAN-SUBMISSION$

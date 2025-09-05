@@ -4,9 +4,9 @@
 \name{apa7-package}
 \alias{apa7}
 \alias{apa7-package}
-\title{apa7: Write Documents in APA Style 7th Edition}
+\title{apa7: Facilitate Writing Documents in American Psychological Association Style, Seventh Edition}
 \description{
-Functions to create APA Style 7th Edition documents.
+Create American Psychological Association Style, Seventh Edition documents. Format numbers and text consistent with APA style. Create tables that comply with APA style by extending flextable functions.
 }
 \seealso{
 Useful links:

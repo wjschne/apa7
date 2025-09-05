@@ -1,10 +1,14 @@
 Package: apa7
-Title: Write Documents in APA Style 7th Edition
+Title: Facilitate Writing Documents in American Psychological Association
+    Style, Seventh Edition
 Version: 0.1.0
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8393-5316"))
-Description: Functions to create APA Style 7th Edition documents.
+Description: Create American Psychological Association Style, Seventh
+    Edition documents. Format numbers and text consistent with APA style.
+    Create tables that comply with APA style by extending flextable
+    functions.
 License: CC0
 URL: https://github.com/wjschne/apa7, https://wjschne.github.io/apa7/
 BugReports: https://github.com/wjschne/apa7/issues
@@ -23,22 +27,32 @@ Imports:
     rlang,
     S7,
     scales,
+    shiny,
     signs,
     stringr,
     tibble,
     tidyr
 Suggests: 
+    bsicons,
+    bslib,
     cli,
+    conflicted,
     forcats,
     ggplot2,
     knitr,
     quarto,
     R.utils,
+    rclipboard,
+    readr,
     rmarkdown,
+    shinyWidgets,
     snakecase,
     spelling,
     testthat (>= 3.0.0),
-    tidyselect
+    tidyselect,
+    tippy,
+    toastui,
+    yaml
 VignetteBuilder: 
     knitr,
     quarto

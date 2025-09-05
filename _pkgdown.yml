@@ -47,6 +47,11 @@ reference:
       - add_list_column
       - add_star_column
       - separate_star_column
+  - title: Quarto
+    desc: Functions for creating apaquarto documents
+    contents:
+      - install_apaquarto
+      - make_apaquarto
   - title: Misc
     desc: Other Functions
     contents:

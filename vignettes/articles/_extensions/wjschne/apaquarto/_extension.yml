@@ -1,6 +1,6 @@
 title: My Document in APA Style, Seventh Edition
 author: W. Joel Schneider
-version: 5.0.1
+version: 5.0.11
 quarto-required: ">=1.4.549"
 contributes:
   formats:
@@ -16,6 +16,7 @@ contributes:
       toc: false
       fig-width: 6.5
       fig-height: 6.5
+      number-depth: 3
       crossref:
         subref-labels: alpha A
       suppress-title-page: false
@@ -54,7 +55,8 @@ contributes:
         title-block-correspondence-note: "Correspondence concerning this article should be addressed to"
         title-block-role-introduction: "Author roles were classified using the Contributor Role Taxonomy (CRediT; https://credit.niso.org/) as follows:"
         title-impact-statement: "Impact Statement"
-        references-meta-analysis: "Las referencias marcadas con un asterisco indican estudios incluidos en el metanálisis."
+        title-word-count: "Word Count"
+        references-meta-analysis: "References marked with an asterisk indicate studies included in the meta-analysis."
       filters:
         # Sets language defaults other than English
         - at: pre-ast
@@ -68,9 +70,9 @@ contributes:
         # Move figures and tables to end of document
         - at: pre-ast
           path: apafloatstoend.lua
-        # Give error message to early versions of apaquarto
-        - at: pre-ast
-          path: apafgtb.lua
+        # # Give error message to early versions of apaquarto
+        # - at: pre-ast
+        #   path: apafgtb.lua
         # Set latex document mode
         - at: pre-ast
           path: journalmode.lua
@@ -86,42 +88,61 @@ contributes:
         # Add a refs div if it was omitted.
         - at: pre-ast
           path: apaomitrefsdiv.lua
+        # Finds citations to be masked and converts them to masked citations
         - at: post-ast
           path: apamasked.lua
+        # Ensures that images have two-column attribute, when needed
         - at: post-ast
           path: apatwocolumnlatex.lua
+        # Formats headers properly
         - at: pre-quarto
           path: apaheader.lua
+        # Formats title and authors
         - at: pre-quarto
           path: apastriptitle.lua
+        # Word count
         - at: pre-quarto
           path: wordcount.lua
+        # Formats title page, abstract (all except latex)
         - at: pre-quarto
           path: frontmatter.lua
+        # Formats multi-paragraph quotes
         - at: pre-quarto
           path: apaquote.lua
+        # Indentation for latex, allow for no indenting command
         - at: pre-quarto
           path: latexnoindent.lua
+        # Inserts appendix prefixes to tables and figures
         - at: pre-quarto
           path: apafigtblappendix.lua
+        # Process tables and figures in latex
         - at: post-quarto
           path: apafloatlatex.lua
+        # Tell latex if there is one author and/or one affiliation
         - at: post-quarto
           path: apaoneauthoraffiliation.lua
+        # Removes surrounding table environment for docx figures and tables
         - at: post-render
           path: apaextractfigure.lua
+        # Formats notes below figures and tables (docx, html, typst)
         - at: post-render
           path: apanote.lua
+        # Adds styles to figures and tables 
         - at: post-render
           path: apafloat.lua
+        # Formats captions for figures and tables 
         - at: post-render
           path: apacaption.lua
+        # Puts proper spacing for paragraphs after figures and tables
         - at: post-render
           path: apaafternote.lua
+        # Process citations, adds asterisks for meta-analysis citations
         - at: post-render
           path: citeprocr.lua
+        # Process APA in-text citations (ampersand to and, possessive citation)
         - at: post-render
           path: apaandcite.lua
+        # Process appendices in latex
         - at: post-render
           path: apaappendixlatex.lua
     native: default
@@ -160,8 +181,10 @@ contributes:
     docx: 
       reference-doc: apaquarto.docx
       filters: 
+        # Add custom styles to docx
         - at: post-quarto
           path: docxstyler.lua
+        # Add line numbers and format Latex symbol
         - at: post-render
           path: docxlinenumber.lua
       knitr: 
@@ -169,6 +192,7 @@ contributes:
           dev: ragg_png
     typst:
       filters: 
+        # Process typst-specific styles
         - at: post-quarto
           path: typst/formattypst.lua
       template-partials:

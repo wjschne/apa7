@@ -42,6 +42,12 @@ $endif$
 $if(duedate)$
 \duedate{$duedate$}
 $endif$
+$if(journalmode)$
+$else$
+$if(note)$
+\note{$note$}
+$endif$
+$endif$
 
 $if(copyrightnotice)$
 \ccoppy{\textcopyright~$copyrightnotice$}
