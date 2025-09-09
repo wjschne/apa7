@@ -59,7 +59,7 @@ apa_cor(
 
 \item{keep_empty_star_columns}{Keep remove empty star columns (Default: \code{TRUE})}
 
-\item{summary_functions}{A named list of functions that summarize data columns (e.g., mean, sd)}
+\item{summary_functions}{Any named list of functions that summarize data columns (e.g., \code{list(Mean = mean, SD = sd)}). Can also be a character vector of function names (e.g., \code{c("n", "M", "SD")}). Functions available in a character vector: IQR, Interquartile Range, Kurtosis, MAD, Median Absolute Deviation, M, Mean, Med, Median, n, N, Quantile, Range, SD, Skewness, Var, Variance}
 
 \item{column_formats}{column_formats object}
 
@@ -72,6 +72,8 @@ flextable::flextable
 APA-formatted correlation table
 }
 \examples{
-apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "flextable")
-apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "tibble")
+apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
+apa_cor(mtcars[, c("mpg", "am", "gear", "carb")],
+        output = "tibble",
+        star_significant = FALSE)
 }

@@ -1,3 +1,9 @@
+# apa7 0.1.1 _2025-09-07_
+
+* Fix `align_chr` so that setting `format_numeric_character = FALSE` works. 
+* `list_column` gains a `unite` parameter that joins list and text columns. 
+* `add_star_column` no longer add stars if the column value is missing.
+
 # apa7 0.1.0 _2025-08-19_
 
 * Initial Cran Release

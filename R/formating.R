@@ -48,7 +48,7 @@ align_chr <- function(
 
   side <- match.arg(side, c("both", "left", "right"))
 
-  if (is.character(xx)) {
+  if (is.character(xx) && format_numeric_character) {
     if (all(grepl("^[-0-9.]+$", xx))) xx <- as.numeric(xx)
   }
 
@@ -642,7 +642,8 @@ the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
       x,
       markdown = TRUE,
       min_digits = min_digits,
-      max_digits = max_digits, ...))
+      max_digits = max_digits, ...),
+    format_numeric_character = FALSE)
 }
 
 the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) {

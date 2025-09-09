@@ -4,7 +4,13 @@
 \alias{add_list_column}
 \title{Make a column into a list column}
 \usage{
-add_list_column(data, ..., type = c("1", "a", "A", "I", "i"), sep = ". ")
+add_list_column(
+  data,
+  ...,
+  type = c("1", "a", "A", "I", "i"),
+  sep = ". ",
+  merge = FALSE
+)
 }
 \arguments{
 \item{data}{data.frame or tibble}
@@ -14,6 +20,8 @@ add_list_column(data, ..., type = c("1", "a", "A", "I", "i"), sep = ". ")
 \item{type}{list type. Can be "1" (numeric), "a" (lowercase alphabetical), or "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I" (uppercase Roman numerals)}
 
 \item{sep}{separator}
+
+\item{merge}{If \code{TRUE}, list columns will be united with their respective text columns.}
 }
 \value{
 data.frame
@@ -24,9 +32,12 @@ Make a column into a list column
 \examples{
 d <- data.frame(x = letters[1:5], y = letters[2:6])
 # default is first column
-add_list_column(d)
+add_list_column(d) |>
+  apa_flextable()
 # select any column
-add_list_column(d, y)
+add_list_column(d, y) |>
+  apa_flextable()
 add_list_column(d, type = "a", sep = ") ") |>
  apa_flextable()
+add_list_column(d, merge = TRUE)
 }

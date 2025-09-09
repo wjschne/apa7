@@ -72,6 +72,7 @@ add_break_columns <- function(d,
 #' @param ... Column name or tidyselect function. Select columns. Default is first column
 #' @param type list type. Can be "1" (numeric), "a" (lowercase alphabetical), or "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I" (uppercase Roman numerals)
 #' @param sep separator
+#' @param merge If `TRUE`, list columns will be united with their respective text columns.
 #'
 #' @return data.frame
 #' @export
@@ -79,12 +80,15 @@ add_break_columns <- function(d,
 #' @examples
 #' d <- data.frame(x = letters[1:5], y = letters[2:6])
 #' # default is first column
-#' add_list_column(d)
+#' add_list_column(d) |>
+#'   apa_flextable()
 #' # select any column
-#' add_list_column(d, y)
+#' add_list_column(d, y) |>
+#'   apa_flextable()
 #' add_list_column(d, type = "a", sep = ") ") |>
 #'  apa_flextable()
-add_list_column <- function(data, ..., type = c("1", "a", "A", "I", "i"), sep = ".\u00A0") {
+#' add_list_column(d, merge = TRUE)
+add_list_column <- function(data, ..., type = c("1", "a", "A", "I", "i"), sep = ".\u00A0", merge = FALSE) {
   type <- match.arg(type)
   # l <- rlang::list2(...)
   nn <- colnames(dplyr::select(data, ...))
@@ -106,8 +110,13 @@ add_list_column <- function(data, ..., type = c("1", "a", "A", "I", "i"), sep = 
 
   for (n in nn) {
     vn <- paste0(n, "apa7listcolumn")
-    data[vn] <- vl
-    data <- dplyr::relocate(data, vn, .before = n)
+    if (merge) {
+      data[n] <- paste0(vl, data[[n]])
+    } else {
+      data[vn] <- vl
+      data <- dplyr::relocate(data, vn, .before = n)
+    }
+
   }
   data
 }
@@ -174,7 +183,13 @@ add_star_column <- function(
   keys <- R.utils::insert(colnames(data),
                           ats = where_numbers + 1,
                           values = star_names)
-  data[,star_names] <- p2stars(data[[p_names]], first_alpha_marginal = first_alpha_marginal, superscript = superscript, alpha = alpha, add_trailing_space = add_trailing_space, prefix = prefix)
+  p_stars <- p2stars(data[[p_names]], first_alpha_marginal = first_alpha_marginal, superscript = superscript, alpha = alpha, add_trailing_space = add_trailing_space, prefix = prefix)
+
+  for (wn in where_names) {
+    sn <- paste0(wn, "apa7starcolumn")
+    data[,sn] <- ifelse(data[[wn]] == "" | is.na(data[[wn]]), "", p_stars)
+  }
+
   data <- data[,keys]
 
   if (merge) {
@@ -409,7 +424,7 @@ dd |>
 #' @param star_significant start significant correlations
 #' @param significance_note If TRUE, place note at bottom of table that significant correlations are bolded.
 #' @param output output type. Can be "flextable" or "tibble"
-#' @param summary_functions A named list of functions that summarize data columns (e.g., mean, sd)
+#' @param summary_functions Any named list of functions that summarize data columns (e.g., `list(Mean = mean, SD = sd)`). Can also be a character vector of function names (e.g., `c("n", "M", "SD")`). Functions available in a character vector: IQR, Interquartile Range, Kurtosis, MAD, Median Absolute Deviation, M, Mean, Med, Median, n, N, Quantile, Range, SD, Skewness, Var, Variance
 #' @param keep_empty_star_columns Keep remove empty star columns (Default: `TRUE`)
 #' @param column_formats column_formats object
 #' @inheritParams apa_style
@@ -420,8 +435,10 @@ dd |>
 #' @export
 #'
 #' @examples
-#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "flextable")
-#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], output = "tibble")
+#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
+#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")],
+#'         output = "tibble",
+#'         star_significant = FALSE)
 apa_cor <- function(data,
                     note = NULL,
                     p_value = c(.05, .01, .001),

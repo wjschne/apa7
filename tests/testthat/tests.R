@@ -143,6 +143,9 @@ test_that("align_chr", {
 
   align_chr(c(".1", ".12^\\*\\*^")) |> align_chr()
 
+  expect_equal(align_chr(apa_p(posnum, min_digits = 3),
+                         format_numeric_character = FALSE), c(".010", ".511"))
+
 
 })
 
