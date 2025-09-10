@@ -9,7 +9,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/apa7)](https://CRAN.R-project.org/package=apa7)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![ggdiagram status
 badge](https://wjschne.r-universe.dev/apa7/badges/version)](https://wjschne.r-universe.dev/apa7)
 <!-- badges: end -->
