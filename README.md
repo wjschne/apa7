@@ -22,7 +22,7 @@ Edition).
 To install the published version from CRAN:
 
 ``` r
-install.packages("ggdiagram")
+install.packages("apa7")
 ```
 
 You can install the development version of apa7 with:

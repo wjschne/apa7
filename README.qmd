@@ -33,7 +33,7 @@ To install the published version from CRAN:
 
 ```{r}
 #| eval: false
-install.packages("ggdiagram")
+install.packages("apa7")
 ```
 
 
