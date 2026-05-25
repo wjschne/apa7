@@ -1,3 +1,8 @@
+# apa7 0.1.2 _2025-05-25_
+
+* Used AI (Claude) and old-fashioned effort to generate a more complete set of unit tests, fix minor bugs, and make documentation more consistent.
+* User prompted to install any missing packages when running the `make_apaquarto` shiny app locally.
+
 # apa7 0.1.1 _2025-09-07_
 
 * Fix `align_chr` so that setting `format_numeric_character = FALSE` works. 

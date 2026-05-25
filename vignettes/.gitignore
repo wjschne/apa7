@@ -4,3 +4,5 @@
 *_cache
 _freeze
 /.quarto/
+
+**/*.quarto_ipynb

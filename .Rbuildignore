@@ -25,3 +25,5 @@ math-rendered-by-lua-filter.html
 README.qmd
 ^CODE_OF_CONDUCT\.md$
 ^CRAN-SUBMISSION$
+^\.positai$
+^\.claude$

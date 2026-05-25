@@ -19,25 +19,24 @@
 #' @examples
 #' align_chr(c(1, 10, 100))
 align_chr <- function(
-    x,
-    accuracy = NULL,
-    trim_leading_zeros = FALSE,
-    drop0trailing = FALSE,
-    add_plusses = FALSE,
-    padding_character = NULL, # figure space
-    center = ".",
-    format_integers = FALSE,
-    side = c("both", "left", "right"),
-    NA_value = "",
-    format_numeric_character = FALSE,
-    ...) {
-
+  x,
+  accuracy = NULL,
+  trim_leading_zeros = FALSE,
+  drop0trailing = FALSE,
+  add_plusses = FALSE,
+  padding_character = NULL, # figure space
+  center = ".",
+  format_integers = FALSE,
+  side = c("both", "left", "right"),
+  NA_value = "",
+  format_numeric_character = FALSE,
+  ...
+) {
   if (is.null(padding_character)) {
     padding_character <- "\u2007"
   }
   center1 <- center
   if (center1 == ".") center1 <- "\\."
-
 
   if (is.null(accuracy)) accuracy <- the$accuracy
   xx <- x
@@ -49,17 +48,23 @@ align_chr <- function(
   side <- match.arg(side, c("both", "left", "right"))
 
   if (is.character(xx) && format_numeric_character) {
-    if (all(grepl("^[-0-9.]+$", xx))) xx <- as.numeric(xx)
+    if (all(grepl("^[-0-9.]+$", xx))) {
+      xx <- as.numeric(xx)
+    }
   }
 
-  if ((rlang::is_integerish(x) || rlang::is_integerish(xx)) && !format_integers) {
-    xx  <- num_pad(signs::signs(
-      xx, add_plusses = add_plusses,
-      big.mark = ","),
-      padding_character = padding_character)
-
+  if (
+    (rlang::is_integerish(x) || rlang::is_integerish(xx)) && !format_integers
+  ) {
+    xx <- num_pad(
+      signs::signs(
+        xx,
+        add_plusses = add_plusses,
+        big.mark = ","
+      ),
+      padding_character = padding_character
+    )
   } else {
-
     if (is.numeric(xx)) {
       xx <- signs::signs(
         xx,
@@ -68,8 +73,8 @@ align_chr <- function(
         big.mark = ",",
         trim_leading_zeros = trim_leading_zeros,
         drop0trailing = drop0trailing,
-        ...)
-
+        ...
+      )
     }
 
     # Make split on only on the first instance of center
@@ -79,39 +84,41 @@ align_chr <- function(
     left_x <- stringr::str_split_i(
       xx,
       pattern = splitter,
-      i = 1)
+      i = 1
+    )
 
     right_x <- stringr::str_split_i(
       xx,
       pattern = splitter,
-      i = 2)
+      i = 2
+    )
 
     if (side != "right") {
-      left_x <- num_pad(left_x,
-                        padding_character = padding_character,
-                        NA_value = "")
+      left_x <- num_pad(
+        left_x,
+        padding_character = padding_character,
+        NA_value = ""
+      )
     }
 
     if (side != "left") {
-      right_x <- num_pad(right_x,
-                         pad_left = FALSE,
-                         padding_character = padding_character,
-                         NA_value = "")
+      right_x <- num_pad(
+        right_x,
+        pad_left = FALSE,
+        padding_character = padding_character,
+        NA_value = ""
+      )
     }
 
-    middle <- paste0(center,
-                     rep("", length(xx)))
+    middle <- paste0(center, rep("", length(xx)))
 
     middle[!stringr::str_detect(xx, splitter)] <- ""
 
     middle[is.na(xx)] <- ""
 
-    xx <- paste0(left_x,
-                 middle,
-                 right_x)
+    xx <- paste0(left_x, middle, right_x)
   }
   xx[is.na(x) | nchar(x) == 0 | x == ""] <- NA_value
-
 
   xx
 }
@@ -119,7 +126,7 @@ align_chr <- function(
 #' p-value in APA format
 #'
 #' @param p probability
-#' @param inline If TRUE (default), returns statistic (e.g.,e p = .04), otherwise just the number (e.g., .04)
+#' @param inline If TRUE (default), returns statistic (e.g., p = .04), otherwise just the number (e.g., .04)
 #' @param markdown By default, outputs text compatible with markdown if TRUE, otherwise prints plain text compatible with latex.
 #' @param min_digits minimum number of digits to round to. Default is 2.
 #' @param max_digits maximum number of digits to round to. Default is 3.
@@ -147,23 +154,26 @@ align_chr <- function(
 #' apa_p(.991, min_digits = 3)
 #' apa_p(.9991, min_digits = 3)
 #' apa_p(.9995, min_digits = 3)
-apa_p <- function(p,
-                  inline = FALSE,
-                  markdown = TRUE,
-                  min_digits = 2,
-                  max_digits = 3,
-                  align = FALSE) {
-  min_p <- 10 ^ (-max_digits)
+apa_p <- function(
+  p,
+  inline = FALSE,
+  markdown = TRUE,
+  min_digits = 2,
+  max_digits = 3,
+  align = FALSE
+) {
+  min_p <- 10^(-max_digits)
   min_p_chr <- signs::signs(
     min_p,
     trim_leading_zeros = TRUE,
-    accuracy = min_p)
+    accuracy = min_p
+  )
 
   if (is.character(p)) {
     p <- stringr::str_trim(p)
     less_than <- stringr::str_detect(p, "<")
     p <- stringr::str_remove(p, "^<") |> as.numeric()
-    p[less_than] <- 10 ^ (-max_digits - 1)
+    p[less_than] <- 10^(-max_digits - 1)
   }
 
   if (inline) {
@@ -180,22 +190,22 @@ apa_p <- function(p,
     }
   }
 
-  max_p <- 10 ^ (-min_digits)
-  max_p_chr <- signs::signs(1 - max_p,
-                            trim_leading_zeros = TRUE,
-                            accuracy = max_p)
+  max_p <- 10^(-min_digits)
+  max_p_chr <- signs::signs(
+    1 - max_p,
+    trim_leading_zeros = TRUE,
+    accuracy = max_p
+  )
   p_threshold <- max_p - max_p * .05
   max_p_threshold <- 1 - max_p * .5
 
   digit <- ifelse(p < p_threshold, max_digits, min_digits)
   p_formatted <- purrr::map2_chr(p, digit, function(pp, dd) {
     if (is.na(pp)) return(NA)
-    formatC(round(pp, dd + 1), digits = dd, format = "f")}
-    )
+    formatC(round(pp, dd + 1), digits = dd, format = "f")
+  })
 
-  p_formatted <- sub(x = p_formatted ,
-                     pattern = "^0\\.",
-                     replacement = ".")
+  p_formatted <- sub(x = p_formatted, pattern = "^0\\.", replacement = ".")
 
   gt_symbol <- ifelse(markdown, "\\>", ">")
   p_symbol <- ifelse(markdown, "*p*", "p")
@@ -203,14 +213,11 @@ apa_p <- function(p,
   operator <- ifelse(
     p < min_p,
     "<",
-    ifelse(p >= max_p_threshold,
-           gt_symbol,
-           "="))
+    ifelse(p >= max_p_threshold, gt_symbol, "=")
+  )
   sep <- ifelse(markdown, "\u00A0", " ")
 
-
-
-  prefix <- paste0(p_symbol, sep,operator, sep)
+  prefix <- paste0(p_symbol, sep, operator, sep)
   if (inline) {
     p_formatted[p < min_p] <- min_p_chr
     p_formatted[p >= max_p_threshold] <- max_p_chr
@@ -227,7 +234,6 @@ apa_p <- function(p,
   pv
 }
 
-
 #' Make star notes for p-values
 #'
 #' @param x vector of alpha values (p-value thresholds)
@@ -239,13 +245,25 @@ apa_p <- function(p,
 #' @examples
 #' apa_p_star_note()
 #' apa_p_star_note(x = c(.10, .05, .01, .001), first_alpha_marginal = TRUE)
-apa_p_star_note <- function(x = c(.05, .01, .001), first_alpha_marginal = FALSE) {
+apa_p_star_note <- function(
+  x = c(.05, .01, .001),
+  first_alpha_marginal = FALSE
+) {
   paste0(
-    p2stars(x, alpha = x, superscript = TRUE, first_alpha_marginal = first_alpha_marginal, add_trailing_space = TRUE),
+    p2stars(
+      x,
+      alpha = x,
+      superscript = TRUE,
+      first_alpha_marginal = first_alpha_marginal,
+      add_trailing_space = TRUE
+    ),
     "*p*\u00A0<\u00A0",
-    signs::signs(x,
-                 trim_leading_zeros = TRUE,
-                 drop0trailing = TRUE),
+    signs::signs(
+      x,
+      trim_leading_zeros = TRUE,
+      drop0trailing = TRUE,
+      accuracy = .001
+    ),
     collapse = ". "
   )
 }
@@ -266,13 +284,14 @@ apa_p_star_note <- function(x = c(.05, .01, .001), first_alpha_marginal = FALSE)
 #' @examples
 #' hanging_indent("Hello Darkness, my old friend. I've come to talk with you again.")
 hanging_indent <- function(
-    x,
-    indent = 4,
-    width = 30,
-    space = NULL,
-    newline = "\\\\\n",
-    whitespace_only = FALSE,
-    wrap_equal_width = FALSE) {
+  x,
+  indent = 4,
+  width = 30,
+  space = NULL,
+  newline = "\\\\\n",
+  whitespace_only = FALSE,
+  wrap_equal_width = FALSE
+) {
   if (is.null(space)) {
     space <- "\u00A0" # non-breaking space
   }
@@ -281,15 +300,13 @@ hanging_indent <- function(
   x <- stringr::str_replace_all(x, "\u2007", "\u2057")
 
   if (wrap_equal_width) {
-   x <- str_wrap_equal(x, max_width = width)
+    x <- str_wrap_equal(x, max_width = width)
   } else {
-    x <- stringr::str_wrap(x, width = width,
-                           whitespace_only = whitespace_only)
+    x <- stringr::str_wrap(x, width = width, whitespace_only = whitespace_only)
   }
   stringr::str_replace_all(x, "\n", paste0(newline, indent_chr)) |>
     stringr::str_replace_all("\u2057", "\u2007")
 }
-
 
 #' Like `stringr::str_wrap`, but attempts to create lines of equal width
 #'
@@ -337,7 +354,9 @@ str_wrap_equal <- function(x, max_width = 30L, sep = "\n") {
         # Difference between proposed width and preferred width
         proposed_difference <- abs(proposed_width - preferred_width)
         # Should we start a new line?
-        if (current_difference < proposed_difference | proposed_width > max_width) {
+        if (
+          current_difference < proposed_difference | proposed_width > max_width
+        ) {
           i <- i + 1
         }
         # Add word to current line, remove spaces, and rejoin words divided by forward slashes
@@ -346,8 +365,8 @@ str_wrap_equal <- function(x, max_width = 30L, sep = "\n") {
       }
       # Collapse non-empty lines by separation character
       paste0(textlines[stringr::str_length(textlines) > 0], collapse = sep)
-    }})
-
+    }
+  })
 }
 
 #' Tests if a character vector contains numeric-like values
@@ -385,10 +404,12 @@ is_numeric_like <- function(x, elementwise = FALSE) {
 #'
 #' @examples
 #' num_pad(c("a", "bb"))
-num_pad <- function(x,
-                    pad_left = TRUE,
-                    padding_character = "&numsp;",
-                    NA_value = "") {
+num_pad <- function(
+  x,
+  pad_left = TRUE,
+  padding_character = "&numsp;",
+  NA_value = ""
+) {
   nch <- nchar(x)
   gtcount <- stringr::str_count(x, "\\>")
   gtcount[is.na(gtcount)] <- 0
@@ -426,17 +447,17 @@ num_pad <- function(x,
 #' @examples
 #' p2stars(c(.32, .02, .005),
 #'         alpha = c(.05, .01))
-p2stars <- function(p,
-                    alpha = c(0.05, .01, .001),
-                    first_alpha_marginal = FALSE,
-                    superscript = FALSE,
-                    add_trailing_space = FALSE,
-                    prefix = "\\") {
+p2stars <- function(
+  p,
+  alpha = c(0.05, .01, .001),
+  first_alpha_marginal = FALSE,
+  superscript = FALSE,
+  add_trailing_space = FALSE,
+  prefix = "\\"
+) {
   pstars <- purrr::map_chr(p, \(pp) {
     if (is.na(pp)) return("")
-    paste0(rep(paste0(prefix, "*"),
-               sum((pp <= alpha) * 1L)),
-           collapse = "")
+    paste0(rep(paste0(prefix, "*"), sum((pp <= alpha) * 1L)), collapse = "")
   })
   if (first_alpha_marginal) {
     # if the first value is marginal, we don't want to add a star
@@ -447,7 +468,6 @@ p2stars <- function(p,
     } else {
       pstars <- stringr::str_remove(pstars, paste0(prefix, "\\*"))
     }
-
   }
   trailing_space <- ifelse(add_trailing_space, "\u2009", "")
   if (superscript) {
@@ -455,16 +475,17 @@ p2stars <- function(p,
       "^",
       pstars[nchar(pstars) > 0],
       trailing_space,
-      "^")
+      "^"
+    )
   } else {
     pstars[nchar(pstars) > 0] <- paste0(
       pstars[nchar(pstars) > 0],
-      trailing_space)
+      trailing_space
+    )
   }
   pstars
 }
 # p2stars(.10, alpha = c(.10, .05, .01, .001), first_alpha_marginal = FALSE)
-
 
 #' Surrounds text with tags unless empty
 #'
@@ -490,7 +511,6 @@ tagger <- function(x, tag = "<span>", right_tag = gsub("^<", "</", tag)) {
   y[!nzchar(x)] <- ""
   y
 }
-
 
 #' @rdname tagger
 #' @export
@@ -523,7 +543,6 @@ header_md <- function(x, level = 1) {
   tagger(x, paste0(paste0(rep("#", level), collapse = ""), " "), right_tag = "")
 }
 
-
 # Column format ----
 #' Column format class
 #'
@@ -548,23 +567,29 @@ header_md <- function(x, level = 1) {
 #' R2
 #' R2@header
 #' R2@formatter
-column_format <- new_class("column_format", properties = list(
-  name = class_character,
-  header = class_character,
-  latex = class_character,
-  formatter = class_function
-))
+column_format <- new_class(
+  "column_format",
+  properties = list(
+    name = class_character,
+    header = class_character,
+    latex = class_character,
+    formatter = class_function
+  )
+)
 
-
-as_tibble <- S7::new_external_generic(package = "tibble", name = "as_tibble", dispatch_args = "x")
-
+as_tibble <- S7::new_external_generic(
+  package = "tibble",
+  name = "as_tibble",
+  dispatch_args = "x"
+)
 
 method(as_tibble, column_format) <- function(x, ...) {
   tibble::tibble(
     name = x@name,
     header = x@header,
     latex = ifelse(is.null(x@latex), NA, x@latex),
-    formatter = list(x@formatter))
+    formatter = list(x@formatter)
+  )
 }
 
 method(str, column_format) <- function(object, ...) {
@@ -575,13 +600,15 @@ method(str, column_format) <- function(object, ...) {
 
 #' @keywords internal
 #' @noRd
-variable_name_formatter <- function(x,
-                                    pattern = NULL,
-                                    replacement = NULL,
-                                    formatter = NULL) {
+variable_name_formatter <- function(
+  x,
+  pattern = NULL,
+  replacement = NULL,
+  formatter = NULL
+) {
   pre_p2r <- c(
-    `\\:` =  " : ",
-    `\\^` =  "Apasevencaret",
+    `\\:` = " : ",
+    `\\^` = "Apasevencaret",
     `\\(Intercept\\)` = the$intercept_text,
     ` \\[linear\\]$` = "",
     ` \\[quadratic\\]$` = " Apasevencaret 2 Apasevencaret",
@@ -594,8 +621,8 @@ variable_name_formatter <- function(x,
   )
 
   post_p2r <- c(
-    ` Apasevendotspace` =  ".\u2007",
-    `Apasevendotspace` =  ".\u2007",
+    ` Apasevendotspace` = ".\u2007",
+    `Apasevendotspace` = ".\u2007",
     `Apasevennumsp` = "\u2007",
     `Apaseventhinsp` = "\u2009",
     `Apasevennbsp` = "\u00A0",
@@ -603,16 +630,42 @@ variable_name_formatter <- function(x,
     `\\)` = ") ",
     `^ \\(` = "(",
     `\\) $` = ")",
-    ` Apasevencaret (\\d) Apasevencaret` = "^\\1^")
-
-
+    ` Apasevencaret (\\d) Apasevencaret` = "^\\1^"
+  )
 
   x <- stringr::str_replace_all(x, pre_p2r) |>
     stringr::str_replace_all("\\.\u2007", "Apasevendotspace") |>
     stringr::str_replace_all("\u2007", "Apasevennumsp") |>
     stringr::str_replace_all("\u00A0", "Apasevennbsp") |>
     stringr::str_replace_all("\u2009", "Apaseventhinsp") |>
-    snakecase::to_title_case(abbreviations = c(":", "\u00D7", "\\^", "\\(", "\\)", "\\$", "\\]", "\\[", "s\\)", "\\.\u2007", "\u2007", "\\\\\\\n", "\u00A0", "\u2007", "&thinsp;", "&numsp;", "&nbsp;","Apasevendotspace", "Apasevennumsp", "Apasevennbsp", "Apaseventhinsp", "Apasevencaret", "\t", "\n")) |>
+    snakecase::to_title_case(
+      abbreviations = c(
+        ":",
+        "\u00D7",
+        "\\^",
+        "\\(",
+        "\\)",
+        "\\$",
+        "\\]",
+        "\\[",
+        "s\\)",
+        "\\.\u2007",
+        "\u2007",
+        "\\\\\\\n",
+        "\u00A0",
+        "\u2007",
+        "&thinsp;",
+        "&numsp;",
+        "&nbsp;",
+        "Apasevendotspace",
+        "Apasevennumsp",
+        "Apasevennbsp",
+        "Apaseventhinsp",
+        "Apasevencaret",
+        "\t",
+        "\n"
+      )
+    ) |>
     stringr::str_replace_all(post_p2r) |>
     stringr::str_replace_all(" \u00D7 ", "\u00D7") |>
     stringr::str_replace_all("\u00D7", " \u00D7 ")
@@ -642,15 +695,16 @@ the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
       x,
       markdown = TRUE,
       min_digits = min_digits,
-      max_digits = max_digits, ...),
-    format_numeric_character = FALSE)
+      max_digits = max_digits,
+      ...
+    ),
+    format_numeric_character = FALSE
+  )
 }
 
 the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) {
-  align_chr(x,
-            accuracy = accuracy,
-            trim_leading_zeros = TRUE,
-            ...)}
+  align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, ...)
+}
 the$variable_name_formatter <- variable_name_formatter
 
 # Columns ----
@@ -689,12 +743,14 @@ the$columns <- list(
     name = "B",
     header = "*B*",
     latex = "$B$",
-    formatter = the$number_formatter),
+    formatter = the$number_formatter
+  ),
   b = column_format(
     name = "b",
     header = "*b*",
     latex = "$b$",
-    formatter = the$number_formatter),
+    formatter = the$number_formatter
+  ),
   beta = column_format(
     name = "beta",
     header = "&beta;",
@@ -769,10 +825,13 @@ the$columns <- list(
       middle <- rep(", ", length(l))
       middle[is.na(l) | is.na(u)] <- ""
       align_chr(
-        paste0(align_chr(l, accuracy = accuracy, ...),
-               middle,
-               align_chr(u, accuracy = accuracy, ...)
-               ), center = ", ") |>
+        paste0(
+          align_chr(l, accuracy = accuracy, ...),
+          middle,
+          align_chr(u, accuracy = accuracy, ...)
+        ),
+        center = ", "
+      ) |>
         tagger("[", "]")
     }
   ),
@@ -795,7 +854,8 @@ the$columns <- list(
     formatter = function(x, accuracy = the$accuracy) {
       x_split <- stringr::str_replace_all(
         x,
-        c(`\\[` = "", `\\]` = "")) |>
+        c(`\\[` = "", `\\]` = "")
+      ) |>
         stringr::str_split_fixed(",", n = 2)
       lb <- x_split[, 1] |> align_chr(accuracy = accuracy)
       ub <- x_split[, 2] |> align_chr(accuracy = accuracy)
@@ -808,17 +868,20 @@ the$columns <- list(
     name = "cohens_d",
     header = "Cohen's *d*",
     latex = "Cohen's $d$",
-    formatter = the$number_formatter),
+    formatter = the$number_formatter
+  ),
   Cohens_d = column_format(
     name = "Cohens_d",
     header = "Cohen's *d*",
     latex = "Cohen's $d$",
-    formatter = the$number_formatter),
+    formatter = the$number_formatter
+  ),
   Coefficient = column_format(
     name = "Coefficient",
     header = "*B*",
     latex = "$B$",
-    formatter = the$number_formatter),
+    formatter = the$number_formatter
+  ),
   Cramers_v = column_format(
     name = "Cramers_v",
     header = "Cram\u00E9r's *V*",
@@ -885,7 +948,7 @@ the$columns <- list(
     latex = "$\\eta^2$",
     formatter = the$trim_leading_zero
   ),
-    Eta2_partial = column_format(
+  Eta2_partial = column_format(
     name = "Eta2_partial",
     header = "*&eta;*^2^",
     latex = "$\\eta^2$",
@@ -1027,7 +1090,8 @@ the$columns <- list(
     name = "Std_Coefficient",
     header = "&beta;",
     latex = "$\\beta$",
-    formatter = the$trim_leading_zero),
+    formatter = the$trim_leading_zero
+  ),
   t = column_format(
     name = "t",
     header = "*t*",
@@ -1089,32 +1153,37 @@ column_formats <- new_class(
   name = "column_formats",
   parent = class_list,
   properties = list(
-    accuracy = new_property(name = "accuracy",
-                            class = class_double,
-                            setter = function(self, value) {
-      for (cf in S7_data(self)) {
-        if (!is.null(formals(cf@formatter)["accuracy"])) {
-          cff <- formals(cf@formatter)
-          cff$accuracy <- value
-          formals(cf@formatter) <- cff
-          self[[cf@name]] <- cf
+    accuracy = new_property(
+      name = "accuracy",
+      class = class_double,
+      setter = function(self, value) {
+        for (cf in S7_data(self)) {
+          if (!is.null(formals(cf@formatter)["accuracy"])) {
+            cff <- formals(cf@formatter)
+            cff$accuracy <- value
+            formals(cf@formatter) <- cff
+            self[[cf@name]] <- cf
+          }
         }
-      }
 
-      self@accuracy <- value
-      self
-    }),
+        self@accuracy <- value
+        self
+      }
+    ),
     intercept_text = class_character,
     starred_columns = class_character,
     variable_labels = class_character,
     get_column_names = new_property(getter = \(self) {
-        names(S7_data(self))
+      names(S7_data(self))
     }),
     get_headers = new_property(getter = \(self) {
-        purrr::map_chr(S7_data(self), "header")
+      purrr::map_chr(S7_data(self), "header")
     }),
     get_latex = new_property(getter = \(self) {
-      purrr::map_chr(S7_data(self), \(ap) ifelse(is.null(ap@latex), ap@name, ap@latex))
+      purrr::map_chr(
+        S7_data(self),
+        \(ap) ifelse(is.null(ap@latex), ap@name, ap@latex)
+      )
     }),
     get_formatters = new_property(getter = \(self) {
       purrr::map(S7_data(self), "formatter")
@@ -1162,7 +1231,7 @@ column_formats <- new_class(
     if (!is.null(custom_columns)) {
       if (is.null(names(custom_columns))) {
         stop("custom_columns must be a named list")
-        }
+      }
       .data[names(custom_columns)] <- custom_columns
     }
 
@@ -1216,39 +1285,43 @@ the$column_formats <- column_formats()
 #' apa7_defaults(accuracy = .001)
 #' # Reset to package defaults
 #' apa7_defaults(reset = TRUE)
-apa7_defaults <- function(accuracy = NULL,
-                          font_family = NULL,
-                          intercept_text = NULL,
-                          column_formats = NULL,
-                          number_formatter = NULL,
-                          trim_leading_zero = NULL,
-                          reset = FALSE) {
+apa7_defaults <- function(
+  accuracy = NULL,
+  font_family = NULL,
+  intercept_text = NULL,
+  column_formats = NULL,
+  number_formatter = NULL,
+  trim_leading_zero = NULL,
+  reset = FALSE
+) {
   old <- the
   if (reset) {
     the$accuracy <- .01
     the$column_formats <- column_formats()
     the$intercept_text <- "Constant"
     the$font_family <- "Times New Roman"
-    the$number_formatter <- \(x, accuracy = the$accuracy, ...) align_chr(
-      x,
-      accuracy = accuracy,
-      ...
-    )
-    the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) align_chr(
-      x,
-      accuracy = accuracy,
-      trim_leading_zeros = TRUE,
-      ...
-    )
+    the$number_formatter <- \(x, accuracy = the$accuracy, ...)
+      align_chr(
+        x,
+        accuracy = accuracy,
+        ...
+      )
+    the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...)
+      align_chr(
+        x,
+        accuracy = accuracy,
+        trim_leading_zeros = TRUE,
+        ...
+      )
     the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
+      # nocov start
       max_digits <- 3
       min_digits <- round(-log10(accuracy))
       if (max_digits < min_digits) {
         max_digits <- min_digits
       }
-      align_chr(apa_p(x,
-                      min_digits = min_digits,
-                      max_digits = max_digits, ...))}
+      align_chr(apa_p(x, min_digits = min_digits, max_digits = max_digits, ...))
+    } # nocov end
   }
 
   if (!is.null(accuracy)) the$accuracy <- accuracy
@@ -1281,18 +1354,21 @@ apa7_defaults <- function(accuracy = NULL,
 #'   parameters::parameters() |>
 #'   apa_format_columns() |>
 #'   apa_flextable()
-apa_format_columns <- function(data,
-                               column_formats = NULL,
-                               no_format_columns = NULL,
-                               rename_headers = TRUE,
-                               latex_headers = FALSE,
-                               format_separated_headers = TRUE,
-                               sep = "_",
-                               accuracy = NULL) {
+apa_format_columns <- function(
+  data,
+  column_formats = NULL,
+  no_format_columns = NULL,
+  rename_headers = TRUE,
+  latex_headers = FALSE,
+  format_separated_headers = TRUE,
+  sep = "_",
+  accuracy = NULL
+) {
   CI_low <- CI_high <- df_error <- name <- header <- column <- group <- value <- pattern_1 <- pattern_2 <- replace_1 <- replace_2 <- pattern <- type <- should_replace <- id <- replacer <- formatter <- name1 <- NULL
 
   no_format_columns <- data |>
-    dplyr::select({{ no_format_columns }}) |> colnames()
+    dplyr::select(all_of(no_format_columns)) |>
+    colnames()
 
   if (is.null(column_formats)) {
     cf <- the$column_formats
@@ -1312,8 +1388,7 @@ apa_format_columns <- function(data,
   format_names <- names(cf)
 
   if (any(stringr::str_detect(data_names, "t\\((\\d+)\\)$"))) {
-    t_df <- data_names[stringr::str_detect(data_names,
-                                  "t\\((\\d+)\\)$")]
+    t_df <- data_names[stringr::str_detect(data_names, "t\\((\\d+)\\)$")]
 
     new_col <- column_format(
       t_df,
@@ -1326,12 +1401,11 @@ apa_format_columns <- function(data,
   }
 
   if (any(stringr::str_detect(data_names, "(\\d+)\\% CI$"))) {
-    pci <- data_names[stringr::str_detect(data_names,
-                                  "(\\d+)\\% CI$")]
+    pci <- data_names[stringr::str_detect(data_names, "(\\d+)\\% CI$")]
 
     if (is.null(cf$CI_percent)) {
       cf$CI_percent <- the$column_formats$CI_percent
-      }
+    }
 
     new_col <- column_format(
       pci,
@@ -1347,13 +1421,13 @@ apa_format_columns <- function(data,
   temp_fix_names <- stringr::str_replace_all(
     string = format_names,
     pattern = "_",
-    replacement = "apa7separator") |>
+    replacement = "apa7separator"
+  ) |>
     `names<-`(format_names)
 
   d_formatter <- cf@get_tibble
 
   d_names <- tibble::tibble(column = data_names, name = data_names)
-
 
   if (format_separated_headers) {
     d_names <- d_names |>
@@ -1364,9 +1438,11 @@ apa_format_columns <- function(data,
       )
   }
 
-  d_names <- dplyr::left_join(d_names,
-                              d_formatter,
-                              by = dplyr::join_by(name)) |>
+  d_names <- dplyr::left_join(
+    d_names,
+    d_formatter,
+    by = dplyr::join_by(name)
+  ) |>
     dplyr::filter(!is.na(header))
 
   cls <- d_names |> dplyr::pull(column)
@@ -1377,17 +1453,22 @@ apa_format_columns <- function(data,
 
   ci <- .95
 
-  if (all(c("CI", "CI_low", "CI_high") %in% d_names$name) &&
-      !is.null(cf$CI) & ("CI" %in% cls)) {
-
+  if (
+    all(c("CI", "CI_low", "CI_high") %in% d_names$name) &&
+      !is.null(cf$CI) &
+      ("CI" %in% cls)
+  ) {
     d_ci <- d_names |>
-      dplyr::mutate(group = stringr::str_remove(column, paste0(sep, name, "$"))) |>
+      dplyr::mutate(
+        group = stringr::str_remove(column, paste0(sep, name, "$"))
+      ) |>
       dplyr::filter(name == "CI") |>
-      dplyr::mutate(CI_low = paste0(group, sep, "low"),
-             CI_high = paste0(group, sep, "high"))
+      dplyr::mutate(
+        CI_low = paste0(group, sep, "low"),
+        CI_high = paste0(group, sep, "high")
+      )
 
     for (i in seq_len(nrow(d_ci))) {
-
       ci_names <- d_ci[i, c("column", "CI_low", "CI_high")] |>
         tidyr::pivot_longer(dplyr::everything()) |>
         dplyr::pull(value)
@@ -1397,7 +1478,9 @@ apa_format_columns <- function(data,
       if (all(ci_names %in% colnames(data))) {
         ci <- max(data[, ci_names[1]], na.rm = TRUE)
 
-        d_names[d_names$column == d_ci[[i, "column"]], "header"] <- glue::glue(cf$CI@header) |>
+        d_names[d_names$column == d_ci[[i, "column"]], "header"] <- glue::glue(
+          cf$CI@header
+        ) |>
           as.character()
 
         data[, ci_names[1]] <- cf$CI@formatter(
@@ -1412,13 +1495,15 @@ apa_format_columns <- function(data,
     }
   }
 
-  if (all(c("t", "df_error") %in% data_names)  &&
-      ("t" %in% cls)) {
+  if (
+    all(c("t", "df_error") %in% data_names) &&
+      ("t" %in% cls)
+  ) {
     df <- paste0(
       "(",
-      align_chr(max(data$df_error, na.rm = TRUE),
-                accuracy = the$accuracy),
-      ")")
+      align_chr(max(data$df_error, na.rm = TRUE), accuracy = the$accuracy),
+      ")"
+    )
 
     cf$t@header <- paste0(cf$t@header, df)
 
@@ -1442,7 +1527,8 @@ apa_format_columns <- function(data,
       if (cl %in% colnames(data)) {
         data <- dplyr::mutate(
           data,
-          {{ cl }} := f1[[1]]( data[, cl, drop = TRUE]))
+          {{ cl }} := f1[[1]](data[, cl, drop = TRUE])
+        )
       }
     }
   }
@@ -1456,24 +1542,34 @@ apa_format_columns <- function(data,
 
     if (nrow(d_names) > 0) {
       rcls <- d_names |>
-        dplyr::mutate(name1 = stringr::str_remove_all(name, c(`\\(` = "\\\\(", `\\)` = "\\\\)"))) |>
-        dplyr::mutate(pattern_1 = paste0("^", name1, "$"),
-                      replace_1 = header,
-                      pattern_2 = paste0("_",name1,"$"),
-                      replace_2 = paste0("_", header)) |>
-        dplyr::select(-name1) |>
-        dplyr::select(column,
-                      pattern_1,
-                      pattern_2,
-                      replace_1,
-                      replace_2) |>
+        dplyr::mutate(
+          name1 = stringr::str_remove_all(
+            name,
+            c(`\\(` = "\\\\(", `\\)` = "\\\\)")
+          ),
+          latex1 = stringr::str_replace_all(
+            latex,
+            pattern = "\\\\$",
+            replacement = "\\\\$"
+          )
+        ) |>
+        dplyr::mutate(
+          pattern_1 = paste0("^", name1, "$"),
+          replace_1 = dplyr::if_else(rep(latex_headers, dplyr::n()), latex1, header),
+          pattern_2 = paste0("_", name1, "$"),
+          replace_2 = paste0("_", dplyr::if_else(rep(latex_headers, dplyr::n()), latex1, header))
+        ) |>
+        dplyr::select(-name1, -latex1) |>
+        dplyr::select(column, pattern_1, pattern_2, replace_1, replace_2) |>
         tidyr::pivot_longer(-column) |>
         tidyr::separate(name, c("name", "type")) |>
         tidyr::pivot_wider() |>
         dplyr::mutate(
           should_replace = stringr::str_detect(
             column,
-            pattern)) |>
+            pattern
+          )
+        ) |>
         dplyr::select(-type) |>
         dplyr::filter(should_replace) |>
         dplyr::mutate(id = dplyr::row_number(), .by = column) |>
@@ -1482,9 +1578,12 @@ apa_format_columns <- function(data,
           replacer = stringr::str_replace(
             column,
             pattern,
-            replace)) |>
+            replace
+          )
+        ) |>
         dplyr::select(replacer, column) |>
         tibble::deframe()
+
 
       data <- data |>
         dplyr::rename(dplyr::any_of(rcls))
@@ -1513,7 +1612,6 @@ star_balance <- function(x, star = "\\*", superscript = TRUE) {
   ss
 }
 
-
 the$summary_functions <- list(
   IQR = IQR,
   `Interquartile Range` = IQR,
@@ -1531,8 +1629,8 @@ the$summary_functions <- list(
   SD = sd,
   Skewness = psych::skew,
   Var = var,
-  Variance = var)
-
+  Variance = var
+)
 
 #' Prepend column spanner labels to data column labels
 #'
@@ -1561,14 +1659,18 @@ column_spanner_label <- function(data, label, ..., relocate = TRUE) {
   cnames <- dplyr::select(data, ...) |> colnames()
   if (length(cnames) > 0) {
     if (relocate) {
-      data <- dplyr::relocate(.data = data, dplyr::any_of(cnames), .after = cnames[1])
-    }
-      dplyr::rename_with(
+      data <- dplyr::relocate(
         .data = data,
-        .fn = \(x) paste0(label, "_", x),
-        .cols = dplyr::any_of(cnames))
+        dplyr::any_of(cnames),
+        .after = cnames[1]
+      )
+    }
+    dplyr::rename_with(
+      .data = data,
+      .fn = \(x) paste0(label, "_", x),
+      .cols = dplyr::any_of(cnames)
+    )
   } else {
     data
   }
 }
-

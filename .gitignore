@@ -27,3 +27,5 @@ math-rendered-by-lua-filter.html
 **/.quarto/
 /doc/
 /Meta/
+.positai
+.claude

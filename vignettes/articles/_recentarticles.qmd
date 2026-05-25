@@ -193,8 +193,10 @@ Fabiano, G. A., Schatz, N. K., Merrill, B. M., Piscitello, J., Hayes, T. B., Jus
 ## Recreating Table from @fabianoRandomizedControlledTrial2025
 
 ```{r}
-#| label: fabiano
-#| tbl-width: 9
+#| label: tbl-fabiano
+#| tbl-cap:  Pooled Imputation Model Results for Rule Violations Outcome
+#| width: 9
+#| column: "page-right"
 cf <- column_formats()
 cf$p@formatter <- \(x) apa_p(x, align = TRUE, min_digits = 3)
 tibble::tribble(
@@ -431,18 +433,22 @@ tibble::tribble(
 ) |>
   mutate(dv = str_replace(dv, " ", "\u2009")) |>
   pivot_wider_name_first(names_from = dv, values_from = b:p) |>
-  apa_flextable(font_size = 8, line_spacing = 1.2, column_formats = cf) |>
-  pretty_widths(table_width = 6.5) |>
-  width(j = 1, width = 1) |>
+  apa_flextable(font_size = 10, line_spacing = 1.2, column_formats = cf) |>
+  pretty_widths(table_width = 9) |>
+  # width(j = 1, width = 1) |>
   valign(valign = "bottom", part = "header")
 
 
 ```
 
 
-@segalRandomizedControlledTrial2025
+## Recreating Table from @segalRandomizedControlledTrial2025
 
-```{r segal}
+```{r}
+#| label: tbl-segal
+#| tbl-cap: "Sample Characteristics (Counts[%] for Categorical and Mean [StandardDeviations] for Continuous Variables)"
+#| width: 9
+#| column: "page-right"
 d <- tibble(
   Variable = c(
     rep("Deployed relative", 4),
@@ -611,7 +617,8 @@ d_cateogry |>
   rename(any_of(dv_levels)) |>
   rename(`Baseline characteristic` = Category) |>
   apa_flextable(
-    "Variable",
+    "Variable", 
+    font_size = 12,
     row_title_border = NA,
     line_spacing = 1.35,
     left_column_padding = 15
