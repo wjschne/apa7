@@ -121,3 +121,9 @@ data.frame
 \description{
 The default for \code{names_vary} is "slowest" instead of the usual "fastest".
 }
+\examples{
+d <- data.frame(Model = paste0("Model","_", 1:2), t = 1:2, p = c(.05, .45))
+pivot_wider_name_first(d, names_from = Model, values_from = c(t, p))
+# For comparison:
+tidyr::pivot_wider(d, names_from = Model, values_from = c(t, p))
+}

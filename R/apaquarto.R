@@ -17,7 +17,7 @@ make_apaquarto <- function(launch.browser = TRUE) {
     req <- unlist(lapply(libs, require, character.only = TRUE))
     need <- libs[req == FALSE]
     if (length(need) > 0) {
-      response <- askYesNo(
+      response <- utils::askYesNo(
         paste0(
           "Some missing packages are needed to run this app. Install ",
           xfun::join_words(need),
@@ -25,7 +25,7 @@ make_apaquarto <- function(launch.browser = TRUE) {
         )
       )
       if (isTRUE(response)) {
-        install.packages(need)
+        utils::install.packages(need)
       } else {
         print("Action cancelled.")
       }

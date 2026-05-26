@@ -32,3 +32,9 @@ tibble
 \description{
 print loadings
 }
+\examples{
+fit <- psych::fa(Harman74.cor$cov, 4, fm = "pa",rotate = "varimax")
+apa_loadings(fit) |>
+  `colnames<-`(c("Tests", "Verbal", "Spatial", "Quantitative", "Memory")) |>
+  apa_flextable()
+}

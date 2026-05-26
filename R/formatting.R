@@ -1364,10 +1364,10 @@ apa_format_columns <- function(
   sep = "_",
   accuracy = NULL
 ) {
-  CI_low <- CI_high <- df_error <- name <- header <- column <- group <- value <- pattern_1 <- pattern_2 <- replace_1 <- replace_2 <- pattern <- type <- should_replace <- id <- replacer <- formatter <- name1 <- NULL
+  CI_low <- CI_high <- df_error <- name <- header <- column <- group <- value <- pattern_1 <- pattern_2 <- replace_1 <- replace_2 <- pattern <- type <- should_replace <- id <- replacer <- formatter <- name1 <- latex1 <- latex <- NULL
 
   no_format_columns <- data |>
-    dplyr::select(all_of(no_format_columns)) |>
+    dplyr::select(dplyr::all_of(no_format_columns)) |>
     colnames()
 
   if (is.null(column_formats)) {
@@ -1555,9 +1555,16 @@ apa_format_columns <- function(
         ) |>
         dplyr::mutate(
           pattern_1 = paste0("^", name1, "$"),
-          replace_1 = dplyr::if_else(rep(latex_headers, dplyr::n()), latex1, header),
+          replace_1 = dplyr::if_else(
+            rep(latex_headers, dplyr::n()),
+            latex1,
+            header
+          ),
           pattern_2 = paste0("_", name1, "$"),
-          replace_2 = paste0("_", dplyr::if_else(rep(latex_headers, dplyr::n()), latex1, header))
+          replace_2 = paste0(
+            "_",
+            dplyr::if_else(rep(latex_headers, dplyr::n()), latex1, header)
+          )
         ) |>
         dplyr::select(-name1, -latex1) |>
         dplyr::select(column, pattern_1, pattern_2, replace_1, replace_2) |>
@@ -1583,7 +1590,6 @@ apa_format_columns <- function(
         ) |>
         dplyr::select(replacer, column) |>
         tibble::deframe()
-
 
       data <- data |>
         dplyr::rename(dplyr::any_of(rcls))

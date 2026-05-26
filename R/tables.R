@@ -896,8 +896,24 @@ apa_flextable <- function(
       deckered <- spanner <- name1 <- name <- value <-
         break_column <- NULL
 
-  row_title_column <- dplyr::select(data, all_of(row_title_column)) |>
+  rtc <- rlang::enquo(row_title_column)
+
+  rtc_val <- tryCatch(
+    names(suppressWarnings(tidyselect::eval_select(rtc, data))),
+    error = function(e) NULL
+  )
+
+  row_title_column <- dplyr::select(data, dplyr::all_of(rtc_val)) |>
     colnames()
+
+  if (is.null(rtc_val)) {
+    row_title_column <- dplyr::select(
+      data,
+      {{ row_title_column }}
+    ) |>
+      colnames()
+  } else {
+  }
 
   header_align_vertical <- match.arg(header_align_vertical)
 

@@ -13,7 +13,7 @@ make_apaquarto(launch.browser = TRUE)
 Runs a shiny app that creates apaquarto documents
 }
 \description{
-A wrapper for \code{shiny::runGitHub}
+A wrapper for \code{shiny::runGitHub} Note that running this function will install any missing packages needed to run the app: bsicons, bslib, conflicted, dplyr, fresh, purrr, rclipboard, readr, shiny, shinyWidgets, snakecase, tibble, tidyr, tippy, toastui, yaml
 }
 \examples{
 \dontrun{

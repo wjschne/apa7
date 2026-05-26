@@ -263,12 +263,14 @@ test_that("apa_flextable", {
       vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))
     )
   expect_no_error(
-    apa_flextable(d, row_title_column = "vs", row_title_align = "center") |>
-      flextable::align(j = 2:3, align = "center")
+    apa_flextable(d, row_title_column = "vs", row_title_align = "center")
   )
   expect_no_error(
-    apa_flextable(d, row_title_column = "vs", row_title_align = "left") |>
-      flextable::align(j = 2:3, align = "center")
+    apa_flextable(d, row_title_column = "vs", row_title_align = "left")
+  )
+
+  expect_no_error(
+    apa_flextable(d, row_title_column = "fred", row_title_align = "left")
   )
 })
 
