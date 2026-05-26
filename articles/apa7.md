@@ -1121,7 +1121,7 @@ fit |>
   apa_flextable(no_format_columns = Variable) 
 ```
 
-| Variable | Agreeableness | Openness | Conscientiousness | Neuroticism | Extraversion |
+| Variable | Agreeableness | Openness | Neuroticism | Extraversion | Conscientiousness |
 |----|----|----|----|----|----|
 | Get angry easily |  .81 |  |  |  |  |
 | Get irritated easily |  .78 |  |  |  |  |

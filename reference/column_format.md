@@ -66,5 +66,5 @@ R2@formatter
 #>     align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, 
 #>         ...)
 #> }
-#> <environment: 0x559becf53a60>
+#> <environment: 0x55d132848790>
 ```
