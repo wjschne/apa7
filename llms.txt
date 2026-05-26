@@ -1,0 +1,210 @@
+# apa7
+
+The goal of apa7 is to facilitate writing documents in APA Style (7th
+Edition).
+
+## Installation
+
+To install the published version from CRAN:
+
+``` r
+
+install.packages("apa7")
+```
+
+You can install the development version of apa7 with:
+
+``` r
+
+install.packages("apa7", repos = c('https://wjschne.r-universe.dev'))
+```
+
+## Tables
+
+The package provides functions to create APA-style tables, including
+correlation matrices and regression tables. The tables can be formatted
+using the `flextable` package.
+
+``` r
+
+library(apa7)
+# Correlation matrix 
+apa_cor(trees, star_significant = TRUE)
+```
+
+![](reference/figures/README-showcor-1.png)
+
+``` r
+
+# Make regression model, format parameters, and display flextable
+lm(Volume ~ Girth + Height, data = trees) |> 
+  apa_parameters() |> 
+  apa_flextable()
+```
+
+![](reference/figures/README-showlm-1.png)
+
+``` r
+
+# Contingency table with chi-square test of independence
+d <- mtcars[, c("am", "gear")]
+colnames(d) <- c("Transmission", "Gears")
+d$Transmission <- factor(d$Transmission, 
+                         levels = c(0, 1), 
+                         labels = c("Automatic", "Manual"))
+apa_chisq(d)
+```
+
+![](reference/figures/README-showcontingence-1.png)
+
+## Formatting functions
+
+The package provides functions to format p-values, numbers, and other
+statistical results according to APA Style.
+
+``` r
+
+# Format p-values
+apa_p(c(0.0007, 0.001, 0.0081, 0.024, 0.454))
+#> [1] "<.001" ".001"  ".008"  ".02"   ".45"
+```
+
+# Package index
+
+## Create flextables
+
+Convert objects to flextables
+
+- [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  : Convert data to flextable consistent with APA style
+- [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
+  : Make contingency table with chi-square test of independence
+- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md) :
+  APA-formatted correlation table
+- [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+  : print loadings
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  : format model parameters in APA style
+- [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  : format model performance metrics in APA style
+- [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md)
+  : format model comparison metrics in APA style
+
+## Style flextables
+
+Alter the look of a flextable previously created
+
+- [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md)
+  :
+
+  Style
+  [`flextable::flextable`](https://davidgohel.github.io/flextable/reference/flextable.html)
+  object according to APA style
+
+- [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md)
+  : Use flextable::dim_pretty to fit column widths
+
+## Variable Formatters
+
+Alter vector variables
+
+- [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md)
+  : Align text on center text (default is decimal)
+- [`apa_p()`](https://wjschne.github.io/apa7/reference/apa_p.md) :
+  p-value in APA format
+- [`hanging_indent()`](https://wjschne.github.io/apa7/reference/hanging_indent.md)
+  : Return markdown text with hanging indent
+- [`num_pad()`](https://wjschne.github.io/apa7/reference/num_pad.md) :
+  Pads text on the left or right so that the width is the same for each
+  element of the vector
+- [`p2stars()`](https://wjschne.github.io/apa7/reference/p2stars.md) :
+  Convert p-values to stars
+- [`star_balance()`](https://wjschne.github.io/apa7/reference/star_balance.md)
+  : Prefix text with figure spaces to balance star text
+- [`tagger()`](https://wjschne.github.io/apa7/reference/tagger.md)
+  [`bold_md()`](https://wjschne.github.io/apa7/reference/tagger.md)
+  [`italic_md()`](https://wjschne.github.io/apa7/reference/tagger.md)
+  [`superscript_md()`](https://wjschne.github.io/apa7/reference/tagger.md)
+  [`subscript_md()`](https://wjschne.github.io/apa7/reference/tagger.md)
+  [`header_md()`](https://wjschne.github.io/apa7/reference/tagger.md) :
+  Surrounds text with tags unless empty
+
+## Automatic formatting
+
+Customize how column_headers and data are formatted by
+apa_style`and`apa_flextable\`
+
+- [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  : Set defaults for apa7 package
+- [`column_format()`](https://wjschne.github.io/apa7/reference/column_format.md)
+  : Column format class
+- [`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md)
+  : Create a set of column formats
+
+## Alter data.frame
+
+Change data.frames
+
+- [`apa_format_columns()`](https://wjschne.github.io/apa7/reference/apa_format_columns.md)
+  : Format data columns
+
+- [`column_spanner_label()`](https://wjschne.github.io/apa7/reference/column_spanner_label.md)
+  : Prepend column spanner labels to data column labels
+
+- [`pivot_wider_name_first()`](https://wjschne.github.io/apa7/reference/pivot_wider_name_first.md)
+  :
+
+  A wrapper for tidyr::pivot_wider that creates columns names as
+  `name_variable` instead of `variable_name`
+
+### Create Special Columns
+
+Adding specialized columns that are formatted differently by `apa_style`
+and `apa_flextable`
+
+- [`add_break_columns()`](https://wjschne.github.io/apa7/reference/add_break_columns.md)
+  : Add break columns
+- [`add_list_column()`](https://wjschne.github.io/apa7/reference/add_list_column.md)
+  : Make a column into a list column
+- [`add_star_column()`](https://wjschne.github.io/apa7/reference/add_star_column.md)
+  : Adds stars next to a column based on p-values
+- [`separate_star_column()`](https://wjschne.github.io/apa7/reference/separate_star_column.md)
+  : Add columns that separate significance stars from numbers
+
+## Quarto
+
+Functions for creating apaquarto documents
+
+- [`install_apaquarto()`](https://wjschne.github.io/apa7/reference/install_apaquarto.md)
+  : Installs the apaquarto extension.
+- [`make_apaquarto()`](https://wjschne.github.io/apa7/reference/make_apaquarto.md)
+  : Run shiny app to make a document in APA style via Quarto
+
+## Misc
+
+Other Functions
+
+- [`apa_p_star_note()`](https://wjschne.github.io/apa7/reference/apa_p_star_note.md)
+  : Make star notes for p-values
+
+- [`is_numeric_like()`](https://wjschne.github.io/apa7/reference/is_numeric_like.md)
+  : Tests if a character vector contains numeric-like values
+
+- [`str_wrap_equal()`](https://wjschne.github.io/apa7/reference/str_wrap_equal.md)
+  :
+
+  Like
+  [`stringr::str_wrap`](https://stringr.tidyverse.org/reference/str_wrap.html),
+  but attempts to create lines of equal width
+
+# Articles
+
+### All vignettes
+
+- [Getting Started with
+  apa7](https://wjschne.github.io/apa7/articles/apa7.md):
+- [Contingency
+  Tables](https://wjschne.github.io/apa7/articles/chisquare.md):
+- [Correlations](https://wjschne.github.io/apa7/articles/correlations.md):
+- [Summarize
+  Data](https://wjschne.github.io/apa7/articles/summarize.md):
