@@ -1,3 +1,5 @@
+# apa7 0.1.3
+
 # apa7 0.1.2 _2025-05-25_
 
 * Used AI (Claude) and old-fashioned effort to generate a more complete set of unit tests, fix minor bugs, and make documentation more consistent.
