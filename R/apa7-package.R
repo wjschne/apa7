@@ -2,6 +2,6 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @rawNamespace import(S7, except = `:=`)
+#' @import S7
 ## usethis namespace: end
 NULL
