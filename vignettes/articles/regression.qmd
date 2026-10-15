@@ -42,10 +42,15 @@ d <- sat.act |>
 m1 <- lm(ACT ~ age + gender, d)
 m2 <- update(m1, . ~ . + education)
 m3 <- update(m2, . ~ . + SATV + SATQ)
-apa_parameters(m3)
-
-
+apa_parameters(m3) |> 
+  apa_flextable()
+align_chr()
 ```
 
 
+# Binary Logistic Regression
+
+```{r}
+
+```
 

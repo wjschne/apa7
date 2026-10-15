@@ -18,5 +18,5 @@ character
 Display latex matrices
 }
 \examples{
-matrix_diplay(diag(2))
+matrix_display(diag(2))
 }

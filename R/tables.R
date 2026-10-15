@@ -1161,11 +1161,13 @@ apa_flextable <- function(
 #' format model parameters in APA style
 #'
 #' @param fit model fit object
-#' @param predictor_parameters predictor parameters to display. If named vector, column names will be vector names
+#' @param predictor_parameters predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., `t` for a model tested with *z*) are silently dropped. For lists of models, `NULL` (default) uses the default for each model's class.
 #' @param starred columns to star with significant p_values
 #' @param bolded columns to bold, if significant
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #' @param t_with_df if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.
+#' @param ... arguments passed to methods
+#' @param performance_parameters for lists of models, model comparison metrics passed to [apa_performance_comparison()]. If `NULL`, no metrics are added.
 #'
 #' @return tibble
 #' @export
@@ -1187,7 +1189,8 @@ apa_parameters <- function(
   starred = NULL,
   bolded = NULL,
   column_formats = NULL,
-  t_with_df = TRUE
+  t_with_df = TRUE,
+  ...
 ) {
   UseMethod("apa_parameters")
 }
@@ -1209,20 +1212,11 @@ apa_parameters.lm <- function(
   starred = NA,
   bolded = NA,
   column_formats = NULL,
-  t_with_df = TRUE
+  t_with_df = TRUE,
+  ...
 ) {
   # Prevent warnings
-  pstar <- Parameter <- Std_Coefficient <- df_error <- header <- name <- NULL
-
-  # Get column formats
-  if (is.null(column_formats)) {
-    column_formats <- the$column_formats
-  }
-
-  # Make sure Parameter is in the predictor_parameters
-  if (!("Parameter" %in% predictor_parameters)) {
-    predictor_parameters <- c("Parameter", predictor_parameters) # nocov
-  }
+  Parameter <- Std_Coefficient <- NULL
 
   names(predictor_parameters) <- NULL
 
@@ -1241,6 +1235,156 @@ apa_parameters.lm <- function(
     d_b <- d_b |>
       dplyr::left_join(d_std, by = dplyr::join_by(Parameter))
   }
+
+  format_apa_parameters(
+    d_b,
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df
+  )
+}
+
+#' @param exponentiate if `NULL` (default), exponentiated coefficients are added when the model's link function is logit or log (i.e., odds ratios, risk ratios, or incidence rate ratios). If `TRUE`, exponentiated coefficients are always added. If `FALSE`, they are never added.
+#' @details
+#' For `glm` objects (including `MASS::glm.nb`), the test statistic is *z* for families with a fixed dispersion parameter (binomial, Poisson, negative binomial) and *t* for families with an estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi families). Whichever statistic applies is displayed. The exponentiated coefficient column (`Exp_Coefficient`) is labeled *OR* for logit links, *IRR* for log links in count models (Poisson, quasi-Poisson, negative binomial), *RR* for log links in binomial models, and Exp(*B*) otherwise.
+#' @export apa_parameters.glm
+#' @export
+#' @rdname apa_parameters
+#' @examples
+#' glm(am ~ wt + hp, data = mtcars, family = binomial) |>
+#'    apa_parameters() |>
+#'    apa_flextable()
+apa_parameters.glm <- function(
+  fit,
+  predictor_parameters = c(
+    "Parameter",
+    "Coefficient",
+    "SE",
+    "Exp_Coefficient",
+    "t",
+    "z",
+    "df_error",
+    "p"
+  ),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  ...
+) {
+  # Prevent warnings
+  Parameter <- Std_Coefficient <- Coefficient <- NULL
+
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+
+  names(predictor_parameters) <- NULL
+
+  link <- stats::family(fit)$link
+  if (is.null(exponentiate)) {
+    exponentiate <- link %in% c("logit", "log")
+  }
+
+  d_b <- parameters::model_parameters(fit) |>
+    tibble::as_tibble() |>
+    dplyr::mutate(Parameter = parameters::format_parameters(fit))
+
+  if (exponentiate && "Exp_Coefficient" %in% predictor_parameters) {
+    d_b <- dplyr::mutate(d_b, Exp_Coefficient = exp(Coefficient))
+
+    # Label exponentiated coefficients by link, unless user customized header
+    if (
+      !is.null(column_formats$Exp_Coefficient) &&
+        identical(
+          column_formats$Exp_Coefficient@header,
+          the$columns$Exp_Coefficient@header
+        )
+    ) {
+      exp_label <- exp_coefficient_label(fit)
+      column_formats$Exp_Coefficient@header <- exp_label[["header"]]
+      column_formats$Exp_Coefficient@latex <- exp_label[["latex"]]
+    }
+  }
+
+  if ("Std_Coefficient" %in% predictor_parameters) {
+    d_std <- parameters::standardise_parameters(fit, method = "basic") |>
+      tibble::as_tibble() |>
+      dplyr::mutate(Parameter = parameters::format_parameters(fit)) |>
+      dplyr::select(Parameter, Std_Coefficient)
+
+    d_b <- d_b |>
+      dplyr::left_join(d_std, by = dplyr::join_by(Parameter))
+  }
+
+  # z tests have infinite df, which should not be displayed
+  if ("df_error" %in% colnames(d_b) && all(is.infinite(d_b$df_error))) {
+    d_b$df_error <- NULL
+  }
+
+  format_apa_parameters(
+    d_b,
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df
+  )
+}
+
+#' @keywords internal
+#' @noRd
+exp_coefficient_label <- function(fit) {
+  fam <- stats::family(fit)
+  family <- tolower(fam$family)
+  if (fam$link == "logit") {
+    return(c(header = "*OR*", latex = "$OR$"))
+  }
+  if (fam$link == "log") {
+    if (grepl("poisson|negative binomial", family)) {
+      return(c(header = "*IRR*", latex = "$IRR$"))
+    }
+    if (grepl("binomial", family)) {
+      return(c(header = "*RR*", latex = "$RR$"))
+    }
+  }
+  c(
+    header = the$columns$Exp_Coefficient@header,
+    latex = the$columns$Exp_Coefficient@latex
+  )
+}
+
+#' Format a model parameter tibble in APA style
+#'
+#' Shared by `apa_parameters` methods. `d_b` holds unformatted parameters with
+#' `Parameter` and `p` columns.
+#' @keywords internal
+#' @noRd
+format_apa_parameters <- function(
+  d_b,
+  predictor_parameters,
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE
+) {
+  # Prevent warnings
+  pstar <- df_error <- header <- name <- NULL
+
+  # Get column formats
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+
+  # Make sure Parameter is in the predictor_parameters
+  if (!("Parameter" %in% predictor_parameters)) {
+    predictor_parameters <- c("Parameter", predictor_parameters) # nocov
+  }
+
+  names(predictor_parameters) <- NULL
 
   d_b_new <- d_b
 
@@ -1288,20 +1432,20 @@ apa_parameters.lm <- function(
 
   # add starred column
   starred <- starred[starred %in% colnames(d_b_new)]
-  if (length(starred > 0) && !is.na(starred) && all(starred != "") ) {
+  if (length(starred) > 0 && all(!is.na(starred)) && all(starred != "")) {
+    pstar <- p2stars(d_b$p, superscript = TRUE)
+    pstar[is.na(pstar)] <- ""
     d_b_new <- d_b_new |>
-      dplyr::mutate(pstar = p2stars(d_b$p, superscript = TRUE)) |>
-      tidyr::unite(
-        {{ starred }},
-        c({{ starred }}, pstar),
-        na.rm = TRUE,
-        sep = ""
-      ) |>
-      dplyr::mutate(dplyr::across(dplyr::any_of(starred), align_chr))
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::all_of(starred),
+          \(x) align_chr(paste0(ifelse(is.na(x), "", x), pstar))
+        )
+      )
   }
 
   # bold star
-  if (length(bolded > 0) & !is.na(bolded) & (bolded != "")) {
+  if (length(bolded) > 0 && all(!is.na(bolded)) && all(bolded != "")) {
     my_bold <- ifelse(d_b$p <= 0.05, "**", "")
     d_b_new <- d_b_new |>
       dplyr::mutate(
@@ -1328,20 +1472,13 @@ apa_parameters.lm <- function(
 #' @rdname apa_parameters
 apa_parameters.list <- function(
   fit,
-  predictor_parameters = c(
-    "Parameter",
-    "Coefficient",
-    "SE",
-    "Std_Coefficient",
-    "t",
-    "df_error",
-    "p"
-  ),
-  performance_parameters = c("R2", "deltaR2"),
+  predictor_parameters = NULL,
   starred = "deltaR2",
   bolded = NA,
   column_formats = NULL,
-  t_with_df = TRUE
+  t_with_df = TRUE,
+  performance_parameters = c("R2", "deltaR2"),
+  ...
 ) {
   if (is.null(names(fit))) {
     names(fit) <- paste("Model", seq(1, length(fit)))
@@ -1349,14 +1486,19 @@ apa_parameters.list <- function(
   d_fit <- purrr::map_df(
     fit,
     \(f1) {
-      apa_parameters(
+      args <- list(
         f1,
-        predictor_parameters = predictor_parameters,
         column_formats = column_formats,
         t_with_df = FALSE,
         starred = starred,
-        bolded = bolded
+        bolded = bolded,
+        ...
       )
+      # If NULL, use the default predictor_parameters of each model's method
+      if (!is.null(predictor_parameters)) {
+        args$predictor_parameters <- predictor_parameters
+      }
+      do.call(apa_parameters, args)
     },
     .id = "Model"
   )

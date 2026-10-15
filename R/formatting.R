@@ -33,26 +33,33 @@ align_chr <- function(
   ...
 ) {
   if (is.null(padding_character)) {
+    # Default padding character is a figure space
     padding_character <- "\u2007"
   }
   center1 <- center
   if (center1 == ".") center1 <- "\\."
 
   if (is.null(accuracy)) accuracy <- the$accuracy
+
+  # Use xx to make changes, keep x pristine
   xx <- x
 
+  # Trim spaces
   if (is.character(x)) {
     xx <- stringr::str_trim(xx)
   }
 
+  # On which side to align
   side <- match.arg(side, c("both", "left", "right"))
 
+  # If character text is all numbers, make numeric
   if (is.character(xx) && format_numeric_character) {
     if (all(grepl("^[-0-9.]+$", xx))) {
       xx <- as.numeric(xx)
     }
   }
 
+  # If x is all integers, then do not add decimals
   if (
     (rlang::is_integerish(x) || rlang::is_integerish(xx)) && !format_integers
   ) {
@@ -110,14 +117,20 @@ align_chr <- function(
       )
     }
 
+    # Make middle text equal to center
     middle <- paste0(center, rep("", length(xx)))
 
+    # Remove center text if splitter is not detected
     middle[!stringr::str_detect(xx, splitter)] <- ""
 
+    # Remove center text if xx is NA
     middle[is.na(xx)] <- ""
 
+    # combine left, middle, and right text
     xx <- paste0(left_x, middle, right_x)
   }
+
+  # Make NA if original x is NA, zero-length, or empty
   xx[is.na(x) | nchar(x) == 0 | x == ""] <- NA_value
 
   xx
@@ -989,6 +1002,12 @@ the$columns <- list(
     header = "*&eta;*^2^",
     latex = "$\\eta^2$",
     formatter = the$trim_leading_zero
+  ),
+  Exp_Coefficient = column_format(
+    name = "Exp_Coefficient",
+    header = "Exp(*B*)",
+    latex = "Exp($B$)",
+    formatter = the$number_formatter
   ),
   `F` = column_format(
     name = "F",

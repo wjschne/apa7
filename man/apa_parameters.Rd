@@ -3,6 +3,7 @@
 \name{apa_parameters}
 \alias{apa_parameters}
 \alias{apa_parameters.lm}
+\alias{apa_parameters.glm}
 \alias{apa_parameters.list}
 \title{format model parameters in APA style}
 \usage{
@@ -12,7 +13,8 @@ apa_parameters(
   starred = NULL,
   bolded = NULL,
   column_formats = NULL,
-  t_with_df = TRUE
+  t_with_df = TRUE,
+  ...
 )
 
 \method{apa_parameters}{lm}(
@@ -22,24 +24,37 @@ apa_parameters(
   starred = NA,
   bolded = NA,
   column_formats = NULL,
-  t_with_df = TRUE
+  t_with_df = TRUE,
+  ...
+)
+
+\method{apa_parameters}{glm}(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "t", "z",
+    "df_error", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  ...
 )
 
 \method{apa_parameters}{list}(
   fit,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t",
-    "df_error", "p"),
-  performance_parameters = c("R2", "deltaR2"),
-  starred = NA,
+  predictor_parameters = NULL,
+  starred = "deltaR2",
   bolded = NA,
   column_formats = NULL,
-  t_with_df = TRUE
+  t_with_df = TRUE,
+  performance_parameters = c("R2", "deltaR2"),
+  ...
 )
 }
 \arguments{
 \item{fit}{model fit object}
 
-\item{predictor_parameters}{predictor parameters to display. If named vector, column names will be vector names}
+\item{predictor_parameters}{predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., \code{t} for a model tested with \emph{z}) are silently dropped. For lists of models, \code{NULL} (default) uses the default for each model's class.}
 
 \item{starred}{columns to star with significant p_values}
 
@@ -48,6 +63,12 @@ apa_parameters(
 \item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 
 \item{t_with_df}{if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.}
+
+\item{...}{arguments passed to methods}
+
+\item{exponentiate}{if \code{NULL} (default), exponentiated coefficients are added when the model's link function is logit or log (i.e., odds ratios, risk ratios, or incidence rate ratios). If \code{TRUE}, exponentiated coefficients are always added. If \code{FALSE}, they are never added.}
+
+\item{performance_parameters}{for lists of models, model comparison metrics passed to \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}. If \code{NULL}, no metrics are added.}
 }
 \value{
 tibble
@@ -55,8 +76,14 @@ tibble
 \description{
 format model parameters in APA style
 }
+\details{
+For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \emph{z} for families with a fixed dispersion parameter (binomial, Poisson, negative binomial) and \emph{t} for families with an estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi families). Whichever statistic applies is displayed. The exponentiated coefficient column (\code{Exp_Coefficient}) is labeled \emph{OR} for logit links, \emph{IRR} for log links in count models (Poisson, quasi-Poisson, negative binomial), \emph{RR} for log links in binomial models, and Exp(\emph{B}) otherwise.
+}
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
+   apa_parameters() |>
+   apa_flextable()
+glm(am ~ wt + hp, data = mtcars, family = binomial) |>
    apa_parameters() |>
    apa_flextable()
 }

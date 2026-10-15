@@ -125,6 +125,69 @@ test_that("apa_parameters.lm returns a tibble-like object", {
   expect_no_error(result)
 })
 
+test_that("apa_parameters.glm reports odds ratios and z for logistic models", {
+  fit <- suppressWarnings(
+    glm(am ~ wt + hp, data = mtcars, family = binomial)
+  )
+  result <- apa_parameters(fit, starred = c("Coefficient", "z"), bolded = "p")
+  expect_true(is.data.frame(result))
+  expect_equal(nrow(result), 3L)
+  expect_equal(
+    colnames(result),
+    c("Variable", "*B*", "*SE*", "*OR*", "*z*", "*p*")
+  )
+  expect_no_error(apa_flextable(result))
+})
+
+test_that("apa_parameters.glm labels exponentiated coefficients by link", {
+  pois <- glm(carb ~ wt, data = mtcars, family = poisson)
+  expect_true("*IRR*" %in% colnames(apa_parameters(pois)))
+
+  nb <- suppressWarnings(MASS::glm.nb(carb ~ wt, data = mtcars))
+  expect_true("*IRR*" %in% colnames(apa_parameters(nb)))
+
+  gamma_log <- glm(mpg ~ wt, data = mtcars, family = Gamma("log"))
+  expect_true("Exp(*B*)" %in% colnames(apa_parameters(gamma_log)))
+
+  probit <- suppressWarnings(
+    glm(am ~ wt, data = mtcars, family = binomial("probit"))
+  )
+  probit_cols <- colnames(apa_parameters(probit))
+  expect_false(any(c("*OR*", "Exp(*B*)") %in% probit_cols))
+  expect_true("Exp(*B*)" %in% colnames(apa_parameters(probit, exponentiate = TRUE)))
+  expect_false("*IRR*" %in% colnames(apa_parameters(pois, exponentiate = FALSE)))
+})
+
+test_that("apa_parameters.glm uses t with df for estimated dispersion", {
+  fit <- glm(carb ~ wt, data = mtcars, family = quasipoisson)
+  result <- apa_parameters(fit)
+  expect_true("*t*(30)" %in% colnames(result))
+  expect_false("*z*" %in% colnames(result))
+  expect_true("*IRR*" %in% colnames(result))
+
+  gaussian <- glm(mpg ~ wt, data = mtcars)
+  expect_false(any(c("*OR*", "Exp(*B*)") %in% colnames(apa_parameters(gaussian))))
+})
+
+test_that("apa_parameters.glm exponentiates the raw coefficients", {
+  fit <- glm(carb ~ wt, data = mtcars, family = poisson)
+  result <- apa_parameters(fit, predictor_parameters = c("Parameter", "Exp_Coefficient"))
+  expect_equal(
+    as.numeric(gsub("[  ]", "", result[["*IRR*"]])),
+    round(exp(unname(coef(fit))), 2)
+  )
+})
+
+test_that("apa_parameters.list handles lists of glm models", {
+  fits <- suppressWarnings(list(
+    glm(am ~ wt, data = mtcars, family = binomial),
+    glm(am ~ wt + hp, data = mtcars, family = binomial)
+  ))
+  result <- apa_parameters(fits, performance_parameters = NULL)
+  expect_true(all(c("*OR*", "*z*") %in% colnames(result)))
+  expect_equal(nrow(result), 5L)
+})
+
 # apa_performance ----
 
 test_that("apa_performance.lm returns a data frame", {
