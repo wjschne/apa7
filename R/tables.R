@@ -1465,7 +1465,8 @@ format_apa_parameters <- function(
     tibble::deframe()
 
   d_b_new |>
-    dplyr::select(dplyr::any_of(pr_selector))
+    dplyr::select(dplyr::any_of(pr_selector)) |>
+    as_apa7_tbl()
 }
 
 #' @export
@@ -1522,7 +1523,7 @@ apa_parameters.list <- function(
 
 
   }
-  d_fit
+  as_apa7_tbl(d_fit)
 }
 
 #' print loadings
@@ -1614,10 +1615,15 @@ apa_performance.lm <- function(
 
   names(metrics) <- NULL
 
-  prs <- column_formats@get_tibble
-
   d <- performance::model_performance(fit, metrics = "all") |>
     tibble::as_tibble()
+
+  # GLMs report a pseudo-R2 under its own name
+  pr2 <- use_pseudo_r2(d, column_formats)
+  d <- pr2$data
+  column_formats <- pr2$column_formats
+
+  prs <- column_formats@get_tibble
 
   d_new <- d
 
@@ -1643,14 +1649,86 @@ apa_performance.lm <- function(
     tibble::deframe()
 
   d_new |>
-    dplyr::select(dplyr::any_of(pr_selector))
+    dplyr::select(dplyr::any_of(pr_selector)) |>
+    as_apa7_tbl()
+}
+
+#' @details
+#' For `glm` objects, `R2` is the pseudo-*R*^2^ that [performance::r2()] selects for the model family (e.g., Tjur's *R*^2^ for logistic regression and Nagelkerke's *R*^2^ for count models). The header names the pseudo-*R*^2^ that was used. Because the residual standard deviation is not meaningful for most GLMs, the default metrics are `R2` and `AIC`.
+#' @export
+#' @rdname apa_performance
+apa_performance.glm <- function(
+  fit,
+  metrics = c("R2", "AIC"),
+  column_formats = NULL
+) {
+  apa_performance.lm(fit, metrics = metrics, column_formats = column_formats)
+}
+
+#' Use a pseudo-R2 as the R2 column
+#'
+#' `performance` names pseudo-R2 columns by type (e.g., `R2_Tjur`). Copies the
+#' first one found into `R2` and labels the `R2` and `deltaR2` headers with the
+#' type, unless `R2` already exists or the headers were customized.
+#' @keywords internal
+#' @noRd
+use_pseudo_r2 <- function(data, column_formats) {
+  pseudo <- c(
+    R2_Tjur = "Tjur",
+    R2_Nagelkerke = "Nagelkerke",
+    R2_McFadden = "McFadden",
+    R2_CoxSnell = "Cox–Snell"
+  )
+  found <- intersect(names(pseudo), colnames(data))
+  if ("R2" %in% colnames(data) || length(found) == 0) {
+    return(list(data = data, column_formats = column_formats))
+  }
+  found <- found[1]
+  data$R2 <- data[[found]]
+  label <- pseudo[[found]]
+  for (cl in c("R2", "deltaR2")) {
+    if (
+      !is.null(column_formats[[cl]]) &&
+        identical(column_formats[[cl]]@header, the$columns[[cl]]@header)
+    ) {
+      column_formats[[cl]]@header <- paste0(
+        column_formats[[cl]]@header,
+        "~",
+        label,
+        "~"
+      )
+      column_formats[[cl]]@latex <- sub(
+        "\\$$",
+        paste0("_{\\\\text{", label, "}}$"),
+        column_formats[[cl]]@latex
+      )
+    }
+  }
+  list(data = data, column_formats = column_formats)
+}
+
+#' Does a model have a fixed dispersion parameter?
+#'
+#' Nested models with fixed dispersion (binomial, Poisson, negative binomial)
+#' are compared with likelihood ratio tests rather than F tests.
+#' @keywords internal
+#' @noRd
+has_fixed_dispersion <- function(fit) {
+  if (!inherits(fit, "glm")) {
+    return(FALSE)
+  }
+  family <- stats::family(fit)$family
+  family %in% c("binomial", "poisson") ||
+    startsWith(family, "Negative Binomial")
 }
 
 #' format model comparison metrics in APA style
 #'
 #' @param ... model fit objects
-#' @param metrics performance metrics. Default is R2, deltaR2, F, and p
+#' @param metrics performance metrics. If `NULL` (default), R2, deltaR2, F, and p for models with an estimated dispersion parameter (e.g., `lm`, Gaussian or quasi-family `glm`), and R2, deltaR2, Chi2, df, and p for GLMs with a fixed dispersion parameter (binomial, Poisson, negative binomial). Use "all" for all available metrics.
 #' @param starred columns to star with significant p_values
+#' @details
+#' Nested models are compared with *F* tests ([performance::test_wald()]) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests ([performance::test_likelihoodratio()]) are used. For GLMs, `R2` is the pseudo-*R*^2^ that [performance::r2()] selects for the model family, and the header names it (e.g., *R*^2^~Tjur~).
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
 #' @return tibble
@@ -1663,26 +1741,10 @@ apa_performance.lm <- function(
 #'    apa_flextable()
 apa_performance_comparison <- function(
   ...,
-  metrics = c("R2", "deltaR2", "F", "p"),
+  metrics = NULL,
   starred = NA,
   column_formats = NULL
 ) {
-  if (any(metrics == "all")) {
-    metrics <- c(
-      "R2",
-      "deltaR2",
-      "R2_adjusted",
-      "RMSE",
-      "Sigma",
-      "AIC",
-      "AICc",
-      "BIC",
-      "F",
-      "df",
-      "p"
-    )
-  }
-
   R2 <- Model <- pstar <- df <- df_diff <- Name <- NULL
 
   if (is.null(column_formats)) {
@@ -1691,21 +1753,62 @@ apa_performance_comparison <- function(
 
   .dots <- rlang::list2(...)
 
+  # Models may be passed individually or as a single (unclassed) list
+  models <- .dots
+  if (length(.dots) == 1 && is.list(.dots[[1]]) && !is.object(.dots[[1]])) {
+    models <- .dots[[1]]
+  }
+  use_lrt <- all(purrr::map_lgl(models, has_fixed_dispersion))
+
+  if (is.null(metrics)) {
+    metrics <- if (use_lrt) {
+      c("R2", "deltaR2", "Chi2", "df", "p")
+    } else {
+      c("R2", "deltaR2", "F", "p")
+    }
+  }
+
+  if (any(metrics == "all")) {
+    metrics <- c(
+      "R2",
+      "deltaR2",
+      "R2_adjusted",
+      "RMSE",
+      # Sigma is fixed at 1 when dispersion is fixed
+      if (!use_lrt) "Sigma",
+      "AIC",
+      "AICc",
+      "BIC",
+      if (use_lrt) "Chi2" else "F",
+      "df",
+      "p"
+    )
+  }
+
   if (length(.dots[[1]]) > 1) {
 
     cp <- performance::compare_performance(..., metrics = "all") |>
       tibble::as_tibble()
 
+    pr2 <- use_pseudo_r2(cp, column_formats)
+    cp <- pr2$data
+    column_formats <- pr2$column_formats
 
-    t_wald <- performance::test_wald(...) |>
-      tibble::as_tibble()
+    # Likelihood ratio tests for fixed-dispersion GLMs, F tests otherwise
+    t_nested <- if (use_lrt) {
+      performance::test_likelihoodratio(...)
+    } else {
+      performance::test_wald(...)
+    }
+    t_nested <- tibble::as_tibble(t_nested) |>
+      dplyr::select(-dplyr::any_of("Criterion"))
 
     if ("deltaR2" %in% metrics) {
       cp <- cp |>
         dplyr::mutate(deltaR2 = ifelse(is.na(dplyr::lag(R2)), R2, R2 - dplyr::lag(R2)))
     }
     cp <- cp |>
-      dplyr::left_join(t_wald, by = dplyr::join_by(Name, Model))
+      dplyr::left_join(t_nested, by = dplyr::join_by(Name, Model))
   } else {
     cp <- performance::performance(.dots[[1]], metrics = "all")
   }
@@ -1730,7 +1833,12 @@ apa_performance_comparison <- function(
     cp[p_empty, starred] <- NA
   }
 
-  if (all(c("df", "df_diff") %in% colnames(cp))) {
+  if ("Chi2" %in% colnames(cp) && all(c("df", "df_diff") %in% colnames(cp))) {
+    # Chi-square tests report only the df of the difference
+    cp$df <- align_chr(abs(cp$df_diff), accuracy = the$accuracy)
+    cp$df[is.na(cp$df_diff)] <- NA
+    cp$df_diff <- NULL
+  } else if (all(c("df", "df_diff") %in% colnames(cp))) {
     cp <- cp |>
       dplyr::mutate(
         dplyr::across(c(df_diff, df), .fns = \(x) {
@@ -1749,7 +1857,8 @@ apa_performance_comparison <- function(
   cp |>
     dplyr::select(Model = Name, dplyr::any_of(metrics)) |>
     dplyr::mutate(Model = paste("Model", dplyr::row_number())) |>
-    apa_format_columns(column_formats)
+    apa_format_columns(column_formats) |>
+    as_apa7_tbl()
 }
 
 # apa_style <- function(x,

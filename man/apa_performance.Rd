@@ -3,11 +3,14 @@
 \name{apa_performance}
 \alias{apa_performance}
 \alias{apa_performance.lm}
+\alias{apa_performance.glm}
 \title{format model performance metrics in APA style}
 \usage{
 apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 
 \method{apa_performance}{lm}(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
+
+\method{apa_performance}{glm}(fit, metrics = c("R2", "AIC"), column_formats = NULL)
 }
 \arguments{
 \item{fit}{model fit object}
@@ -21,6 +24,9 @@ tibble
 }
 \description{
 format model performance metrics in APA style
+}
+\details{
+For \code{glm} objects, \code{R2} is the pseudo-\emph{R}^2^ that \code{\link[performance:r2]{performance::r2()}} selects for the model family (e.g., Tjur's \emph{R}^2^ for logistic regression and Nagelkerke's \emph{R}^2^ for count models). The header names the pseudo-\emph{R}^2^ that was used. Because the residual standard deviation is not meaningful for most GLMs, the default metrics are \code{R2} and \code{AIC}.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>

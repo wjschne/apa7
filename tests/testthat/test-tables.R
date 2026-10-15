@@ -186,6 +186,13 @@ test_that("apa_parameters.list handles lists of glm models", {
   result <- apa_parameters(fits, performance_parameters = NULL)
   expect_true(all(c("*OR*", "*z*") %in% colnames(result)))
   expect_equal(nrow(result), 5L)
+
+  # Default performance parameters use the pseudo-R2
+  result <- apa_parameters(fits)
+  expect_true(
+    all(c("*R*^2^~Tjur~", "&Delta;*R*^2^~Tjur~") %in% colnames(result))
+  )
+  expect_no_error(apa_flextable(result))
 })
 
 # apa_performance ----
@@ -222,6 +229,113 @@ test_that("apa_performance.lm returns a data frame", {
     ),
     5L
   )
+})
+
+test_that("apa_performance.glm uses a labeled pseudo-R2", {
+  fit <- suppressWarnings(
+    glm(am ~ wt + hp, data = mtcars, family = binomial)
+  )
+  result <- apa_performance(fit)
+  expect_equal(colnames(result), c("*R*^2^~Tjur~", "*AIC*"))
+  expect_equal(result[[1]], ".81")
+
+  gaussian <- glm(mpg ~ wt, data = mtcars)
+  expect_true("*R*^2^" %in% colnames(apa_performance(gaussian)))
+})
+
+test_that("apa_performance_comparison uses LRT for fixed-dispersion GLMs", {
+  fits <- suppressWarnings(list(
+    glm(am ~ wt, data = mtcars, family = binomial),
+    glm(am ~ wt + hp, data = mtcars, family = binomial)
+  ))
+  result <- apa_performance_comparison(fits)
+  expect_equal(
+    colnames(result),
+    c("Model", "*R*^2^~Tjur~", "&Delta;*R*^2^~Tjur~", "*&chi;*^2^", "*df*", "*p*")
+  )
+  lrt <- performance::test_likelihoodratio(fits)
+  expect_equal(result[["*&chi;*^2^"]][2], sprintf("%.2f", lrt$Chi2[2]))
+  expect_equal(trimws(result[["*df*"]][2]), "1")
+  expect_false("&sigma;~*e*~" %in% colnames(
+    apa_performance_comparison(fits, metrics = "all")
+  ))
+
+  pois <- list(
+    glm(carb ~ wt, data = mtcars, family = poisson),
+    glm(carb ~ wt + hp, data = mtcars, family = poisson)
+  )
+  expect_true(
+    all(c("*R*^2^~Nagelkerke~", "*&chi;*^2^") %in%
+      colnames(apa_performance_comparison(pois)))
+  )
+
+  nb <- suppressWarnings(list(
+    MASS::glm.nb(carb ~ wt, data = mtcars),
+    MASS::glm.nb(carb ~ wt + hp, data = mtcars)
+  ))
+  expect_true("*&chi;*^2^" %in% colnames(apa_performance_comparison(nb)))
+})
+
+test_that("apa_performance_comparison uses F for estimated-dispersion GLMs", {
+  qp <- list(
+    glm(carb ~ wt, data = mtcars, family = quasipoisson),
+    glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
+  )
+  result <- apa_performance_comparison(qp)
+  expect_true(all(c("*R*^2^~Nagelkerke~", "*F*") %in% colnames(result)))
+  expect_false("*&chi;*^2^" %in% colnames(result))
+
+  gaussian <- list(glm(mpg ~ wt, data = mtcars), glm(mpg ~ wt + hp, data = mtcars))
+  expect_equal(
+    colnames(apa_performance_comparison(gaussian)),
+    c("Model", "*R*^2^", "&Delta;*R*^2^", "*F*", "*p*")
+  )
+})
+
+# apa7_tbl ----
+
+test_that("apa tables have class apa7_tbl and remain tibbles", {
+  fit <- lm(mpg ~ cyl + wt, data = mtcars)
+  m1 <- lm(mpg ~ cyl, data = mtcars)
+  glms <- suppressWarnings(list(
+    glm(am ~ wt, data = mtcars, family = binomial),
+    glm(am ~ wt + hp, data = mtcars, family = binomial)
+  ))
+  objs <- list(
+    apa_parameters(fit),
+    apa_parameters(list(m1, fit)),
+    apa_parameters(glms),
+    apa_performance(fit),
+    apa_performance_comparison(list(m1, fit))
+  )
+  for (o in objs) {
+    expect_s3_class(o, "apa7_tbl")
+    expect_s3_class(o, "data.frame")
+  }
+  # Single-model tables are tibbles (lists of models are grouped data frames)
+  expect_s3_class(objs[[1]], "tbl_df")
+
+  # Class survives dplyr post-processing
+  d <- apa_parameters(fit) |>
+    dplyr::filter(Variable != "Constant")
+  expect_s3_class(d, "apa7_tbl")
+  expect_equal(nrow(d), 2L)
+  expect_s3_class(apa_flextable(d), "flextable")
+})
+
+test_that("apa7.print option controls knit_print and print", {
+  d <- apa_parameters(lm(mpg ~ cyl + wt, data = mtcars))
+
+  withr::with_options(list(apa7.print = "auto"), {
+    expect_s3_class(knit_print.apa7_tbl(d), "knit_asis")
+    expect_output(print(d), "tibble")
+  })
+
+  withr::with_options(list(apa7.print = "tibble"), {
+    expect_false(inherits(knit_print.apa7_tbl(d), "knit_asis") &&
+      grepl("<table", paste(knit_print.apa7_tbl(d), collapse = "")))
+    expect_output(print(d), "tibble")
+  })
 })
 
 # add_list_column ----

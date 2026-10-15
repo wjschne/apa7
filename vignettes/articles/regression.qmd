@@ -20,7 +20,11 @@ library(psych)
 ```
 
 
-The apa7 package is closely aligned with the easystats suite of packages. In most cases, it relies on easystats functions to do most of the hard work and then converts the output to APA style tables. For example, the easystats package parameters takes regression fit objects and displays regression coefficient tables as markdown tables.
+The apa7 package is closely aligned with the [easystats](https://easystats.github.io/easystats/) suite of packages for reporting statistical analyses. In most cases, it relies on easystats functions to do most of the hard work and then converts the output to APA style tables. For example, the easystats package parameters has a function `model_parameters` that takes regression fit objects and displays regression coefficient tables into a `tibble` that is displayed as a markdown table. The `apa_parameters` function converts the output of `model_parameters` into a `tibble` that is ready for `apa_flextable` to display as an APA-style table. That is.
+
+1. Make regression model fit object with `lm` function.
+2. `apa_parameters` converts fit object into a tibble using easystats functions.
+3. `apa_flextable` converts tibble into an APA-style table
 
 ```{r}
 #| label: ACT
@@ -39,18 +43,22 @@ d <- sat.act |>
     )
   ) |>
   tidyr::drop_na()
+
 m1 <- lm(ACT ~ age + gender, d)
+apa_parameters(m1)
+
+apa_parameters(m1) |> 
+  apa_flextable()
+
+
 m2 <- update(m1, . ~ . + education)
 m3 <- update(m2, . ~ . + SATV + SATQ)
-apa_parameters(m3) |> 
+apa_parameters(list(m1, m2, m3)) |> 
   apa_flextable()
-align_chr()
 ```
 
 
 # Binary Logistic Regression
 
-```{r}
 
-```
 

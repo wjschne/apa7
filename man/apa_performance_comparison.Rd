@@ -6,7 +6,7 @@
 \usage{
 apa_performance_comparison(
   ...,
-  metrics = c("R2", "deltaR2", "F", "p"),
+  metrics = NULL,
   starred = NA,
   column_formats = NULL
 )
@@ -14,7 +14,7 @@ apa_performance_comparison(
 \arguments{
 \item{...}{model fit objects}
 
-\item{metrics}{performance metrics. Default is R2, deltaR2, F, and p}
+\item{metrics}{performance metrics. If \code{NULL} (default), R2, deltaR2, F, and p for models with an estimated dispersion parameter (e.g., \code{lm}, Gaussian or quasi-family \code{glm}), and R2, deltaR2, Chi2, df, and p for GLMs with a fixed dispersion parameter (binomial, Poisson, negative binomial). Use "all" for all available metrics.}
 
 \item{starred}{columns to star with significant p_values}
 
@@ -25,6 +25,9 @@ tibble
 }
 \description{
 format model comparison metrics in APA style
+}
+\details{
+Nested models are compared with \emph{F} tests (\code{\link[performance:test_wald]{performance::test_wald()}}) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests (\code{\link[performance:test_likelihoodratio]{performance::test_likelihoodratio()}}) are used. For GLMs, \code{R2} is the pseudo-\emph{R}^2^ that \code{\link[performance:r2]{performance::r2()}} selects for the model family, and the header names it (e.g., \emph{R}^2^~Tjur~).
 }
 \examples{
 m1 <- lm(mpg ~ cyl, data = mtcars)
