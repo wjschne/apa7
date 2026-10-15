@@ -54,7 +54,9 @@ add_break_columns <- function(
     where_names <- where_names[-length(where_names)]
   }
 
-  if (length(where_names) == 0) return(d)
+  if (length(where_names) == 0) {
+    return(d)
+  }
 
   blank_names <- paste0("apa7breakcolumn", seq_along(where_names))
 
@@ -111,7 +113,9 @@ add_list_column <- function(
     vl <- paste0(vseq, sep)
   } else if (tolower(type) == "i") {
     rmn <- utils::as.roman(vseq)
-    if (type == "i") rmn <- tolower(rmn)
+    if (type == "i") {
+      rmn <- tolower(rmn)
+    }
     vl <- paste0(rmn, sep, recycle0 = TRUE)
   } else {
     vl <- paste0(rep_letters(vseq, type = type), sep, recycle0 = TRUE)
@@ -137,9 +141,15 @@ add_list_column <- function(
 #' @keywords internal
 rep_letters <- function(i, type = c("a", "A")) {
   # https://stackoverflow.com/a/25881167/4513316
-  if (any(i < 1)) return(character(0))
+  if (any(i < 1)) {
+    return(character(0))
+  }
   type <- match.arg(type)
-  if (type == "a") letts <- letters else letts <- LETTERS
+  if (type == "a") {
+    letts <- letters
+  } else {
+    letts <- LETTERS
+  }
   base10toA <- function(n, A) {
     stopifnot(n >= 0L)
     N <- length(A)
@@ -250,7 +260,9 @@ separate_star_column <- function(
   .dots <- rlang::expr(...)
   apa7rownumber <- apa7starvalue <- apa7starname <- apa7starcolumn <- NULL
 
-  if (missing(.dots)) .dots <- colnames(data)
+  if (missing(.dots)) {
+    .dots <- colnames(data)
+  }
   ss <- ifelse(superscript, "^", "")
 
   d <- data |>
@@ -362,18 +374,23 @@ apa_chisq <- function(
   suppress_warnings = TRUE,
   ...
 ) {
-  if (is.null(font_family)) font_family <- the$font_family
-  if (!inherits(data, "data.frame"))
+  if (is.null(font_family)) {
+    font_family <- the$font_family
+  }
+  if (!inherits(data, "data.frame")) {
     stop("data must be a data.frame or tibble.")
-  if (ncol(data) != 2)
+  }
+  if (ncol(data) != 2) {
     stop(
       'data must have 2 columns. Select the 2 variables you wish to test before passing them to this function. For example:\nx <- mtcars[, c("am", "cyl")]\nor\nx <- dplyr::select(mtcars, am, cyl)'
     )
+  }
 
   tbl <- table(data)
 
-  if (nrow(tbl) < 2 || ncol(tbl) < 2)
+  if (nrow(tbl) < 2 || ncol(tbl) < 2) {
     stop("The contingency table must be at least a 2 by 2 table.")
+  }
 
   if (suppress_warnings) {
     fit <- suppressWarnings(stats::chisq.test(tbl))
@@ -509,11 +526,15 @@ apa_cor <- function(
   ...
 ) {
   value <- name <- Variable <- k <- group <- width <- NULL
-  if (is.null(font_family)) font_family <- the$font_family
+  if (is.null(font_family)) {
+    font_family <- the$font_family
+  }
   output <- match.arg(output)
   v_names <- colnames(data)
   v_seq <- seq(ncol(data))
-  if (is.null(column_formats)) column_formats <- column_formats()
+  if (is.null(column_formats)) {
+    column_formats <- column_formats()
+  }
 
   if (bold_significant) {
     star_significant <- FALSE
@@ -912,8 +933,7 @@ apa_flextable <- function(
       {{ row_title_column }}
     ) |>
       colnames()
-  } else {
-  }
+  } else {}
 
   header_align_vertical <- match.arg(header_align_vertical)
 
@@ -927,7 +947,9 @@ apa_flextable <- function(
     colnames()
 
   # Get default column formats
-  if (is.null(column_formats)) column_formats <- the$column_formats
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
 
   if (row_title_prefix == "") {
     row_title_sep <- ""
@@ -1046,25 +1068,27 @@ apa_flextable <- function(
       theme_fun = flextable::theme_apa
     ) |>
       flextable::mk_par(
-        i = ~!is.na(row_title),
+        i = ~ !is.na(row_title),
         value = flextable::as_paragraph(
           row_title_prefix,
           row_title_sep,
           row_title
         )
       ) |>
-      flextable::merge_h(i = ~!is.na(row_title))
+      flextable::merge_h(i = ~ !is.na(row_title))
 
     if (all(!is.na(row_title_border))) {
       ft <- ft |>
         flextable::surround(
-          i = ~!is.na(row_title),
+          i = ~ !is.na(row_title),
           border.top = row_title_border
         )
     }
   }
 
-  if (separate_headers) ft <- flextable::separate_header(ft, split = "[_]")
+  if (separate_headers) {
+    ft <- flextable::separate_header(ft, split = "[_]")
+  }
   if (!is_docx) {
     ft <- flextable::empty_blanks(ft)
   }
@@ -1075,6 +1099,13 @@ apa_flextable <- function(
   if (length(center_me) > 0) {
     ft <- flextable::align(ft, j = center_me, align = "center")
   }
+  cnames <- colnames(data)
+  if (length(cnames) > 2) {
+    if (cnames[1] == "Model" && cnames[2] == "Variable") {
+      ft <- flextable::align(ft, j = c("Model", "Variable"), part = "all")
+    }
+  }
+
 
   if (apa_style) {
     ft <- apa_style(
@@ -1103,7 +1134,7 @@ apa_flextable <- function(
   if ("row_title" %in% colnames(d)) {
     ft <- flextable::align(
       ft,
-      i = ~!is.na(row_title),
+      i = ~ !is.na(row_title),
       align = row_title_align,
       part = "body"
     )
@@ -1111,7 +1142,7 @@ apa_flextable <- function(
       ft <- flextable::padding(
         ft,
         j = 1,
-        i = ~is.na(row_title),
+        i = ~ is.na(row_title),
         padding.left = left_column_padding
       )
     }
@@ -1184,7 +1215,9 @@ apa_parameters.lm <- function(
   pstar <- Parameter <- Std_Coefficient <- df_error <- header <- name <- NULL
 
   # Get column formats
-  if (is.null(column_formats)) column_formats <- the$column_formats
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
 
   # Make sure Parameter is in the predictor_parameters
   if (!("Parameter" %in% predictor_parameters)) {
@@ -1254,7 +1287,8 @@ apa_parameters.lm <- function(
   }
 
   # add starred column
-  if (length(starred > 0) && !is.na(starred) && all(starred != "")) {
+  starred <- starred[starred %in% colnames(d_b_new)]
+  if (length(starred > 0) && !is.na(starred) && all(starred != "") ) {
     d_b_new <- d_b_new |>
       dplyr::mutate(pstar = p2stars(d_b$p, superscript = TRUE)) |>
       tidyr::unite(
@@ -1303,7 +1337,8 @@ apa_parameters.list <- function(
     "df_error",
     "p"
   ),
-  starred = NA,
+  performance_parameters = c("R2", "deltaR2"),
+  starred = "deltaR2",
   bolded = NA,
   column_formats = NULL,
   t_with_df = TRUE
@@ -1311,17 +1346,41 @@ apa_parameters.list <- function(
   if (is.null(names(fit))) {
     names(fit) <- paste("Model", seq(1, length(fit)))
   }
-  purrr::map_df(
+  d_fit <- purrr::map_df(
     fit,
-    \(f1)
+    \(f1) {
       apa_parameters(
         f1,
         predictor_parameters = predictor_parameters,
         column_formats = column_formats,
-        t_with_df = FALSE
-      ),
+        t_with_df = FALSE,
+        starred = starred,
+        bolded = bolded
+      )
+    },
     .id = "Model"
   )
+  if (
+    !(is.null(performance_parameters) ||
+      length(performance_parameters) == 0 ||
+      all(is.na(performance_parameters)))
+  ) {
+    d_fit <- d_fit |>
+      flextable::as_grouped_data(groups = "Model") |>
+      dplyr::left_join(
+        apa_performance_comparison(
+          fit,
+          metrics = performance_parameters,
+          starred = starred
+        ),
+        by = dplyr::join_by(Model)
+      ) |>
+      dplyr::mutate(dplyr::across(.cols = dplyr::where(is.character), \(x) dplyr::replace_values(x, from = NA, to = "")))
+
+
+
+  }
+  d_fit
 }
 
 #' print loadings
@@ -1407,7 +1466,9 @@ apa_performance.lm <- function(
 
   header <- name <- NULL
 
-  if (is.null(column_formats)) column_formats <- the$column_formats
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
 
   names(metrics) <- NULL
 
@@ -1488,27 +1549,27 @@ apa_performance_comparison <- function(
 
   .dots <- rlang::list2(...)
 
-  t_wald <- performance::test_wald(...) |>
-    tibble::as_tibble()
+  if (length(.dots[[1]]) > 1) {
 
-  cp <- performance::compare_performance(..., metrics = "all") |>
-    tibble::as_tibble()
+    cp <- performance::compare_performance(..., metrics = "all") |>
+      tibble::as_tibble()
 
-  if ("deltaR2" %in% metrics) {
+
+    t_wald <- performance::test_wald(...) |>
+      tibble::as_tibble()
+
+    if ("deltaR2" %in% metrics) {
+      cp <- cp |>
+        dplyr::mutate(deltaR2 = ifelse(is.na(dplyr::lag(R2)), R2, R2 - dplyr::lag(R2)))
+    }
     cp <- cp |>
-      dplyr::mutate(
-        deltaR2 = ifelse(
-          is.na(dplyr::lag(R2)),
-          R2,
-          R2 - dplyr::lag(R2)
-        )
-      )
+      dplyr::left_join(t_wald, by = dplyr::join_by(Name, Model))
+  } else {
+    cp <- performance::performance(.dots[[1]], metrics = "all")
   }
 
-  cp <- cp |>
-    dplyr::left_join(t_wald, by = dplyr::join_by(Name, Model))
-
-  if (length(starred > 0) & !is.na(starred) & (starred != "")) {
+  starred <- starred[starred %in% colnames(cp)]
+  if (length(starred > 0) && !is.na(starred) && (starred != "")) {
     p_empty <- is.na(cp$p)
     cp <- cp |>
       dplyr::mutate(pstar = p2stars(cp$p, superscript = TRUE)) |>
@@ -1542,8 +1603,10 @@ apa_performance_comparison <- function(
     cp$df_diff <- NULL
   }
 
+
   cp |>
     dplyr::select(Model = Name, dplyr::any_of(metrics)) |>
+    dplyr::mutate(Model = paste("Model", dplyr::row_number())) |>
     apa_format_columns(column_formats)
 }
 
@@ -1849,10 +1912,8 @@ apa_style <- function(
     dt <- x$header$content$data
     hh <- character(0)
     md_keys <- x$col_keys[
-      !(
-        x$col_keys %in%
-          unique(c(listcolumn_keys, break_keys, no_markdown_columns_header))
-      )
+      !(x$col_keys %in%
+        unique(c(listcolumn_keys, break_keys, no_markdown_columns_header)))
     ]
     for (ch in md_keys) {
       if (!("chunk" %in% class(dt$header$content$data[[1, ch]]))) {
@@ -1871,10 +1932,8 @@ apa_style <- function(
     dt <- x$body$content$data
     hh <- character(0)
     md_keys <- x$col_keys[
-      !(
-        x$col_keys %in%
-          unique(c(listcolumn_keys, break_keys, no_markdown_columns))
-      )
+      !(x$col_keys %in%
+        unique(c(listcolumn_keys, break_keys, no_markdown_columns)))
     ]
     for (ch in md_keys) {
       if (!("chunk" %in% class(dt$body$content$data[[1, ch]]))) {
@@ -1913,8 +1972,7 @@ pretty_widths <- function(
   unit <- match.arg(unit, choices = c("in", "cm", "mm"))
   pwidth <- flextable::dim_pretty(x, unit = unit)$widths
   pwidth[pwidth < min_width] <- min_width
-  if (is.null(table_width) || is.na(table_width) || table_width == 0) {
-  } else {
+  if (is.null(table_width) || is.na(table_width) || table_width == 0) {} else {
     # Are there breaks and lists?
     break_keys <- grepl("^apa7breakcolumn", x$col_keys)
     listcolumn_keys <- x$col_keys[grepl("apa7listcolumn$", x$col_keys)]

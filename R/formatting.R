@@ -616,11 +616,14 @@ variable_name_formatter <- function(
     ` \\[(\\d)th degree\\]$` = " Apasevencaret \\1 Apasevencaret",
     `\\^(\\d)\\^` = " Apasevencaret \\1 Apasevencaret",
     `\\^(\\d)$` = " Apasevencaret \\1 Apasevencaret",
+    `–` = "Apasevenendash ",
+    ` \\[([^]]+)\\]` ="Apasevenendash \\1",
     `\\&numsp;` = "Apasevennumsp",
     `\\&nbsp;` = "Apasevennbsp"
   )
 
   post_p2r <- c(
+    ` ?Apasevenendash ?` = "–",
     ` Apasevendotspace` = ".\u2007",
     `Apasevendotspace` = ".\u2007",
     `Apasevennumsp` = "\u2007",
@@ -633,7 +636,25 @@ variable_name_formatter <- function(
     ` Apasevencaret (\\d) Apasevencaret` = "^\\1^"
   )
 
-  x <- stringr::str_replace_all(x, pre_p2r) |>
+  # Protect all-caps words (e.g., ACT, SAT-V) from title casing
+  caps_regex <- "(?<![A-Za-z0-9])[A-Z]{2,}[A-Z0-9]*(?:[-_][A-Z0-9]+)*(?![A-Za-z0-9])"
+  x <- stringr::str_replace_all(x, pre_p2r)
+  caps_words <- unique(unlist(stringr::str_extract_all(x, caps_regex)))
+  caps_words <- caps_words[order(-nchar(caps_words))]
+  caps_keys <- paste0(
+    "Apasevencap",
+    chartr("0123456789", "abcdefghij", seq_along(caps_words)),
+    "z"
+  )
+  for (i in seq_along(caps_words)) {
+    x <- stringr::str_replace_all(
+      x,
+      paste0("(?<![A-Za-z0-9])", caps_words[i], "(?![A-Za-z0-9])"),
+      caps_keys[i]
+    )
+  }
+
+  x <- x |>
     stringr::str_replace_all("\\.\u2007", "Apasevendotspace") |>
     stringr::str_replace_all("\u2007", "Apasevennumsp") |>
     stringr::str_replace_all("\u00A0", "Apasevennbsp") |>
@@ -662,11 +683,26 @@ variable_name_formatter <- function(
         "Apasevennbsp",
         "Apaseventhinsp",
         "Apasevencaret",
+        "Apasevenendash",
+        "–",
         "\t",
         "\n"
       )
     ) |>
-    stringr::str_replace_all(post_p2r) |>
+    stringr::str_replace_all(post_p2r)
+
+  for (i in seq_along(caps_words)) {
+    x <- stringr::str_replace_all(
+      x,
+      stringr::fixed(caps_keys[i]),
+      gsub("_", " ", caps_words[i], fixed = TRUE)
+    )
+  }
+
+  x <- x |>
+    stringr::str_replace_all("\u2013(\\p{Ll})", \(m) {
+      paste0("\u2013", toupper(substring(m, 2)))
+    }) |>
     stringr::str_replace_all(" \u00D7 ", "\u00D7") |>
     stringr::str_replace_all("\u00D7", " \u00D7 ")
 

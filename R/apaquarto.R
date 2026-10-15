@@ -1,6 +1,6 @@
 #' Run shiny app to make a document in APA style via Quarto
 #'
-#' A wrapper for `shiny::runGitHub` Note that running this function will install any missing packages needed to run the app: bsicons, bslib, conflicted, dplyr, fresh, purrr, rclipboard, readr, shiny, shinyWidgets, snakecase, tibble, tidyr, tippy, toastui, yaml
+#' A wrapper for `shiny::runGitHub` Note that running this function will install any missing packages needed to run the app: bsicons, bslib, conflicted, dplyr, fresh, purrr, ragg, rclipboard, readr, shiny, shinyWidgets, snakecase, svglite, tibble, tidyr, tippy, toastui, yaml
 #' @param launch.browser run shiny app in default browser
 #' @returns Runs a shiny app that creates apaquarto documents
 #' @export
@@ -48,7 +48,9 @@ make_apaquarto <- function(launch.browser = TRUE) {
     "readr",
     "snakecase",
     "tibble",
-    "fresh"
+    "fresh",
+    "ragg",
+    "svglite"
   )
 
   shiny::runGitHub(
@@ -78,6 +80,32 @@ install_apaquarto <- function(
   quarto_args = NULL
 ) {
   # nocov start
+  using <- function(...) {
+    libs <- unlist(list(...))
+    req <- unlist(lapply(libs, require, character.only = TRUE))
+    need <- libs[req == FALSE]
+    if (length(need) > 0) {
+      response <- utils::askYesNo(
+        paste0(
+          "Some missing packages are needed to run this extension. Install ",
+          xfun::join_words(need),
+          "?"
+        )
+      )
+      if (isTRUE(response)) {
+        utils::install.packages(need)
+      } else {
+        print("Action cancelled.")
+      }
+    }
+    invisible(need)
+  }
+  installed <- using(
+    "ragg",
+    "svglite"
+  )
+
+
   quarto::quarto_add_extension(
     extension = "wjschne/apaquarto",
     no_prompt = no_prompt,

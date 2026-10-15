@@ -4,7 +4,7 @@
 \name{apa7-package}
 \alias{apa7}
 \alias{apa7-package}
-\title{apa7: Facilitate Writing Documents in American Psychological Association Style, Seventh Edition}
+\title{apa7: Writing Documents in American Psychological Association Style, Seventh Edition}
 \description{
 Create American Psychological Association Style, Seventh Edition documents. Format numbers and text consistent with APA style. Create tables that comply with APA style by extending flextable functions.
 }
@@ -18,11 +18,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: W. Joel Schneider \email{w.joel.schneider@gmail.com} (\href{https://orcid.org/0000-0002-8393-5316}{ORCID})
+\strong{Maintainer}: W. Joel Schneider \email{w.joel.schneider@gmail.com} (\href{https://orcid.org/0000-0002-8393-5316}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
-  \item W. Joel Schneider \email{w.joel.schneider@gmail.com} (\href{https://orcid.org/0000-0002-8393-5316}{ORCID})
+  \item W. Joel Schneider \email{w.joel.schneider@gmail.com} (\href{https://orcid.org/0000-0002-8393-5316}{ORCID}) [copyright holder]
 }
 
 }

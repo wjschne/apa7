@@ -1,0 +1,51 @@
+---
+title: "Regression Analysis Tables"
+format: html
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(parameters)
+library(performance)
+library(apa7)
+library(psych)
+```
+
+```{r}
+#| label: setup2
+#| eval: false
+<<setup>>
+```
+
+
+The apa7 package is closely aligned with the easystats suite of packages. In most cases, it relies on easystats functions to do most of the hard work and then converts the output to APA style tables. For example, the easystats package parameters takes regression fit objects and displays regression coefficient tables as markdown tables.
+
+```{r}
+#| label: ACT
+
+d <- sat.act |>
+  mutate(
+    gender = factor(
+      gender,
+      levels = 1:2,
+      labels = c("Male", "Female")
+    ),
+    education = factor(
+      education,
+      levels = 0:5,
+      labels =     c("None", "High School", "Some College", "Bachelor", "Master", "Doctorate")
+    )
+  ) |>
+  tidyr::drop_na()
+m1 <- lm(ACT ~ age + gender, d)
+m2 <- update(m1, . ~ . + education)
+m3 <- update(m2, . ~ . + SATV + SATQ)
+apa_parameters(m3)
+
+
+```
+
+
+

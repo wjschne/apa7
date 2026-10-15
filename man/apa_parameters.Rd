@@ -29,6 +29,7 @@ apa_parameters(
   fit,
   predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "t",
     "df_error", "p"),
+  performance_parameters = c("R2", "deltaR2"),
   starred = NA,
   bolded = NA,
   column_formats = NULL,
