@@ -20,11 +20,13 @@ library(psych)
 ```
 
 
-The apa7 package is closely aligned with the [easystats](https://easystats.github.io/easystats/) suite of packages for reporting statistical analyses. In most cases, it relies on easystats functions to do most of the hard work and then converts the output to APA style tables. For example, the easystats package parameters has a function `model_parameters` that takes regression fit objects and displays regression coefficient tables into a `tibble` that is displayed as a markdown table. The `apa_parameters` function converts the output of `model_parameters` into a `tibble` that is ready for `apa_flextable` to display as an APA-style table. That is.
+The apa7 package is closely aligned with the [easystats](https://easystats.github.io/easystats/) suite of packages for reporting statistical analyses. In most cases, it relies on easystats functions to do most of the hard work and then converts the output to APA style tables. For example, the easystats package parameters has a function `model_parameters` that takes regression fit objects and displays regression coefficient tables into a `tibble` that is displayed as a markdown table. The `apa_parameters` function converts the output of `model_parameters` into a `tibble` that is ready for `apa_flextable` to display as an APA-style table. The workflow has three steps:
 
-1. Make regression model fit object with `lm` function.
-2. `apa_parameters` converts fit object into a tibble using easystats functions.
-3. `apa_flextable` converts tibble into an APA-style table
+1. Make a regression model fit object with `lm`, `glm`, or a similar function.
+2. `apa_parameters` converts the fit object into a tibble using easystats functions.
+3. `apa_flextable` converts the tibble into an APA-style table.
+
+Because step 2 returns a tibble, you can post-process it with dplyr before step 3. In Quarto and R Markdown documents, however, the output of `apa_parameters` is displayed as an APA-style table automatically, so step 3 is only needed when you want to customize the table or save it.
 
 ```{r}
 #| label: ACT
@@ -44,21 +46,126 @@ d <- sat.act |>
   ) |>
   tidyr::drop_na()
 
-m1 <- lm(ACT ~ age + gender, d)
-apa_parameters(m1)
+lm1 <- lm(ACT ~ age + gender, d)
+lm2 <- update(lm1, . ~ . + education)
+lm3 <- update(lm2, . ~ . + SATV + SATQ)
+```
 
-apa_parameters(m1) |> 
-  apa_flextable()
+# Linear Regression
 
+In the console, `apa_parameters` prints as an ordinary tibble, so you can inspect it. Here `as_tibble` is used to show that tibble in this document.
 
-m2 <- update(m1, . ~ . + education)
-m3 <- update(m2, . ~ . + SATV + SATQ)
-apa_parameters(list(m1, m2, m3)) |> 
+```{r}
+#| label: lm-tibble
+apa_parameters(lm1) |>
+  tibble::as_tibble()
+```
+
+In a document, the output of `apa_parameters` is displayed as a table without further processing.
+
+```{r}
+#| label: lm-auto
+apa_parameters(lm1)
+```
+
+The output is still a tibble, so ordinary dplyr verbs work. Pass the result to `apa_flextable` to customize the table. For example, to drop the intercept:
+
+```{r}
+#| label: lm-filter
+apa_parameters(lm1) |>
+  filter(Variable != "Constant") |>
   apa_flextable()
 ```
 
+To compare nested models, pass a list. Model fit statistics (*R*^2^, change in *R*^2^, and the *F* test of the change) are added automatically.
+
+```{r}
+#| label: lm-list
+apa_parameters(list(lm1, lm2, lm3))
+```
 
 # Binary Logistic Regression
 
+`apa_parameters` also accepts `glm` objects. The table reports coefficients on the link scale (*B*), their standard errors, the exponentiated coefficient, and the test statistic. For logistic regression, the exponentiated coefficient is the odds ratio (*OR*), and the test statistic is *z*.
 
+```{r}
+#| label: glm1
+glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
+apa_parameters(glm1)
+```
+
+Exponentiated coefficients are added whenever the link function is logit or log. They are labeled *OR* for logit links, *IRR* (incidence rate ratio) for log links in count models, and *RR* (risk ratio) for log links in binomial models. Set `exponentiate = FALSE` to leave them out, or `exponentiate = TRUE` to add them for other links such as probit.
+
+```{r}
+#| label: glm-noexp
+apa_parameters(glm1, exponentiate = FALSE)
+```
+
+To choose and order the columns, use `predictor_parameters`. Columns that the model does not report (for example, *t* for a model tested with *z*) are dropped silently.
+
+```{r}
+#| label: glm-columns
+apa_parameters(
+  glm1,
+  predictor_parameters = c("Parameter", "Exp_Coefficient", "z", "p")
+)
+```
+
+As with `lm`, `starred` and `bolded` mark significant coefficients.
+
+```{r}
+#| label: glm-starred
+apa_parameters(glm1, starred = "Coefficient", bolded = "p")
+```
+
+## Comparing logistic regression models
+
+A list of `glm` models is displayed with a pseudo-*R*^2^ (Tjur's for logistic regression, as chosen by `performance::r2`) and a likelihood ratio test of the change, because the binomial family has a fixed dispersion parameter.
+
+```{r}
+#| label: glm-list
+glm0 <- glm(am ~ wt, data = mtcars, family = binomial)
+apa_parameters(list(glm0, glm1))
+```
+
+The model comparison can also be displayed separately with `apa_performance_comparison`.
+
+```{r}
+#| label: glm-compare
+apa_performance_comparison(list(glm0, glm1))
+```
+
+# Count Regression
+
+For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*).
+
+```{r}
+#| label: poisson
+glm_pois <- glm(carb ~ wt + hp, data = mtcars, family = poisson)
+apa_parameters(glm_pois)
+```
+
+Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests.
+
+```{r}
+#| label: quasipoisson
+glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
+apa_parameters(glm_qpois)
+```
+
+# Printing Options
+
+The `apa7.print` option controls how the output of `apa_parameters`, `apa_performance`, and `apa_performance_comparison` is displayed.
+
+* `"auto"` (default): table in Quarto and R Markdown documents, tibble in the console.
+* `"flextable"`: table everywhere.
+* `"tibble"`: tibble everywhere.
+
+```{r}
+#| label: print-option
+#| eval: false
+options(apa7.print = "tibble")
+```
+
+To get the table with non-default settings, pass the output to `apa_flextable`, which always returns a flextable.
 
