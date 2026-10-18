@@ -11,6 +11,7 @@ apa7_defaults(
   column_formats = NULL,
   number_formatter = NULL,
   trim_leading_zero = NULL,
+  width_aware_padding = NULL,
   reset = FALSE
 )
 }
@@ -26,6 +27,8 @@ apa7_defaults(
 \item{number_formatter}{default function to format numbers}
 
 \item{trim_leading_zero}{default function to trim leading zeros from numbers}
+
+\item{width_aware_padding}{if \code{TRUE} (default), \code{\link[=align_chr]{align_chr()}} pads text to equal rendered width in \code{font_family} (when the font is installed). If \code{FALSE}, text is padded with one figure space per missing character.}
 
 \item{reset}{if \code{TRUE}, reset all defaults (except as specified)}
 }

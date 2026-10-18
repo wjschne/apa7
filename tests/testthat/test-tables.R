@@ -292,6 +292,28 @@ test_that("apa_performance_comparison uses F for estimated-dispersion GLMs", {
   )
 })
 
+# align_padded_columns ----
+
+test_that("apa_flextable left-aligns padded columns and centers the block", {
+  glm1 <- suppressWarnings(glm(am ~ wt + hp, data = mtcars, family = binomial))
+  d <- apa_parameters(
+    glm1,
+    predictor_parameters = c("Parameter", "Exp_Coefficient", "z", "p")
+  )
+  ft <- apa_flextable(d)
+  align <- ft$body$styles$pars$text.align$data
+  pad <- ft$body$styles$pars$padding.left$data
+  expect_true(all(align[, "*z*"] == "left"))
+  expect_true(all(pad[, "*z*"] > 3))
+  # Uniform padding within the column
+  expect_equal(length(unique(pad[, "*z*"])), 1L)
+
+  # Unpadded columns stay centered
+  d2 <- tibble::tibble(Variable = c("a", "b"), x = c("one", "two"))
+  ft2 <- apa_flextable(d2)
+  expect_true(all(ft2$body$styles$pars$text.align$data[, "x"] == "center"))
+})
+
 # apa7_tbl ----
 
 test_that("apa tables have class apa7_tbl and remain tibbles", {

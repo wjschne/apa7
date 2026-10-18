@@ -59,6 +59,57 @@ test_that("num_pad replaces NA with empty string and still pads", {
   expect_true(grepl("^(&numsp;)*$", result[2]))
 })
 
+test_that("num_pad counts visible characters, not markdown markup", {
+  # Superscript stars: ^\*\*^ renders as two characters
+  result <- num_pad(c("1^\\*\\*^", "123"), padding_character = "_")
+  expect_equal(result, c("1^\\*\\*^", "123"))
+  # Bold markers are not counted
+  expect_equal(num_pad(c("**1**", "12"), padding_character = "_"), c("_**1**", "12"))
+  # Word endings are not subtracted (old "\\>" regex bug)
+  expect_equal(num_pad(c("1,234", "5"), padding_character = "_"), c("1,234", "____5"))
+  # Entities count as one character
+  expect_equal(num_pad(c("&minus;1", "12"), padding_character = "_"), c("&minus;1", "12"))
+})
+
+test_that("num_pad pads to equal rendered width in an installed font", {
+  skip_if_not(apa7:::font_available("Times New Roman"))
+  tnr <- "Times New Roman"
+  w <- \(x) apa7:::md_text_width(x, tnr)
+
+  # Minus sign (0.564 em) is wider than a figure space (0.5 em)
+  result <- num_pad(c("−1", "1"), font_family = tnr)
+  expect_true(startsWith(result[2], " "))
+  expect_lt(abs(diff(w(result))), 0.025)
+
+  # Superscripts are measured at reduced size
+  result <- num_pad(c("1^\\*^", "1^\\*\\*^", "1"), pad_left = FALSE, font_family = tnr)
+  expect_lt(diff(range(w(result))), 0.05)
+
+  # Commas are narrower than digits
+  result <- num_pad(c("1,234", "5"), font_family = tnr)
+  expect_lt(abs(diff(w(result))), 0.025)
+
+  # Unknown fonts fall back to character counts
+  expect_equal(
+    num_pad(c("a", "bb"), padding_character = "_", font_family = "No Such Font apa7"),
+    c("_a", "bb")
+  )
+})
+
+test_that("align_chr aligns decimals by rendered width", {
+  skip_if_not(apa7:::font_available("Times New Roman"))
+  apa7_defaults(font_family = "Times New Roman", width_aware_padding = TRUE)
+  x <- align_chr(c(-2.63, 2.53, 18.87))
+  left <- sub("\\..*$", "", x)
+  w <- apa7:::md_text_width(left, "Times New Roman")
+  expect_lt(diff(range(w)), 0.025)
+
+  # Turning width-aware padding off restores figure-space padding
+  apa7_defaults(width_aware_padding = FALSE)
+  withr::defer(apa7_defaults(width_aware_padding = TRUE))
+  expect_equal(align_chr(c(-.01, .51)), c("−0.01", " 0.51"))
+})
+
 # hanging_indent ----
 
 test_that("hanging_indent returns a character string", {

@@ -5,7 +5,7 @@
 #' @param trim_leading_zeros if TRUE (default), trims leading zeros, otherwise keeps them
 #' @param drop0trailing Drop trailing zeros
 #' @param add_plusses if TRUE (default), adds a plus to positive numbers
-#' @param padding_character character to use for padding, default is `&numsp;` (figure space)
+#' @param padding_character character to use for padding, default is `&numsp;` (figure space). With the default, text is padded to equal rendered width in the default font family (see [num_pad()] and the `width_aware_padding` argument of [apa7_defaults()]).
 #' @param center text on which to align text. Center on decimal by default, but can be any text.
 #' @param format_integers If TRUE, integers will be formatted with digits
 #' @param side side on which to make text of equal width
@@ -35,6 +35,15 @@ align_chr <- function(
   if (is.null(padding_character)) {
     # Default padding character is a figure space
     padding_character <- "\u2007"
+  }
+
+  # With figure-space padding, pad to equal rendered width in the default font
+  pad_font <- NA
+  if (
+    isTRUE(the$width_aware_padding) &&
+      padding_character %in% c("\u2007", "&numsp;")
+  ) {
+    pad_font <- the$font_family
   }
   center1 <- center
   if (center1 == ".") {
@@ -73,7 +82,8 @@ align_chr <- function(
         add_plusses = add_plusses,
         big.mark = ","
       ),
-      padding_character = padding_character
+      padding_character = padding_character,
+      font_family = pad_font
     )
   } else {
     if (is.numeric(xx)) {
@@ -108,7 +118,8 @@ align_chr <- function(
       left_x <- num_pad(
         left_x,
         padding_character = padding_character,
-        NA_value = ""
+        NA_value = "",
+        font_family = pad_font
       )
     }
 
@@ -117,7 +128,8 @@ align_chr <- function(
         right_x,
         pad_left = FALSE,
         padding_character = padding_character,
-        NA_value = ""
+        NA_value = "",
+        font_family = pad_font
       )
     }
 
@@ -413,42 +425,186 @@ is_numeric_like <- function(x, elementwise = FALSE) {
 
 #' Pads text on the left or right so that the width is the same for each element of the vector
 #'
+#' By default, text is padded with one `padding_character` per missing visible character. Markdown markup (e.g., `**`, `*`, `^`, `~`, and backslash escapes) is not counted. If `font_family` names an installed font, text is instead padded to equal *rendered* width in that font, using a combination of figure, punctuation, thin, and hair spaces (`padding_character` is then ignored). Superscripts and subscripts are measured at 2/3 of the font size.
+#'
 #' @param x vector of text
 #' @param pad_left if TRUE (default), pads on the left, otherwise pads on the right
 #' @param padding_character character to use for padding, default is `&numsp;` (figure space)
 #' @param NA_value value to replace NA
+#' @param font_family font in which to measure text widths. If `NULL` (default) or `NA`, or if the font is not installed, widths are counted in characters.
 #'
 #' @return character vector
 #' @export
 #'
 #' @examples
 #' num_pad(c("a", "bb"))
+#' num_pad(c("−1", "1"), font_family = "Times New Roman")
 num_pad <- function(
   x,
   pad_left = TRUE,
   padding_character = "&numsp;",
-  NA_value = ""
+  NA_value = "",
+  font_family = NULL
 ) {
-  nch <- nchar(x)
-  gtcount <- stringr::str_count(x, "\\>")
-  gtcount[is.na(gtcount)] <- 0
-  starcount <- stringr::str_count(x, "\\*")
-  starcount[is.na(starcount)] <- 0
-  nch <- nch - gtcount - starcount
-  nch[is.na(nch)] <- 0
+  width_aware <- !is.null(font_family) &&
+    !is.na(font_family) &&
+    font_available(font_family)
+
+  if (width_aware) {
+    w <- md_text_width(x, font_family)
+    pad_chr <- space_fill(max(w) - w, font_family)
+  } else {
+    nch <- nchar(md_visible_text(x))
+    nch[is.na(x)] <- 0
+    pad_chr <- strrep(padding_character, max(nch) - nch)
+  }
 
   x[is.na(x)] <- NA_value
 
-  max_nch <- max(nch)
-  pad_nch <- max_nch - nch
-  pad_chr <- purrr::map_chr(pad_nch, \(t) {
-    paste0(rep(padding_character, t), collapse = "")
-  })
   if (pad_left) {
     paste0(pad_chr, x)
   } else {
     paste0(x, pad_chr)
   }
+}
+
+# Width-aware padding ----
+
+# Spaces used to fill padding, widest first
+padding_spaces <- c(
+  figure = " ",
+  punctuation = " ",
+  thin = " ",
+  hair = " "
+)
+
+md_entities <- c(
+  "&numsp;" = " ",
+  "&puncsp;" = " ",
+  "&thinsp;" = " ",
+  "&hairsp;" = " ",
+  "&nbsp;" = " ",
+  "&minus;" = "−",
+  "&times;" = "×",
+  "&lt;" = "<",
+  "&gt;" = ">",
+  "&amp;" = "&"
+)
+
+#' Visible text of markdown, with scripts marked
+#'
+#' Removes emphasis markers and backslash escapes and converts common HTML
+#' entities. Superscripts (`^x^`) and subscripts (`~x~`) are kept with their
+#' delimiters so callers can measure them separately.
+#' @keywords internal
+#' @noRd
+md_strip <- function(x) {
+  x <- as.character(x)
+  x[is.na(x)] <- ""
+  x <- stringr::str_replace_all(x, stringr::fixed(md_entities))
+  # Other entities (e.g., &sigma;) are one glyph; approximate with "x"
+  x <- stringr::str_replace_all(x, "&[A-Za-z0-9#]+;", "x")
+  # Protect escaped characters, then drop unescaped emphasis markers
+  x <- stringr::str_replace_all(x, "\\\\\\*", "\u0001")
+  x <- stringr::str_remove_all(x, "\\*")
+  x <- stringr::str_replace_all(x, "\\\\(.)", "\\1")
+  stringr::str_replace_all(x, "\u0001", "*")
+}
+
+#' Visible text of markdown (scripts flattened)
+#' @keywords internal
+#' @noRd
+md_visible_text <- function(x) {
+  out <- stringr::str_remove_all(md_strip(x), "[\\^~]")
+  out[is.na(x)] <- NA
+  out
+}
+
+#' Width of text in em
+#' @keywords internal
+#' @noRd
+string_width_em <- function(x, font_family) {
+  out <- numeric(length(x))
+  has_text <- !is.na(x) & nzchar(x)
+  if (any(has_text)) {
+    size <- 1000
+    out[has_text] <- systemfonts::string_width(
+      x[has_text],
+      family = font_family,
+      size = size,
+      res = 72
+    ) / size
+  }
+  out
+}
+
+#' Rendered width of markdown text in em
+#'
+#' Superscripts and subscripts are measured at `script_scale` times the font size.
+#' @keywords internal
+#' @noRd
+md_text_width <- function(
+  x,
+  font_family = the$font_family,
+  script_scale = the$script_scale
+) {
+  script_re <- "\\^[^\\^]*\\^|~[^~]*~"
+  s <- md_strip(x)
+  scripts <- stringr::str_extract_all(s, script_re) |>
+    purrr::map_chr(\(p) stringr::str_remove_all(paste0(p, collapse = ""), "[\\^~]"))
+  base <- stringr::str_remove_all(s, script_re)
+  string_width_em(base, font_family) +
+    script_scale * string_width_em(scripts, font_family)
+}
+
+#' Is a font installed?
+#' @keywords internal
+#' @noRd
+font_available <- function(font_family) {
+  if (is.null(the$font_available)) {
+    the$font_available <- list()
+  }
+  if (is.null(the$font_available[[font_family]])) {
+    families <- c(
+      systemfonts::system_fonts()$family,
+      systemfonts::registry_fonts()$family
+    )
+    the$font_available[[font_family]] <- tolower(font_family) %in%
+      tolower(families)
+  }
+  the$font_available[[font_family]]
+}
+
+#' Spaces that fill a width
+#'
+#' Uses as many figure spaces as fit, then the combination of punctuation,
+#' thin, and hair spaces that best fills the remainder.
+#' @param deficit width to fill, in em
+#' @keywords internal
+#' @noRd
+space_fill <- function(deficit, font_family) {
+  w <- string_width_em(padding_spaces, font_family)
+  names(w) <- names(padding_spaces)
+  combos <- expand.grid(punctuation = 0:1, thin = 0:2, hair = 0:5)
+  combos$width <- as.matrix(combos) %*% w[names(combos)]
+  combos$n <- rowSums(combos[, c("punctuation", "thin", "hair")])
+  # Fewest characters among the most accurate combinations
+  combos <- combos[order(combos$n), ]
+
+  purrr::map_chr(deficit, \(d) {
+    if (is.na(d) || d <= 0) {
+      return("")
+    }
+    n_figure <- floor(d / w[["figure"]] + 1e-6)
+    remainder <- d - n_figure * w[["figure"]]
+    best <- combos[which.min(round(abs(remainder - combos$width), 4)), ]
+    paste0(
+      strrep(padding_spaces[["figure"]], n_figure),
+      strrep(padding_spaces[["punctuation"]], best$punctuation),
+      strrep(padding_spaces[["thin"]], best$thin),
+      strrep(padding_spaces[["hair"]], best$hair)
+    )
+  })
 }
 
 #' Scientific notation for markdown
@@ -473,34 +629,19 @@ sci_md <- function(x, digits = 2, lb = .0095, ub = 99.5, align = FALSE) {
 
   x_md <- formatC(x, digits = digits, format = "f")
 
-  if (align) {
-    x_sci_left <- align_chr(x_sci_left)
-  }
 
-  max_digit <- 0
-  if (!is.null(ub)) {
-    if (sum(x >= ub) > 0) {
-      max_digit <- max(nchar(x_sci_right[x >= ub]))
-    }
-    x_sci_right[x >= ub] <- paste0("\u00D7", "10^", x_sci_right[x >= ub], "^")
-  }
 
-  if (!is.null(lb)) {
-    if (sum(x <= lb) > 0) {
-      max_digit <- max(max_digit, max(nchar(x_sci_right[x <= lb])))
-    }
-    x_sci_right[x <= lb] <- paste0("\u00D7", "10^", x_sci_right[x <= lb], "^")
-  }
+    x_sci_right[x >= ub | x <= lb] <- paste0("\u00D7", "10^", x_sci_right[x >= ub | x <= lb], "^")
 
-  if (align && max_digit > 0) {
-    x_sci_right[x > lb & x < ub] <- paste0(
-      "\u2007\u2007\u2007^",
-      paste0(rep("\u2007", max_digit), collapse = ""),
-      "^"
-    )
-  }
+
+
+x_sci_right[x > lb & x < ub] <- ""
 
   x_sci_md <- paste0(x_sci_left, x_sci_right)
+
+  if (align) {
+    x_sci_md <- align_chr(x_sci_md)
+  }
 
   x_sci_md
 }
@@ -792,6 +933,11 @@ the <- new.env(parent = emptyenv())
 the$accuracy <- .01
 the$intercept_text <- "Constant"
 the$font_family <- "Times New Roman"
+# Pad to equal rendered width in the$font_family (see num_pad)
+the$width_aware_padding <- TRUE
+# Superscripts and subscripts are drawn smaller than the base text. Word draws
+# them at about 2/3 of the font size; browsers at about 0.83.
+the$script_scale <- 2 / 3
 the$number_formatter <- \(x, accuracy = the$accuracy, ...) {
   align_chr(x, accuracy = accuracy, ...)
 }
@@ -1403,6 +1549,7 @@ the$column_formats <- column_formats()
 #' @param column_formats column formatting functions
 #' @param number_formatter default function to format numbers
 #' @param trim_leading_zero default function to trim leading zeros from numbers
+#' @param width_aware_padding if `TRUE` (default), [align_chr()] pads text to equal rendered width in `font_family` (when the font is installed). If `FALSE`, text is padded with one figure space per missing character.
 #' @param reset if `TRUE`, reset all defaults (except as specified)
 #'
 #' @return previous defaults
@@ -1419,6 +1566,7 @@ apa7_defaults <- function(
   column_formats = NULL,
   number_formatter = NULL,
   trim_leading_zero = NULL,
+  width_aware_padding = NULL,
   reset = FALSE
 ) {
   old <- the
@@ -1427,6 +1575,7 @@ apa7_defaults <- function(
     the$column_formats <- column_formats()
     the$intercept_text <- "Constant"
     the$font_family <- "Times New Roman"
+    the$width_aware_padding <- TRUE
     the$number_formatter <- \(x, accuracy = the$accuracy, ...) {
       align_chr(
         x,
@@ -1458,6 +1607,9 @@ apa7_defaults <- function(
   }
   if (!is.null(font_family)) {
     the$font_family <- font_family
+  }
+  if (!is.null(width_aware_padding)) {
+    the$width_aware_padding <- width_aware_padding
   }
   if (!is.null(intercept_text)) {
     the$intercept_text <- intercept_text

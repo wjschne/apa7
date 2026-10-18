@@ -1153,8 +1153,84 @@ apa_flextable <- function(
     ft <- pretty_widths(ft, table_width = table_width * 6.5)
   }
 
+  if (is.null(font_family)) {
+    font_family <- the$font_family
+  }
+  ft <- align_padded_columns(
+    ft,
+    d,
+    font_family = font_family,
+    font_size = font_size,
+    horizontal_padding = horizontal_padding
+  )
+
   class(ft) <- unique(c("apaflextable", class(ft)))
 
+  ft
+}
+
+#' Align padded columns on one side
+#'
+#' Columns padded by [align_chr()] line up only if every cell's text starts at
+#' the same position. In a centered cell, that requires the text on both sides
+#' of the alignment character to have equal widths, which is hard to achieve
+#' with superscripts and other glyphs of irregular width. Instead, body cells
+#' of padded columns are left-aligned, so only the left side's padding matters.
+#' A uniform left padding centers the widest cell under the header. An
+#' inaccurate width estimate shifts all rows equally, so it does not misalign
+#' them.
+#' @param ft flextable
+#' @param d data used to make `ft`
+#' @keywords internal
+#' @noRd
+align_padded_columns <- function(
+  ft,
+  d,
+  font_family,
+  font_size,
+  horizontal_padding
+) {
+  # Spaces that align_chr and num_pad use for padding
+  pad_re <- "[ - ]|&numsp;"
+
+  keys <- intersect(ft$col_keys[-1], colnames(d))
+
+  # Leave value columns paired with star or list columns as apa_style sets them
+  star_keys <- ft$col_keys[grepl("apa7starcolumn$", ft$col_keys)]
+  list_keys <- ft$col_keys[grepl("apa7listcolumn$", ft$col_keys)]
+  paired <- c(
+    ft$col_keys[match(star_keys, ft$col_keys) - 1],
+    ft$col_keys[match(list_keys, ft$col_keys) + 1]
+  )
+  keys <- keys[!grepl("apa7(starcolumn|listcolumn)$|^apa7breakcolumn", keys)]
+  keys <- setdiff(keys, paired)
+
+  # Skip row-title rows, which span the table
+  rows <- seq_len(nrow(d))
+  if ("row_title" %in% colnames(d)) {
+    rows <- which(is.na(d$row_title))
+  }
+  if (length(rows) == 0) {
+    return(ft)
+  }
+
+  for (k in keys) {
+    v <- as.character(d[[k]])[rows]
+    if (!any(grepl(pad_re, v))) {
+      next
+    }
+    block_width <- max(md_text_width(v, font_family)) * font_size
+    col_width <- ft$body$colwidths[[match(k, ft$col_keys)]] * 72
+    padding_left <- max(horizontal_padding, (col_width - block_width) / 2)
+    ft <- ft |>
+      flextable::align(i = rows, j = k, align = "left", part = "body") |>
+      flextable::padding(
+        i = rows,
+        j = k,
+        padding.left = padding_left,
+        part = "body"
+      )
+  }
   ft
 }
 

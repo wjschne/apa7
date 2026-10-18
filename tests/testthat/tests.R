@@ -71,6 +71,9 @@ test_that("apa_p", {
 })
 
 test_that("align_chr", {
+  # Character-count padding (width-aware padding is tested separately)
+  apa7_defaults(width_aware_padding = FALSE)
+  withr::defer(apa7_defaults(width_aware_padding = TRUE))
   posnum <- c(.010, .511)
   expect_equal(align_chr(posnum, accuracy = .01), c("0.01", "0.51"))
   expect_equal(align_chr(posnum, accuracy = .001), c("0.010", "0.511"))

@@ -30,7 +30,7 @@ align_chr(
 
 \item{add_plusses}{if TRUE (default), adds a plus to positive numbers}
 
-\item{padding_character}{character to use for padding, default is \verb{&numsp;} (figure space)}
+\item{padding_character}{character to use for padding, default is \verb{&numsp;} (figure space). With the default, text is padded to equal rendered width in the default font family (see \code{\link[=num_pad]{num_pad()}} and the \code{width_aware_padding} argument of \code{\link[=apa7_defaults]{apa7_defaults()}}).}
 
 \item{center}{text on which to align text. Center on decimal by default, but can be any text.}
 

@@ -30,6 +30,7 @@ Imports:
     shiny,
     signs,
     stringr,
+    systemfonts,
     tibble,
     tidyr,
     xfun
