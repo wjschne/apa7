@@ -2,6 +2,8 @@
 
 ## apa7 0.1.3
 
+CRAN release: 2026-05-26
+
 ## apa7 0.1.2 *2025-05-25*
 
 - Used AI (Claude) and old-fashioned effort to generate a more complete

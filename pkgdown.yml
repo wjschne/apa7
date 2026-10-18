@@ -1,12 +1,12 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   apa7: apa7.html
   articles/chisquare: chisquare.html
   articles/correlations: correlations.html
   articles/summarize: summarize.html
-last_built: 2026-05-26T04:55Z
+last_built: 2026-10-18T03:27Z
 urls:
   reference: https://wjschne.github.io/apa7/reference
   article: https://wjschne.github.io/apa7/articles
