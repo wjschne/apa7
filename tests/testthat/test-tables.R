@@ -326,6 +326,59 @@ test_that("apa_flextable handles Model as the row title column", {
   expect_false("Model" %in% ft$col_keys)
 })
 
+# ordinal models ----
+
+test_that("apa_parameters.polr reports ORs, z tests, and thresholds", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("carData")
+  fit <- MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE)
+  result <- apa_parameters(fit)
+  expect_s3_class(result, "apa7_tbl")
+  expect_equal(
+    colnames(result),
+    c("Variable", "*B*", "*SE*", "*OR*", "*z*", "*p*")
+  )
+  # Predictors first, then the two thresholds
+  expect_equal(nrow(result), 4L)
+  expect_equal(
+    result$Variable[3:4],
+    c("Too Little | About Right", "About Right | Too Much")
+  )
+  # Thresholds have no OR, z, or p
+  expect_true(all(is.na(result[["*OR*"]][3:4]) | result[["*OR*"]][3:4] == ""))
+  expect_true(all(is.na(result[["*p*"]][3:4]) | result[["*p*"]][3:4] == ""))
+  # p values are from the normal distribution
+  z <- summary(fit)$coefficients["gendermale", "t value"]
+  expect_equal(
+    gsub("[ -  ]", "", result[["*p*"]][1]),
+    apa_p(2 * pnorm(-abs(z)), inline = FALSE)
+  )
+
+  expect_equal(nrow(apa_parameters(fit, thresholds = FALSE)), 2L)
+  expect_false("*OR*" %in% colnames(apa_parameters(fit, exponentiate = FALSE)))
+})
+
+test_that("apa_parameters.clm matches apa_parameters.polr", {
+  skip_if_not_installed("ordinal")
+  skip_if_not_installed("carData")
+  f <- poverty ~ gender + age
+  p <- apa_parameters(MASS::polr(f, data = carData::WVS, Hess = TRUE))
+  c <- apa_parameters(ordinal::clm(f, data = carData::WVS))
+  expect_equal(colnames(c), colnames(p))
+  expect_equal(c$Variable, p$Variable)
+  expect_equal(c[["*OR*"]], p[["*OR*"]])
+})
+
+test_that("lists of ordinal models are compared with likelihood ratio tests", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("carData")
+  m1 <- MASS::polr(poverty ~ gender, data = carData::WVS, Hess = TRUE)
+  m2 <- update(m1, . ~ . + age)
+  comp <- apa_performance_comparison(list(m1, m2))
+  expect_true(all(c("*R*^2^~Nagelkerke~", "*&chi;*^2^") %in% colnames(comp)))
+  expect_no_error(apa_flextable(apa_parameters(list(m1, m2))))
+})
+
 # align_padded_columns ----
 
 test_that("apa_flextable left-aligns padded columns and centers the block", {

@@ -4,6 +4,8 @@
 \alias{apa_parameters}
 \alias{apa_parameters.lm}
 \alias{apa_parameters.glm}
+\alias{apa_parameters.polr}
+\alias{apa_parameters.clm}
 \alias{apa_parameters.list}
 \title{format model parameters in APA style}
 \usage{
@@ -40,6 +42,30 @@ apa_parameters(
   ...
 )
 
+\method{apa_parameters}{polr}(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "z", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  thresholds = TRUE,
+  ...
+)
+
+\method{apa_parameters}{clm}(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "z", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  thresholds = TRUE,
+  ...
+)
+
 \method{apa_parameters}{list}(
   fit,
   predictor_parameters = NULL,
@@ -68,6 +94,8 @@ apa_parameters(
 
 \item{exponentiate}{if \code{NULL} (default), exponentiated coefficients are added when the model's link function is logit or log (i.e., odds ratios, risk ratios, or incidence rate ratios). If \code{TRUE}, exponentiated coefficients are always added. If \code{FALSE}, they are never added.}
 
+\item{thresholds}{for ordinal models, if \code{TRUE} (default), threshold (cutpoint) rows are displayed below the predictors.}
+
 \item{performance_parameters}{for lists of models, model comparison metrics passed to \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}. If \code{NULL}, no metrics are added.}
 }
 \value{
@@ -78,6 +106,8 @@ format model parameters in APA style
 }
 \details{
 For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \emph{z} for families with a fixed dispersion parameter (binomial, Poisson, negative binomial) and \emph{t} for families with an estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi families). Whichever statistic applies is displayed. The exponentiated coefficient column (\code{Exp_Coefficient}) is labeled \emph{OR} for logit links, \emph{IRR} for log links in count models (Poisson, quasi-Poisson, negative binomial), \emph{RR} for log links in binomial models, and Exp(\emph{B}) otherwise.
+
+For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coefficients are tested with Wald \emph{z} tests. (\code{parameters} reports \emph{t} for \code{polr}, but the test is asymptotically normal, and \code{clm} reports \emph{z} for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled \emph{OR}. Threshold rows show only the estimate and its standard error, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
@@ -86,4 +116,6 @@ lm(mpg ~ cyl + wt, data = mtcars) |>
 glm(am ~ wt + hp, data = mtcars, family = binomial) |>
    apa_parameters() |>
    apa_flextable()
+MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
+   apa_parameters()
 }

@@ -45,6 +45,7 @@ Suggests:
     ggplot2,
     knitr,
     MASS,
+    ordinal,
     quarto,
     R.utils,
     ragg,

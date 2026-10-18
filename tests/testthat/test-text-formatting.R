@@ -34,6 +34,7 @@ test_that("sci_md uses fixed notation within bounds and scientific outside", {
     sci_md(c(0.8, 1.04, 0.991, 24567857.45, .0045)),
     c("0.80", "1.04", "0.99", "2.46×10^7^", "4.50×10^−3^")
   )
+  expect_equal(sci_md(c(NA, 0.8)), c(NA, "0.80"))
 })
 
 test_that("Exp_Coefficient shows odds ratios below 1 correctly", {

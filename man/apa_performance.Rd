@@ -4,6 +4,8 @@
 \alias{apa_performance}
 \alias{apa_performance.lm}
 \alias{apa_performance.glm}
+\alias{apa_performance.polr}
+\alias{apa_performance.clm}
 \title{format model performance metrics in APA style}
 \usage{
 apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
@@ -11,6 +13,10 @@ apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 \method{apa_performance}{lm}(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 
 \method{apa_performance}{glm}(fit, metrics = c("R2", "AIC"), column_formats = NULL)
+
+\method{apa_performance}{polr}(fit, metrics = c("R2", "AIC"), column_formats = NULL)
+
+\method{apa_performance}{clm}(fit, metrics = c("R2", "AIC"), column_formats = NULL)
 }
 \arguments{
 \item{fit}{model fit object}

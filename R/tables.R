@@ -1416,6 +1416,155 @@ apa_parameters.glm <- function(
   )
 }
 
+#' @param thresholds for ordinal models, if `TRUE` (default), threshold (cutpoint) rows are displayed below the predictors.
+#' @details
+#' For ordinal regression models (`MASS::polr` and `ordinal::clm`), coefficients are tested with Wald *z* tests. (`parameters` reports *t* for `polr`, but the test is asymptotically normal, and `clm` reports *z* for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled *OR*. Threshold rows show only the estimate and its standard error, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful.
+#' @export
+#' @rdname apa_parameters
+#' @examples
+#' MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
+#'    apa_parameters()
+apa_parameters.polr <- function(
+  fit,
+  predictor_parameters = c(
+    "Parameter",
+    "Coefficient",
+    "SE",
+    "Exp_Coefficient",
+    "z",
+    "p"
+  ),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  thresholds = TRUE,
+  ...
+) {
+  link <- if (fit$method == "logistic") "logit" else fit$method
+  apa_parameters_ordinal(
+    fit,
+    link = link,
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df,
+    exponentiate = exponentiate,
+    thresholds = thresholds
+  )
+}
+
+#' @export
+#' @rdname apa_parameters
+apa_parameters.clm <- function(
+  fit,
+  predictor_parameters = c(
+    "Parameter",
+    "Coefficient",
+    "SE",
+    "Exp_Coefficient",
+    "z",
+    "p"
+  ),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  thresholds = TRUE,
+  ...
+) {
+  apa_parameters_ordinal(
+    fit,
+    link = as.character(fit$link),
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df,
+    exponentiate = exponentiate,
+    thresholds = thresholds
+  )
+}
+
+#' Parameters of ordinal cumulative link models
+#' @param link link function ("logit", "probit", ...)
+#' @keywords internal
+#' @noRd
+apa_parameters_ordinal <- function(
+  fit,
+  link,
+  predictor_parameters,
+  starred,
+  bolded,
+  column_formats,
+  t_with_df,
+  exponentiate,
+  thresholds
+) {
+  Coefficient <- NULL
+
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+  names(predictor_parameters) <- NULL
+
+  if (is.null(exponentiate)) {
+    exponentiate <- link == "logit"
+  }
+
+  d_b <- parameters::model_parameters(fit) |>
+    tibble::as_tibble() |>
+    dplyr::mutate(Parameter = parameters::format_parameters(fit))
+
+  # Thresholds are "alpha" (polr) or "intercept" (clm)
+  is_threshold <- d_b$Component %in% c("alpha", "intercept")
+
+  # Wald tests of ordinal models are asymptotically normal
+  if ("t" %in% colnames(d_b)) {
+    d_b <- dplyr::rename(d_b, z = "t")
+  }
+  d_b$p <- 2 * stats::pnorm(-abs(d_b$z))
+  d_b$df_error <- NULL
+
+  if (exponentiate && "Exp_Coefficient" %in% predictor_parameters) {
+    d_b <- dplyr::mutate(d_b, Exp_Coefficient = exp(Coefficient))
+    d_b$Exp_Coefficient[is_threshold] <- NA
+    if (
+      link == "logit" &&
+        !is.null(column_formats$Exp_Coefficient) &&
+        identical(
+          column_formats$Exp_Coefficient@header,
+          the$columns$Exp_Coefficient@header
+        )
+    ) {
+      column_formats$Exp_Coefficient@header <- "*OR*"
+      column_formats$Exp_Coefficient@latex <- "$OR$"
+    }
+  }
+
+  # Testing whether a threshold equals 0 is not meaningful
+  d_b$z[is_threshold] <- NA
+  d_b$p[is_threshold] <- NA
+
+  # Predictors first, then thresholds
+  d_b <- d_b[order(is_threshold), ]
+  if (!thresholds) {
+    d_b <- d_b[!sort(is_threshold), ]
+  }
+
+  format_apa_parameters(
+    d_b,
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df
+  )
+}
+
 #' @keywords internal
 #' @noRd
 exp_coefficient_label <- function(fit) {
@@ -1758,6 +1907,14 @@ apa_performance.glm <- function(
   apa_performance.lm(fit, metrics = metrics, column_formats = column_formats)
 }
 
+#' @export
+#' @rdname apa_performance
+apa_performance.polr <- apa_performance.glm
+
+#' @export
+#' @rdname apa_performance
+apa_performance.clm <- apa_performance.glm
+
 #' Use a pseudo-R2 as the R2 column
 #'
 #' `performance` names pseudo-R2 columns by type (e.g., `R2_Tjur`). Copies the
@@ -1802,11 +1959,15 @@ use_pseudo_r2 <- function(data, column_formats) {
 
 #' Does a model have a fixed dispersion parameter?
 #'
-#' Nested models with fixed dispersion (binomial, Poisson, negative binomial)
-#' are compared with likelihood ratio tests rather than F tests.
+#' Nested models with fixed dispersion (binomial, Poisson, negative binomial,
+#' and ordinal cumulative link models) are compared with likelihood ratio tests
+#' rather than F tests.
 #' @keywords internal
 #' @noRd
 has_fixed_dispersion <- function(fit) {
+  if (inherits(fit, c("polr", "clm"))) {
+    return(TRUE)
+  }
   if (!inherits(fit, "glm")) {
     return(FALSE)
   }
