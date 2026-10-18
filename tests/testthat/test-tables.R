@@ -178,6 +178,21 @@ test_that("apa_parameters.glm exponentiates the raw coefficients", {
   )
 })
 
+test_that("apa_parameters.list aligns values across models", {
+  skip_if_not(apa7:::font_available("Times New Roman"))
+  apa7_defaults(font_family = "Times New Roman")
+  # Model 1 has a negative coefficient; Model 2 has none
+  fits <- list(
+    lm(mpg ~ wt, data = mtcars),
+    lm(mpg ~ hp, data = transform(mtcars, hp = -hp))
+  )
+  result <- apa_parameters(fits, performance_parameters = NULL)
+  b <- result[["*B*"]][!is.na(result[["*B*"]]) & nzchar(result[["*B*"]])]
+  left <- sub("\\..*$", "", b)
+  w <- apa7:::md_text_width(left, "Times New Roman")
+  expect_lt(diff(range(w)), 0.025)
+})
+
 test_that("apa_parameters.list handles lists of glm models", {
   fits <- suppressWarnings(list(
     glm(am ~ wt, data = mtcars, family = binomial),
@@ -290,6 +305,25 @@ test_that("apa_performance_comparison uses F for estimated-dispersion GLMs", {
     colnames(apa_performance_comparison(gaussian)),
     c("Model", "*R*^2^", "&Delta;*R*^2^", "*F*", "*p*")
   )
+})
+
+test_that("apa_flextable handles Model as the row title column", {
+  d <- tibble::tibble(
+    Model = paste("Model", c(1, 1, 2, 2, 2)),
+    Predictor = c("Constant", "SES", "Constant", "SES", "Age"),
+    b = c(-4.5, 1.23, -5.1, 1.45, -.23),
+    p = c(.0001, .0245, .0001, .0341, .544)
+  )
+  cf <- column_formats()
+  cf$Predictor <- column_format(
+    name = "Predictor",
+    header = "Variable",
+    latex = "Variable",
+    formatter = stringr::str_to_upper
+  )
+  ft <- apa_flextable(d, row_title_column = Model, column_formats = cf)
+  expect_s3_class(ft, "flextable")
+  expect_false("Model" %in% ft$col_keys)
 })
 
 # align_padded_columns ----

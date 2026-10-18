@@ -1102,7 +1102,12 @@ apa_flextable <- function(
   cnames <- colnames(data)
   if (length(cnames) > 2) {
     if (cnames[1] == "Model" && cnames[2] == "Variable") {
-      ft <- flextable::align(ft, j = c("Model", "Variable"), part = "all")
+      # Model is not a column when it is the row_title_column
+      ft <- flextable::align(
+        ft,
+        j = intersect(c("Model", "Variable"), ft$col_keys),
+        part = "all"
+      )
     }
   }
 
@@ -1579,6 +1584,18 @@ apa_parameters.list <- function(
     },
     .id = "Model"
   )
+
+  # Each model was aligned separately; re-align values across all models.
+  # Skip Model and the variable-name column that follows it.
+  value_columns <- setdiff(colnames(d_fit), colnames(d_fit)[1:2])
+  d_fit <- d_fit |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::all_of(value_columns) & dplyr::where(is.character),
+        align_chr
+      )
+    )
+
   if (
     !(is.null(performance_parameters) ||
       length(performance_parameters) == 0 ||
