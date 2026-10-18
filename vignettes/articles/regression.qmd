@@ -164,26 +164,65 @@ apa_performance_comparison(list(glm_vol1, glm_vol2))
 
 # Count Regression
 
-For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*).
+Do students who struggle academically miss more school? Quine (1975) recorded the number of days that 146 Australian students were absent from school in one year, along with whether their teachers classified them as average or slow learners, their year in school, and their sex. The data are in the `quine` data set from the MASS package. The outcome is a count, so a Poisson regression is a natural starting point.
+
+```{r}
+#| label: quine
+d_quine <- MASS::quine |>
+  mutate(
+    Learner = factor(Lrn, levels = c("AL", "SL"), labels = c("Average", "Slow")),
+    Year = factor(
+      Age,
+      levels = c("F0", "F1", "F2", "F3"),
+      labels = c("Primary", "Form 1", "Form 2", "Form 3")
+    ),
+    Sex = factor(Sex, levels = c("F", "M"), labels = c("Female", "Male"))
+  )
+
+glm_pois <- glm(
+  Days ~ Learner + Year + Sex,
+  data = d_quine,
+  family = poisson
+)
+```
+
+For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*): the multiplicative change in the expected number of days absent for a one-unit change in the predictor (here, for each category compared with the reference category), holding the other predictors constant.
 
 ```{r}
 #| label: poisson
-d_mtcars <- mtcars |>
-  rename(Weight = wt,
-         Horsepower = hp,
-         Carburetors = carb)
-
-glm_pois <- glm(Carburetors ~ Weight + Horsepower, data = d_mtcars, family = poisson)
 apa_parameters(glm_pois)
 ```
 
-Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests.
+A Poisson model assumes that the variance of the counts equals their mean. Absences vary far more than that, which `performance::check_overdispersion` confirms.
+
+```{r}
+#| label: overdispersion
+performance::check_overdispersion(glm_pois)
+```
+
+With overdispersion, Poisson standard errors are too small, and the *p* values are too small with them. A quasi-Poisson model estimates the dispersion from the data. Its coefficients and *IRR*s are identical to the Poisson model's, but its standard errors are inflated by the square root of the estimated dispersion. Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests.
 
 ```{r}
 #| label: quasipoisson
-glm_qpois <- glm(Carburetors ~ Weight + Horsepower, data = d_mtcars, family = quasipoisson)
+glm_qpois <- glm(
+  Days ~ Learner + Year + Sex,
+  data = d_quine,
+  family = quasipoisson
+)
 apa_parameters(glm_qpois)
 ```
+
+The slow-learner effect that looked decisive in the Poisson model is no longer statistically significant at the .05 level. The estimated effect size did not change; the evidence for it did.
+
+A negative binomial model handles overdispersion differently: it adds a parameter that lets the variance grow faster than the mean. Its coefficients can differ from the Poisson model's, its exponentiated coefficients are again *IRR*s, and its test statistic is *z*.
+
+```{r}
+#| label: negbin
+glm_nb <- MASS::glm.nb(Days ~ Learner + Year + Sex, data = d_quine)
+apa_parameters(glm_nb)
+```
+
+The negative binomial model leads to the same conclusion as the quasi-Poisson model: slow learners are estimated to miss about a third more days than average learners, but these data provide only weak evidence for the difference.
 
 # Printing Options
 
