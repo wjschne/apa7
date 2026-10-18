@@ -50,7 +50,4 @@ export(superscript_md)
 export(tagger)
 if (getRversion() < "4.3.0") importFrom("S7", "@")
 import(S7)
-importFrom(rlang,
-  ":=",
-  .data
-)
+importFrom(rlang,.data)
