@@ -23,6 +23,7 @@ reference:
     contents:
       - align_chr
       - apa_p
+      - sci_md
       - hanging_indent
       - num_pad
       - p2stars
@@ -58,5 +59,7 @@ reference:
       - apa_p_star_note
       - is_numeric_like
       - str_wrap_equal
+      - matrix_display
+      - apa7_tbl
 
 

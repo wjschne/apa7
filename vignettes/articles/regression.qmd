@@ -68,7 +68,7 @@ In a rendered document, the output of `apa_parameters` is displayed as a table w
 
 ```{r}
 #| label: lm-auto
-apa_parameters(lm1)
+apa_parameters(lm1) 
 ```
 
 The output is still a tibble, so ordinary dplyr verbs work. Pass the result to `apa_flextable` to customize the table. For example, to drop the intercept:
@@ -83,7 +83,8 @@ To compare nested models, pass a list. Model fit statistics (*R*^2^, change in *
 
 ```{r}
 #| label: lm-list
-apa_parameters(list(lm1, lm2, lm3))
+apa_parameters(list(lm1, lm2, lm3)) |> 
+  apa_flextable()
 ```
 
 # Binary Logistic Regression
@@ -92,7 +93,14 @@ apa_parameters(list(lm1, lm2, lm3))
 
 ```{r}
 #| label: glm1
-glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
+
+d_mtcars <- mtcars |> 
+  rename(Weight = wt,
+         Horsepower = hp,
+         Transmission = am,
+         Carburetors = carb)
+
+glm1 <- glm(Transmission ~ Weight + Horsepower, data = d_mtcars, family = binomial)
 apa_parameters(glm1)
 
 ```
@@ -111,14 +119,16 @@ To choose and order the columns, use `predictor_parameters`. Columns that the mo
 apa_parameters(
   glm1,
   predictor_parameters = c("Parameter", "Exp_Coefficient", "z", "p")
-)
+) |> 
+  apa_flextable()
 ```
 
 As with `lm`, `starred` and `bolded` mark significant coefficients.
 
 ```{r}
 #| label: glm-starred
-apa_parameters(glm1, starred = "Coefficient", bolded = "p")
+apa_parameters(glm1, starred = "Coefficient", bolded = "p") |> 
+  apa_flextable()
 ```
 
 ## Comparing logistic regression models
@@ -127,8 +137,9 @@ A list of `glm` models is displayed with a pseudo-*R*^2^ (Tjur's for logistic re
 
 ```{r}
 #| label: glm-list
-glm0 <- glm(am ~ wt, data = mtcars, family = binomial)
-apa_parameters(list(glm0, glm1))
+glm0 <- glm(Transmission ~ Weight, data = d_mtcars, family = binomial)
+apa_parameters(list(glm0, glm1)) |> 
+  apa_flextable()
 ```
 
 The model comparison can also be displayed separately with `apa_performance_comparison`.
@@ -144,7 +155,7 @@ For Poisson and negative binomial regression, the exponentiated coefficients are
 
 ```{r}
 #| label: poisson
-glm_pois <- glm(carb ~ wt + hp, data = mtcars, family = poisson)
+glm_pois <- glm(Carburetors ~ Weight + Horsepower, data = d_mtcars, family = poisson)
 apa_parameters(glm_pois)
 ```
 
@@ -152,7 +163,7 @@ Quasi-families and other families with an estimated dispersion parameter are tes
 
 ```{r}
 #| label: quasipoisson
-glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
+glm_qpois <- glm(Carburetors ~ Weight + Horsepower, data = d_mtcars, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
 

@@ -111,9 +111,9 @@ apa_flextable(d,
 Without a row_title_column specified, the `Model` column can be vertically merged
 
 ```{r vmerge}
-d |> 
-  mutate(Model = str_remove(Model, "Model ")) |> 
-apa_flextable() |> 
+d |>
+  mutate(Model = str_remove(Model, "Model ")) |>
+  apa_flextable() |>
   merge_v() |>
   align(j = "Predictor", part = "all") |>
   align(j = "Model", align = "center") |>
@@ -361,8 +361,6 @@ tibble(x = align_chr(c(2.431, -0.4, -10, 101),
 
 The `hanging_indent` function is a hack, but a necessary one. Sometimes we need paragraphs to be indented in one way or another, and flextable does not have exactly what we need. So `hanging_indent` splits the text (via `stringr::str_wrap`) and indents it as specified with figure spaces `\u2007`.
 
-Note that `align_chr` aligns the text on the decimal, but pads the left side only so that the right side of the text can be of variable width.
-
 ```{r quotetable}
 d_quote <- tibble(
   Quote = c(
@@ -374,7 +372,7 @@ d_quote <- tibble(
     "Tact is the art of making a point without making an enemy.",
     "Short cuts make long delays.",
     "The price one pays for pursuing any profession or calling is an intimate knowledge of its ugly side.",
-    "There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me",
+    "There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me.",
     "There is a crack in everything, that’s how the light gets in.",
     "If you choose to dig a rather deep hole, someday you will have no choice but to keep on digging, even with tears.",
     "We long for self-confidence, till we look at the people who have it.",
@@ -405,11 +403,7 @@ d_quote <- tibble(
   arrange(nchar(Quote))
 
 d_quote |> 
-  mutate(Quote = paste0(seq_along(Quote), 
-                        ".\u2007",
-                        Quote) |> 
-           align_chr(side = "left") |> 
-           hanging_indent(width = 55, indent = 7)) |> 
+  mutate(Quote = hanging_indent(Quote, width = 55, indent = 5)) |> 
   apa_flextable() |>  
   align(j = "Attribution", part = "all") |> 
   width(width = c(4.5, 2))
@@ -419,15 +413,6 @@ d_quote |>
 
 ```{r numberedlist}
 d_quote |> 
-  
-    mutate(linechar = purrr::map_int(Quote, \(x) {
-    stringr::str_split(x, "\\\\\n") |> 
-      purrr::map(str_trim) |> 
-      purrr::map(nchar) |> 
-      purrr::map_int(max)
-  })) |> 
-  arrange(linechar) |> 
-  select(-linechar) |> 
   add_list_column(Quote) |> 
   apa_flextable() |> 
   align(j = "Attribution", part = "all") |>
@@ -556,9 +541,9 @@ fit_3 <- list(
 )
 
 fit_3 |> 
-  apa_parameters() |>
+  apa_parameters(performance_parameters = NULL) |>
   apa_flextable(row_title_column = Model, 
-                row_title_align = "center")
+                row_title_align = "center", )
 ```
 
 Performance comparison (via `performance::compare_performance`)
@@ -574,8 +559,14 @@ fit_3 |>
 ## Correlation
 
 ```{r correlation}
-ggplot2::diamonds |> 
-  select(table,  carat, length = x, width = y , depth = z) |> 
+ggplot2::diamonds |>
+  select(
+    Table = table,
+    Caret = carat,
+    Length = x,
+    Width = y ,
+    Depth = z
+  ) |>
   apa_cor() 
 ```
 

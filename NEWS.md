@@ -1,6 +1,6 @@
-# apa7 0.1.3
+# apa7 0.2.0 _2026-10-18_
 
-# apa7 0.1.2 _2025-05-25_
+# apa7 0.1.2 _2026-05-25_
 
 * Used AI (Claude) and old-fashioned effort to generate a more complete set of unit tests, fix minor bugs, and make documentation more consistent.
 * User prompted to install any missing packages when running the `make_apaquarto` shiny app locally.
