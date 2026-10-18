@@ -629,15 +629,12 @@ sci_md <- function(x, digits = 2, lb = .0095, ub = 99.5, align = FALSE) {
 
   x_md <- formatC(x, digits = digits, format = "f")
 
+  x_sci_right[x >= ub | x <= lb] <- paste0("\u00D7", "10^", x_sci_right[x >= ub | x <= lb], "^")
 
-
-    x_sci_right[x >= ub | x <= lb] <- paste0("\u00D7", "10^", x_sci_right[x >= ub | x <= lb], "^")
-
-
-
-x_sci_right[x > lb & x < ub] <- ""
-
+  # Values within the bounds use fixed notation, not the mantissa alone
+  in_range <- !is.na(x) & x > lb & x < ub
   x_sci_md <- paste0(x_sci_left, x_sci_right)
+  x_sci_md[in_range] <- x_md[in_range]
 
   if (align) {
     x_sci_md <- align_chr(x_sci_md)

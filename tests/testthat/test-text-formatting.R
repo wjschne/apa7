@@ -27,6 +27,27 @@ test_that("is_numeric_like treats empty string as acceptable", {
   expect_true(is_numeric_like(c("1", "")))
 })
 
+# sci_md ----
+
+test_that("sci_md uses fixed notation within bounds and scientific outside", {
+  expect_equal(
+    sci_md(c(0.8, 1.04, 0.991, 24567857.45, .0045)),
+    c("0.80", "1.04", "0.99", "2.46×10^7^", "4.50×10^−3^")
+  )
+})
+
+test_that("Exp_Coefficient shows odds ratios below 1 correctly", {
+  fit <- glm(am ~ wt, data = mtcars, family = binomial)
+  or <- apa_parameters(
+    fit,
+    predictor_parameters = c("Parameter", "Exp_Coefficient")
+  )[["*OR*"]]
+  expect_equal(
+    as.numeric(sub("×.*$", "", gsub("[ -  ]", "", or[2]))),
+    round(exp(coef(fit)[["wt"]]), 2)
+  )
+})
+
 # num_pad ----
 
 test_that("num_pad prepends padding character to shorter string on left", {

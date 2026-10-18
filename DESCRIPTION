@@ -37,6 +37,7 @@ Imports:
 Suggests: 
     bsicons,
     bslib,
+    carData,
     cli,
     conflicted,
     forcats,
