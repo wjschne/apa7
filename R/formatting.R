@@ -37,9 +37,13 @@ align_chr <- function(
     padding_character <- "\u2007"
   }
   center1 <- center
-  if (center1 == ".") center1 <- "\\."
+  if (center1 == ".") {
+    center1 <- "\\."
+  }
 
-  if (is.null(accuracy)) accuracy <- the$accuracy
+  if (is.null(accuracy)) {
+    accuracy <- the$accuracy
+  }
 
   # Use xx to make changes, keep x pristine
   xx <- x
@@ -214,7 +218,9 @@ apa_p <- function(
 
   digit <- ifelse(p < p_threshold, max_digits, min_digits)
   p_formatted <- purrr::map2_chr(p, digit, function(pp, dd) {
-    if (is.na(pp)) return(NA)
+    if (is.na(pp)) {
+      return(NA)
+    }
     formatC(round(pp, dd + 1), digits = dd, format = "f")
   })
 
@@ -445,6 +451,60 @@ num_pad <- function(
   }
 }
 
+#' Scientific notation for markdown
+#'
+#' @param x Numeric vector
+#' @param digits number of digits of precision
+#' @param lb lower bound where scientific notation is turned on
+#' @param ub upper bound where scientific notation is turned on
+#' @param align decimal align
+#'
+#' @returns A character vector
+#' @export
+#'
+#' @examples
+#' sci_md(c(.0045,1.44, 24567857.45))
+sci_md <- function(x, digits = 2, lb = .0095, ub = 99.5, align = FALSE) {
+  x_sci <- formatC(x, digits = digits, format = "e")
+  x_sci_left <- stringr::str_split_i(x_sci, pattern = "e", i = 1)
+  x_sci_right <- stringr::str_split_i(x_sci, pattern = "e", i = 2) |>
+    as.numeric() |>
+    signs::signs()
+
+  x_md <- formatC(x, digits = digits, format = "f")
+
+  if (align) {
+    x_sci_left <- align_chr(x_sci_left)
+  }
+
+  max_digit <- 0
+  if (!is.null(ub)) {
+    if (sum(x >= ub) > 0) {
+      max_digit <- max(nchar(x_sci_right[x >= ub]))
+    }
+    x_sci_right[x >= ub] <- paste0("\u00D7", "10^", x_sci_right[x >= ub], "^")
+  }
+
+  if (!is.null(lb)) {
+    if (sum(x <= lb) > 0) {
+      max_digit <- max(max_digit, max(nchar(x_sci_right[x <= lb])))
+    }
+    x_sci_right[x <= lb] <- paste0("\u00D7", "10^", x_sci_right[x <= lb], "^")
+  }
+
+  if (align && max_digit > 0) {
+    x_sci_right[x > lb & x < ub] <- paste0(
+      "\u2007\u2007\u2007^",
+      paste0(rep("\u2007", max_digit), collapse = ""),
+      "^"
+    )
+  }
+
+  x_sci_md <- paste0(x_sci_left, x_sci_right)
+
+  x_sci_md
+}
+
 #' Convert p-values to stars
 #'
 #' @param p vector of numbers
@@ -469,7 +529,9 @@ p2stars <- function(
   prefix = "\\"
 ) {
   pstars <- purrr::map_chr(p, \(pp) {
-    if (is.na(pp)) return("")
+    if (is.na(pp)) {
+      return("")
+    }
     paste0(rep(paste0(prefix, "*"), sum((pp <= alpha) * 1L)), collapse = "")
   })
   if (first_alpha_marginal) {
@@ -630,7 +692,7 @@ variable_name_formatter <- function(
     `\\^(\\d)\\^` = " Apasevencaret \\1 Apasevencaret",
     `\\^(\\d)$` = " Apasevencaret \\1 Apasevencaret",
     `–` = "Apasevenendash ",
-    ` \\[([^]]+)\\]` ="Apasevenendash \\1",
+    ` \\[([^]]+)\\]` = "Apasevenendash \\1",
     `\\&numsp;` = "Apasevennumsp",
     `\\&nbsp;` = "Apasevennbsp"
   )
@@ -732,6 +794,10 @@ the$intercept_text <- "Constant"
 the$font_family <- "Times New Roman"
 the$number_formatter <- \(x, accuracy = the$accuracy, ...) {
   align_chr(x, accuracy = accuracy, ...)
+}
+
+the$sci_number_formatter <- \(x, digits = 2, ...) {
+  sci_md(x, digits = digits, align = TRUE)
 }
 the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
   max_digits <- 3
@@ -1007,7 +1073,7 @@ the$columns <- list(
     name = "Exp_Coefficient",
     header = "Exp(*B*)",
     latex = "Exp($B$)",
-    formatter = the$number_formatter
+    formatter = the$sci_number_formatter
   ),
   `F` = column_format(
     name = "F",
@@ -1270,9 +1336,15 @@ column_formats <- new_class(
     variable_labels = character(0),
     custom_columns = NULL
   ) {
-    if (is.null(.data)) .data <- the$columns
-    if (is.null(accuracy)) accuracy <- the$accuracy
-    if (is.null(intercept_text)) intercept_text <- the$intercept_text
+    if (is.null(.data)) {
+      .data <- the$columns
+    }
+    if (is.null(accuracy)) {
+      accuracy <- the$accuracy
+    }
+    if (is.null(intercept_text)) {
+      intercept_text <- the$intercept_text
+    }
 
     for (cf in .data) {
       if (!is.null(formals(cf@formatter)["accuracy"])) {
@@ -1355,19 +1427,21 @@ apa7_defaults <- function(
     the$column_formats <- column_formats()
     the$intercept_text <- "Constant"
     the$font_family <- "Times New Roman"
-    the$number_formatter <- \(x, accuracy = the$accuracy, ...)
+    the$number_formatter <- \(x, accuracy = the$accuracy, ...) {
       align_chr(
         x,
         accuracy = accuracy,
         ...
       )
-    the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...)
+    }
+    the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) {
       align_chr(
         x,
         accuracy = accuracy,
         trim_leading_zeros = TRUE,
         ...
       )
+    }
     the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
       # nocov start
       max_digits <- 3
@@ -1379,12 +1453,24 @@ apa7_defaults <- function(
     } # nocov end
   }
 
-  if (!is.null(accuracy)) the$accuracy <- accuracy
-  if (!is.null(font_family)) the$font_family <- font_family
-  if (!is.null(intercept_text)) the$intercept_text <- intercept_text
-  if (!is.null(column_formats)) the$column_formats <- column_formats
-  if (!is.null(number_formatter)) the$number_formatter <- number_formatter
-  if (!is.null(trim_leading_zero)) the$trim_leading_zero <- trim_leading_zero
+  if (!is.null(accuracy)) {
+    the$accuracy <- accuracy
+  }
+  if (!is.null(font_family)) {
+    the$font_family <- font_family
+  }
+  if (!is.null(intercept_text)) {
+    the$intercept_text <- intercept_text
+  }
+  if (!is.null(column_formats)) {
+    the$column_formats <- column_formats
+  }
+  if (!is.null(number_formatter)) {
+    the$number_formatter <- number_formatter
+  }
+  if (!is.null(trim_leading_zero)) {
+    the$trim_leading_zero <- trim_leading_zero
+  }
 
   invisible(old)
 }

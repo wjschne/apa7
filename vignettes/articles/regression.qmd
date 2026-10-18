@@ -28,6 +28,9 @@ The apa7 package is closely aligned with the [easystats](https://easystats.githu
 
 Because step 2 returns a tibble, you can post-process it with dplyr before step 3. In Quarto and R Markdown documents, however, the output of `apa_parameters` is displayed as an APA-style table automatically, so step 3 is only needed when you want to customize the table or save it.
 
+
+# Linear Regression
+
 ```{r}
 #| label: ACT
 
@@ -51,7 +54,7 @@ lm2 <- update(lm1, . ~ . + education)
 lm3 <- update(lm2, . ~ . + SATV + SATQ)
 ```
 
-# Linear Regression
+
 
 In the console, `apa_parameters` prints as an ordinary tibble, so you can inspect it. Here `as_tibble` is used to show that tibble in this document.
 
@@ -61,7 +64,7 @@ apa_parameters(lm1) |>
   tibble::as_tibble()
 ```
 
-In a document, the output of `apa_parameters` is displayed as a table without further processing.
+In a rendered document, the output of `apa_parameters` is displayed as a table without further processing.
 
 ```{r}
 #| label: lm-auto
@@ -73,8 +76,7 @@ The output is still a tibble, so ordinary dplyr verbs work. Pass the result to `
 ```{r}
 #| label: lm-filter
 apa_parameters(lm1) |>
-  filter(Variable != "Constant") |>
-  apa_flextable()
+  filter(Variable != "Constant") 
 ```
 
 To compare nested models, pass a list. Model fit statistics (*R*^2^, change in *R*^2^, and the *F* test of the change) are added automatically.
@@ -92,6 +94,7 @@ apa_parameters(list(lm1, lm2, lm3))
 #| label: glm1
 glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
 apa_parameters(glm1)
+
 ```
 
 Exponentiated coefficients are added whenever the link function is logit or log. They are labeled *OR* for logit links, *IRR* (incidence rate ratio) for log links in count models, and *RR* (risk ratio) for log links in binomial models. Set `exponentiate = FALSE` to leave them out, or `exponentiate = TRUE` to add them for other links such as probit.
@@ -164,7 +167,7 @@ The `apa7.print` option controls how the output of `apa_parameters`, `apa_perfor
 ```{r}
 #| label: print-option
 #| eval: false
-options(apa7.print = "tibble")
+options(apa7.print = "flextable")
 ```
 
 To get the table with non-default settings, pass the output to `apa_flextable`, which always returns a flextable.
