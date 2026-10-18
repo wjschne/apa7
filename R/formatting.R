@@ -1344,7 +1344,6 @@ apa7_defaults <- function(
 #' @param format_separated_headers if `TRUE`, format headers with separated names. For example, if the formatter formats column `R2` as `*R*^2^`, then `Model 1_R2` becomes `Model 1_*R*^2^`)
 #' @param sep separator for separated headers (default is "_")
 #' @param accuracy numeric (default: NULL, uses the current default accuracy set with [apa7_defaults()]). If not NULL, sets the accuracy for the formatter.
-#' @importFrom rlang :=
 #'
 #' @return tibble
 #' @export
