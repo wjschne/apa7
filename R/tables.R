@@ -1951,9 +1951,8 @@ apa_parameters.list <- function(
   performance_parameters = c("R2", "deltaR2"),
   ...
 ) {
-  if (is.null(names(fit))) {
-    names(fit) <- paste("Model", seq(1, length(fit)))
-  }
+  # List names label the models ("Model 1", ... if unnamed)
+  names(fit) <- model_names(fit)
   d_fit <- purrr::map_df(
     fit,
     \(f1) {
@@ -2170,6 +2169,45 @@ apa_performance.merMod <- function(
   apa_performance.lm(fit, metrics = metrics, column_formats = column_formats)
 }
 
+#' @details
+#' For a list of models, each model's metrics are displayed in a row, labeled in a `Model` column by the list's names (or "Model 1", "Model 2", ... for unnamed elements). If `metrics` is `NULL` (default), each model's default metrics are used.
+#' @export
+#' @rdname apa_performance
+#' @examples
+#' list(
+#'   `Cylinders` = lm(mpg ~ cyl, data = mtcars),
+#'   `Cylinders and weight` = lm(mpg ~ cyl + wt, data = mtcars)
+#' ) |>
+#'   apa_performance()
+apa_performance.list <- function(
+  fit,
+  metrics = NULL,
+  column_formats = NULL
+) {
+  Model <- NULL
+  names(fit) <- model_names(fit)
+  d <- purrr::map_df(
+    fit,
+    \(f1) {
+      args <- list(f1, column_formats = column_formats)
+      if (!is.null(metrics)) {
+        args$metrics <- metrics
+      }
+      tibble::as_tibble(do.call(apa_performance, args))
+    },
+    .id = "Model"
+  )
+  # Each model was aligned separately; re-align values across models
+  d |>
+    dplyr::mutate(
+      dplyr::across(
+        !dplyr::all_of("Model") & dplyr::where(is.character),
+        align_chr
+      )
+    ) |>
+    as_apa7_tbl()
+}
+
 #' Use a pseudo-R2 as the R2 column
 #'
 #' `performance` names pseudo-R2 columns by type (e.g., `R2_Tjur`). Copies the
@@ -2236,7 +2274,7 @@ has_fixed_dispersion <- function(fit) {
 
 #' format model comparison metrics in APA style
 #'
-#' @param ... model fit objects
+#' @param ... model fit objects, or a list of them. Models are labeled by the list's names (or the argument names), and "Model 1", "Model 2", ... for unnamed models.
 #' @param metrics performance metrics. If `NULL` (default), R2, deltaR2, F, and p for models with an estimated dispersion parameter (e.g., `lm`, Gaussian or quasi-family `glm`), and R2, deltaR2, Chi2, df, and p for GLMs with a fixed dispersion parameter (binomial, Poisson, negative binomial). Use "all" for all available metrics.
 #' @param starred columns to star with significant p_values
 #' @details
@@ -2366,11 +2404,33 @@ apa_performance_comparison <- function(
   }
 
 
+  # Use the names of a named list (or of named arguments) as model labels
+  model_labels <- model_names(models)
+  if (length(model_labels) != nrow(cp)) {
+    model_labels <- paste("Model", seq_len(nrow(cp))) # nocov
+  }
+
   cp |>
     dplyr::select(Model = Name, dplyr::any_of(metrics)) |>
-    dplyr::mutate(Model = paste("Model", dplyr::row_number())) |>
+    dplyr::mutate(Model = model_labels) |>
     apa_format_columns(column_formats) |>
     as_apa7_tbl()
+}
+
+#' Labels for a list of models
+#'
+#' Uses the list's names, and "Model 1", "Model 2", ... for unnamed elements.
+#' @keywords internal
+#' @noRd
+model_names <- function(models) {
+  default <- paste("Model", seq_along(models))
+  labels <- names(models)
+  if (is.null(labels)) {
+    return(default)
+  }
+  unnamed <- is.na(labels) | labels == ""
+  labels[unnamed] <- default[unnamed]
+  labels
 }
 
 # apa_style <- function(x,

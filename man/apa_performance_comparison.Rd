@@ -12,7 +12,7 @@ apa_performance_comparison(
 )
 }
 \arguments{
-\item{...}{model fit objects}
+\item{...}{model fit objects, or a list of them. Models are labeled by the list's names (or the argument names), and "Model 1", "Model 2", ... for unnamed models.}
 
 \item{metrics}{performance metrics. If \code{NULL} (default), R2, deltaR2, F, and p for models with an estimated dispersion parameter (e.g., \code{lm}, Gaussian or quasi-family \code{glm}), and R2, deltaR2, Chi2, df, and p for GLMs with a fixed dispersion parameter (binomial, Poisson, negative binomial). Use "all" for all available metrics.}
 

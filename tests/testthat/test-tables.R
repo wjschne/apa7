@@ -379,6 +379,40 @@ test_that("lists of ordinal models are compared with likelihood ratio tests", {
   expect_no_error(apa_flextable(apa_parameters(list(m1, m2))))
 })
 
+# named lists of models ----
+
+test_that("named lists label models by name", {
+  fits <- list(
+    Cylinders = lm(mpg ~ cyl, data = mtcars),
+    `Cylinders and weight` = lm(mpg ~ cyl + wt, data = mtcars)
+  )
+  labels <- c("Cylinders", "Cylinders and weight")
+
+  expect_equal(apa_performance_comparison(fits)$Model, labels)
+  expect_equal(apa_performance(fits)$Model, labels)
+
+  # Group rows use the names, and fit statistics join to them
+  result <- apa_parameters(fits)
+  model_rows <- result$Model[nzchar(result$Model)]
+  expect_equal(model_rows, labels)
+  r2 <- result[["*R*^2^"]][nzchar(result$Model)]
+  expect_true(all(nzchar(r2)))
+  expect_no_error(apa_flextable(result))
+
+  # Unnamed elements fall back to "Model i"
+  partly <- list(A = fits[[1]], fits[[2]])
+  expect_equal(apa_performance_comparison(partly)$Model, c("A", "Model 2"))
+  expect_equal(
+    apa_performance_comparison(unname(fits))$Model,
+    c("Model 1", "Model 2")
+  )
+  # Named arguments work too
+  expect_equal(
+    apa_performance_comparison(First = fits[[1]], Second = fits[[2]])$Model,
+    c("First", "Second")
+  )
+})
+
 # mixed models ----
 
 test_that("apa_parameters.merMod shows fixed and random effects", {
