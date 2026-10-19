@@ -27,6 +27,23 @@ test_that("is_numeric_like treats empty string as acceptable", {
   expect_true(is_numeric_like(c("1", "")))
 })
 
+# variable_name_formatter ----
+
+test_that("variable_name_formatter renders exponents as superscripts", {
+  vnf <- apa7:::variable_name_formatter
+  # I(x^2) terms are labeled "x^2" by parameters
+  expect_equal(vnf(c("Days^2", "x^3", "x^2^", "x^12")), c("Days^2^", "X^3^", "X^2^", "X^12^"))
+  # poly() terms
+  expect_equal(
+    vnf(c("hp [1st degree]", "hp [2nd degree]", "hp [3rd degree]", "hp [4th degree]")),
+    c("Hp", "Hp^2^", "Hp^3^", "Hp^4^")
+  )
+  expect_equal(vnf(c("x [linear]", "x [quadratic]")), c("X", "X^2^"))
+
+  fit <- lm(mpg ~ wt + I(wt^2), data = mtcars)
+  expect_equal(apa_parameters(fit)$Variable, c("Constant", "Wt", "Wt^2^"))
+})
+
 # sci_md ----
 
 test_that("sci_md uses fixed notation within bounds and scientific outside", {

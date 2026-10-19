@@ -868,16 +868,21 @@ variable_name_formatter <- function(
   replacement = NULL,
   formatter = NULL
 ) {
+  # Rules are applied in order: specific exponent rules must come before the
+  # generic caret rule, which would otherwise consume their carets
   pre_p2r <- c(
     `\\:` = " : ",
-    `\\^` = "Apasevencaret",
     `\\(Intercept\\)` = the$intercept_text,
     ` \\[linear\\]$` = "",
     ` \\[quadratic\\]$` = " Apasevencaret 2 Apasevencaret",
     ` \\[cubic\\]$` = " Apasevencaret 3 Apasevencaret",
-    ` \\[(\\d)th degree\\]$` = " Apasevencaret \\1 Apasevencaret",
-    `\\^(\\d)\\^` = " Apasevencaret \\1 Apasevencaret",
-    `\\^(\\d)$` = " Apasevencaret \\1 Apasevencaret",
+    # poly() terms (e.g., "x [1st degree]", "x [2nd degree]")
+    ` \\[1st degree\\]$` = "",
+    ` \\[(\\d+)(?:st|nd|rd|th) degree\\]$` = " Apasevencaret \\1 Apasevencaret",
+    # Exponents, with (x^2^) or without (x^2, from I(x^2)) a closing caret
+    `\\^(\\d+)\\^` = " Apasevencaret \\1 Apasevencaret",
+    `\\^(\\d+)` = " Apasevencaret \\1 Apasevencaret",
+    `\\^` = "Apasevencaret",
     `–` = "Apasevenendash ",
     # Ordinal thresholds (e.g., "Low|High")
     ` ?\\| ?` = " Apasevenpipe ",
@@ -898,7 +903,7 @@ variable_name_formatter <- function(
     `\\)` = ") ",
     `^ \\(` = "(",
     `\\) $` = ")",
-    ` Apasevencaret (\\d) Apasevencaret` = "^\\1^"
+    ` Apasevencaret (\\d+) Apasevencaret` = "^\\1^"
   )
 
   # Protect all-caps words (e.g., ACT, SAT-V) from title casing
