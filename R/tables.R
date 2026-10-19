@@ -1242,12 +1242,12 @@ align_padded_columns <- function(
 #' format model parameters in APA style
 #'
 #' @param fit model fit object
-#' @param predictor_parameters predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., `t` for a model tested with *z*) are silently dropped. For lists of models, `NULL` (default) uses the default for each model's class.
+#' @param predictor_parameters predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., `t` for a model tested with *z*) are silently dropped. For lists of models, `NULL` (default) uses the default for each model's class. Add `"CI"` to show confidence intervals as \[*LL*, *UL*\] (headed, e.g., "95% CI"), and, for `glm`, `polr`, and `clm` models, `"Exp_CI"` to show confidence intervals of exponentiated coefficients (headed, e.g., "95% CI for *OR*"). Confidence intervals are not shown by default.
 #' @param starred columns to star with significant p_values
 #' @param bolded columns to bold, if significant
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #' @param t_with_df if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.
-#' @param ... arguments passed to methods
+#' @param ... arguments passed to methods. For `lm`, `glm`, `polr`, and `clm` models, further arguments are passed to [parameters::model_parameters()]. For example, `vcov = "HC3"` gives heteroskedasticity-consistent (robust) standard errors, and the test statistics, *p*-values, and confidence intervals are based on them. `ci = .90` sets the confidence level.
 #' @param performance_parameters for lists of models, model comparison metrics passed to [apa_performance_comparison()]. If `NULL`, no metrics are added.
 #'
 #' @return tibble
@@ -1256,6 +1256,14 @@ align_padded_columns <- function(
 #' @examples
 #' lm(mpg ~ cyl + wt, data = mtcars) |>
 #'    apa_parameters() |>
+#'    apa_flextable()
+#'
+#' # Confidence intervals with robust (HC3) standard errors
+#' lm(mpg ~ cyl + wt, data = mtcars) |>
+#'    apa_parameters(
+#'      predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
+#'      vcov = "HC3"
+#'    ) |>
 #'    apa_flextable()
 apa_parameters <- function(
   fit,
@@ -1302,7 +1310,7 @@ apa_parameters.lm <- function(
   names(predictor_parameters) <- NULL
 
   # Get and format parameters
-  d_b <- parameters::model_parameters(fit) |>
+  d_b <- parameters::model_parameters(fit, ...) |>
     tibble::as_tibble() |>
     dplyr::mutate(Parameter = parameters::format_parameters(fit))
 
@@ -1370,25 +1378,17 @@ apa_parameters.glm <- function(
     exponentiate <- link %in% c("logit", "log")
   }
 
-  d_b <- parameters::model_parameters(fit) |>
+  d_b <- parameters::model_parameters(fit, ...) |>
     tibble::as_tibble() |>
     dplyr::mutate(Parameter = parameters::format_parameters(fit))
 
-  if (exponentiate && "Exp_Coefficient" %in% predictor_parameters) {
-    d_b <- dplyr::mutate(d_b, Exp_Coefficient = exp(Coefficient))
-
-    # Label exponentiated coefficients by link, unless user customized header
-    if (
-      !is.null(column_formats$Exp_Coefficient) &&
-        identical(
-          column_formats$Exp_Coefficient@header,
-          the$columns$Exp_Coefficient@header
-        )
-    ) {
-      exp_label <- exp_coefficient_label(fit)
-      column_formats$Exp_Coefficient@header <- exp_label[["header"]]
-      column_formats$Exp_Coefficient@latex <- exp_label[["latex"]]
-    }
+  if (exponentiate) {
+    d_b <- add_exp_columns(d_b, predictor_parameters)
+    # Label exponentiated coefficients by link
+    column_formats <- label_exp_columns(
+      column_formats,
+      exp_coefficient_label(fit)
+    )
   }
 
   if ("Std_Coefficient" %in% predictor_parameters) {
@@ -1418,7 +1418,7 @@ apa_parameters.glm <- function(
 
 #' @param thresholds for ordinal models, if `TRUE` (default), threshold (cutpoint) rows are displayed below the predictors.
 #' @details
-#' For ordinal regression models (`MASS::polr` and `ordinal::clm`), coefficients are tested with Wald *z* tests. (`parameters` reports *t* for `polr`, but the test is asymptotically normal, and `clm` reports *z* for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled *OR*. Threshold rows show only the estimate and its standard error, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful.
+#' For ordinal regression models (`MASS::polr` and `ordinal::clm`), coefficients are tested with Wald *z* tests. (`parameters` reports *t* for `polr`, but the test is asymptotically normal, and `clm` reports *z* for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled *OR*. Threshold rows show only the estimate, its standard error, and its confidence interval, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful. Confidence intervals (`"CI"`, `"Exp_CI"`) are Wald *z* intervals, consistent with the *z* tests.
 #' @export
 #' @rdname apa_parameters
 #' @examples
@@ -1452,7 +1452,8 @@ apa_parameters.polr <- function(
     column_formats = column_formats,
     t_with_df = t_with_df,
     exponentiate = exponentiate,
-    thresholds = thresholds
+    thresholds = thresholds,
+    ...
   )
 }
 
@@ -1485,7 +1486,8 @@ apa_parameters.clm <- function(
     column_formats = column_formats,
     t_with_df = t_with_df,
     exponentiate = exponentiate,
-    thresholds = thresholds
+    thresholds = thresholds,
+    ...
   )
 }
 
@@ -1502,9 +1504,9 @@ apa_parameters_ordinal <- function(
   column_formats,
   t_with_df,
   exponentiate,
-  thresholds
+  thresholds,
+  ...
 ) {
-  Coefficient <- NULL
 
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
@@ -1515,7 +1517,7 @@ apa_parameters_ordinal <- function(
     exponentiate <- link == "logit"
   }
 
-  d_b <- parameters::model_parameters(fit) |>
+  d_b <- parameters::model_parameters(fit, ...) |>
     tibble::as_tibble() |>
     dplyr::mutate(Parameter = parameters::format_parameters(fit))
 
@@ -1525,23 +1527,28 @@ apa_parameters_ordinal <- function(
   # Wald tests of ordinal models are asymptotically normal
   if ("t" %in% colnames(d_b)) {
     d_b <- dplyr::rename(d_b, z = "t")
+    # Wald z intervals, consistent with the z test
+    if (all(c("CI", "CI_low", "CI_high", "SE") %in% colnames(d_b))) {
+      crit <- stats::qnorm((1 + d_b$CI) / 2)
+      d_b$CI_low <- d_b$Coefficient - crit * d_b$SE
+      d_b$CI_high <- d_b$Coefficient + crit * d_b$SE
+    }
   }
   d_b$p <- 2 * stats::pnorm(-abs(d_b$z))
   d_b$df_error <- NULL
 
-  if (exponentiate && "Exp_Coefficient" %in% predictor_parameters) {
-    d_b <- dplyr::mutate(d_b, Exp_Coefficient = exp(Coefficient))
-    d_b$Exp_Coefficient[is_threshold] <- NA
-    if (
-      link == "logit" &&
-        !is.null(column_formats$Exp_Coefficient) &&
-        identical(
-          column_formats$Exp_Coefficient@header,
-          the$columns$Exp_Coefficient@header
-        )
-    ) {
-      column_formats$Exp_Coefficient@header <- "*OR*"
-      column_formats$Exp_Coefficient@latex <- "$OR$"
+  if (exponentiate) {
+    d_b <- add_exp_columns(d_b, predictor_parameters)
+    exp_columns <- intersect(
+      c("Exp_Coefficient", "Exp_CI_low", "Exp_CI_high"),
+      colnames(d_b)
+    )
+    d_b[is_threshold, exp_columns] <- NA
+    if (link == "logit") {
+      column_formats <- label_exp_columns(
+        column_formats,
+        c(header = "*OR*", latex = "$OR$")
+      )
     }
   }
 
@@ -1563,6 +1570,54 @@ apa_parameters_ordinal <- function(
     column_formats = column_formats,
     t_with_df = t_with_df
   )
+}
+
+#' Add exponentiated coefficients and confidence limits
+#' @keywords internal
+#' @noRd
+add_exp_columns <- function(d_b, predictor_parameters) {
+  if ("Exp_Coefficient" %in% predictor_parameters) {
+    d_b$Exp_Coefficient <- exp(d_b$Coefficient)
+  }
+  if (
+    "Exp_CI" %in% predictor_parameters &&
+      all(c("CI_low", "CI_high") %in% colnames(d_b))
+  ) {
+    d_b$Exp_CI_low <- exp(d_b$CI_low)
+    d_b$Exp_CI_high <- exp(d_b$CI_high)
+  }
+  d_b
+}
+
+#' Label exponentiated columns (e.g., *OR*), unless the user customized them
+#' @param label named character vector with `header` and `latex`
+#' @keywords internal
+#' @noRd
+label_exp_columns <- function(column_formats, label) {
+  if (
+    !is.null(column_formats$Exp_Coefficient) &&
+      identical(
+        column_formats$Exp_Coefficient@header,
+        the$columns$Exp_Coefficient@header
+      )
+  ) {
+    column_formats$Exp_Coefficient@header <- label[["header"]]
+    column_formats$Exp_Coefficient@latex <- label[["latex"]]
+  }
+  if (
+    !is.null(column_formats$Exp_CI) &&
+      identical(column_formats$Exp_CI@header, the$columns$Exp_CI@header)
+  ) {
+    column_formats$Exp_CI@header <- paste0(
+      "{round(ci * 100)}% CI for ",
+      label[["header"]]
+    )
+    column_formats$Exp_CI@latex <- paste0(
+      "{round(ci * 100)}\\% CI for ",
+      label[["latex"]]
+    )
+  }
+  column_formats
 }
 
 #' @keywords internal
@@ -1647,8 +1702,38 @@ format_apa_parameters <- function(
     }
   }
 
+  # Combine lower and upper bounds into one interval column. The CI level
+  # (e.g., .95) fills in the header template.
+  ci_columns <- c("CI", "Exp_CI")
+  ci_level <- 0.95
+  if ("CI" %in% colnames(d_b) && is.numeric(d_b$CI) && any(!is.na(d_b$CI))) {
+    ci_level <- d_b$CI[!is.na(d_b$CI)][1]
+  }
+  for (ci_col in ci_columns) {
+    bounds <- paste0(ci_col, c("_low", "_high"))
+    if (
+      ci_col %in% predictor_parameters &&
+        all(bounds %in% colnames(d_b)) &&
+        !is.null(column_formats[[ci_col]])
+    ) {
+      d_b_new[[ci_col]] <- column_formats[[ci_col]]@formatter(
+        d_b[[bounds[1]]],
+        d_b[[bounds[2]]]
+      )
+      column_formats[[ci_col]]@header <- as.character(
+        glue::glue(column_formats[[ci_col]]@header, ci = ci_level)
+      )
+      column_formats[[ci_col]]@latex <- as.character(
+        glue::glue(column_formats[[ci_col]]@latex, ci = ci_level)
+      )
+    } else {
+      # The CI column from parameters holds the CI level, not an interval
+      d_b_new[[ci_col]] <- NULL
+    }
+  }
+
   # Format columns
-  for (pr in predictor_parameters) {
+  for (pr in setdiff(predictor_parameters, ci_columns)) {
     if (!is.null(column_formats[[pr]])) {
       d_b_new <- dplyr::mutate(
         d_b_new,
@@ -1737,10 +1822,13 @@ apa_parameters.list <- function(
   # Each model was aligned separately; re-align values across all models.
   # Skip Model and the variable-name column that follows it.
   value_columns <- setdiff(colnames(d_fit), colnames(d_fit)[1:2])
+  ci_value_columns <- value_columns[purrr::map_lgl(d_fit[value_columns], is_ci_md)]
   d_fit <- d_fit |>
     dplyr::mutate(
+      dplyr::across(dplyr::all_of(ci_value_columns), realign_ci),
       dplyr::across(
-        dplyr::all_of(value_columns) & dplyr::where(is.character),
+        dplyr::all_of(setdiff(value_columns, ci_value_columns)) &
+          dplyr::where(is.character),
         align_chr
       )
     )

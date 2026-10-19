@@ -645,6 +645,45 @@ sci_md <- function(x, digits = 2, lb = .0095, ub = 99.5, align = FALSE) {
   x_sci_md
 }
 
+#' Combine formatted interval bounds into "\[LL, UL\]"
+#'
+#' `l` and `u` are already formatted and aligned. Rows flagged in `missing`
+#' are blank.
+#' @keywords internal
+#' @noRd
+ci_md <- function(l, u, missing = FALSE) {
+  middle <- rep(", ", length(l))
+  middle[missing] <- ""
+  l[missing] <- ""
+  u[missing] <- ""
+  align_chr(paste0(l, middle, u), center = ", ") |>
+    tagger("[", "]")
+}
+
+#' Re-align formatted "\[LL, UL\]" intervals
+#'
+#' Used when intervals formatted separately (e.g., one table per model) are
+#' stacked into one column.
+#' @keywords internal
+#' @noRd
+realign_ci <- function(x) {
+  missing <- is.na(x) | !nzchar(stringr::str_trim(x))
+  inner <- stringr::str_remove_all(x, "^\\[|\\]$")
+  ci_md(
+    align_chr(stringr::str_split_i(inner, ", ", 1)),
+    align_chr(stringr::str_split_i(inner, ", ", 2)),
+    missing = missing
+  )
+}
+
+#' Is a character vector made of formatted "\[LL, UL\]" intervals?
+#' @keywords internal
+#' @noRd
+is_ci_md <- function(x) {
+  x <- x[!is.na(x) & nzchar(stringr::str_trim(x))]
+  is.character(x) && length(x) > 0 && all(grepl("^\\[.+, .+\\]$", x))
+}
+
 #' Convert p-values to stars
 #'
 #' @param p vector of numbers
@@ -1084,19 +1123,13 @@ the$columns <- list(
   CI = column_format(
     name = "CI",
     header = "{round(ci * 100)}% CI",
-    latex = "{round(ci * 100)}\\%",
+    latex = "{round(ci * 100)}\\% CI",
     formatter = \(l, u, accuracy = the$accuracy, ...) {
-      middle <- rep(", ", length(l))
-      middle[is.na(l) | is.na(u)] <- ""
-      align_chr(
-        paste0(
-          align_chr(l, accuracy = accuracy, ...),
-          middle,
-          align_chr(u, accuracy = accuracy, ...)
-        ),
-        center = ", "
-      ) |>
-        tagger("[", "]")
+      ci_md(
+        align_chr(l, accuracy = accuracy, ...),
+        align_chr(u, accuracy = accuracy, ...),
+        missing = is.na(l) | is.na(u)
+      )
     }
   ),
   CI_high = column_format(
@@ -1223,6 +1256,18 @@ the$columns <- list(
     header = "Exp(*B*)",
     latex = "Exp($B$)",
     formatter = the$sci_number_formatter
+  ),
+  Exp_CI = column_format(
+    name = "Exp_CI",
+    header = "{round(ci * 100)}% CI for Exp(*B*)",
+    latex = "{round(ci * 100)}\\% CI for Exp($B$)",
+    formatter = \(l, u, digits = 2, ...) {
+      ci_md(
+        sci_md(l, digits = digits, align = TRUE),
+        sci_md(u, digits = digits, align = TRUE),
+        missing = is.na(l) | is.na(u)
+      )
+    }
   ),
   `F` = column_format(
     name = "F",

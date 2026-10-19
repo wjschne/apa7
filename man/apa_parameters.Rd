@@ -80,7 +80,7 @@ apa_parameters(
 \arguments{
 \item{fit}{model fit object}
 
-\item{predictor_parameters}{predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., \code{t} for a model tested with \emph{z}) are silently dropped. For lists of models, \code{NULL} (default) uses the default for each model's class.}
+\item{predictor_parameters}{predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., \code{t} for a model tested with \emph{z}) are silently dropped. For lists of models, \code{NULL} (default) uses the default for each model's class. Add \code{"CI"} to show confidence intervals as [\emph{LL}, \emph{UL}] (headed, e.g., "95\% CI"), and, for \code{glm}, \code{polr}, and \code{clm} models, \code{"Exp_CI"} to show confidence intervals of exponentiated coefficients (headed, e.g., "95\% CI for \emph{OR}"). Confidence intervals are not shown by default.}
 
 \item{starred}{columns to star with significant p_values}
 
@@ -90,7 +90,7 @@ apa_parameters(
 
 \item{t_with_df}{if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.}
 
-\item{...}{arguments passed to methods}
+\item{...}{arguments passed to methods. For \code{lm}, \code{glm}, \code{polr}, and \code{clm} models, further arguments are passed to \code{\link[parameters:model_parameters]{parameters::model_parameters()}}. For example, \code{vcov = "HC3"} gives heteroskedasticity-consistent (robust) standard errors, and the test statistics, \emph{p}-values, and confidence intervals are based on them. \code{ci = .90} sets the confidence level.}
 
 \item{exponentiate}{if \code{NULL} (default), exponentiated coefficients are added when the model's link function is logit or log (i.e., odds ratios, risk ratios, or incidence rate ratios). If \code{TRUE}, exponentiated coefficients are always added. If \code{FALSE}, they are never added.}
 
@@ -107,11 +107,19 @@ format model parameters in APA style
 \details{
 For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \emph{z} for families with a fixed dispersion parameter (binomial, Poisson, negative binomial) and \emph{t} for families with an estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi families). Whichever statistic applies is displayed. The exponentiated coefficient column (\code{Exp_Coefficient}) is labeled \emph{OR} for logit links, \emph{IRR} for log links in count models (Poisson, quasi-Poisson, negative binomial), \emph{RR} for log links in binomial models, and Exp(\emph{B}) otherwise.
 
-For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coefficients are tested with Wald \emph{z} tests. (\code{parameters} reports \emph{t} for \code{polr}, but the test is asymptotically normal, and \code{clm} reports \emph{z} for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled \emph{OR}. Threshold rows show only the estimate and its standard error, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful.
+For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coefficients are tested with Wald \emph{z} tests. (\code{parameters} reports \emph{t} for \code{polr}, but the test is asymptotically normal, and \code{clm} reports \emph{z} for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled \emph{OR}. Threshold rows show only the estimate, its standard error, and its confidence interval, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful. Confidence intervals (\code{"CI"}, \code{"Exp_CI"}) are Wald \emph{z} intervals, consistent with the \emph{z} tests.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
    apa_parameters() |>
+   apa_flextable()
+
+# Confidence intervals with robust (HC3) standard errors
+lm(mpg ~ cyl + wt, data = mtcars) |>
+   apa_parameters(
+     predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
+     vcov = "HC3"
+   ) |>
    apa_flextable()
 glm(am ~ wt + hp, data = mtcars, family = binomial) |>
    apa_parameters() |>

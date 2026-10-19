@@ -379,6 +379,189 @@ test_that("lists of ordinal models are compared with likelihood ratio tests", {
   expect_no_error(apa_flextable(apa_parameters(list(m1, m2))))
 })
 
+# Confidence intervals ----
+
+# Parse "[LL, UL]" strings into a two-column matrix
+parse_ci <- function(x) {
+  x <- gsub("−", "-", gsub("[^0-9.,−-]", "", x))
+  do.call(rbind, lapply(strsplit(x, ","), as.numeric))
+}
+
+lm_ci_parameters <- c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p")
+exp_ci_parameters <- c(
+  "Parameter", "Coefficient", "SE", "CI", "Exp_Coefficient", "Exp_CI", "z", "p"
+)
+
+test_that("apa_parameters does not show confidence intervals by default", {
+  result <- apa_parameters(lm(mpg ~ wt, data = mtcars))
+  expect_false(any(grepl("CI", colnames(result))))
+  result <- apa_parameters(glm(am ~ wt, data = mtcars, family = binomial))
+  expect_false(any(grepl("CI", colnames(result))))
+})
+
+test_that("apa_parameters.lm shows confidence intervals", {
+  fit <- lm(mpg ~ cyl + wt, data = mtcars)
+  result <- apa_parameters(fit, predictor_parameters = lm_ci_parameters)
+  expect_equal(
+    colnames(result),
+    c("Variable", "*B*", "*SE*", "95% CI", "*t*(29)", "*p*")
+  )
+  expect_match(result[["95% CI"]], "^\\[.+, .+\\]$")
+  mp <- parameters::model_parameters(fit)
+  expect_equal(
+    parse_ci(result[["95% CI"]]),
+    unname(round(cbind(mp$CI_low, mp$CI_high), 2))
+  )
+
+  # The CI level comes from the ci argument
+  result <- apa_parameters(fit, predictor_parameters = lm_ci_parameters, ci = .90)
+  expect_true("90% CI" %in% colnames(result))
+
+  # Renamed column
+  result <- apa_parameters(
+    fit,
+    predictor_parameters = c(Parameter = "Parameter", Interval = "CI")
+  )
+  expect_equal(ncol(result), 2L)
+
+  expect_no_error(apa_flextable(apa_parameters(fit, predictor_parameters = lm_ci_parameters)))
+})
+
+test_that("apa_parameters.lm passes vcov to model_parameters (robust SEs)", {
+  fit <- lm(mpg ~ cyl + wt, data = mtcars)
+  classic <- apa_parameters(fit, predictor_parameters = lm_ci_parameters)
+  robust <- apa_parameters(fit, predictor_parameters = lm_ci_parameters, vcov = "HC3")
+  mp <- parameters::model_parameters(fit, vcov = "HC3")
+
+  expect_equal(robust[["*B*"]], classic[["*B*"]])
+  for (column in c("*SE*", "95% CI", "*t*(29)")) {
+    expect_false(identical(robust[[column]], classic[[column]]))
+  }
+  expect_equal(
+    as.numeric(gsub("[^0-9.]", "", robust[["*SE*"]])),
+    unname(round(mp$SE, 2))
+  )
+  expect_equal(
+    parse_ci(robust[["95% CI"]]),
+    unname(round(cbind(mp$CI_low, mp$CI_high), 2))
+  )
+  expect_equal(
+    gsub("[^0-9.<]", "", robust[["*p*"]]),
+    apa_p(mp$p, inline = FALSE)
+  )
+})
+
+test_that("apa_parameters.glm shows exponentiated confidence intervals", {
+  fit <- glm(carb ~ wt, data = mtcars, family = poisson)
+  result <- apa_parameters(fit, predictor_parameters = exp_ci_parameters)
+  expect_equal(
+    colnames(result),
+    c("Variable", "*B*", "*SE*", "95% CI", "*IRR*", "95% CI for *IRR*", "*z*", "*p*")
+  )
+  mp <- parameters::model_parameters(fit)
+  expect_equal(
+    parse_ci(result[["95% CI for *IRR*"]]),
+    unname(round(exp(cbind(mp$CI_low, mp$CI_high)), 2))
+  )
+
+  # Logistic models: CI for OR
+  fit_logit <- glm(am ~ wt, data = mtcars, family = binomial)
+  result <- apa_parameters(fit_logit, predictor_parameters = exp_ci_parameters)
+  expect_true("95% CI for *OR*" %in% colnames(result))
+
+  # Not exponentiated: no Exp_CI column, and no stray CI level column
+  result <- apa_parameters(
+    fit,
+    predictor_parameters = c("Parameter", "Coefficient", "Exp_CI"),
+    exponentiate = FALSE
+  )
+  expect_equal(colnames(result), c("Variable", "*B*"))
+
+  # User-customized header is kept
+  cf <- column_formats()
+  cf$Exp_CI@header <- "{round(ci * 100)}% CI for ratio"
+  result <- apa_parameters(
+    fit,
+    predictor_parameters = exp_ci_parameters,
+    column_formats = cf
+  )
+  expect_true("95% CI for ratio" %in% colnames(result))
+
+  expect_no_error(
+    apa_flextable(apa_parameters(fit, predictor_parameters = exp_ci_parameters))
+  )
+})
+
+test_that("apa_parameters.glm passes vcov to model_parameters (robust SEs)", {
+  fit <- glm(carb ~ wt, data = mtcars, family = poisson)
+  classic <- apa_parameters(fit, predictor_parameters = exp_ci_parameters)
+  robust <- apa_parameters(fit, predictor_parameters = exp_ci_parameters, vcov = "HC3")
+  mp <- parameters::model_parameters(fit, vcov = "HC3")
+
+  for (column in c("*SE*", "95% CI", "95% CI for *IRR*", "*z*", "*p*")) {
+    expect_false(identical(robust[[column]], classic[[column]]))
+  }
+  expect_equal(
+    as.numeric(gsub("[^0-9.]", "", robust[["*SE*"]])),
+    unname(round(mp$SE, 2))
+  )
+  expect_equal(
+    parse_ci(robust[["95% CI for *IRR*"]]),
+    unname(round(exp(cbind(mp$CI_low, mp$CI_high)), 2))
+  )
+})
+
+test_that("ordinal models show Wald CIs, with blank exponentiated CIs for thresholds", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinal")
+  skip_if_not_installed("carData")
+  f <- poverty ~ gender + age
+  fit <- MASS::polr(f, data = carData::WVS, Hess = TRUE)
+  result <- apa_parameters(fit, predictor_parameters = exp_ci_parameters)
+  expect_true(all(c("95% CI", "95% CI for *OR*") %in% colnames(result)))
+  expect_equal(result[["95% CI for *OR*"]][3:4], c("", ""))
+  expect_match(result[["95% CI"]], "^\\[.+, .+\\]$")
+
+  # Wald z intervals
+  s <- summary(fit)$coefficients[c("gendermale", "age"), ]
+  wald <- exp(s[, "Value"] + outer(s[, "Std. Error"], qnorm(c(.025, .975))))
+  expect_equal(
+    parse_ci(result[["95% CI for *OR*"]][1:2]),
+    unname(round(wald, 2))
+  )
+
+  # clm gives the same intervals
+  result_clm <- apa_parameters(
+    ordinal::clm(f, data = carData::WVS),
+    predictor_parameters = exp_ci_parameters
+  )
+  expect_equal(result_clm[["95% CI for *OR*"]], result[["95% CI for *OR*"]])
+})
+
+test_that("apa_parameters.list re-aligns confidence intervals across models", {
+  skip_if_not(apa7:::font_available("Times New Roman"))
+  apa7_defaults(font_family = "Times New Roman")
+  fits <- list(
+    lm(mpg ~ wt, data = mtcars),
+    lm(mpg ~ hp, data = transform(mtcars, hp = -hp))
+  )
+  result <- apa_parameters(
+    fits,
+    predictor_parameters = lm_ci_parameters,
+    performance_parameters = NULL
+  )
+  ci <- result[["95% CI"]]
+  expect_match(ci, "^\\[.+, .+\\]$")
+  # Lower bound decimals and commas line up; upper bound decimals line up
+  # relative to the comma
+  width <- \(pattern) {
+    apa7:::md_text_width(stringr::str_extract(ci, pattern), "Times New Roman")
+  }
+  expect_lt(diff(range(width("^[^.]*"))), 0.025)
+  expect_lt(diff(range(width("^[^,]*"))), 0.025)
+  expect_lt(diff(range(width("^[^,]*,[^.]*") - width("^[^,]*"))), 0.025)
+})
+
 # align_padded_columns ----
 
 test_that("apa_flextable left-aligns padded columns and centers the block", {
