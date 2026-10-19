@@ -112,7 +112,7 @@ apa_parameters(
 
 \item{random}{for mixed models, if \code{TRUE} (default), random-effect standard deviations and correlations (and the residual standard deviation, for linear mixed models) are displayed below the fixed effects.}
 
-\item{performance_parameters}{for lists of models, model comparison metrics passed to \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}. If \code{NULL}, no metrics are added.}
+\item{performance_parameters}{for lists of models, model comparison metrics passed to \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}. If \code{NULL}, no metrics are added. By default, \code{R2} and \code{deltaR2}; for lists of mixed models (\code{lme4}), the default also includes the conditional \emph{R}^2^ and its change (\code{R2_conditional}, \code{deltaR2_conditional}), and \code{R2} is the marginal \emph{R}^2^.}
 }
 \value{
 tibble

@@ -1210,6 +1210,12 @@ the$columns <- list(
     latex = "$\\Delta R^2$",
     formatter = the$trim_leading_zero
   ),
+  deltaR2_conditional = column_format(
+    name = "deltaR2_conditional",
+    header = "&Delta;*R*^2^~conditional~",
+    latex = "$\\Delta R^2_{\\text{conditional}}$",
+    formatter = the$trim_leading_zero
+  ),
   deltaAIC = column_format(
     name = "deltaAIC",
     header = "&Delta;*AIC*",

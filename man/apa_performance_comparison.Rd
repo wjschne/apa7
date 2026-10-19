@@ -28,6 +28,8 @@ format model comparison metrics in APA style
 }
 \details{
 Nested models are compared with \emph{F} tests (\code{\link[performance:test_wald]{performance::test_wald()}}) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests (\code{\link[performance:test_likelihoodratio]{performance::test_likelihoodratio()}}) are used. For GLMs, \code{R2} is the pseudo-\emph{R}^2^ that \code{\link[performance:r2]{performance::r2()}} selects for the model family, and the header names it (e.g., \emph{R}^2^~Tjur~).
+
+Mixed models (\code{lme4::lmer} and \code{lme4::glmer}) are compared with likelihood ratio tests. \code{R2} is the marginal \emph{R}^2^ (variance explained by the fixed effects), and by default the conditional \emph{R}^2^ (fixed and random effects) and its change (\code{R2_conditional}, \code{deltaR2_conditional}) are shown too, because adding random effects changes the conditional but not the marginal \emph{R}^2^.
 }
 \examples{
 m1 <- lm(mpg ~ cyl, data = mtcars)

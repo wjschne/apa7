@@ -477,9 +477,49 @@ test_that("mixed-model fit and comparisons", {
     c("*R*^2^~marginal~", "*R*^2^~conditional~", "ICC")
   )
   comp <- suppressMessages(apa_performance_comparison(list(m0, m1)))
-  expect_true(all(c("*R*^2^~marginal~", "*&chi;*^2^") %in% colnames(comp)))
+  expect_equal(
+    colnames(comp),
+    c(
+      "Model",
+      "*R*^2^~marginal~",
+      "&Delta;*R*^2^~marginal~",
+      "*R*^2^~conditional~",
+      "&Delta;*R*^2^~conditional~",
+      "*&chi;*^2^",
+      "*df*",
+      "*p*"
+    )
+  )
+  # The random slope changes the conditional, not the marginal, R2
+  r2c <- vapply(
+    list(m0, m1),
+    \(m) performance::r2_nakagawa(m)$R2_conditional,
+    numeric(1)
+  )
+  expect_equal(
+    comp[["&Delta;*R*^2^~conditional~"]][2],
+    apa7:::align_chr(diff(r2c), trim_leading_zeros = TRUE)
+  )
   result <- suppressMessages(apa_parameters(list(m0, m1)))
+  expect_true(all(
+    c(
+      "*R*^2^~marginal~",
+      "&Delta;*R*^2^~marginal~",
+      "*R*^2^~conditional~",
+      "&Delta;*R*^2^~conditional~"
+    ) %in%
+      colnames(result)
+  ))
+  # Neither change is shown for the first model
+  first <- result[result$Model == "Model 1", ]
+  expect_true(first[["&Delta;*R*^2^~marginal~"]] %in% c("", NA))
+  expect_true(first[["&Delta;*R*^2^~conditional~"]] %in% c("", NA))
   expect_no_error(apa_flextable(result))
+  # An explicit choice is respected
+  result <- suppressMessages(
+    apa_parameters(list(m0, m1), performance_parameters = c("R2", "deltaR2"))
+  )
+  expect_false("*R*^2^~conditional~" %in% colnames(result))
 })
 
 # Confidence intervals ----

@@ -1248,7 +1248,7 @@ align_padded_columns <- function(
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #' @param t_with_df if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.
 #' @param ... arguments passed to methods. For `lm`, `glm`, `polr`, and `clm` models, further arguments are passed to [parameters::model_parameters()]. For example, `vcov = "HC3"` gives heteroskedasticity-consistent (robust) standard errors, and the test statistics, *p*-values, and confidence intervals are based on them. `ci = .90` sets the confidence level.
-#' @param performance_parameters for lists of models, model comparison metrics passed to [apa_performance_comparison()]. If `NULL`, no metrics are added.
+#' @param performance_parameters for lists of models, model comparison metrics passed to [apa_performance_comparison()]. If `NULL`, no metrics are added. By default, `R2` and `deltaR2`; for lists of mixed models (`lme4`), the default also includes the conditional *R*^2^ and its change (`R2_conditional`, `deltaR2_conditional`), and `R2` is the marginal *R*^2^.
 #'
 #' @return tibble
 #' @export
@@ -1951,6 +1951,19 @@ apa_parameters.list <- function(
   performance_parameters = c("R2", "deltaR2"),
   ...
 ) {
+  # Mixed models also show the conditional R2 and its change by default
+  if (
+    missing(performance_parameters) &&
+      all(purrr::map_lgl(fit, \(m) inherits(m, "merMod")))
+  ) {
+    performance_parameters <- c(
+      "R2",
+      "deltaR2",
+      "R2_conditional",
+      "deltaR2_conditional"
+    )
+  }
+
   # List names label the models ("Model 1", ... if unnamed)
   names(fit) <- model_names(fit)
   d_fit <- purrr::map_df(
@@ -2279,6 +2292,8 @@ has_fixed_dispersion <- function(fit) {
 #' @param starred columns to star with significant p_values
 #' @details
 #' Nested models are compared with *F* tests ([performance::test_wald()]) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests ([performance::test_likelihoodratio()]) are used. For GLMs, `R2` is the pseudo-*R*^2^ that [performance::r2()] selects for the model family, and the header names it (e.g., *R*^2^~Tjur~).
+#'
+#' Mixed models (`lme4::lmer` and `lme4::glmer`) are compared with likelihood ratio tests. `R2` is the marginal *R*^2^ (variance explained by the fixed effects), and by default the conditional *R*^2^ (fixed and random effects) and its change (`R2_conditional`, `deltaR2_conditional`) are shown too, because adding random effects changes the conditional but not the marginal *R*^2^.
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
 #' @return tibble
@@ -2309,10 +2324,13 @@ apa_performance_comparison <- function(
     models <- .dots[[1]]
   }
   use_lrt <- all(purrr::map_lgl(models, has_fixed_dispersion))
+  # Mixed models have marginal and conditional R2
+  is_mixed <- all(purrr::map_lgl(models, \(m) inherits(m, "merMod")))
+  conditional_r2 <- if (is_mixed) c("R2_conditional", "deltaR2_conditional")
 
   if (is.null(metrics)) {
     metrics <- if (use_lrt) {
-      c("R2", "deltaR2", "Chi2", "df", "p")
+      c("R2", "deltaR2", conditional_r2, "Chi2", "df", "p")
     } else {
       c("R2", "deltaR2", "F", "p")
     }
@@ -2322,6 +2340,7 @@ apa_performance_comparison <- function(
     metrics <- c(
       "R2",
       "deltaR2",
+      conditional_r2,
       "R2_adjusted",
       "RMSE",
       # Sigma is fixed at 1 when dispersion is fixed
@@ -2357,6 +2376,17 @@ apa_performance_comparison <- function(
       cp <- cp |>
         dplyr::mutate(deltaR2 = ifelse(is.na(dplyr::lag(R2)), R2, R2 - dplyr::lag(R2)))
     }
+    if (
+      "deltaR2_conditional" %in% metrics &&
+        "R2_conditional" %in% colnames(cp)
+    ) {
+      r2c <- cp$R2_conditional
+      cp$deltaR2_conditional <- ifelse(
+        is.na(dplyr::lag(r2c)),
+        r2c,
+        r2c - dplyr::lag(r2c)
+      )
+    }
     cp <- cp |>
       dplyr::left_join(t_nested, by = dplyr::join_by(Name, Model))
   } else {
@@ -2381,6 +2411,11 @@ apa_performance_comparison <- function(
         sep = ""
       )
     cp[p_empty, starred] <- NA
+    # Leave every change column blank where there is no test of the change
+    delta_columns <- intersect(c("deltaR2", "deltaR2_conditional"), colnames(cp))
+    if (any(starred %in% delta_columns)) {
+      cp[p_empty, delta_columns] <- NA
+    }
   }
 
   if ("Chi2" %in% colnames(cp) && all(c("df", "df_diff") %in% colnames(cp))) {
