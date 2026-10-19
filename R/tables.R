@@ -1572,6 +1572,155 @@ apa_parameters_ordinal <- function(
   )
 }
 
+#' @param random for mixed models, if `TRUE` (default), random-effect standard deviations and correlations (and the residual standard deviation, for linear mixed models) are displayed below the fixed effects.
+#' @details
+#' For mixed models fit with `lme4` (`lmer` and `glmer`), fixed effects are displayed as for `lm` and `glm` models. For linear mixed models, *t* tests and confidence intervals use Kenward–Roger degrees of freedom by default (`ci_method = "kenward"`, which requires the pbkrtest package); pass another `ci_method` (e.g., `"satterthwaite"`, which requires lmerTest, or `"wald"`) to change this. When the degrees of freedom differ across fixed effects, they are shown in a *df* column rather than in the *t* column header. Random-effect rows show only the estimated standard deviation (*SD*) or correlation (*r*), labeled by grouping factor.
+#' @export
+#' @rdname apa_parameters
+#' @examples
+#' if (requireNamespace("lme4", quietly = TRUE) &&
+#'     requireNamespace("pbkrtest", quietly = TRUE)) {
+#'   lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy) |>
+#'     apa_parameters()
+#' }
+apa_parameters.merMod <- function(
+  fit,
+  predictor_parameters = c(
+    "Parameter",
+    "Coefficient",
+    "SE",
+    "Exp_Coefficient",
+    "t",
+    "z",
+    "df_error",
+    "p"
+  ),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  random = TRUE,
+  ...
+) {
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+  names(predictor_parameters) <- NULL
+
+  dots <- list(...)
+  is_glmm <- inherits(fit, "glmerMod")
+  if (!is_glmm && is.null(dots$ci_method)) {
+    dots$ci_method <- "kenward"
+  }
+
+  d_b <- do.call(
+    parameters::model_parameters,
+    c(list(fit, effects = "fixed"), dots)
+  ) |>
+    tibble::as_tibble()
+
+  # Format variable names here, because random-effect labels are built below
+  name_formatter <- column_formats$Parameter@formatter
+  d_b$Parameter <- name_formatter(parameters::format_parameters(fit))
+
+  if (is_glmm) {
+    if (is.null(exponentiate)) {
+      exponentiate <- stats::family(fit)$link %in% c("logit", "log")
+    }
+    if (exponentiate) {
+      d_b <- add_exp_columns(d_b, predictor_parameters)
+      column_formats <- label_exp_columns(
+        column_formats,
+        exp_coefficient_label(fit)
+      )
+    }
+  }
+
+  # z tests have infinite df, which should not be displayed
+  if ("df_error" %in% colnames(d_b) && all(is.infinite(d_b$df_error))) {
+    d_b$df_error <- NULL
+  }
+
+  if (random) {
+    d_r <- parameters::model_parameters(fit, effects = "random", ci = NULL) |>
+      tibble::as_tibble()
+    is_cor <- startsWith(d_r$Parameter, "Cor ")
+    # Correlations have no leading zero; SDs are formatted like coefficients
+    coef_chr <- character(nrow(d_r))
+    coef_chr[is_cor] <- signs::signs(
+      d_r$Coefficient[is_cor],
+      accuracy = column_formats@accuracy,
+      trim_leading_zeros = TRUE
+    )
+    coef_chr[!is_cor] <- signs::signs(
+      d_r$Coefficient[!is_cor],
+      accuracy = column_formats@accuracy
+    )
+    fixed_chr <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
+    d_b$Coefficient <- fixed_chr
+    d_b <- dplyr::bind_rows(
+      d_b,
+      tibble::tibble(
+        Parameter = random_effect_labels(d_r$Parameter, d_r$Group, name_formatter),
+        Coefficient = coef_chr
+      )
+    )
+  }
+
+  # Names were formatted above
+  column_formats$Parameter@formatter <- \(x, ...) x
+
+  format_apa_parameters(
+    d_b,
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df
+  )
+}
+
+#' Labels for random-effect parameters
+#'
+#' Converts `parameters` labels such as "SD (Days)", "Cor (Intercept~Days)",
+#' and "SD (Observations)" into "Subject: *SD* (Days)",
+#' "Subject: *r* (Constant, Days)", and "Residual *SD*".
+#' @param parameter random-effect parameter labels from `parameters`
+#' @param group grouping factor of each parameter
+#' @param formatter formats term names (e.g., "(Intercept)" to "Constant")
+#' @keywords internal
+#' @noRd
+random_effect_labels <- function(parameter, group, formatter) {
+  terms <- stringr::str_match(parameter, "^(SD|Cor) \\((.*)\\)$")
+  type <- terms[, 2]
+  inner <- terms[, 3]
+  purrr::pmap_chr(
+    list(type, inner, group, parameter),
+    \(type, inner, group, parameter) {
+      if (is.na(type)) {
+        return(parameter) # nocov
+      }
+      if (group == "Residual") {
+        return("Residual *SD*")
+      }
+      parts <- strsplit(inner, "~", fixed = TRUE)[[1]]
+      # parameters drops the parentheses around Intercept in these labels
+      parts[parts == "Intercept"] <- "(Intercept)"
+      parts <- formatter(parts)
+      symbol <- if (type == "SD") "*SD*" else "*r*"
+      paste0(
+        formatter(group),
+        ": ",
+        symbol,
+        " (",
+        paste(parts, collapse = ", "),
+        ")"
+      )
+    }
+  )
+}
+
 #' Add exponentiated coefficients and confidence limits
 #' @keywords internal
 #' @noRd
@@ -1673,16 +1822,22 @@ format_apa_parameters <- function(
 
   d_b_new <- d_b
 
-  # Put df into t column name
+  # Put df into t column name, if all parameters have the same df
   if (t_with_df) {
     if (
       all(c("t", "df_error") %in% colnames(d_b)) &&
         !is.null(column_formats$CI) &&
-        ("t" %in% predictor_parameters)
+        ("t" %in% predictor_parameters) &&
+        length(unique(round(stats::na.omit(d_b$df_error), 2))) == 1
     ) {
+      # e.g., t(29), or t(17.03) for fractional (e.g., Kenward-Roger) df
       df <- paste0(
         "(",
-        align_chr(max(d_b$df_error, na.rm = TRUE), accuracy = the$accuracy),
+        align_chr(
+          max(d_b$df_error, na.rm = TRUE),
+          accuracy = the$accuracy,
+          drop0trailing = TRUE
+        ),
         ")"
       )
       column_formats$t@header <- paste0(column_formats$t@header, df)
@@ -2003,6 +2158,18 @@ apa_performance.polr <- apa_performance.glm
 #' @rdname apa_performance
 apa_performance.clm <- apa_performance.glm
 
+#' @details
+#' For mixed models (`lme4::lmer` and `lme4::glmer`), the default metrics are the marginal *R*^2^ (variance explained by the fixed effects), the conditional *R*^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by [performance::model_performance()].
+#' @export
+#' @rdname apa_performance
+apa_performance.merMod <- function(
+  fit,
+  metrics = c("R2_marginal", "R2_conditional", "ICC"),
+  column_formats = NULL
+) {
+  apa_performance.lm(fit, metrics = metrics, column_formats = column_formats)
+}
+
 #' Use a pseudo-R2 as the R2 column
 #'
 #' `performance` names pseudo-R2 columns by type (e.g., `R2_Tjur`). Copies the
@@ -2015,7 +2182,9 @@ use_pseudo_r2 <- function(data, column_formats) {
     R2_Tjur = "Tjur",
     R2_Nagelkerke = "Nagelkerke",
     R2_McFadden = "McFadden",
-    R2_CoxSnell = "Cox–Snell"
+    R2_CoxSnell = "Cox–Snell",
+    # Mixed models: variance explained by the fixed effects
+    R2_marginal = "marginal"
   )
   found <- intersect(names(pseudo), colnames(data))
   if ("R2" %in% colnames(data) || length(found) == 0) {
@@ -2053,7 +2222,8 @@ use_pseudo_r2 <- function(data, column_formats) {
 #' @keywords internal
 #' @noRd
 has_fixed_dispersion <- function(fit) {
-  if (inherits(fit, c("polr", "clm"))) {
+  # Nested mixed models are also compared with likelihood ratio tests
+  if (inherits(fit, c("polr", "clm", "merMod"))) {
     return(TRUE)
   }
   if (!inherits(fit, "glm")) {

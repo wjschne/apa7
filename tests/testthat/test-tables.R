@@ -379,6 +379,75 @@ test_that("lists of ordinal models are compared with likelihood ratio tests", {
   expect_no_error(apa_flextable(apa_parameters(list(m1, m2))))
 })
 
+# mixed models ----
+
+test_that("apa_parameters.merMod shows fixed and random effects", {
+  skip_if_not_installed("lme4")
+  skip_if_not_installed("pbkrtest")
+  fit <- lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
+  result <- apa_parameters(fit)
+  expect_s3_class(result, "apa7_tbl")
+  # Kenward-Roger df (17) in the t header
+  expect_equal(colnames(result), c("Variable", "*B*", "*SE*", "*t*(17)", "*p*"))
+  expect_equal(
+    result$Variable,
+    c(
+      "Constant",
+      "Days",
+      "Subject: *SD* (Constant)",
+      "Subject: *SD* (Days)",
+      "Subject: *r* (Constant, Days)",
+      "Residual *SD*"
+    )
+  )
+  # Random-effect rows show only the estimate; correlations lack a leading zero
+  expect_true(all(result[["*p*"]][3:6] %in% c("", NA)))
+  expect_equal(gsub("[ -  ]", "", result[["*B*"]][5]), ".07")
+
+  expect_equal(nrow(apa_parameters(fit, random = FALSE)), 2L)
+  # Other ci_methods pass through
+  expect_true("*t*(174)" %in% colnames(apa_parameters(fit, ci_method = "wald")))
+})
+
+test_that("apa_parameters.merMod shows a df column when df differ", {
+  skip_if_not_installed("lme4")
+  skip_if_not_installed("pbkrtest")
+  fit <- lme4::lmer(Reaction ~ Days + (1 | Subject), data = lme4::sleepstudy)
+  result <- apa_parameters(fit, random = FALSE)
+  expect_true(all(c("*t*", "*df*") %in% colnames(result)))
+})
+
+test_that("apa_parameters.merMod reports odds ratios for glmer", {
+  skip_if_not_installed("lme4")
+  fit <- lme4::glmer(
+    cbind(incidence, size - incidence) ~ period + (1 | herd),
+    data = lme4::cbpp,
+    family = binomial
+  )
+  result <- apa_parameters(fit)
+  expect_true(all(c("*OR*", "*z*") %in% colnames(result)))
+  expect_equal(result$Variable[5], "Herd: *SD* (Constant)")
+  expect_equal(
+    as.numeric(gsub("[ -  ]", "", result[["*OR*"]][2])),
+    round(exp(lme4::fixef(fit)[["period2"]]), 2)
+  )
+})
+
+test_that("mixed-model fit and comparisons", {
+  skip_if_not_installed("lme4")
+  skip_if_not_installed("pbkrtest")
+  m0 <- lme4::lmer(Reaction ~ Days + (1 | Subject), data = lme4::sleepstudy)
+  m1 <- lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
+  expect_equal(
+    colnames(apa_performance(m1)),
+    c("*R*^2^~marginal~", "*R*^2^~conditional~", "ICC")
+  )
+  comp <- suppressMessages(apa_performance_comparison(list(m0, m1)))
+  expect_true(all(c("*R*^2^~marginal~", "*&chi;*^2^") %in% colnames(comp)))
+  result <- suppressMessages(apa_parameters(list(m0, m1)))
+  expect_no_error(apa_flextable(result))
+})
+
 # Confidence intervals ----
 
 # Parse "[LL, UL]" strings into a two-column matrix

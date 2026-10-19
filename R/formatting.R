@@ -521,6 +521,10 @@ md_visible_text <- function(x) {
 }
 
 #' Width of text in em
+#'
+#' Sums the advance widths of individual characters, ignoring kerning. Word
+#' does not kern body text by default, and Times New Roman kerns some digit
+#' pairs (e.g., "11"), so kerned widths would misalign Word tables.
 #' @keywords internal
 #' @noRd
 string_width_em <- function(x, font_family) {
@@ -528,12 +532,16 @@ string_width_em <- function(x, font_family) {
   has_text <- !is.na(x) & nzchar(x)
   if (any(has_text)) {
     size <- 1000
-    out[has_text] <- systemfonts::string_width(
-      x[has_text],
+    chars <- strsplit(x[has_text], "")
+    glyphs <- unique(unlist(chars))
+    glyph_width <- systemfonts::string_width(
+      glyphs,
       family = font_family,
       size = size,
       res = 72
     ) / size
+    names(glyph_width) <- glyphs
+    out[has_text] <- vapply(chars, \(g) sum(glyph_width[g]), numeric(1))
   }
   out
 }
@@ -1357,6 +1365,24 @@ the$columns <- list(
     name = "R2_adjusted",
     header = "adj*R*^2^",
     latex = "$\\text{adj}R^2$",
+    formatter = the$trim_leading_zero
+  ),
+  R2_conditional = column_format(
+    name = "R2_conditional",
+    header = "*R*^2^~conditional~",
+    latex = "$R^2_{\\text{conditional}}$",
+    formatter = the$trim_leading_zero
+  ),
+  R2_marginal = column_format(
+    name = "R2_marginal",
+    header = "*R*^2^~marginal~",
+    latex = "$R^2_{\\text{marginal}}$",
+    formatter = the$trim_leading_zero
+  ),
+  ICC = column_format(
+    name = "ICC",
+    header = "ICC",
+    latex = "ICC",
     formatter = the$trim_leading_zero
   ),
   RMSE = column_format(

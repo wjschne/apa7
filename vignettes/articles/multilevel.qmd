@@ -1,0 +1,145 @@
+---
+title: "Multilevel Model Tables"
+format: html
+execute:
+  cache: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
+library(dplyr)
+library(lme4)
+library(apa7)
+```
+
+```{r}
+#| label: setup2
+#| eval: false
+<<setup>>
+```
+
+When observations are nested (trials within participants, students within classrooms) or crossed (participants responding to the same set of items), ordinary regression treats correlated observations as independent and understates uncertainty. Multilevel (mixed-effects) models account for the nesting with random effects. `apa_parameters` accepts models fit with `lme4::lmer` and `lme4::glmer` and displays the fixed effects as in an ordinary regression table, followed by the random-effect standard deviations and correlations.
+
+# Linear Mixed Models
+
+How quickly does performance deteriorate when people do not get enough sleep, and are some people more vulnerable than others? Belenky et al. (2003) restricted 18 participants to 3 hours of sleep per night and measured their average reaction time on a vigilance task each day. The data are in the `sleepstudy` data set from the lme4 package. Days 0 and 1 were adaptation and training, and Day 2 was the baseline, so we keep Days 2 through 9 and count days of sleep restriction from the baseline.
+
+```{r}
+#| label: sleep-data
+d_sleep <- sleepstudy |>
+  filter(Days >= 2) |>
+  mutate(Days = Days - 2)
+```
+
+## How much do participants differ?
+
+A model with only a random intercept for each participant shows how much of the variability in reaction time lies between participants. The intraclass correlation (ICC) is the proportion of the variance that is due to stable differences between participants.
+
+```{r}
+#| label: sleep0
+sleep0 <- lmer(Reaction ~ 1 + (1 | Subject), data = d_sleep)
+apa_performance(sleep0, metrics = "ICC")
+```
+
+About half of the variance in reaction time is between participants, so treating the 144 observations as independent would be a mistake.
+
+## Random intercepts
+
+The next model adds days of sleep restriction as a fixed effect. Each participant still has their own intercept, but all participants are assumed to slow down at the same rate.
+
+```{r}
+#| label: sleep1
+sleep1 <- lmer(Reaction ~ Days + (1 | Subject), data = d_sleep)
+apa_parameters(sleep1)
+```
+
+The table has two parts. The fixed effects are read like ordinary regression coefficients: at baseline, the average reaction time is about 268 ms, and it increases by about 11 ms per day of sleep restriction. Below them, the random effects show the standard deviation (*SD*) of participants' intercepts around the average intercept, and the residual *SD* of observations around each participant's own line.
+
+For linear mixed models, `apa_parameters` tests fixed effects with *t* tests that use Kenward–Roger degrees of freedom, which account for the number of participants as well as the number of observations. Because the intercept and the slope have different degrees of freedom here, they are shown in a *df* column. To use a different method, pass `ci_method` (e.g., `ci_method = "satterthwaite"`, which requires the lmerTest package).
+
+## Random slopes
+
+Do participants differ in how quickly they deteriorate? Adding a random slope for days lets each participant have their own rate of change.
+
+```{r}
+#| label: sleep2
+sleep2 <- lmer(Reaction ~ Days + (Days | Subject), data = d_sleep)
+apa_parameters(sleep2)
+```
+
+The average slope is unchanged, but its standard error is larger, because the model now recognizes that participants' slopes vary: the *SD* of the slopes is about 7 ms per day around the average of 11 ms per day. The correlation (*r*) between participants' intercepts and slopes is small. When all fixed effects share the same degrees of freedom, as here, they appear in the *t* column header.
+
+The random-effect rows can be omitted with `random = FALSE`, and confidence intervals can be added with `"CI"`.
+
+```{r}
+#| label: sleep2-ci
+apa_parameters(
+  sleep2,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
+  random = FALSE
+)
+```
+
+## Model fit
+
+For mixed models, `apa_performance` reports the marginal *R*^2^ (the variance explained by the fixed effects), the conditional *R*^2^ (the variance explained by the fixed and random effects together), and the ICC.
+
+```{r}
+#| label: sleep2-performance
+apa_performance(sleep2)
+```
+
+## Comparing models
+
+A list of mixed models is compared with likelihood ratio tests, and the change in marginal *R*^2^ is shown for each model. When the models differ in their fixed effects, the likelihood ratio test is based on maximum likelihood rather than restricted maximum likelihood (REML) estimates, as it should be.
+
+```{r}
+#| label: sleep-list
+#| message: false
+apa_parameters(list(sleep1, sleep2))
+```
+
+The random slope does not change the marginal *R*^2^, because the fixed effects are the same in both models, but the likelihood ratio test shows that the slopes vary across participants. (A likelihood ratio test of a variance is conservative, because a variance cannot be negative, so the true *p* value is smaller than the one shown.)
+
+The comparison can also be displayed on its own with `apa_performance_comparison`, here including the model with no predictors:
+
+```{r}
+#| label: sleep-compare
+#| message: false
+apa_performance_comparison(list(sleep0, sleep1, sleep2))
+```
+
+# Generalized Linear Mixed Models
+
+`glmer` models are displayed like `glm` models, with exponentiated coefficients (e.g., odds ratios) and *z* tests for the fixed effects.
+
+The `VerbAgg` data set from the lme4 package contains 316 people's responses to 24 items describing verbally aggressive reactions to frustrating situations. Each item describes a behavior (cursing, scolding, or shouting) in a situation in which someone else is to blame or in which the respondent is to blame, and asks whether the respondent would *want* to react that way or would actually *do* so. Do people with higher trait anger endorse more verbally aggressive reactions, and are people less willing to say that they would act aggressively than that they would want to?
+
+Because every person responds to every item, people and items are crossed random effects.
+
+```{r}
+#| label: verbagg
+d_va <- VerbAgg |>
+  mutate(
+    Response = r2 == "Y",
+    Gender = factor(Gender, labels = c("Female", "Male")),
+    Behavior = btype,
+    Mode = mode,
+    Situation = situ,
+    Person = id,
+    Item = item
+  )
+
+glmer_va <- glmer(
+  Response ~ Anger + Gender + Behavior + Mode + Situation +
+    (1 | Person) + (1 | Item),
+  data = d_va,
+  family = binomial,
+  control = glmerControl(optimizer = "bobyqa")
+)
+apa_parameters(glmer_va)
+```
+
+Each point of trait anger multiplies the odds of endorsing an item by about 1.06. Scolding and shouting are endorsed less often than cursing, reactions are endorsed less often when the respondent is to blame than when someone else is, and people are less likely to say they would *do* something than that they would *want* to. The random-effect *SD*s are on the log-odds scale and show that people differ much more than items do, after the item characteristics are taken into account.

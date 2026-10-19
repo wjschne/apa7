@@ -6,6 +6,7 @@
 \alias{apa_parameters.glm}
 \alias{apa_parameters.polr}
 \alias{apa_parameters.clm}
+\alias{apa_parameters.merMod}
 \alias{apa_parameters.list}
 \title{format model parameters in APA style}
 \usage{
@@ -66,6 +67,19 @@ apa_parameters(
   ...
 )
 
+\method{apa_parameters}{merMod}(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "t", "z",
+    "df_error", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  random = TRUE,
+  ...
+)
+
 \method{apa_parameters}{list}(
   fit,
   predictor_parameters = NULL,
@@ -96,6 +110,8 @@ apa_parameters(
 
 \item{thresholds}{for ordinal models, if \code{TRUE} (default), threshold (cutpoint) rows are displayed below the predictors.}
 
+\item{random}{for mixed models, if \code{TRUE} (default), random-effect standard deviations and correlations (and the residual standard deviation, for linear mixed models) are displayed below the fixed effects.}
+
 \item{performance_parameters}{for lists of models, model comparison metrics passed to \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}. If \code{NULL}, no metrics are added.}
 }
 \value{
@@ -108,6 +124,8 @@ format model parameters in APA style
 For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \emph{z} for families with a fixed dispersion parameter (binomial, Poisson, negative binomial) and \emph{t} for families with an estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi families). Whichever statistic applies is displayed. The exponentiated coefficient column (\code{Exp_Coefficient}) is labeled \emph{OR} for logit links, \emph{IRR} for log links in count models (Poisson, quasi-Poisson, negative binomial), \emph{RR} for log links in binomial models, and Exp(\emph{B}) otherwise.
 
 For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coefficients are tested with Wald \emph{z} tests. (\code{parameters} reports \emph{t} for \code{polr}, but the test is asymptotically normal, and \code{clm} reports \emph{z} for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled \emph{OR}. Threshold rows show only the estimate, its standard error, and its confidence interval, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful. Confidence intervals (\code{"CI"}, \code{"Exp_CI"}) are Wald \emph{z} intervals, consistent with the \emph{z} tests.
+
+For mixed models fit with \code{lme4} (\code{lmer} and \code{glmer}), fixed effects are displayed as for \code{lm} and \code{glm} models. For linear mixed models, \emph{t} tests and confidence intervals use Kenward–Roger degrees of freedom by default (\code{ci_method = "kenward"}, which requires the pbkrtest package); pass another \code{ci_method} (e.g., \code{"satterthwaite"}, which requires lmerTest, or \code{"wald"}) to change this. When the degrees of freedom differ across fixed effects, they are shown in a \emph{df} column rather than in the \emph{t} column header. Random-effect rows show only the estimated standard deviation (\emph{SD}) or correlation (\emph{r}), labeled by grouping factor.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
@@ -126,4 +144,9 @@ glm(am ~ wt + hp, data = mtcars, family = binomial) |>
    apa_flextable()
 MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
    apa_parameters()
+if (requireNamespace("lme4", quietly = TRUE) &&
+    requireNamespace("pbkrtest", quietly = TRUE)) {
+  lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy) |>
+    apa_parameters()
+}
 }

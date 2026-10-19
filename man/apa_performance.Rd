@@ -6,6 +6,7 @@
 \alias{apa_performance.glm}
 \alias{apa_performance.polr}
 \alias{apa_performance.clm}
+\alias{apa_performance.merMod}
 \title{format model performance metrics in APA style}
 \usage{
 apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
@@ -17,6 +18,12 @@ apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 \method{apa_performance}{polr}(fit, metrics = c("R2", "AIC"), column_formats = NULL)
 
 \method{apa_performance}{clm}(fit, metrics = c("R2", "AIC"), column_formats = NULL)
+
+\method{apa_performance}{merMod}(
+  fit,
+  metrics = c("R2_marginal", "R2_conditional", "ICC"),
+  column_formats = NULL
+)
 }
 \arguments{
 \item{fit}{model fit object}
@@ -33,6 +40,8 @@ format model performance metrics in APA style
 }
 \details{
 For \code{glm} objects, \code{R2} is the pseudo-\emph{R}^2^ that \code{\link[performance:r2]{performance::r2()}} selects for the model family (e.g., Tjur's \emph{R}^2^ for logistic regression and Nagelkerke's \emph{R}^2^ for count models). The header names the pseudo-\emph{R}^2^ that was used. Because the residual standard deviation is not meaningful for most GLMs, the default metrics are \code{R2} and \code{AIC}.
+
+For mixed models (\code{lme4::lmer} and \code{lme4::glmer}), the default metrics are the marginal \emph{R}^2^ (variance explained by the fixed effects), the conditional \emph{R}^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by \code{\link[performance:model_performance]{performance::model_performance()}}.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
