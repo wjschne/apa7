@@ -12,6 +12,8 @@ execute:
 library(dplyr)
 library(lme4)
 library(apa7)
+library(performance)
+library(parameters)
 ```
 
 ```{r}
@@ -30,7 +32,8 @@ How quickly does performance deteriorate when people do not get enough sleep, an
 #| label: sleep-data
 d_sleep <- sleepstudy |>
   filter(Days >= 2) |>
-  mutate(Days = Days - 2)
+  mutate(Days = Days - 2) |> 
+  rename(Participant = Subject)
 ```
 
 ## How much do participants differ?
@@ -39,11 +42,13 @@ A model with only a random intercept for each participant shows how much of the 
 
 ```{r}
 #| label: sleep0
-sleep0 <- lmer(Reaction ~ 1 + (1 | Subject), data = d_sleep)
-apa_performance(sleep0, metrics = "ICC")
+sleep0 <- lmer(Reaction ~ 1 + (1 | Participant), data = d_sleep)
+apa_performance(sleep0)
 ```
 
 About half of the variance in reaction time is between participants, so treating the 144 observations as independent would be a mistake.
+
+Also displayed is the marginal *R*^2^, the proportion of variance explained by fixed effects. Because there are no fixed effects in this model, the *R*^2^~marginal~ is 0. The conditional *R*^2^ is the proportion of variance explained by both fixed and random effects. Because the random effect of participants is the only effect, the *R*^2^~conditional~ is equal to the ICC in this model.
 
 ## Random intercepts
 
@@ -51,7 +56,9 @@ The next model adds days of sleep restriction as a fixed effect. Each participan
 
 ```{r}
 #| label: sleep1
-sleep1 <- lmer(Reaction ~ Days + (1 | Subject), data = d_sleep)
+sleep1 <- lmer(Reaction ~ Days + (1 | Participant), data = d_sleep)
+model_parameters(sleep1, ci_method = "boot") |> 
+  tibble::as_tibble()
 apa_parameters(sleep1)
 ```
 
@@ -65,7 +72,7 @@ Do participants differ in how quickly they deteriorate? Adding a random slope fo
 
 ```{r}
 #| label: sleep2
-sleep2 <- lmer(Reaction ~ Days + (Days | Subject), data = d_sleep)
+sleep2 <- lmer(Reaction ~ Days + (Days | Participant), data = d_sleep)
 apa_parameters(sleep2)
 ```
 
@@ -81,6 +88,8 @@ apa_parameters(
   random = FALSE
 )
 ```
+
+
 
 ## Model fit
 
@@ -98,7 +107,7 @@ A list of mixed models is compared with likelihood ratio tests, and the change i
 ```{r}
 #| label: sleep-list
 #| message: false
-apa_parameters(list(sleep1, sleep2))
+apa_parameters(list(sleep0, sleep1, sleep2))
 ```
 
 The random slope does not change the marginal *R*^2^, because the fixed effects are the same in both models, but the likelihood ratio test shows that the slopes vary across participants. (A likelihood ratio test of a variance is conservative, because a variance cannot be negative, so the true *p* value is smaller than the one shown.)
@@ -108,7 +117,8 @@ The comparison can also be displayed on its own with `apa_performance_comparison
 ```{r}
 #| label: sleep-compare
 #| message: false
-apa_performance_comparison(list(sleep0, sleep1, sleep2))
+apa_performance_comparison(list(sleep0, sleep1, sleep2)) |> 
+  apa_flextable()
 ```
 
 # Generalized Linear Mixed Models

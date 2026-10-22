@@ -68,7 +68,7 @@ In a rendered document, the output of `apa_parameters` is displayed as a table w
 
 ```{r}
 #| label: lm-auto
-apa_parameters(lm1) 
+apa_parameters(lm1)
 ```
 
 The output is still a tibble, so ordinary dplyr verbs work. Pass the result to `apa_flextable` to customize the table. For example, to drop the intercept:
@@ -83,47 +83,25 @@ To compare nested models, pass a list. Model fit statistics (*R*^2^, change in *
 
 ```{r}
 #| label: lm-list
-apa_parameters(list(lm1, lm2, lm3)) |> 
-  apa_flextable()
+apa_parameters(list(lm1, lm2, lm3))
 ```
 
 # Binary Logistic Regression
 
-Psychologists who study volunteers have long worried that the people who sign up for experiments differ from the people who do not. If personality predicts who volunteers, findings from volunteer samples may not generalize. Cowles and Davis (1987) asked 1,421 students whether they would volunteer for a psychology experiment and measured their neuroticism and extraversion with the Eysenck Personality Inventory. The data are in the `Cowles` data set from the carData package.
-
-Neuroticism and extraversion are centered at their means so that, when the model includes their interaction, each trait's coefficient is its effect for a person of average standing on the other trait.
+`apa_parameters` also accepts `glm` objects. The table reports coefficients on the link scale (*B*), their standard errors, the exponentiated coefficient, and the test statistic. For logistic regression, the exponentiated coefficient is the odds ratio (*OR*), and the test statistic is *z*.
 
 ```{r}
-#| label: cowles
-d_vol <- carData::Cowles |>
-  mutate(
-    Volunteer = volunteer == "yes",
-    Sex = sex,
-    Neuroticism = neuroticism - mean(neuroticism),
-    Extraversion = extraversion - mean(extraversion)
-  )
+#| label: glm1
+glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
+apa_parameters(glm1)
 
-glm_vol1 <- glm(
-  Volunteer ~ Sex + Neuroticism + Extraversion,
-  data = d_vol,
-  family = binomial
-)
 ```
-
-`apa_parameters` accepts `glm` objects. The table reports the coefficients on the log-odds scale (*B*), their standard errors, the exponentiated coefficients, and the test statistics. For logistic regression, the exponentiated coefficient is the odds ratio (*OR*), and the test statistic is *z*.
-
-```{r}
-#| label: glm-vol1
-apa_parameters(glm_vol1)
-```
-
-Each odds ratio is the multiplicative change in the odds of volunteering for a one-point increase in the predictor (or, for Sex, for men compared with women), holding the other predictors constant. For the constant, the exponentiated coefficient is the odds of volunteering for a woman of average neuroticism and extraversion, not an odds ratio.
 
 Exponentiated coefficients are added whenever the link function is logit or log. They are labeled *OR* for logit links, *IRR* (incidence rate ratio) for log links in count models, and *RR* (risk ratio) for log links in binomial models. Set `exponentiate = FALSE` to leave them out, or `exponentiate = TRUE` to add them for other links such as probit.
 
 ```{r}
 #| label: glm-noexp
-apa_parameters(glm_vol1, exponentiate = FALSE)
+apa_parameters(glm1, exponentiate = FALSE)
 ```
 
 To choose and order the columns, use `predictor_parameters`. Columns that the model does not report (for example, *t* for a model tested with *z*) are dropped silently.
@@ -131,7 +109,7 @@ To choose and order the columns, use `predictor_parameters`. Columns that the mo
 ```{r}
 #| label: glm-columns
 apa_parameters(
-  glm_vol1,
+  glm1,
   predictor_parameters = c("Parameter", "Exp_Coefficient", "z", "p")
 )
 ```
@@ -140,89 +118,46 @@ As with `lm`, `starred` and `bolded` mark significant coefficients.
 
 ```{r}
 #| label: glm-starred
-apa_parameters(glm_vol1, starred = "Coefficient", bolded = "p")
+apa_parameters(glm1, starred = "Coefficient", bolded = "p")
+
+sci_md(c(123251,45, .00045), align = TRUE)
+
 ```
 
 ## Comparing logistic regression models
 
-Does the effect of extraversion depend on neuroticism? A second model adds their interaction. A list of `glm` models is displayed with a pseudo-*R*^2^ (Tjur's for logistic regression, as chosen by `performance::r2`) and a likelihood ratio test of the change, because the binomial family has a fixed dispersion parameter.
+A list of `glm` models is displayed with a pseudo-*R*^2^ (Tjur's for logistic regression, as chosen by `performance::r2`) and a likelihood ratio test of the change, because the binomial family has a fixed dispersion parameter.
 
 ```{r}
 #| label: glm-list
-glm_vol2 <- update(glm_vol1, . ~ . + Neuroticism:Extraversion)
-apa_parameters(list(glm_vol1, glm_vol2))
+glm0 <- glm(am ~ wt, data = mtcars, family = binomial)
+apa_parameters(list(glm0, glm1))
 ```
-
-The interaction improves the fit, but the gain in Tjur's *R*^2^ is small. Its odds ratio is below 1: the more neurotic a person is, the less extraversion increases the odds of volunteering.
 
 The model comparison can also be displayed separately with `apa_performance_comparison`.
 
 ```{r}
 #| label: glm-compare
-apa_performance_comparison(list(glm_vol1, glm_vol2))
+apa_performance_comparison(list(glm0, glm1))
 ```
 
 # Count Regression
 
-Do students who struggle academically miss more school? Quine (1975) recorded the number of days that 146 Australian students were absent from school in one year, along with whether their teachers classified them as average or slow learners, their year in school, and their sex. The data are in the `quine` data set from the MASS package. The outcome is a count, so a Poisson regression is a natural starting point.
-
-```{r}
-#| label: quine
-d_quine <- MASS::quine |>
-  mutate(
-    Learner = factor(Lrn, levels = c("AL", "SL"), labels = c("Average", "Slow")),
-    Year = factor(
-      Age,
-      levels = c("F0", "F1", "F2", "F3"),
-      labels = c("Primary", "Form 1", "Form 2", "Form 3")
-    ),
-    Sex = factor(Sex, levels = c("F", "M"), labels = c("Female", "Male"))
-  )
-
-glm_pois <- glm(
-  Days ~ Learner + Year + Sex,
-  data = d_quine,
-  family = poisson
-)
-```
-
-For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*): the multiplicative change in the expected number of days absent for a one-unit change in the predictor (here, for each category compared with the reference category), holding the other predictors constant.
+For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*).
 
 ```{r}
 #| label: poisson
+glm_pois <- glm(carb ~ wt + hp, data = mtcars, family = poisson)
 apa_parameters(glm_pois)
 ```
 
-A Poisson model assumes that the variance of the counts equals their mean. Absences vary far more than that, which `performance::check_overdispersion` confirms.
-
-```{r}
-#| label: overdispersion
-performance::check_overdispersion(glm_pois)
-```
-
-With overdispersion, Poisson standard errors are too small, and the *p* values are too small with them. A quasi-Poisson model estimates the dispersion from the data. Its coefficients and *IRR*s are identical to the Poisson model's, but its standard errors are inflated by the square root of the estimated dispersion. Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests.
+Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests.
 
 ```{r}
 #| label: quasipoisson
-glm_qpois <- glm(
-  Days ~ Learner + Year + Sex,
-  data = d_quine,
-  family = quasipoisson
-)
+glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
-
-The slow-learner effect that looked decisive in the Poisson model is no longer statistically significant at the .05 level. The estimated effect size did not change; the evidence for it did.
-
-A negative binomial model handles overdispersion differently: it adds a parameter that lets the variance grow faster than the mean. Its coefficients can differ from the Poisson model's, its exponentiated coefficients are again *IRR*s, and its test statistic is *z*.
-
-```{r}
-#| label: negbin
-glm_nb <- MASS::glm.nb(Days ~ Learner + Year + Sex, data = d_quine)
-apa_parameters(glm_nb)
-```
-
-The negative binomial model leads to the same conclusion as the quasi-Poisson model: slow learners are estimated to miss about a third more days than average learners, but these data provide only weak evidence for the difference.
 
 # Printing Options
 
