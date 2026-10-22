@@ -6,7 +6,12 @@ A wrapper for
 ## Usage
 
 ``` r
-install_apaquarto(no_prompt = FALSE, quiet = FALSE, quarto_args = NULL)
+install_apaquarto(
+  no_prompt = FALSE,
+  quiet = FALSE,
+  quarto_args = NULL,
+  ask = TRUE
+)
 ```
 
 ## Arguments
@@ -23,6 +28,11 @@ install_apaquarto(no_prompt = FALSE, quiet = FALSE, quarto_args = NULL)
 
   Character vector of other quarto CLI arguments to append to the Quarto
   command executed by this function.
+
+- ask:
+
+  if `TRUE` (default), ask before installing missing packages. If
+  `FALSE`, install missing packages without asking.
 
 ## Value
 

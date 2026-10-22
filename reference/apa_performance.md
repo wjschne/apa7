@@ -9,6 +9,25 @@ apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 
 # S3 method for class 'lm'
 apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
+
+# S3 method for class 'glm'
+apa_performance(fit, metrics = c("R2", "AIC"), column_formats = NULL)
+
+# S3 method for class 'polr'
+apa_performance(fit, metrics = c("R2", "AIC"), column_formats = NULL)
+
+# S3 method for class 'clm'
+apa_performance(fit, metrics = c("R2", "AIC"), column_formats = NULL)
+
+# S3 method for class 'merMod'
+apa_performance(
+  fit,
+  metrics = c("R2_marginal", "R2_conditional", "ICC"),
+  column_formats = NULL
+)
+
+# S3 method for class 'list'
+apa_performance(fit, metrics = NULL, column_formats = NULL)
 ```
 
 ## Arguments
@@ -29,6 +48,27 @@ apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 ## Value
 
 tibble
+
+## Details
+
+For `glm` objects, `R2` is the pseudo-*R*^2^ that
+[`performance::r2()`](https://easystats.github.io/performance/reference/r2.html)
+selects for the model family (e.g., Tjur's *R*^2^ for logistic
+regression and Nagelkerke's *R*^2^ for count models). The header names
+the pseudo-*R*^2^ that was used. Because the residual standard deviation
+is not meaningful for most GLMs, the default metrics are `R2` and `AIC`.
+
+For mixed models ([`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html)
+and [`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html)), the
+default metrics are the marginal *R*^2^ (variance explained by the fixed
+effects), the conditional *R*^2^ (fixed and random effects), and the
+intraclass correlation (ICC), as computed by
+[`performance::model_performance()`](https://easystats.github.io/performance/reference/model_performance.html).
+
+For a list of models, each model's metrics are displayed in a row,
+labeled in a `Model` column by the list's names (or "Model 1", "Model
+2", ... for unnamed elements). If `metrics` is `NULL` (default), each
+model's default metrics are used.
 
 ## Examples
 

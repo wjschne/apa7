@@ -21,6 +21,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/chisquare.html">Contingency Tables</a></li>
     <li><a class="dropdown-item" href="../articles/correlations.html">Correlations</a></li>
+    <li><a class="dropdown-item" href="../articles/multilevel.html">Multilevel Model Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/regression.html">Regression Analysis Tables</a></li>
     <li><a class="dropdown-item" href="../articles/summarize.html">Summarize Data</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -48,7 +50,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_performance_comparison</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
-<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R2"</span>, <span class="st">"deltaR2"</span>, <span class="st">"F"</span>, <span class="st">"p"</span><span class="op">)</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  starred <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  column_formats <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -59,11 +61,11 @@
 
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>model fit objects</p></dd>
+<dd><p>model fit objects, or a list of them. Models are labeled by the list's names (or the argument names), and "Model 1", "Model 2", ... for unnamed models.</p></dd>
 
 
 <dt id="arg-metrics">metrics<a class="anchor" aria-label="anchor" href="#arg-metrics"></a></dt>
-<dd><p>performance metrics. Default is R2, deltaR2, F, and p</p></dd>
+<dd><p>performance metrics. If <code>NULL</code> (default), R2, deltaR2, F, and p for models with an estimated dispersion parameter (e.g., <code>lm</code>, Gaussian or quasi-family <code>glm</code>), and R2, deltaR2, Chi2, df, and p for GLMs with a fixed dispersion parameter (binomial, Poisson, negative binomial). Use "all" for all available metrics.</p></dd>
 
 
 <dt id="arg-starred">starred<a class="anchor" aria-label="anchor" href="#arg-starred"></a></dt>
@@ -77,6 +79,11 @@
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>tibble</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Nested models are compared with <em>F</em> tests (<code><a href="https://easystats.github.io/performance/reference/test_performance.html" class="external-link">performance::test_wald()</a></code>) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests (<code><a href="https://easystats.github.io/performance/reference/test_performance.html" class="external-link">performance::test_likelihoodratio()</a></code>) are used. For GLMs, <code>R2</code> is the pseudo-<em>R</em>^2^ that <code><a href="https://easystats.github.io/performance/reference/r2.html" class="external-link">performance::r2()</a></code> selects for the model family, and the header names it (e.g., <em>R</em>^2^~Tjur~).</p>
+<p>Mixed models (<code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer</a></code> and <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer</a></code>) are compared with likelihood ratio tests. <code>R2</code> is the marginal <em>R</em>^2^ (variance explained by the fixed effects), and by default the conditional <em>R</em>^2^ (fixed and random effects) and its change (<code>R2_conditional</code>, <code>deltaR2_conditional</code>) are shown too, because adding random effects changes the conditional but not the marginal <em>R</em>^2^.</p>
     </div>
 
     <div class="section level2">

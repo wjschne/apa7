@@ -7,7 +7,7 @@ format model comparison metrics in APA style
 ``` r
 apa_performance_comparison(
   ...,
-  metrics = c("R2", "deltaR2", "F", "p"),
+  metrics = NULL,
   starred = NA,
   column_formats = NULL
 )
@@ -17,11 +17,17 @@ apa_performance_comparison(
 
 - ...:
 
-  model fit objects
+  model fit objects, or a list of them. Models are labeled by the list's
+  names (or the argument names), and "Model 1", "Model 2", ... for
+  unnamed models.
 
 - metrics:
 
-  performance metrics. Default is R2, deltaR2, F, and p
+  performance metrics. If `NULL` (default), R2, deltaR2, F, and p for
+  models with an estimated dispersion parameter (e.g., `lm`, Gaussian or
+  quasi-family `glm`), and R2, deltaR2, Chi2, df, and p for GLMs with a
+  fixed dispersion parameter (binomial, Poisson, negative binomial). Use
+  "all" for all available metrics.
 
 - starred:
 
@@ -35,6 +41,26 @@ apa_performance_comparison(
 ## Value
 
 tibble
+
+## Details
+
+Nested models are compared with *F* tests
+([`performance::test_wald()`](https://easystats.github.io/performance/reference/test_performance.html))
+unless every model is a GLM with a fixed dispersion parameter, in which
+case likelihood ratio tests
+([`performance::test_likelihoodratio()`](https://easystats.github.io/performance/reference/test_performance.html))
+are used. For GLMs, `R2` is the pseudo-*R*^2^ that
+[`performance::r2()`](https://easystats.github.io/performance/reference/r2.html)
+selects for the model family, and the header names it (e.g.,
+*R*^2^~Tjur~).
+
+Mixed models ([`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html) and
+[`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html)) are compared
+with likelihood ratio tests. `R2` is the marginal *R*^2^ (variance
+explained by the fixed effects), and by default the conditional *R*^2^
+(fixed and random effects) and its change (`R2_conditional`,
+`deltaR2_conditional`) are shown too, because adding random effects
+changes the conditional but not the marginal *R*^2^.
 
 ## Examples
 

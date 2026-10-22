@@ -1,10 +1,19 @@
 # Changelog
 
-## apa7 0.1.3
+## apa7 0.2.0 *2026-10-18*
 
-CRAN release: 2026-05-26
+- [`make_apaquarto()`](https://wjschne.github.io/apa7/reference/make_apaquarto.md)
+  and
+  [`install_apaquarto()`](https://wjschne.github.io/apa7/reference/install_apaquarto.md)
+  now list missing packages separately and ask a short “Install them
+  now?” question, so the prompt is readable in the console (e.g., R on
+  macOS). New `ask` argument installs missing packages without asking
+  when `FALSE`. If installation is declined, the function stops and
+  prints the
+  [`install.packages()`](https://rdrr.io/r/utils/install.packages.html)
+  command to run.
 
-## apa7 0.1.2 *2025-05-25*
+## apa7 0.1.2 *2026-05-25*
 
 - Used AI (Claude) and old-fashioned effort to generate a more complete
   set of unit tests, fix minor bugs, and make documentation more

@@ -47,7 +47,12 @@ align_chr(
 
 - padding_character:
 
-  character to use for padding, default is `&numsp;` (figure space)
+  character to use for padding, default is `&numsp;` (figure space).
+  With the default, text is padded to equal rendered width in the
+  default font family (see
+  [`num_pad()`](https://wjschne.github.io/apa7/reference/num_pad.md) and
+  the `width_aware_padding` argument of
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)).
 
 - center:
 

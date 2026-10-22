@@ -41,6 +41,8 @@ Alter vector variables
   : Align text on center text (default is decimal)
 - [`apa_p()`](https://wjschne.github.io/apa7/reference/apa_p.md) :
   p-value in APA format
+- [`sci_md()`](https://wjschne.github.io/apa7/reference/sci_md.md) :
+  Scientific notation for markdown
 - [`hanging_indent()`](https://wjschne.github.io/apa7/reference/hanging_indent.md)
   : Return markdown text with hanging indent
 - [`num_pad()`](https://wjschne.github.io/apa7/reference/num_pad.md) :
@@ -125,3 +127,12 @@ Other Functions
   Like
   [`stringr::str_wrap`](https://stringr.tidyverse.org/reference/str_wrap.html),
   but attempts to create lines of equal width
+
+- [`matrix_display()`](https://wjschne.github.io/apa7/reference/matrix_display.md)
+  : Display latex matrices
+
+- [`print(`*`<apa7_tbl>`*`)`](https://wjschne.github.io/apa7/reference/apa7_tbl.md)
+  [`knit_print(`*`<apa7_tbl>`*`)`](https://wjschne.github.io/apa7/reference/apa7_tbl.md)
+  :
+
+  Tables ready for `apa_flextable`

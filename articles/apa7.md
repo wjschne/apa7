@@ -159,9 +159,9 @@ vertically merged
 
 ``` r
 
-d |> 
-  mutate(Model = str_remove(Model, "Model ")) |> 
-apa_flextable() |> 
+d |>
+  mutate(Model = str_remove(Model, "Model ")) |>
+  apa_flextable() |>
   merge_v() |>
   align(j = "Predictor", part = "all") |>
   align(j = "Model", align = "center") |>
@@ -323,73 +323,79 @@ my_formats@get_tibble |>
   apa_flextable(markdown_body = F)
 ```
 
-| name            | header                 | latex                 |
-|-----------------|------------------------|-----------------------|
-| AIC             | \*AIC\*                | \$AIC\$               |
-| AIC_wt          | \*AIC\* weight         | \$AIC\$ weight        |
-| AICc            | \*AICc\*               | \$AICc\$              |
-| AICc_wt         | \*AICc\* weight        | \$AICc\$ weight       |
-| alpha           | &alpha;                | \$\alpha\$            |
-| b               | \*b\*                  | \$b\$                 |
-| B               | \*B\*                  | \$B\$                 |
-| BIC             | \*BIC\*                | \$BIC\$               |
-| BIC_wt          | \*BIC\* weight         | \$BIC\$ weight        |
-| BICc            | \*BICc\*               | \$BICc\$              |
-| CFI             | CFI                    | CFI                   |
-| Chi2            | \*&chi;\*^2^           | \$\chi^2\$            |
-| Chi2 value      | \*&chi;\*^2^           | \$\chi^2\$            |
-| Chi2_df         | \*df\*                 | \$df\$                |
-| chisq           | \*&chi;\*^2^           | \$\chi^2\$            |
-| Chisq           | \*&chi;\*^2^           | \$\chi^2\$            |
-| CI              | {round(ci \* 100)}% CI | {round(ci \* 100)}\\  |
-| CI_high         | UL                     | UL                    |
-| CI_low          | LL                     | LL                    |
-| CI_percent      | {p}% CI                | {p}\\ CI              |
-| Coefficient     | \*B\*                  | \$B\$                 |
-| cohens_d        | Cohen's \*d\*          | Cohen's \$d\$         |
-| Cohens_d        | Cohen's \*d\*          | Cohen's \$d\$         |
-| Cramers_v       | Cramér's \*V\*         | Cramér's \$V\$        |
-| cronbach        | Cronbach's &alpha;     | Cronbach's \$\alpha\$ |
-| deltaAIC        | &Delta;\*AIC\*         | \$\Delta AIC\$        |
-| deltaBIC        | &Delta;\*BIC\*         | \$\Delta BIC\$        |
-| deltachi2       | &Delta;&chi;^2^        | \$\Delta \chi^2\$     |
-| deltaR2         | &Delta;\*R\*^2^        | \$\Delta R^2\$        |
-| df              | \*df\*                 | \$df\$                |
-| df_diff         | &Delta;\*df\*          | \$\Delta df\$         |
-| df_error        | \*df\*                 | \$df\$                |
-| eta2            | \*&eta;\*^2^           | \$\eta^2\$            |
-| Eta2            | \*&eta;\*^2^           | \$\eta^2\$            |
-| Eta2_partial    | \*&eta;\*^2^           | \$\eta^2\$            |
-| F               | \*F\*                  | \$F\$                 |
-| m               | \*m\*                  | \$m\$                 |
-| M               | \*M\*                  | \$M\$                 |
-| Mean            | \*Mean\*               | \$Mean\$              |
-| n               | \*n\*                  | \$n\$                 |
-| N               | \*N\*                  | \$N\$                 |
-| NFI             | NFI                    | NFI                   |
-| omega           | &omega;                | \$\omega\$            |
-| p               | \*p\*                  | \$p\$                 |
-| p_Chi2          | \*p\*                  | \$p\$                 |
-| Parameter       | Variable               | Variable              |
-| phi             | &phi;                  | \$\phi\$              |
-| Phi             | &Phi;                  | \$\Phi\$              |
-| Predictor       | Variable               | Variable              |
-| r               | \*r\*                  | \$r\$                 |
-| R2              | \*R\*^2^               | \$R^2\$               |
-| R2_adjusted     | adj\*R\*^2^            | \$\text{adj}R^2\$     |
-| RMSE            | \*RMSE\*               | \$RMSE\$              |
-| RMSEA           | RMSEA                  | RMSEA                 |
-| s               | \*s\*                  | \$s\$                 |
-| SD              | \*SD\*                 | \$SD\$                |
-| SE              | \*SE\*                 | \$SE\$                |
-| SE_B            | \*SE_B\*               | \$SE~B\$              |
-| Sigma           | &sigma;~\*e\*~         | \$\sigma\_{e}\$       |
-| Std_Coefficient | &beta;                 | \$\beta\$             |
-| t               | \*t\*                  | \$t\$                 |
-| t_df            | \*t\*({df})            | \$t\$({df})           |
-| tau             | &tau;                  | \$\tau\$              |
-| Variable        | Variable               | Variable              |
-| z               | \*z\*                  | \$z\$                 |
+| name | header | latex |
+|----|----|----|
+| AIC | \*AIC\* | \$AIC\$ |
+| AIC_wt | \*AIC\* weight | \$AIC\$ weight |
+| AICc | \*AICc\* | \$AICc\$ |
+| AICc_wt | \*AICc\* weight | \$AICc\$ weight |
+| alpha | &alpha; | \$\alpha\$ |
+| b | \*b\* | \$b\$ |
+| B | \*B\* | \$B\$ |
+| BIC | \*BIC\* | \$BIC\$ |
+| BIC_wt | \*BIC\* weight | \$BIC\$ weight |
+| BICc | \*BICc\* | \$BICc\$ |
+| CFI | CFI | CFI |
+| Chi2 | \*&chi;\*^2^ | \$\chi^2\$ |
+| Chi2 value | \*&chi;\*^2^ | \$\chi^2\$ |
+| Chi2_df | \*df\* | \$df\$ |
+| chisq | \*&chi;\*^2^ | \$\chi^2\$ |
+| Chisq | \*&chi;\*^2^ | \$\chi^2\$ |
+| CI | {round(ci \* 100)}% CI | {round(ci \* 100)}\\ CI |
+| CI_high | UL | UL |
+| CI_low | LL | LL |
+| CI_percent | {p}% CI | {p}\\ CI |
+| Coefficient | \*B\* | \$B\$ |
+| cohens_d | Cohen's \*d\* | Cohen's \$d\$ |
+| Cohens_d | Cohen's \*d\* | Cohen's \$d\$ |
+| Cramers_v | Cramér's \*V\* | Cramér's \$V\$ |
+| cronbach | Cronbach's &alpha; | Cronbach's \$\alpha\$ |
+| deltaAIC | &Delta;\*AIC\* | \$\Delta AIC\$ |
+| deltaBIC | &Delta;\*BIC\* | \$\Delta BIC\$ |
+| deltachi2 | &Delta;&chi;^2^ | \$\Delta \chi^2\$ |
+| deltaR2 | &Delta;\*R\*^2^ | \$\Delta R^2\$ |
+| deltaR2_conditional | &Delta;\*R\*^2^~conditional~ | \$\Delta R^2\_{\text{conditional}}\$ |
+| df | \*df\* | \$df\$ |
+| df_diff | &Delta;\*df\* | \$\Delta df\$ |
+| df_error | \*df\* | \$df\$ |
+| eta2 | \*&eta;\*^2^ | \$\eta^2\$ |
+| Eta2 | \*&eta;\*^2^ | \$\eta^2\$ |
+| Eta2_partial | \*&eta;\*^2^ | \$\eta^2\$ |
+| Exp_CI | {round(ci \* 100)}% CI for Exp(\*B\*) | {round(ci \* 100)}\\ CI for Exp(\$B\$) |
+| Exp_Coefficient | Exp(\*B\*) | Exp(\$B\$) |
+| F | \*F\* | \$F\$ |
+| ICC | ICC | ICC |
+| m | \*m\* | \$m\$ |
+| M | \*M\* | \$M\$ |
+| Mean | \*Mean\* | \$Mean\$ |
+| n | \*n\* | \$n\$ |
+| N | \*N\* | \$N\$ |
+| NFI | NFI | NFI |
+| omega | &omega; | \$\omega\$ |
+| p | \*p\* | \$p\$ |
+| p_Chi2 | \*p\* | \$p\$ |
+| Parameter | Variable | Variable |
+| phi | &phi; | \$\phi\$ |
+| Phi | &Phi; | \$\Phi\$ |
+| Predictor | Variable | Variable |
+| r | \*r\* | \$r\$ |
+| R2 | \*R\*^2^ | \$R^2\$ |
+| R2_adjusted | adj\*R\*^2^ | \$\text{adj}R^2\$ |
+| R2_conditional | \*R\*^2^~conditional~ | \$R^2\_{\text{conditional}}\$ |
+| R2_marginal | \*R\*^2^~marginal~ | \$R^2\_{\text{marginal}}\$ |
+| RMSE | \*RMSE\* | \$RMSE\$ |
+| RMSEA | RMSEA | RMSEA |
+| s | \*s\* | \$s\$ |
+| SD | \*SD\* | \$SD\$ |
+| SE | \*SE\* | \$SE\$ |
+| SE_B | \*SE_B\* | \$SE~B\$ |
+| Sigma | &sigma;~\*e\*~ | \$\sigma\_{e}\$ |
+| Std_Coefficient | &beta; | \$\beta\$ |
+| t | \*t\* | \$t\$ |
+| t_df | \*t\*({df}) | \$t\$({df}) |
+| tau | &tau; | \$\tau\$ |
+| Variable | Variable | Variable |
+| z | \*z\* | \$z\$ |
 
 The `apa_flextable` function performs a number of formatting operations
 on the data before and after the data are sent to `flextable`. Roughly
@@ -660,9 +666,6 @@ does not have exactly what we need. So `hanging_indent` splits the text
 [`stringr::str_wrap`](https://stringr.tidyverse.org/reference/str_wrap.html))
 and indents it as specified with figure spaces `\u2007`.
 
-Note that `align_chr` aligns the text on the decimal, but pads the left
-side only so that the right side of the text can be of variable width.
-
 ``` r
 
 d_quote <- tibble(
@@ -675,7 +678,7 @@ d_quote <- tibble(
     "Tact is the art of making a point without making an enemy.",
     "Short cuts make long delays.",
     "The price one pays for pursuing any profession or calling is an intimate knowledge of its ugly side.",
-    "There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me",
+    "There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me.",
     "There is a crack in everything, that’s how the light gets in.",
     "If you choose to dig a rather deep hole, someday you will have no choice but to keep on digging, even with tears.",
     "We long for self-confidence, till we look at the people who have it.",
@@ -706,11 +709,7 @@ d_quote <- tibble(
   arrange(nchar(Quote))
 
 d_quote |> 
-  mutate(Quote = paste0(seq_along(Quote), 
-                        ".\u2007",
-                        Quote) |> 
-           align_chr(side = "left") |> 
-           hanging_indent(width = 55, indent = 7)) |> 
+  mutate(Quote = hanging_indent(Quote, width = 55, indent = 5)) |> 
   apa_flextable() |>  
   align(j = "Attribution", part = "all") |> 
   width(width = c(4.5, 2))
@@ -723,15 +722,6 @@ d_quote |>
 ``` r
 
 d_quote |> 
-  
-    mutate(linechar = purrr::map_int(Quote, \(x) {
-    stringr::str_split(x, "\\\\\n") |> 
-      purrr::map(str_trim) |> 
-      purrr::map(nchar) |> 
-      purrr::map_int(max)
-  })) |> 
-  arrange(linechar) |> 
-  select(-linechar) |> 
   add_list_column(Quote) |> 
   apa_flextable() |> 
   align(j = "Attribution", part = "all") |>
@@ -755,7 +745,7 @@ d_quote |>
 | 13.  | What you read when you don’t have to, determines what you will be when you can’t help it. | Charles Francis Potter |
 | 14.  | The price one pays for pursuing any profession or calling is an intimate knowledge of its ugly side. | James Baldwin |
 | 15.  | If you choose to dig a rather deep hole, someday you will have no choice but to keep on digging, even with tears. | Liyun Chen |
-| 16.  | There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me | Jane Austin |
+| 16.  | There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me. | Jane Austin |
 
 It is also possible to make the list lettered (upper or lowercase) or
 with Roman numerals (upper or lowercase). Set the `type` argument to
@@ -787,7 +777,7 @@ d_quote |>
 | M) | What you read when you don’t have to, determines what you will be when you can’t help it. | Charles Francis Potter |
 | N) | The price one pays for pursuing any profession or calling is an intimate knowledge of its ugly side. | James Baldwin |
 | O) | If you choose to dig a rather deep hole, someday you will have no choice but to keep on digging, even with tears. | Liyun Chen |
-| P) | There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me | Jane Austin |
+| P) | There is a stubbornness about me that never can bear to be frightened at the will of others. My courage always rises at every attempt to intimidate me. | Jane Austin |
 
 ### Stars
 
@@ -963,19 +953,19 @@ fit_3 <- list(
 )
 
 fit_3 |> 
-  apa_parameters() |>
+  apa_parameters(performance_parameters = NULL) |>
   apa_flextable(row_title_column = Model, 
-                row_title_align = "center")
+                row_title_align = "center", )
 ```
 
 | Variable | B         | SE     | β    | t      | df     | p      |
 |----------|-----------|--------|------|--------|--------|--------|
 | Model 1  |           |        |      |        |        |        |
-| Constant | 4,062.24  | 25.40  |  .00 | 159.92 | 53,935 | \<.001 |
-| Cut      |  −362.73  | 68.04  | −.03 |  −5.33 | 53,935 | \<.001 |
-| Cut2     |  −225.58  | 60.65  | −.03 |  −3.72 | 53,935 | \<.001 |
-| Cut3     |  −699.50  | 52.78  | −.07 | −13.25 | 53,935 | \<.001 |
-| Cut4     |  −280.36  | 42.56  | −.03 |  −6.59 | 53,935 | \<.001 |
+| Constant |  4,062.24 |  25.40 |  .00 | 159.92 | 53,935 | \<.001 |
+| Cut      |   −362.73 |  68.04 | −.03 |  −5.33 | 53,935 | \<.001 |
+| Cut2     |   −225.58 |  60.65 | −.03 |  −3.72 | 53,935 | \<.001 |
+| Cut3     |   −699.50 |  52.78 | −.07 | −13.25 | 53,935 | \<.001 |
+| Cut4     |   −280.36 |  42.56 | −.03 |  −6.59 | 53,935 | \<.001 |
 | Model 2  |           |        |      |        |        |        |
 | Constant | −6,340.26 | 537.01 |  .00 | −11.81 | 53,934 | \<.001 |
 | Cut      |    −14.24 |  70.15 |  .00 |  −0.20 | 53,934 |  .84   |
@@ -1015,18 +1005,24 @@ fit_3 |>
 
 ``` r
 
-ggplot2::diamonds |> 
-  select(table,  carat, length = x, width = y , depth = z) |> 
+ggplot2::diamonds |>
+  select(
+    Table = table,
+    Caret = carat,
+    Length = x,
+    Width = y ,
+    Depth = z
+  ) |>
   apa_cor() 
 ```
 
 | Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  |
 |----|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| 1.  | table | 57.46 | 2.23 | — |  |  |  |  |  |  |  |  |  |
-| 2.  | carat |  0.80 | 0.47 | .18 | \*\*\* | — |  |  |  |  |  |  |  |
-| 3.  | length |  5.73 | 1.12 | .20 | \*\*\* | .98 | \*\*\* | — |  |  |  |  |  |
-| 4.  | width |  5.73 | 1.14 | .18 | \*\*\* | .95 | \*\*\* | .97 | \*\*\* | — |  |  |  |
-| 5.  | depth |  3.54 | 0.71 | .15 | \*\*\* | .95 | \*\*\* | .97 | \*\*\* | .95 | \*\*\* | — |  |
+| 1.  | Table | 57.46 | 2.23 | — |  |  |  |  |  |  |  |  |  |
+| 2.  | Caret |  0.80 | 0.47 | .18 | \*\*\* | — |  |  |  |  |  |  |  |
+| 3.  | Length |  5.73 | 1.12 | .20 | \*\*\* | .98 | \*\*\* | — |  |  |  |  |  |
+| 4.  | Width |  5.73 | 1.14 | .18 | \*\*\* | .95 | \*\*\* | .97 | \*\*\* | — |  |  |  |
+| 5.  | Depth |  3.54 | 0.71 | .15 | \*\*\* | .95 | \*\*\* | .97 | \*\*\* | .95 | \*\*\* | — |  |
 | \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 ### Cross-tabulation with Chi-square Test of Independence
@@ -1121,7 +1117,7 @@ fit |>
   apa_flextable(no_format_columns = Variable) 
 ```
 
-| Variable | Openness | Conscientiousness | Extraversion | Neuroticism | Agreeableness |
+| Variable | Openness | Neuroticism | Conscientiousness | Extraversion | Agreeableness |
 |----|----|----|----|----|----|
 | Get angry easily |  .81 |  |  |  |  |
 | Get irritated easily |  .78 |  |  |  |  |

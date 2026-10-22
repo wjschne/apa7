@@ -12,6 +12,7 @@ apa7_defaults(
   column_formats = NULL,
   number_formatter = NULL,
   trim_leading_zero = NULL,
+  width_aware_padding = NULL,
   reset = FALSE
 )
 ```
@@ -41,6 +42,14 @@ apa7_defaults(
 - trim_leading_zero:
 
   default function to trim leading zeros from numbers
+
+- width_aware_padding:
+
+  if `TRUE` (default),
+  [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md)
+  pads text to equal rendered width in `font_family` (when the font is
+  installed). If `FALSE`, text is padded with one figure space per
+  missing character.
 
 - reset:
 

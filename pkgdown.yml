@@ -5,8 +5,10 @@ articles:
   apa7: apa7.html
   articles/chisquare: chisquare.html
   articles/correlations: correlations.html
+  articles/multilevel: multilevel.html
+  articles/regression: regression.html
   articles/summarize: summarize.html
-last_built: 2026-10-18T03:27Z
+last_built: 2026-10-22T19:44Z
 urls:
   reference: https://wjschne.github.io/apa7/reference
   article: https://wjschne.github.io/apa7/articles

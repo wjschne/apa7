@@ -21,6 +21,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/chisquare.html">Contingency Tables</a></li>
     <li><a class="dropdown-item" href="../articles/correlations.html">Correlations</a></li>
+    <li><a class="dropdown-item" href="../articles/multilevel.html">Multilevel Model Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/regression.html">Regression Analysis Tables</a></li>
     <li><a class="dropdown-item" href="../articles/summarize.html">Summarize Data</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -53,6 +55,7 @@
 <span>  column_formats <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  number_formatter <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  trim_leading_zero <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  width_aware_padding <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reset <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -83,6 +86,10 @@
 
 <dt id="arg-trim-leading-zero">trim_leading_zero<a class="anchor" aria-label="anchor" href="#arg-trim-leading-zero"></a></dt>
 <dd><p>default function to trim leading zeros from numbers</p></dd>
+
+
+<dt id="arg-width-aware-padding">width_aware_padding<a class="anchor" aria-label="anchor" href="#arg-width-aware-padding"></a></dt>
+<dd><p>if <code>TRUE</code> (default), <code><a href="align_chr.html">align_chr()</a></code> pads text to equal rendered width in <code>font_family</code> (when the font is installed). If <code>FALSE</code>, text is padded with one figure space per missing character.</p></dd>
 
 
 <dt id="arg-reset">reset<a class="anchor" aria-label="anchor" href="#arg-reset"></a></dt>
