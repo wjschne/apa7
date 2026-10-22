@@ -4,10 +4,12 @@
 \alias{make_apaquarto}
 \title{Run shiny app to make a document in APA style via Quarto}
 \usage{
-make_apaquarto(launch.browser = TRUE)
+make_apaquarto(launch.browser = TRUE, ask = TRUE)
 }
 \arguments{
 \item{launch.browser}{run shiny app in default browser}
+
+\item{ask}{if \code{TRUE} (default), ask before installing missing packages. If \code{FALSE}, install missing packages without asking.}
 }
 \value{
 Runs a shiny app that creates apaquarto documents

@@ -4,7 +4,12 @@
 \alias{install_apaquarto}
 \title{Installs the apaquarto extension.}
 \usage{
-install_apaquarto(no_prompt = FALSE, quiet = FALSE, quarto_args = NULL)
+install_apaquarto(
+  no_prompt = FALSE,
+  quiet = FALSE,
+  quarto_args = NULL,
+  ask = TRUE
+)
 }
 \arguments{
 \item{no_prompt}{Do not prompt to confirm approval to download external extension.}
@@ -12,6 +17,8 @@ install_apaquarto(no_prompt = FALSE, quiet = FALSE, quarto_args = NULL)
 \item{quiet}{Suppress warning and other messages}
 
 \item{quarto_args}{Character vector of other quarto CLI arguments to append to the Quarto command executed by this function.}
+
+\item{ask}{if \code{TRUE} (default), ask before installing missing packages. If \code{FALSE}, install missing packages without asking.}
 }
 \value{
 installs the apaquarto Quarto extension
