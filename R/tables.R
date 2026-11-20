@@ -850,7 +850,7 @@ apa_cor <- function(
 #' @param auto_format_columns if true, will attempt to format some columns automatically
 #' @param column_formats a column_formats object
 #' @param pretty_widths apply `pretty_widths` function
-#' @param no_format_columns Column name or tidyselect function. selected columns are not formatted
+#' @param no_format_columns Column name or tidyselect function. selected columns are not formatted. Columns named in a `"no_format_columns"` attribute of `data` (set by functions such as [apa_loadings()]) are not formatted either. Likewise, a rule is drawn above the first body row whose first-column text matches a `"rule_above"` attribute of `data`.
 #' @param add_breaks_between_spanners add breaks between spanners if TRUE
 #' @inheritParams apa_style
 #' @param ... arguments passed to `apa_style`
@@ -945,6 +945,12 @@ apa_flextable <- function(
 
   no_format_columns <- dplyr::select(data, {{ no_format_columns }}) |>
     colnames()
+
+  # Tables such as apa_loadings() mark columns that must not be reformatted
+  no_format_columns <- union(
+    no_format_columns,
+    intersect(attr(data, "no_format_columns", exact = TRUE), colnames(data))
+  )
 
   # Get default column formats
   if (is.null(column_formats)) {
@@ -1167,6 +1173,14 @@ apa_flextable <- function(
     font_family = font_family,
     font_size = font_size,
     horizontal_padding = horizontal_padding
+  )
+
+  # Tables such as apa_loadings() name rows that need a rule above them
+  ft <- add_rule_above(
+    ft,
+    attr(data, "rule_above", exact = TRUE),
+    border_color = border_color,
+    border_width = border_width
   )
 
   class(ft) <- unique(c("apaflextable", class(ft)))
@@ -2021,55 +2035,6 @@ apa_parameters.list <- function(
 
   }
   as_apa7_tbl(d_fit)
-}
-
-#' print loadings
-#'
-#' @inheritParams apa_parameters
-#' @param sort_loading sort table using `psych::fa.sort`
-#' @param min_loading minimum loading to display
-#' @param complexity print complexity column in factor analysis table
-#' @param uniqueness print uniqueness column in factor analysis table
-#'
-#' @returns tibble
-#' @export
-#' @examples
-#' fit <- psych::fa(Harman74.cor$cov, 4, fm = "pa",rotate = "varimax")
-#' apa_loadings(fit) |>
-#'   `colnames<-`(c("Tests", "Verbal", "Spatial", "Quantitative", "Memory")) |>
-#'   apa_flextable()
-apa_loadings <- function(
-  fit,
-  sort_loading = TRUE,
-  min_loading = 0.2,
-  column_formats = NULL,
-  complexity = FALSE,
-  uniqueness = FALSE
-) {
-  Variable <- NULL
-  x <- fit |>
-    parameters::parameters(sort = sort_loading) |>
-    tibble::as_tibble()
-
-  if (!complexity) {
-    x$Complexity <- NULL
-  }
-
-  if (!uniqueness) {
-    x$Uniqueness <- NULL
-  }
-
-  x |>
-    dplyr::mutate(
-      dplyr::across(-Variable, \(x) {
-        new_x <- align_chr(x, trim_leading_zeros = TRUE)
-        if (!is.na(min_loading)) {
-          new_x[abs(x) < min_loading] <- NA
-        }
-
-        new_x
-      })
-    )
 }
 
 #' format model performance metrics in APA style

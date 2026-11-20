@@ -51,11 +51,15 @@ Last reviewed: 2026-11-20
 
 ### 3. Factor analysis (`apa_loadings()`)
 
-- [ ] Return an `apa7_tbl` like the other table functions
-- [ ] Support `psych::principal` in addition to `psych::fa`
-- [ ] Optional rows for variance explained (SS loadings, proportion, cumulative)
-- [ ] Optional factor correlation table for oblique rotations
-- [ ] Tests and vignette examples
+- [x] Return an `apa7_tbl` like the other table functions
+- [x] Support `psych::principal` in addition to `psych::fa`
+- [x] Optional rows for variance explained (SS loadings, proportion, cumulative)
+- [x] Optional factor correlation table for oblique rotations (`apa_factor_cor()`)
+- [x] Tests (`tests/testthat/test-loadings.R`) and vignette examples (`vignettes/apa7.qmd`)
+- [x] Vignette article (`vignettes/articles/factor-analysis.qmd`)
+- [x] Rule above the variance rows in the flextable, so they stand apart from the loadings
+- [x] Bold the largest loading in each row (optional, `bold_max = TRUE`)
+- [x] Support `parameters::factor_analysis()` / `principal_components()` output directly
 
 ### 4. More mixed-model classes
 

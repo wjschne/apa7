@@ -10,6 +10,7 @@ reference:
       - apa_anova
       - apa_chisq
       - apa_cor
+      - apa_factor_cor
       - apa_loadings
       - apa_parameters
       - apa_performance

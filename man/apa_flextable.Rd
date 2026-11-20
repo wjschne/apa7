@@ -98,7 +98,7 @@ apa_flextable(
 
 \item{no_markdown_columns_header}{column headers that should not be treated as markdown}
 
-\item{no_format_columns}{Column name or tidyselect function. selected columns are not formatted}
+\item{no_format_columns}{Column name or tidyselect function. selected columns are not formatted. Columns named in a \code{"no_format_columns"} attribute of \code{data} (set by functions such as \code{\link[=apa_loadings]{apa_loadings()}}) are not formatted either. Likewise, a rule is drawn above the first body row whose first-column text matches a \code{"rule_above"} attribute of \code{data}.}
 
 \item{auto_format_columns}{if true, will attempt to format some columns automatically}
 

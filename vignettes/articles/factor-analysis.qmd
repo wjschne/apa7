@@ -1,0 +1,311 @@
+---
+title: "Factor Analysis Tables"
+format: html
+knitr:
+  opts_chunk:
+    fig-cap-location: top
+execute:
+  cache: true
+filters:
+  - quarto
+  - apanote
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tibble)
+library(stringr)
+library(apa7)
+library(psych)
+```
+
+```{r}
+#| label: setup2
+#| eval: false
+<<setup>>
+```
+
+Two functions make APA-style tables from exploratory factor analyses and principal components analyses run with the [psych](https://personality-project.org/r/psych/) package:
+
+* `apa_loadings` makes a table of factor loadings, with optional columns for communalities, uniquenesses, and complexity, and optional rows for variance explained.
+* `apa_factor_cor` makes a table of the correlations among factors after an oblique rotation.
+
+Both accept models from `psych::fa` and `psych::principal` and from the easystats functions `parameters::factor_analysis` and `parameters::principal_components`.
+
+The workflow is the same as for the other apa7 tables:
+
+1. Fit a model with `psych::fa` or `parameters::factor_analysis` (factor analysis), or with `psych::principal` or `parameters::principal_components` (principal components).
+2. `apa_loadings` or `apa_factor_cor` converts the fit object into a tibble.
+3. In Quarto and R Markdown documents, the tibble is displayed as an APA-style table automatically. Pass it to `apa_flextable` to customize the table or save it.
+
+# Data
+
+The `bfi` data set in the psych package has 2,800 people's ratings of 25 personality items, five items for each of the Big Five personality traits. The `bfi.dictionary` data set has the text of each item, which makes better row labels than item codes such as `A1` and `N3`. Here the item codes are replaced with the item text (minus the final period).
+
+```{r}
+#| label: data
+item_text <- bfi.dictionary |>
+  rownames_to_column("code") |>
+  filter(code %in% colnames(bfi)[1:25]) |>
+  mutate(Item = str_remove(Item, "[.]$")) |>
+  select(Item, code) |>
+  deframe()
+
+d_bfi <- bfi |>
+  select(A1:O5) |>
+  rename(all_of(item_text))
+```
+
+# Factor Loadings
+
+## A basic table
+
+A five-factor solution with principal axis factoring (`fm = "pa"`) and an oblimin rotation (the default in `psych::fa`) finds the Big Five:
+
+```{r}
+#| label: fit
+#| message: false
+fit_bfi <- fa(d_bfi, nfactors = 5, fm = "pa")
+```
+
+By default, `apa_loadings`
+
+* sorts the items so that they are grouped by the factor on which they load most strongly,
+* leaves loadings smaller than .20 in absolute value blank, and
+* puts the variable names in title case.
+
+The bfi items are short sentences, so `format_variable_names = FALSE` keeps them as they are.
+
+```{r}
+#| label: tbl-basic
+#| tbl-cap: Factor Loadings of Big Five Personality Items
+apa_loadings(fit_bfi, format_variable_names = FALSE)
+```
+
+## Naming the factors
+
+psych names factors by the fitting method and a number (e.g., PA1 for the first principal axis factor). The `factor_names` argument gives them meaningful names. Give the names in the order the factors appear in the table, which is the order psych gives them (by the variance they explain):
+
+```{r}
+#| label: tbl-named
+#| tbl-cap: Factor Loadings of Big Five Personality Items
+big5 <- c("Neuroticism",
+          "Extraversion",
+          "Conscientiousness",
+          "Agreeableness",
+          "Openness")
+
+apa_loadings(fit_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE)
+```
+
+A named vector such as `c(PA1 = "Neuroticism", PA2 = "Extraversion")` also works, and it can rename just some of the factors. Be careful with it, though. After an oblimin rotation, the labels psych gives the factors can change from one run to the next even when the solution is the same, so a label-based mapping that was right yesterday can be wrong today. The order of the factors does not change, so the unnamed form is safer. Either way, read the items in each column to check the names.
+
+## Which loadings to show
+
+The `min_loading` argument sets the smallest absolute loading that is displayed. Many authors show only loadings of .30 or higher. To show every loading, set `min_loading = 0`.
+
+```{r}
+#| label: tbl-min30
+#| tbl-cap: Factor Loadings of .30 or Higher
+apa_loadings(fit_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .30)
+```
+
+To keep the items in their original order, set `sort_loading = FALSE`. The `digits` argument sets the number of decimal places.
+
+## Highlighting primary loadings
+
+When some items load on more than one factor, readers need to see which factor each item belongs to. With `bold_max = TRUE`, the largest loading in each row (in absolute value) is bolded. Here all loadings of .20 or higher are shown, so the cross-loadings are visible next to the bolded primary loadings:
+
+```{r}
+#| label: tbl-bold
+#| tbl-cap: Factor Loadings With Primary Loadings in Bold
+apa_loadings(fit_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             bold_max = TRUE)
+```
+
+A loading that is hidden by `min_loading` is never bolded, so an item with no loading above the cutoff has no bold value.
+
+## Communalities, uniquenesses, and complexity
+
+Three optional columns describe each item:
+
+* `communality = TRUE` adds *h*^2^, the proportion of the item's variance explained by the factors.
+* `uniqueness = TRUE` adds *u*^2^ = 1 − *h*^2^.
+* `complexity = TRUE` adds Hofmann's (1978) complexity index, which is 1 when an item loads on a single factor and increases as its loadings are spread over more factors.
+
+```{r}
+#| label: tbl-columns
+#| tbl-cap: Factor Loadings, Communalities, and Complexity
+apa_loadings(fit_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .30,
+             communality = TRUE,
+             complexity = TRUE)
+```
+
+## Variance explained
+
+With `variance = TRUE`, three rows are added below the loadings: the sum of squared loadings for each factor, the proportion of the total variance it explains, and the cumulative proportion. A rule separates these rows from the loadings.
+
+```{r}
+#| label: tbl-variance
+#| tbl-cap: Factor Loadings and Variance Explained
+apa_loadings(fit_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .30,
+             variance = TRUE)
+```
+
+With an oblique rotation, the factors are correlated, so the variance they explain overlaps. The sums of squared loadings describe the pattern matrix, and the cumulative proportion is only approximate. Report the factor correlations as well (see below). After an orthogonal rotation, the cumulative proportion is exact.
+
+# Factor Correlations
+
+After an oblique rotation, report the correlations among the factors. `apa_factor_cor` numbers the factors in the first column and uses the numbers as column headers. The factors are in the same order as in `apa_loadings`, so the same `factor_names` vector works for both.
+
+```{r}
+#| label: tbl-factor-cor
+#| tbl-cap: Correlations Among Big Five Factors
+apa_factor_cor(fit_bfi, factor_names = big5)
+```
+
+Neuroticism correlates negatively with the other factors because its items describe negative emotions, while the other four factors are scored in the socially desirable direction.
+
+Factors from an orthogonal rotation (e.g., `rotate = "varimax"`) are uncorrelated by definition, so `apa_factor_cor` gives an error for them, as it does for one-factor solutions.
+
+# Principal Components
+
+`apa_loadings` and `apa_factor_cor` work the same way with principal components from `psych::principal`. Here the components are rotated with varimax, an orthogonal rotation.
+
+```{r}
+#| label: fit-pca
+fit_pca <- principal(d_bfi, nfactors = 5, rotate = "varimax")
+```
+
+```{r}
+#| label: tbl-pca
+#| tbl-cap: Varimax-Rotated Principal Components of Big Five Personality Items
+apa_loadings(fit_pca,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .30,
+             variance = TRUE)
+```
+
+# Output From the parameters Package
+
+`apa_loadings` and `apa_factor_cor` also accept output from `parameters::factor_analysis` and `parameters::principal_components`, the easystats functions for factor analysis and principal components. The loadings come from the model that parameters fits, so the `sort` and `threshold` arguments of the parameters functions make no difference. Use `sort_loading` and `min_loading` instead.
+
+```{r}
+#| label: tbl-parameters-efa
+#| tbl-cap: Factor Loadings From parameters::factor_analysis
+efa_bfi <- parameters::factor_analysis(d_bfi, n = 5, rotation = "oblimin")
+
+apa_loadings(efa_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .30)
+```
+
+```{r}
+#| label: tbl-parameters-cor
+#| tbl-cap: Factor Correlations From parameters::factor_analysis
+apa_factor_cor(efa_bfi, factor_names = big5)
+```
+
+Without a rotation, `parameters::principal_components` uses `stats::prcomp`. The loadings are the correlations between the items and the components (when `standardize = TRUE`, the default), and the sums of squared loadings are the eigenvalues. Unrotated components are hard to interpret, so they keep their default names here.
+
+```{r}
+#| label: tbl-parameters-pca
+#| tbl-cap: Unrotated Principal Components From parameters::principal_components
+parameters::principal_components(d_bfi, n = 5) |>
+  apa_loadings(format_variable_names = FALSE,
+               min_loading = .30,
+               bold_max = TRUE,
+               variance = TRUE)
+```
+
+# Formatted Variable Names
+
+When the variables have names rather than text, the default `format_variable_names = TRUE` makes them readable. The `Harman74.cor` data set has the correlations among 24 ability tests, with names such as `SentenceCompletion` and `VisualPerception`. Because `psych::fa` accepts a correlation matrix, give it the sample size (`n.obs`) so that it can compute fit statistics.
+
+```{r}
+#| label: tbl-harman
+#| tbl-cap: Factor Loadings of 24 Ability Tests
+fit_harman <- fa(Harman74.cor$cov,
+                 nfactors = 4,
+                 n.obs = Harman74.cor$n.obs,
+                 fm = "pa",
+                 rotate = "varimax")
+
+apa_loadings(fit_harman,
+             factor_names = c("Verbal", "Spatial", "Speed", "Memory"),
+             min_loading = .30,
+             communality = TRUE)
+```
+
+The names are split into words and put in title case (e.g., SentenceCompletion becomes Sentence Completion). Names that are misspelled in the data stay misspelled (the data set has PargraphComprehension), but the tibble can be fixed before it is displayed.
+
+# Customizing
+
+## Notes
+
+A table of loadings should say how the factors were extracted and rotated and which loadings were omitted. With [apaquarto](https://wjschne.github.io/apaquarto/), add a note with the `apa-note` chunk option:
+
+```{r}
+#| label: tbl-note
+#| tbl-cap: Factor Loadings of Big Five Personality Items
+#| apa-note: Principal axis factoring with oblimin rotation. Loadings smaller than .30 are omitted. *h*^2^ = communality.
+#| echo: fenced
+apa_loadings(fit_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .30,
+             communality = TRUE)
+```
+
+## Post-processing
+
+The output is a tibble, so dplyr functions can change it before it is displayed. For example, to fix the misspelled test name:
+
+```{r}
+#| label: tbl-fix
+#| tbl-cap: Factor Loadings of 24 Ability Tests
+apa_loadings(fit_harman,
+             factor_names = c("Verbal", "Spatial", "Speed", "Memory"),
+             min_loading = .30) |>
+  mutate(Variable = str_replace(Variable, "Pargraph", "Paragraph"))
+```
+
+The variable names are formatted by `apa_loadings`, not by `apa_flextable`. The `Variable` column is marked so that `apa_flextable` leaves it alone, so item text is never changed when the table is displayed, even after dplyr functions like `mutate` and `filter`.
+
+## Further formatting with flextable
+
+Pass the table to `apa_flextable` for more options (e.g., `table_width`) and then to flextable functions for more control. The rule above the variance rows is added by `apa_flextable`, which finds the row by its label, so the rule stays in place even if rows are filtered or reordered first. Here the table is set in a smaller font:
+
+```{r}
+#| label: tbl-flextable
+#| tbl-cap: Factor Loadings and Variance Explained
+apa_loadings(fit_bfi,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .30,
+             variance = TRUE) |>
+  apa_flextable(font_size = 10)
+```
+
+# References
+
+Hofmann, R. J. (1978). Complexity and simplicity as objective indices descriptive of factor solutions. *Multivariate Behavioral Research, 13*(2), 247–250. <https://doi.org/10.1207/s15327906mbr1302_9>
+
+Revelle, W. (2026). *psych: Procedures for psychological, psychometric, and personality research* (Version `r packageVersion("psych")`) [Computer software]. Northwestern University. <https://CRAN.R-project.org/package=psych>

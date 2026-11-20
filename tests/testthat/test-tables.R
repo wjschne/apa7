@@ -893,12 +893,6 @@ test_that("deprecation warning", {
   )
 })
 
-# apa_loadings ----
-test_that("apa_loadings", {
-  fit <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")
-  expect_equal(nrow(apa_loadings(fit)), 24L)
-})
-
 # pivot_wider_name_first  ----
 test_that("pivot_wider_name_first ", {
   d <- data.frame(Model = paste0("Model", " ", 1:2), t = 1:2, p = c(.05, .45))

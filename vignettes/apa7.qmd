@@ -625,18 +625,45 @@ d <- psych::bfi |>
   rename(any_of(rename_items))
 
 # Analysis
-fit <- fa(d, nfactors = 5, fm = "pa", )
+fit <- fa(d, nfactors = 5, fm = "pa")
 
+# Factor names, in the order the factors appear in the table
+big5 <- c("Neuroticism",
+          "Extraversion",
+          "Conscientiousness",
+          "Agreeableness",
+          "Openness")
 
 # Make table
-fit |>
-  apa_loadings() |> 
-  rename(Extraversion = PA1,
-         Neuroticism = PA2,
-         Conscientiousness = PA3,
-         Openness = PA4,
-         Agreeableness = PA5) |> 
-  apa_flextable(no_format_columns = Variable) 
+apa_loadings(fit,
+             factor_names = big5,
+             format_variable_names = FALSE)
+```
+
+`apa_loadings` returns a tibble that is rendered as a flextable in Quarto and R Markdown documents. Loadings smaller than `min_loading` (default .20) are blank, and the rows are sorted so that items are grouped by the factor with their largest loading. The `factor_names` argument relabels the factors in the order they appear in the table (psych orders factors by the variance they explain). A named vector such as `c(PA1 = "Neuroticism")` also works, but be careful with it: after an oblimin rotation, the labels psych gives the factors (PA1, PA2, ...) can change from one run to the next even when the solution is the same, so check the table each time. Because the bfi item text is already in sentence case, `format_variable_names = FALSE` keeps it as it is.
+
+Optional columns show communalities (`communality`), uniquenesses (`uniqueness`), and complexity (`complexity`). With `variance = TRUE`, rows for the sum of squared loadings and the proportion of variance explained by each factor are added at the bottom.
+
+```{r fa-variance}
+apa_loadings(fit,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .3,
+             communality = TRUE,
+             variance = TRUE)
+```
+
+The default oblimin rotation lets the factors correlate. `apa_factor_cor` makes a table of the factor correlations, with the factors in the same order as in `apa_loadings`.
+
+```{r fa-cor}
+apa_factor_cor(fit, factor_names = big5)
+```
+
+`apa_loadings` and `apa_factor_cor` also work with principal components from `psych::principal`.
+
+```{r pca}
+principal(d, nfactors = 5, rotate = "varimax") |>
+  apa_loadings(format_variable_names = FALSE, min_loading = .3)
 ```
 
 
