@@ -2651,6 +2651,12 @@ apa_style <- function(
 
   pd <- (line_spacing - 1) * font_size * 2 / 3
 
+  # Typst sizes a line from cap height to baseline (about 0.66em) instead of
+  # ascender to descender (about 1.15em in Word), so add the difference.
+  if (isTRUE(knitr::pandoc_to("typst"))) {
+    pd <- pd + font_size * 0.245
+  }
+
   break_keys <- x$col_keys[grepl("^apa7breakcolumn", x$col_keys)]
   break_labels <- rep(" ", length(break_keys))
   names(break_labels) <- break_keys
