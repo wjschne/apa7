@@ -19,8 +19,9 @@
 \code{x}, invisibly, for \code{print}. A knit_asis or flextable output for \code{knit_print}.
 }
 \description{
-The tibbles returned by \code{\link[=apa_parameters]{apa_parameters()}}, \code{\link[=apa_performance]{apa_performance()}}, and
-\code{\link[=apa_performance_comparison]{apa_performance_comparison()}} have class \code{apa7_tbl}. They are ordinary
+The tibbles returned by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_parameters]{apa_parameters()}},
+\code{\link[=apa_performance]{apa_performance()}}, and \code{\link[=apa_performance_comparison]{apa_performance_comparison()}} have class
+\code{apa7_tbl}. They are ordinary
 tibbles for post-processing with dplyr, but in knitr and Quarto documents
 they are rendered as an \code{\link[=apa_flextable]{apa_flextable()}} automatically. In the console they
 print as tibbles.

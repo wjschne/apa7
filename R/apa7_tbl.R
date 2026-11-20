@@ -1,7 +1,8 @@
 #' Tables ready for `apa_flextable`
 #'
-#' The tibbles returned by [apa_parameters()], [apa_performance()], and
-#' [apa_performance_comparison()] have class `apa7_tbl`. They are ordinary
+#' The tibbles returned by [apa_anova()], [apa_parameters()],
+#' [apa_performance()], and [apa_performance_comparison()] have class
+#' `apa7_tbl`. They are ordinary
 #' tibbles for post-processing with dplyr, but in knitr and Quarto documents
 #' they are rendered as an [apa_flextable()] automatically. In the console they
 #' print as tibbles.

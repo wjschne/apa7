@@ -1,5 +1,9 @@
 # apa7 0.2.0 _2026-10-18_
 
+* New `apa_anova()` makes APA-style ANOVA source tables for `aov` and `lm` models (Type 1 sums of squares, or Types 2 and 3 via `car::Anova()`), repeated-measures `aov` models with `Error()` strata, `afex` models, and tables from `stats::anova()` and `car::Anova()`. Effect sizes (partial, non-partial, or generalized *η*^2^, *ω*^2^, or *ε*^2^) and their two-sided confidence intervals come from `effectsize`.
+* `apa_parameters()` now returns the ANOVA table for `aov`, repeated-measures `aov`, and `afex` models. Before, `aov` models were treated as `lm` models and gave a coefficients table.
+* Partial *η*^2^ columns (`Eta2_partial`) are now headed *η*^2^~p~. New column formats: `Sum_Squares`, `Mean_Square`, `Eta2_generalized`, `Omega2`, `Omega2_partial`, `Epsilon2`, and `Epsilon2_partial`.
+
 * `make_apaquarto()` and `install_apaquarto()` now list missing packages separately and ask a short "Install them now?" question, so the prompt is readable in the console (e.g., R on macOS). New `ask` argument installs missing packages without asking when `FALSE`. If installation is declined, the function stops and prints the `install.packages()` command to run.
 
 # apa7 0.1.2 _2026-05-25_

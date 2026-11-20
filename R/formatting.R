@@ -1266,8 +1266,26 @@ the$columns <- list(
   ),
   Eta2_partial = column_format(
     name = "Eta2_partial",
-    header = "*&eta;*^2^",
-    latex = "$\\eta^2$",
+    header = "*&eta;*^2^~p~",
+    latex = "$\\eta^2_p$",
+    formatter = the$trim_leading_zero
+  ),
+  Eta2_generalized = column_format(
+    name = "Eta2_generalized",
+    header = "*&eta;*^2^~G~",
+    latex = "$\\eta^2_G$",
+    formatter = the$trim_leading_zero
+  ),
+  Epsilon2 = column_format(
+    name = "Epsilon2",
+    header = "*&epsilon;*^2^",
+    latex = "$\\epsilon^2$",
+    formatter = the$trim_leading_zero
+  ),
+  Epsilon2_partial = column_format(
+    name = "Epsilon2_partial",
+    header = "*&epsilon;*^2^~p~",
+    latex = "$\\epsilon^2_p$",
     formatter = the$trim_leading_zero
   ),
   Exp_Coefficient = column_format(
@@ -1335,6 +1353,24 @@ the$columns <- list(
     header = "&omega;",
     latex = "$\\omega$",
     formatter = the$trim_leading_zero
+  ),
+  Omega2 = column_format(
+    name = "Omega2",
+    header = "*&omega;*^2^",
+    latex = "$\\omega^2$",
+    formatter = the$trim_leading_zero
+  ),
+  Omega2_partial = column_format(
+    name = "Omega2_partial",
+    header = "*&omega;*^2^~p~",
+    latex = "$\\omega^2_p$",
+    formatter = the$trim_leading_zero
+  ),
+  Mean_Square = column_format(
+    name = "Mean_Square",
+    header = "*MS*",
+    latex = "$MS$",
+    formatter = the$number_formatter
   ),
   p = column_format(
     name = "p",
@@ -1424,6 +1460,12 @@ the$columns <- list(
     name = "SE",
     header = "*SE*",
     latex = "$SE$",
+    formatter = the$number_formatter
+  ),
+  Sum_Squares = column_format(
+    name = "Sum_Squares",
+    header = "*SS*",
+    latex = "$SS$",
     formatter = the$number_formatter
   ),
   SE_B = column_format(

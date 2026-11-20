@@ -7,6 +7,7 @@ reference:
     desc: "Convert objects to flextables"
     contents:
       - apa_flextable
+      - apa_anova
       - apa_chisq
       - apa_cor
       - apa_loadings
