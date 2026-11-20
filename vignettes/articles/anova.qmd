@@ -1,6 +1,14 @@
 ---
 title: "Analysis of Variance Tables"
 format: html
+knitr: 
+  opts_chunk: 
+    fig-cap-location: top
+execute:
+  cache: true
+filters:  
+  - quarto
+  - apanote
 ---
 
 ```{r}
@@ -40,12 +48,17 @@ The `apa_anova` function makes APA-style analysis of variance (ANOVA) source tab
 In the `ToothGrowth` data set, guinea pigs were given one of three doses of vitamin C. Does tooth length differ by dose?
 
 ```{r}
-#| label: one-way
+#| label: tbl-one-way
+#| tbl-cap: A One-Way ANOVA Table
 d_tooth <- ToothGrowth |>
-  mutate(dose = factor(dose))
+  mutate(dose = factor(dose)) |> 
+  rename(Dose = dose,
+         Supplement = supp,
+         Length = len)
 
-fit_dose <- aov(len ~ dose, data = d_tooth)
+fit_dose <- aov(Length ~ Dose, data = d_tooth)
 apa_anova(fit_dose)
+
 ```
 
 The table has a row for each effect and a row for the error term (the residuals). Its columns are the sums of squares (*SS*), degrees of freedom (*df*), mean squares (*MS*), the *F* test with its *p*-value, and eta squared (*&eta;*^2^). The default effect size is partial *&eta;*^2^, but in a one-way design, partial and non-partial *&eta;*^2^ are the same, so the column is labeled *&eta;*^2^.
@@ -64,7 +77,7 @@ The guinea pigs also received vitamin C either as orange juice or as ascorbic ac
 
 ```{r}
 #| label: factorial
-fit_tooth <- aov(len ~ supp * dose, data = d_tooth)
+fit_tooth <- aov(Length ~ Supplement * Dose, data = d_tooth)
 apa_anova(fit_tooth)
 ```
 
@@ -98,8 +111,8 @@ By default, `apa_anova` displays partial eta squared (*&eta;*^2^~p~), the most c
 | `effect_size = "eta"` (default) | partial *&eta;*^2^ (*&eta;*^2^~p~) |
 | `effect_size = "eta", partial = FALSE` | *&eta;*^2^ |
 | `effect_size = "eta", generalized = TRUE` | generalized *&eta;*^2^ (*&eta;*^2^~G~) |
-| `effect_size = "omega"` | partial *&omega;*^2^ (*&omega;*^2^~p~) |
-| `effect_size = "omega", partial = FALSE` | *&omega;*^2^ |
+| `effect_size = "omega"` | *&omega;*^2^~p~ |
+| `effect_size = "omega", partial = FALSE` | partial *&omega;*^2^ (*&omega;*^2^~p~) |
 | `effect_size = "epsilon"` | partial *&epsilon;*^2^ (*&epsilon;*^2^~p~) |
 | `effect_size = NULL` | no effect size |
 
@@ -260,24 +273,18 @@ The sphericity correction is set when the model is fit or printed in afex (e.g.,
 
 The table does not say which type of sums of squares or which sphericity correction was used, so say so in a table note. With [apaquarto](https://wjschne.github.io/apaquarto/), add the note with the `apa-note` chunk option:
 
-````markdown
 ```{r}
 #| label: tbl-moore
 #| tbl-cap: Conformity by Authoritarianism and Partner Status
 #| apa-note: Type 2 sums of squares.
+#| echo: fenced
 apa_anova(fit_moore, type = 2)
 ```
-````
+
 
 ## Labels and post-processing
 
-Variable names are converted to title case (e.g., `supp` becomes Supp). For better labels, rename the variables before fitting the model, as was done for the Moore data above. Because the output is a tibble, you can also change the labels afterward:
-
-```{r}
-#| label: relabel
-apa_anova(fit_tooth) |>
-  mutate(Source = sub("Supp", "Supplement", Source))
-```
+Variable names are converted to title case (e.g., `supp` becomes Supp). For better labels, rename the variables before fitting the model, as was done for the Moore data above. Because the output is a tibble, you can also change the labels afterward.
 
 Further formatting is available with `apa_flextable`.
 
