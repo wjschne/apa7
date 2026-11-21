@@ -1,14 +1,11 @@
 ---
 title: "Multilevel Model Tables"
 format: html
-execute:
-  cache: true
 ---
 
 ```{r}
 #| label: setup
 #| include: false
-#| cache: false
 library(dplyr)
 library(lme4)
 library(apa7)
@@ -89,7 +86,7 @@ apa_parameters(
     "Parameter", 
     "Coefficient", 
     "SE", "CI", 
-    "t", "df_error", "p"),
+    "t", "df_error", "p")
 )
 ```
 

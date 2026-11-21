@@ -1,6 +1,6 @@
 #' @exportS3Method knitr::knit_print
 knit_print.latex <- function(x, ...) {
-  res = paste0('$$\n', x, '\n$$')
+  res <- paste0('$$\n', x, '\n$$')
   knitr::asis_output(res)
 }
 #' Display latex matrices

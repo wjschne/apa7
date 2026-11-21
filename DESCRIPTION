@@ -7,7 +7,7 @@ Authors@R:
            comment = c(ORCID = "0000-0002-8393-5316"))
 Description: Create American Psychological Association Style, Seventh
     Edition documents. Format numbers and text consistent with APA style.
-    Create tables that comply with APA style by extending flextable
+    Create tables that comply with APA style by extending 'flextable'
     functions.
 License: CC0
 URL: https://github.com/wjschne/apa7, https://wjschne.github.io/apa7/

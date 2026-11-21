@@ -330,7 +330,7 @@ apa_anova.afex_aov <- function(
     }
   }
 
-  d$Parameter <- gsub(":", " \u00D7 ", d$Parameter)
+  d$Parameter <- gsub(":", " \u00D7 ", d$Parameter, fixed = TRUE)
 
   # Each effect has its own error term
   if (column_formats$Parameter@header == "Variable") {
@@ -451,14 +451,14 @@ anova_es_columns <- c(
 #' @keywords internal
 #' @noRd
 anova_stratum_labels <- function(strata, formatter) {
-  within <- strata == "Within" | grepl(":", strata)
+  within <- strata == "Within" | grepl(":", strata, fixed = TRUE)
   labels <- ifelse(within, "Within subjects", "Between subjects")
   within_strata <- unique(strata[within])
   if (length(within_strata) > 1) {
     effect <- sub("^[^:]*:", "", strata[within])
     labels[within] <- paste0(
       "Within subjects: ",
-      formatter(gsub(":", " \u00D7 ", effect))
+      formatter(gsub(":", " \u00D7 ", effect, fixed = TRUE))
     )
   }
   labels
@@ -562,7 +562,7 @@ apa_anova_table <- function(
   d$Parameter <- ifelse(
     d$Parameter == "Residuals",
     residual_label,
-    gsub(":", " \u00D7 ", d$Parameter)
+    gsub(":", " \u00D7 ", d$Parameter, fixed = TRUE)
   )
   if (column_formats$Parameter@header == "Variable") {
     column_formats$Parameter@header <- "Source"

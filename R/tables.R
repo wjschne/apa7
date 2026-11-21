@@ -61,7 +61,7 @@ add_break_columns <- function(
   blank_names <- paste0("apa7breakcolumn", seq_along(where_names))
 
   where_numbers <- seq(1, ncol(d))[colnames(d) %in% where_names]
-  shifter <- ifelse(.before, 0, 1)
+  shifter <- 1L - .before * 1L
   keys <- insert_at(
     colnames(d),
     ats = where_numbers + shifter,
@@ -544,7 +544,7 @@ apa_cor <- function(
   }
   output <- match.arg(output)
   v_names <- colnames(data)
-  v_seq <- seq(ncol(data))
+  v_seq <- seq_len(ncol(data))
   if (is.null(column_formats)) {
     column_formats <- column_formats()
   }
@@ -1098,7 +1098,7 @@ apa_flextable <- function(
       ) |>
       flextable::merge_h(i = ~ !is.na(row_title))
 
-    if (all(!is.na(row_title_border))) {
+    if (!anyNA(row_title_border)) {
       ft <- ft |>
         flextable::surround(
           i = ~ !is.na(row_title),
@@ -1926,7 +1926,7 @@ format_apa_parameters <- function(
   # (e.g., .95) fills in the header template.
   ci_columns <- c("CI", "Exp_CI")
   ci_level <- 0.95
-  if ("CI" %in% colnames(d_b) && is.numeric(d_b$CI) && any(!is.na(d_b$CI))) {
+  if ("CI" %in% colnames(d_b) && is.numeric(d_b$CI) && !all(is.na(d_b$CI))) {
     ci_level <- d_b$CI[!is.na(d_b$CI)][1]
   }
   for (ci_col in ci_columns) {
@@ -1967,7 +1967,7 @@ format_apa_parameters <- function(
 
   # add starred column
   starred <- starred[starred %in% colnames(d_b_new)]
-  is_starred <- length(starred) > 0 && all(!is.na(starred)) && all(starred != "")
+  is_starred <- length(starred) > 0 && !anyNA(starred) && all(starred != "")
   if (is_starred) {
     pstar <- p2stars(d_b$p, superscript = TRUE)
     pstar[is.na(pstar)] <- ""
@@ -1981,7 +1981,7 @@ format_apa_parameters <- function(
   }
 
   # bold star
-  is_bolded <- length(bolded) > 0 && all(!is.na(bolded)) && all(bolded != "") &&
+  is_bolded <- length(bolded) > 0 && !anyNA(bolded) && !all(bolded == "") &&
     any(bolded %in% colnames(d_b_new))
   if (is_bolded) {
     my_bold <- ifelse(d_b$p <= 0.05, "**", "")
@@ -2812,7 +2812,7 @@ apa_style <- function(
         unique(c(listcolumn_keys, break_keys, no_markdown_columns_header)))
     ]
     for (ch in md_keys) {
-      if (!("chunk" %in% class(dt$header$content$data[[1, ch]]))) {
+      if (!(inherits(dt$header$content$data[[1, ch]], "chunk"))) {
         hh <- c(hh, ch)
       }
     }
@@ -2832,7 +2832,7 @@ apa_style <- function(
         unique(c(listcolumn_keys, break_keys, no_markdown_columns)))
     ]
     for (ch in md_keys) {
-      if (!("chunk" %in% class(dt$body$content$data[[1, ch]]))) {
+      if (!(inherits(dt$body$content$data[[1, ch]], "chunk"))) {
         hh <- c(hh, ch)
       }
     }

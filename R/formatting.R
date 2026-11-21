@@ -200,7 +200,10 @@ apa_p <- function(
 
   if (is.character(p)) {
     p <- stringr::str_trim(p)
-    less_than <- stringr::str_detect(p, "<")
+    less_than <- stringr::str_detect(
+      string = p,
+      pattern = stringr::fixed("<",
+                               ignore_case = TRUE))
     p <- stringr::str_remove(p, "^<") |> as.numeric()
     p[less_than] <- 10^(-max_digits - 1)
   }
@@ -225,8 +228,8 @@ apa_p <- function(
     trim_leading_zeros = TRUE,
     accuracy = max_p
   )
-  p_threshold <- max_p - max_p * .05
-  max_p_threshold <- 1 - max_p * .5
+  p_threshold <- max_p - max_p * 0.05
+  max_p_threshold <- 1 - max_p * 0.5
 
   digit <- ifelse(p < p_threshold, max_digits, min_digits)
   p_formatted <- purrr::map2_chr(p, digit, function(pp, dd) {
@@ -275,9 +278,10 @@ apa_p <- function(
 #'
 #' @examples
 #' apa_p_star_note()
-#' apa_p_star_note(x = c(.10, .05, .01, .001), first_alpha_marginal = TRUE)
+#' apa_p_star_note(x = c(0.10, 0.05, 0.01, 0.001),
+#'                 first_alpha_marginal = TRUE)
 apa_p_star_note <- function(
-  x = c(.05, .01, .001),
+  x = c(0.05, 0.01, 0.001),
   first_alpha_marginal = FALSE
 ) {
   paste0(
@@ -293,7 +297,7 @@ apa_p_star_note <- function(
       x,
       trim_leading_zeros = TRUE,
       drop0trailing = TRUE,
-      accuracy = .001
+      accuracy = 0.001
     ),
     collapse = ". "
   )
@@ -628,7 +632,7 @@ space_fill <- function(deficit, font_family) {
 #'
 #' @examples
 #' sci_md(c(.0045,1.44, 24567857.45))
-sci_md <- function(x, digits = 2, lb = .0095, ub = 99.5, align = FALSE) {
+sci_md <- function(x, digits = 2, lb = 0.0095, ub = 99.5, align = FALSE) {
   x_sci <- formatC(x, digits = digits, format = "e")
   x_sci_left <- stringr::str_split_i(x_sci, pattern = "e", i = 1)
   x_sci_right <- stringr::str_split_i(x_sci, pattern = "e", i = 2) |>

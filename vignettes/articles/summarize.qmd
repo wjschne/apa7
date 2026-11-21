@@ -18,7 +18,6 @@ vignette: >
 ```{r}
 #| label: presetup
 #| include: false
-#| cache: false
 library(apa7)
 library(ftExtra)
 library(flextable)

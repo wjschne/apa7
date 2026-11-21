@@ -4,8 +4,6 @@ format: html
 knitr: 
   opts_chunk: 
     fig-cap-location: top
-execute:
-  cache: true
 filters:  
   - quarto
   - apanote
