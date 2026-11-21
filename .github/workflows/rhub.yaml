@@ -93,6 +93,12 @@ jobs:
           token: ${{ secrets.RHUB_TOKEN }}
       # setup-deps skips Quarto, which the apa7.qmd vignette needs
       - uses: quarto-dev/quarto-actions/setup@v2
+      # On Windows, the R session Quarto starts can't see the temporary
+      # library R CMD build installs apa7 into, so install it first
+      - name: Install apa7 for the Quarto vignette (Windows)
+        if: runner.os == 'Windows'
+        run: R CMD INSTALL .
+        shell: bash
       - uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}
