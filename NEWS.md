@@ -19,7 +19,7 @@
 
 * `make_apaquarto()` and `install_apaquarto()` now list missing packages separately and ask a short "Install them now?" question, so the prompt is readable in the console (e.g., R on macOS). New `ask` argument installs missing packages without asking when `FALSE`. If installation is declined, the function stops and prints the `install.packages()` command to run.
 
-# apa7 0.1.2 _2026-05-25_
+# apa7 0.1.3 _2026-05-25_
 
 * Used AI (Claude) and old-fashioned effort to generate a more complete set of unit tests, fix minor bugs, and make documentation more consistent.
 * User prompted to install any missing packages when running the `make_apaquarto` shiny app locally.
