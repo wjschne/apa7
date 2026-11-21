@@ -7,7 +7,7 @@
 apa_note(x, collapse = " ")
 }
 \arguments{
-\item{x}{a table made by \code{\link[=apa_anova]{apa_anova()}} (or \code{\link[=apa_parameters]{apa_parameters()}} for \code{aov} and \code{afex} models), \code{\link[=apa_loadings]{apa_loadings()}}, or \code{\link[=apa_factor_cor]{apa_factor_cor()}}}
+\item{x}{a table made by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_parameters]{apa_parameters()}}, \code{\link[=apa_loadings]{apa_loadings()}}, or \code{\link[=apa_factor_cor]{apa_factor_cor()}}}
 
 \item{collapse}{string that joins the sentences. Use \code{NULL} to get a character vector with one sentence per element.}
 }
@@ -43,6 +43,19 @@ factors are correlated.
 
 For \code{\link[=apa_factor_cor]{apa_factor_cor()}} tables, the note says how the factors were
 extracted and rotated.
+
+For \code{\link[=apa_parameters]{apa_parameters()}} tables of regression models (\code{lm}, \code{glm}, \code{polr},
+\code{clm}, and \code{lme4} models, or a list of models), the note can say
+\itemize{
+\item which robust standard errors were used (e.g., \code{vcov = "HC3"}),
+\item how the degrees of freedom of mixed-model \emph{t} tests were approximated
+(Kenward-Roger or Satterthwaite),
+\item that ordinal-model thresholds are not tested,
+\item what the standardized coefficient (β), exponentiated coefficient
+(e.g., \emph{OR}), confidence interval, and model-comparison (e.g.,
+Δ\emph{R}^2^) columns stand for, and
+\item what stars or bold values mean.
+}
 
 The sentences are in APA order: general notes first, then probability notes.
 The text does not start with "\emph{Note}." because apaquarto adds it. With
@@ -88,5 +101,10 @@ if (requireNamespace("afex", quietly = TRUE)) {
 # Factor analysis
 fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")
 apa_loadings(fit_fa, min_loading = .3, communality = TRUE) |>
+  apa_note()
+
+# Regression
+lm(mpg ~ cyl + wt, data = mtcars) |>
+  apa_parameters(starred = "p") |>
   apa_note()
 }

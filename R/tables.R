@@ -1345,7 +1345,8 @@ apa_parameters.lm <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
-    t_with_df = t_with_df
+    t_with_df = t_with_df,
+    note = list(vcov = describe_vcov(list(...)$vcov))
   )
 }
 
@@ -1426,7 +1427,8 @@ apa_parameters.glm <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
-    t_with_df = t_with_df
+    t_with_df = t_with_df,
+    note = list(vcov = describe_vcov(list(...)$vcov))
   )
 }
 
@@ -1582,7 +1584,12 @@ apa_parameters_ordinal <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
-    t_with_df = t_with_df
+    t_with_df = t_with_df,
+    note = list(
+      vcov = describe_vcov(list(...)$vcov),
+      thresholds = if (thresholds && any(is_threshold)) link,
+      exp_label = if (link == "logit") "cumulative odds ratio"
+    )
   )
 }
 
@@ -1691,7 +1698,8 @@ apa_parameters.merMod <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
-    t_with_df = t_with_df
+    t_with_df = t_with_df,
+    note = list(df_method = if (!is_glmm) dots$ci_method)
   )
 }
 
@@ -1817,7 +1825,8 @@ format_apa_parameters <- function(
   starred = NA,
   bolded = NA,
   column_formats = NULL,
-  t_with_df = TRUE
+  t_with_df = TRUE,
+  note = list()
 ) {
   # Prevent warnings
   pstar <- df_error <- header <- name <- NULL
@@ -1916,7 +1925,8 @@ format_apa_parameters <- function(
 
   # add starred column
   starred <- starred[starred %in% colnames(d_b_new)]
-  if (length(starred) > 0 && all(!is.na(starred)) && all(starred != "")) {
+  is_starred <- length(starred) > 0 && all(!is.na(starred)) && all(starred != "")
+  if (is_starred) {
     pstar <- p2stars(d_b$p, superscript = TRUE)
     pstar[is.na(pstar)] <- ""
     d_b_new <- d_b_new |>
@@ -1929,7 +1939,9 @@ format_apa_parameters <- function(
   }
 
   # bold star
-  if (length(bolded) > 0 && all(!is.na(bolded)) && all(bolded != "")) {
+  is_bolded <- length(bolded) > 0 && all(!is.na(bolded)) && all(bolded != "") &&
+    any(bolded %in% colnames(d_b_new))
+  if (is_bolded) {
     my_bold <- ifelse(d_b$p <= 0.05, "**", "")
     d_b_new <- d_b_new |>
       dplyr::mutate(
@@ -1948,9 +1960,15 @@ format_apa_parameters <- function(
     dplyr::mutate(header = ifelse(is.na(header), name, header)) |>
     tibble::deframe()
 
-  d_b_new |>
-    dplyr::select(dplyr::any_of(pr_selector)) |>
-    as_apa7_tbl()
+  shown <- pr_selector[pr_selector %in% colnames(d_b_new)]
+  d_b_new <- dplyr::select(d_b_new, dplyr::any_of(pr_selector))
+  attr(d_b_new, "apa_note") <- parameters_note_record(
+    note,
+    headers = stats::setNames(names(shown), shown),
+    starred = is_starred,
+    bolded = is_bolded
+  )
+  as_apa7_tbl(d_b_new)
 }
 
 #' @export
@@ -1980,7 +1998,7 @@ apa_parameters.list <- function(
 
   # List names label the models ("Model 1", ... if unnamed)
   names(fit) <- model_names(fit)
-  d_fit <- purrr::map_df(
+  model_tables <- purrr::map(
     fit,
     \(f1) {
       args <- list(
@@ -1996,9 +2014,9 @@ apa_parameters.list <- function(
         args$predictor_parameters <- predictor_parameters
       }
       do.call(apa_parameters, args)
-    },
-    .id = "Model"
+    }
   )
+  d_fit <- dplyr::bind_rows(model_tables, .id = "Model")
 
   # Each model was aligned separately; re-align values across all models.
   # Skip Model and the variable-name column that follows it.
@@ -2014,11 +2032,10 @@ apa_parameters.list <- function(
       )
     )
 
-  if (
-    !(is.null(performance_parameters) ||
-      length(performance_parameters) == 0 ||
-      all(is.na(performance_parameters)))
-  ) {
+  show_performance <- !(is.null(performance_parameters) ||
+    length(performance_parameters) == 0 ||
+    all(is.na(performance_parameters)))
+  if (show_performance) {
     d_fit <- d_fit |>
       flextable::as_grouped_data(groups = "Model") |>
       dplyr::left_join(
@@ -2030,10 +2047,14 @@ apa_parameters.list <- function(
         by = dplyr::join_by(Model)
       ) |>
       dplyr::mutate(dplyr::across(.cols = dplyr::where(is.character), \(x) dplyr::replace_values(x, from = NA, to = "")))
-
-
-
   }
+
+  attr(d_fit, "apa_note") <- merge_parameters_note_records(
+    purrr::map(model_tables, \(x) attr(x, "apa_note", exact = TRUE)),
+    performance = if (show_performance) performance_parameters,
+    performance_starred = show_performance && any(starred %in% performance_parameters),
+    column_formats = column_formats
+  )
   as_apa7_tbl(d_fit)
 }
 

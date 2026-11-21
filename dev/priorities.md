@@ -81,7 +81,7 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
 - [x] Check that `#| apa-note: !expr apa_note(tbl)` works with apaquarto's `apanote` filter (the table must be made in an earlier chunk)
 - [x] Sphericity wording: afex corrects only within-subjects effects with more than two levels, so say "where applicable" or name the effects
 - [x] Factor analysis: `apa_loadings()` records extraction method, rotation, `min_loading`, and `bold_max` (also `apa_factor_cor()`)
-- [ ] Regression: `apa_parameters()` records robust SE type (`vcov`), standardized coefficients, and star thresholds (reuse `apa_p_star_note()`)
+- [x] Regression: `apa_parameters()` records robust SE type (`vcov`), standardized coefficients, and star thresholds (reuse `apa_p_star_note()`)
 - [ ] `apa_flextable(x, note = TRUE)` adds the generated note as a footer line for plain Quarto, R Markdown, and Word (or `note = "text"` for custom text), like `apa_cor()`'s `note` argument
 - [ ] Column-format definitions: an `abbreviation` slot in `column_format()` (e.g., `*MSE*` = mean square error) so `apa_note()` defines every abbreviation used in a table's headers, for any table type
 - [x] Give a clear message when the `apa_note` attribute has been lost (e.g., after `bind_rows()` or a join)

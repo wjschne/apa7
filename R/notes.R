@@ -26,6 +26,18 @@
 #' For [apa_factor_cor()] tables, the note says how the factors were
 #' extracted and rotated.
 #'
+#' For [apa_parameters()] tables of regression models (`lm`, `glm`, `polr`,
+#' `clm`, and `lme4` models, or a list of models), the note can say
+#'
+#' * which robust standard errors were used (e.g., `vcov = "HC3"`),
+#' * how the degrees of freedom of mixed-model *t* tests were approximated
+#'   (Kenward-Roger or Satterthwaite),
+#' * that ordinal-model thresholds are not tested,
+#' * what the standardized coefficient (&beta;), exponentiated coefficient
+#'   (e.g., *OR*), confidence interval, and model-comparison (e.g.,
+#'   &Delta;*R*^2^) columns stand for, and
+#' * what stars or bold values mean.
+#'
 #' The sentences are in APA order: general notes first, then probability notes.
 #' The text does not start with "*Note*." because apaquarto adds it. With
 #' [apaquarto](https://wjschne.github.io/apaquarto/), make the table in one
@@ -51,7 +63,7 @@
 #' (e.g., `bind_rows()` and joins) drop it, so call `apa_note()` on the
 #' table that the table function returned.
 #'
-#' @param x a table made by [apa_anova()] (or [apa_parameters()] for `aov` and `afex` models), [apa_loadings()], or [apa_factor_cor()]
+#' @param x a table made by [apa_anova()], [apa_parameters()], [apa_loadings()], or [apa_factor_cor()]
 #' @param collapse string that joins the sentences. Use `NULL` to get a character vector with one sentence per element.
 #'
 #' @returns character
@@ -77,12 +89,17 @@
 #' fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")
 #' apa_loadings(fit_fa, min_loading = .3, communality = TRUE) |>
 #'   apa_note()
+#'
+#' # Regression
+#' lm(mpg ~ cyl + wt, data = mtcars) |>
+#'   apa_parameters(starred = "p") |>
+#'   apa_note()
 apa_note <- function(x, collapse = " ") {
   record <- attr(x, "apa_note", exact = TRUE)
   if (is.null(record)) {
     cli::cli_abort(c(
       "{.arg x} has no table note information.",
-      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_loadings}, and {.fn apa_factor_cor}.",
+      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_parameters}, {.fn apa_loadings}, and {.fn apa_factor_cor}.",
       i = "The information is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop. Call {.fn apa_note} on the table before changing it."
     ))
   }
@@ -92,6 +109,7 @@ apa_note <- function(x, collapse = " ") {
     anova = anova_note_sentences(record),
     loadings = loadings_note_sentences(record),
     factor_cor = fa_method_sentence(record),
+    parameters = parameters_note_sentences(record),
     cli::cli_abort("Unknown table type {.val {record$table}}.") # nocov
   )
 
@@ -383,4 +401,227 @@ loadings_note_sentences <- function(record) {
   }
 
   sentences
+}
+
+#' Sentence about the covariance matrix behind the standard errors
+#' @param vcov the `vcov` argument passed to parameters::model_parameters()
+#' @keywords internal
+#' @noRd
+describe_vcov <- function(vcov) {
+  if (is.null(vcov)) {
+    return(NULL)
+  }
+  if (!is.character(vcov)) {
+    return("Standard errors are from a user-supplied covariance matrix.")
+  }
+  v <- vcov[1]
+  type <- if (grepl("^HC[0-9]", v)) {
+    paste0("heteroskedasticity-consistent (", v, ")")
+  } else if (v %in% c("vcovHC", "HC")) {
+    "heteroskedasticity-consistent"
+  } else if (grepl("^CR[0-9]", v)) {
+    paste0("cluster-robust (", v, ")")
+  } else if (v %in% c("vcovCL", "vcovCR", "CR")) {
+    "cluster-robust"
+  } else if (v %in% c("vcovHAC", "HAC", "NeweyWest", "vcovPL", "kernHAC")) {
+    "heteroskedasticity- and autocorrelation-consistent"
+  } else if (v %in% c("vcovBS", "BS", "bootstrap")) {
+    "bootstrapped"
+  } else {
+    paste0("robust (", v, ")")
+  }
+  paste0("Standard errors are ", type, ".")
+}
+
+#' Record what a regression table's note needs
+#' @param note list from an apa_parameters method (vcov, df_method,
+#'   thresholds, exp_label)
+#' @param headers headers of the columns shown, named by column format name
+#' @param starred,bolded whether stars or bolding were applied
+#' @keywords internal
+#' @noRd
+parameters_note_record <- function(note, headers, starred, bolded) {
+  list(
+    table = "parameters",
+    headers = headers,
+    vcov = note$vcov,
+    df_method = note$df_method,
+    thresholds = note$thresholds,
+    exp_label = note$exp_label,
+    starred = isTRUE(starred),
+    bolded = isTRUE(bolded),
+    performance = NULL,
+    performance_starred = FALSE
+  )
+}
+
+#' Combine the note records of the models in a list of models
+#' @keywords internal
+#' @noRd
+merge_parameters_note_records <- function(
+  records,
+  performance = NULL,
+  performance_starred = FALSE,
+  column_formats = NULL
+) {
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+  records <- purrr::compact(records)
+  headers <- unlist(unname(purrr::map(records, "headers")))
+  headers <- headers[!duplicated(names(headers))]
+
+  pick <- function(field) {
+    unique(unlist(purrr::map(records, field)))
+  }
+
+  performance_headers <- NULL
+  if (length(performance) > 0) {
+    performance <- performance[!is.na(performance)]
+    performance_headers <- purrr::map_chr(
+      performance,
+      \(m) if (is.null(column_formats[[m]])) m else column_formats[[m]]@header
+    )
+    names(performance_headers) <- performance
+  }
+
+  list(
+    table = "parameters",
+    headers = headers,
+    vcov = pick("vcov"),
+    df_method = pick("df_method"),
+    thresholds = pick("thresholds"),
+    exp_label = pick("exp_label")[1],
+    starred = any(purrr::map_lgl(records, "starred")),
+    bolded = any(purrr::map_lgl(records, "bolded")),
+    performance = performance_headers,
+    performance_starred = isTRUE(performance_starred)
+  )
+}
+
+#' @keywords internal
+#' @noRd
+parameters_note_sentences <- function(record) {
+  sentences <- character(0)
+  headers <- record$headers
+
+  # Standard errors
+  sentences <- c(sentences, record$vcov)
+
+  # Degrees of freedom of mixed-model t tests
+  if ("t" %in% names(headers) && length(record$df_method) > 0) {
+    df_names <- c(
+      kenward = paste0("Kenward", intToUtf8(8211), "Roger"),
+      satterthwaite = "Satterthwaite"
+    )
+    known <- intersect(record$df_method, names(df_names))
+    if (length(known) > 0) {
+      sentences <- c(
+        sentences,
+        paste0(
+          "Degrees of freedom are ",
+          paste(df_names[known], collapse = " and "),
+          " approximations."
+        )
+      )
+    }
+  }
+
+  # Ordinal thresholds
+  if (length(record$thresholds) > 0) {
+    scale_names <- c(
+      logit = "logit",
+      probit = "probit",
+      cloglog = "complementary log-log",
+      loglog = "log-log",
+      cauchit = "Cauchit"
+    )
+    link <- record$thresholds[1]
+    link_name <- if (link %in% names(scale_names)) scale_names[[link]] else link
+    sentences <- c(
+      sentences,
+      paste0(
+        "Thresholds (cutpoints) are on the ",
+        link_name,
+        " scale and are not tested."
+      )
+    )
+  }
+
+  # Abbreviations, in column order
+  abbreviations <- character(0)
+  for (name in names(headers)) {
+    header <- headers[[name]]
+    definition <- switch(
+      name,
+      Std_Coefficient = "standardized coefficient",
+      Exp_Coefficient = exp_coefficient_definition(header, record$exp_label),
+      NULL
+    )
+    if (!is.null(definition)) {
+      abbreviations <- c(abbreviations, paste0(header, " = ", definition))
+    }
+  }
+  if (any(c("CI", "Exp_CI") %in% names(headers))) {
+    abbreviations <- c(abbreviations, "CI = confidence interval")
+  }
+  performance_definitions <- c(
+    R2 = "variance explained by fixed effects",
+    R2_conditional = "variance explained by fixed and random effects",
+    R2_marginal = "variance explained by fixed effects",
+    deltaR2 = paste0("change in ", the$column_formats$R2@header),
+    deltaR2_conditional = paste0(
+      "change in ",
+      the$column_formats$R2_conditional@header
+    )
+  )
+  shown_performance <- intersect(
+    names(record$performance),
+    names(performance_definitions)
+  )
+  # R2 needs a definition only in mixed models, where it is the marginal R2
+  if (!("R2_conditional" %in% names(record$performance))) {
+    shown_performance <- setdiff(shown_performance, "R2")
+  }
+  for (name in shown_performance) {
+    abbreviations <- c(
+      abbreviations,
+      paste0(record$performance[[name]], " = ", performance_definitions[[name]])
+    )
+  }
+  if (length(abbreviations) > 0) {
+    sentences <- c(sentences, paste0(paste(abbreviations, collapse = "; "), "."))
+  }
+
+  # Probability notes
+  if (isTRUE(record$starred) || isTRUE(record$performance_starred)) {
+    sentences <- c(sentences, paste0(apa_p_star_note(), "."))
+  }
+  if (isTRUE(record$bolded)) {
+    sentences <- c(
+      sentences,
+      paste0(
+        "Bold values are statistically significant at *p*",
+        intToUtf8(c(160, 8804, 160)),
+        ".05."
+      )
+    )
+  }
+
+  sentences
+}
+
+#' @keywords internal
+#' @noRd
+exp_coefficient_definition <- function(header, exp_label = NULL) {
+  if (!is.null(exp_label) && !is.na(exp_label)) {
+    return(exp_label)
+  }
+  switch(
+    header,
+    `*OR*` = "odds ratio",
+    `*IRR*` = "incidence rate ratio",
+    `*RR*` = "risk ratio",
+    "exponentiated coefficient"
+  )
 }

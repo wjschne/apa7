@@ -1,6 +1,9 @@
 ---
 title: "Regression Analysis Tables"
 format: html
+filters:
+  - quarto
+  - apanote
 ---
 
 ```{r}
@@ -158,6 +161,48 @@ Quasi-families and other families with an estimated dispersion parameter are tes
 glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
+
+# Table Notes
+
+A regression table often needs a note that defines its symbols and explains its stars. `apa_parameters` records how each table was made, and `apa_note` turns that record into note text. For the hierarchical regression above, the note defines the standardized coefficient and the change in *R*^2^ and explains the stars on the change in *R*^2^:
+
+```{r}
+#| label: note-lm-list
+tbl_lm <- apa_parameters(list(lm1, lm2, lm3))
+apa_note(tbl_lm)
+```
+
+The note changes with the table. With robust standard errors (`vcov`) and confidence intervals, it says which standard errors were used and defines CI:
+
+```{r}
+#| label: note-robust
+apa_parameters(
+  lm3,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
+  vcov = "HC3"
+) |>
+  apa_note()
+```
+
+For logistic regression, it defines the odds ratio. For count models, it defines the incidence rate ratio, and for ordinal models, it says that thresholds are not tested. For mixed models (`lme4`), it gives the method used to approximate the degrees of freedom of the *t* tests (Kenward–Roger by default).
+
+```{r}
+#| label: note-glm
+apa_parameters(glm1, starred = "p") |>
+  apa_note()
+```
+
+The text is in markdown and does not start with "*Note*." because apaquarto adds that. With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option with `!expr`. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_lm` was made above) and display it in the chunk with the note:
+
+```{r}
+#| label: tbl-lm-note
+#| tbl-cap: Hierarchical Regression Predicting ACT Scores
+#| apa-note: !expr apa_note(tbl_lm)
+#| echo: fenced
+tbl_lm
+```
+
+The generated note is a starting point. Add to it with `paste` (e.g., `paste(apa_note(tbl_lm), "Education was dummy coded with None as the reference group.")`), or use `collapse = NULL` to get one sentence per element, so you can drop or reword sentences. `apa_note` reads an attribute of the table that dplyr functions such as `mutate` and `filter` keep but some operations (e.g., joins) drop, so call it on the table that `apa_parameters` returned.
 
 # Printing Options
 
