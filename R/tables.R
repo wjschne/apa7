@@ -1576,7 +1576,7 @@ apa_parameters_ordinal <- function(
     if (link == "logit") {
       column_formats <- label_exp_columns(
         column_formats,
-        c(header = "*OR*", latex = "$OR$")
+        c(header = "*OR*", latex = "$OR$", abbreviation = "cumulative odds ratio")
       )
     }
   }
@@ -1600,8 +1600,7 @@ apa_parameters_ordinal <- function(
     t_with_df = t_with_df,
     note = list(
       vcov = describe_vcov(list(...)$vcov),
-      thresholds = if (thresholds && any(is_threshold)) link,
-      exp_label = if (link == "logit") "cumulative odds ratio"
+      thresholds = if (thresholds && any(is_threshold)) link
     )
   )
 }
@@ -1774,7 +1773,8 @@ add_exp_columns <- function(d_b, predictor_parameters) {
 }
 
 #' Label exponentiated columns (e.g., *OR*), unless the user customized them
-#' @param label named character vector with `header` and `latex`
+#' @param label named character vector with `header`, `latex`, and
+#'   (optionally) `abbreviation`
 #' @keywords internal
 #' @noRd
 label_exp_columns <- function(column_formats, label) {
@@ -1787,6 +1787,9 @@ label_exp_columns <- function(column_formats, label) {
   ) {
     column_formats$Exp_Coefficient@header <- label[["header"]]
     column_formats$Exp_Coefficient@latex <- label[["latex"]]
+    if ("abbreviation" %in% names(label)) {
+      column_formats$Exp_Coefficient@abbreviation <- label[["abbreviation"]]
+    }
   }
   if (
     !is.null(column_formats$Exp_CI) &&
@@ -1810,14 +1813,18 @@ exp_coefficient_label <- function(fit) {
   fam <- stats::family(fit)
   family <- tolower(fam$family)
   if (fam$link == "logit") {
-    return(c(header = "*OR*", latex = "$OR$"))
+    return(c(header = "*OR*", latex = "$OR$", abbreviation = "odds ratio"))
   }
   if (fam$link == "log") {
     if (grepl("poisson|negative binomial", family)) {
-      return(c(header = "*IRR*", latex = "$IRR$"))
+      return(c(
+        header = "*IRR*",
+        latex = "$IRR$",
+        abbreviation = "incidence rate ratio"
+      ))
     }
     if (grepl("binomial", family)) {
-      return(c(header = "*RR*", latex = "$RR$"))
+      return(c(header = "*RR*", latex = "$RR$", abbreviation = "risk ratio"))
     }
   }
   c(
@@ -1978,6 +1985,7 @@ format_apa_parameters <- function(
   attr(d_b_new, "apa_note") <- parameters_note_record(
     note,
     headers = stats::setNames(names(shown), shown),
+    abbreviations = column_abbreviations(unname(shown), column_formats),
     starred = is_starred,
     bolded = is_bolded
   )

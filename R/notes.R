@@ -38,6 +38,19 @@
 #'   &Delta;*R*^2^) columns stand for, and
 #' * what stars or bold values mean.
 #'
+#' Abbreviations are defined from the `abbreviation` slot of each column's
+#' [column_format()], so a note defines every abbreviated header that has a
+#' definition. To define another header, or to change a definition, set the
+#' slot in the `column_formats` passed to the table function (or set the
+#' default with [apa7_defaults()]):
+#'
+#' ```r
+#' cf <- column_formats()
+#' cf$Sum_Squares@abbreviation <- "sum of squares"
+#' apa_anova(fit, anova_parameters = c("Parameter", "Sum_Squares", "df", "F", "p"),
+#'           column_formats = cf)
+#' ```
+#'
 #' The sentences are in APA order: general notes first, then probability notes.
 #' The text does not start with "*Note*." because apaquarto adds it. With
 #' [apaquarto](https://wjschne.github.io/apaquarto/), make the table in one
@@ -129,57 +142,83 @@ apa_note <- function(x, collapse = " ") {
 #' @param correction sphericity correction for afex models ("GG", "HF", "none")
 #' @param corrected_factors formatted names of within-subjects factors with
 #'   more than two levels
-#' @param mse whether an afex *MSE* column is shown
+#' @param abbreviations definitions of the abbreviated headers shown (from
+#'   column_abbreviations())
 #' @keywords internal
 #' @noRd
 anova_note_record <- function(
   ss_type = NA,
-  es_column = NULL,
-  column_formats = NULL,
+  abbreviations = character(0),
   starred = FALSE,
   bolded = FALSE,
   correction = NULL,
-  corrected_factors = character(0),
-  mse = FALSE
+  corrected_factors = character(0)
 ) {
-  if (is.null(column_formats)) {
-    column_formats <- the$column_formats
-  }
-  es <- NULL
-  if (!is.null(es_column) && !is.na(es_column)) {
-    es <- list(
-      column = es_column,
-      header = if (is.null(column_formats[[es_column]])) {
-        es_column
-      } else {
-        column_formats[[es_column]]@header
-      },
-      label = anova_es_labels[[es_column]]
-    )
-  }
   list(
     table = "anova",
     ss_type = ss_type,
     correction = correction,
     corrected_factors = corrected_factors,
-    effect_size = es,
-    mse = mse,
+    abbreviations = abbreviations,
     starred = starred,
     bolded = bolded
   )
 }
 
+#' Definitions of the abbreviated headers of columns
+#'
+#' @param columns column format names of the columns shown, in table order
+#' @param column_formats column_formats (or a named list of column_format
+#'   objects) used for the table
+#' @returns character vector of definitions named by the term defined (the
+#'   header, unless the abbreviation is named), without duplicate terms
 #' @keywords internal
 #' @noRd
-anova_es_labels <- list(
-  Eta2 = "eta squared",
-  Eta2_partial = "partial eta squared",
-  Eta2_generalized = "generalized eta squared",
-  Omega2 = "omega squared",
-  Omega2_partial = "partial omega squared",
-  Epsilon2 = "epsilon squared",
-  Epsilon2_partial = "partial epsilon squared"
-)
+column_abbreviations <- function(columns, column_formats) {
+  out <- character(0)
+  for (name in columns) {
+    cf <- column_formats[[name]]
+    if (is.null(cf)) {
+      next
+    }
+    abbreviation <- cf@abbreviation
+    if (length(abbreviation) == 0 || is.na(abbreviation) || !nzchar(abbreviation)) {
+      next
+    }
+    term <- names(abbreviation)
+    if (is.null(term) || is.na(term) || !nzchar(term)) {
+      term <- cf@header
+    }
+    if (!(term %in% names(out))) {
+      out[[term]] <- unname(abbreviation)
+    }
+  }
+  out
+}
+
+#' Combine definitions, keeping the first definition of each term
+#' @keywords internal
+#' @noRd
+combine_abbreviations <- function(...) {
+  out <- c(...)
+  if (length(out) == 0) {
+    return(character(0))
+  }
+  out[!duplicated(names(out))]
+}
+
+#' "*MSE* = mean square error; CI = confidence interval."
+#' @keywords internal
+#' @noRd
+abbreviation_sentence <- function(abbreviations) {
+  if (length(abbreviations) == 0) {
+    return(NULL)
+  }
+  paste0(
+    paste(names(abbreviations), abbreviations, sep = " = ", collapse = "; "),
+    "."
+  )
+}
 
 #' @keywords internal
 #' @noRd
@@ -227,19 +266,7 @@ anova_note_sentences <- function(record) {
   }
 
   # Abbreviations
-  abbreviations <- character(0)
-  if (isTRUE(record$mse)) {
-    abbreviations <- c(abbreviations, "*MSE* = mean square error")
-  }
-  if (!is.null(record$effect_size) && !is.null(record$effect_size$label)) {
-    abbreviations <- c(
-      abbreviations,
-      paste0(record$effect_size$header, " = ", record$effect_size$label)
-    )
-  }
-  if (length(abbreviations) > 0) {
-    sentences <- c(sentences, paste0(paste(abbreviations, collapse = "; "), "."))
-  }
+  sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
 
   # Probability notes
   if (isTRUE(record$starred)) {
@@ -376,19 +403,7 @@ loadings_note_sentences <- function(record) {
     )
   }
 
-  abbreviations <- character(0)
-  if (isTRUE(record$communality)) {
-    abbreviations <- c(abbreviations, "*h*^2^ = communality")
-  }
-  if (isTRUE(record$uniqueness)) {
-    abbreviations <- c(abbreviations, "*u*^2^ = uniqueness")
-  }
-  if (isTRUE(record$complexity)) {
-    abbreviations <- c(abbreviations, "Complexity = Hofmann's complexity index")
-  }
-  if (length(abbreviations) > 0) {
-    sentences <- c(sentences, paste0(paste(abbreviations, collapse = "; "), "."))
-  }
+  sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
 
   if (isTRUE(record$variance) && isTRUE(record$oblique)) {
     sentences <- c(
@@ -436,19 +451,26 @@ describe_vcov <- function(vcov) {
 
 #' Record what a regression table's note needs
 #' @param note list from an apa_parameters method (vcov, df_method,
-#'   thresholds, exp_label)
+#'   thresholds)
 #' @param headers headers of the columns shown, named by column format name
+#' @param abbreviations definitions of the abbreviated headers shown
 #' @param starred,bolded whether stars or bolding were applied
 #' @keywords internal
 #' @noRd
-parameters_note_record <- function(note, headers, starred, bolded) {
+parameters_note_record <- function(
+  note,
+  headers,
+  abbreviations = character(0),
+  starred = FALSE,
+  bolded = FALSE
+) {
   list(
     table = "parameters",
     headers = headers,
+    abbreviations = abbreviations,
     vcov = note$vcov,
     df_method = note$df_method,
     thresholds = note$thresholds,
-    exp_label = note$exp_label,
     starred = isTRUE(starred),
     bolded = isTRUE(bolded),
     performance = NULL,
@@ -477,6 +499,7 @@ merge_parameters_note_records <- function(
   }
 
   performance_headers <- NULL
+  performance_abbreviations <- character(0)
   if (length(performance) > 0) {
     performance <- performance[!is.na(performance)]
     performance_headers <- purrr::map_chr(
@@ -484,15 +507,32 @@ merge_parameters_note_records <- function(
       \(m) if (is.null(column_formats[[m]])) m else column_formats[[m]]@header
     )
     names(performance_headers) <- performance
+    performance_abbreviations <- column_abbreviations(performance, column_formats)
+    # In mixed models, R2 is the marginal R2, so it needs a definition
+    if (
+      all(c("R2", "R2_conditional") %in% performance) &&
+        !(performance_headers[["R2"]] %in% names(performance_abbreviations))
+    ) {
+      performance_abbreviations <- combine_abbreviations(
+        stats::setNames(
+          "variance explained by fixed effects",
+          performance_headers[["R2"]]
+        ),
+        performance_abbreviations
+      )
+    }
   }
 
   list(
     table = "parameters",
     headers = headers,
+    abbreviations = combine_abbreviations(
+      unlist(unname(purrr::map(records, "abbreviations"))),
+      performance_abbreviations
+    ),
     vcov = pick("vcov"),
     df_method = pick("df_method"),
     thresholds = pick("thresholds"),
-    exp_label = pick("exp_label")[1],
     starred = any(purrr::map_lgl(records, "starred")),
     bolded = any(purrr::map_lgl(records, "bolded")),
     performance = performance_headers,
@@ -550,49 +590,7 @@ parameters_note_sentences <- function(record) {
   }
 
   # Abbreviations, in column order
-  abbreviations <- character(0)
-  for (name in names(headers)) {
-    header <- headers[[name]]
-    definition <- switch(
-      name,
-      Std_Coefficient = "standardized coefficient",
-      Exp_Coefficient = exp_coefficient_definition(header, record$exp_label),
-      NULL
-    )
-    if (!is.null(definition)) {
-      abbreviations <- c(abbreviations, paste0(header, " = ", definition))
-    }
-  }
-  if (any(c("CI", "Exp_CI") %in% names(headers))) {
-    abbreviations <- c(abbreviations, "CI = confidence interval")
-  }
-  performance_definitions <- c(
-    R2 = "variance explained by fixed effects",
-    R2_conditional = "variance explained by fixed and random effects",
-    R2_marginal = "variance explained by fixed effects",
-    deltaR2 = paste0("change in ", the$column_formats$R2@header),
-    deltaR2_conditional = paste0(
-      "change in ",
-      the$column_formats$R2_conditional@header
-    )
-  )
-  shown_performance <- intersect(
-    names(record$performance),
-    names(performance_definitions)
-  )
-  # R2 needs a definition only in mixed models, where it is the marginal R2
-  if (!("R2_conditional" %in% names(record$performance))) {
-    shown_performance <- setdiff(shown_performance, "R2")
-  }
-  for (name in shown_performance) {
-    abbreviations <- c(
-      abbreviations,
-      paste0(record$performance[[name]], " = ", performance_definitions[[name]])
-    )
-  }
-  if (length(abbreviations) > 0) {
-    sentences <- c(sentences, paste0(paste(abbreviations, collapse = "; "), "."))
-  }
+  sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
 
   # Probability notes
   if (isTRUE(record$starred) || isTRUE(record$performance_starred)) {
@@ -610,21 +608,6 @@ parameters_note_sentences <- function(record) {
   }
 
   sentences
-}
-
-#' @keywords internal
-#' @noRd
-exp_coefficient_definition <- function(header, exp_label = NULL) {
-  if (!is.null(exp_label) && !is.na(exp_label)) {
-    return(exp_label)
-  }
-  switch(
-    header,
-    `*OR*` = "odds ratio",
-    `*IRR*` = "incidence rate ratio",
-    `*RR*` = "risk ratio",
-    "exponentiated coefficient"
-  )
 }
 
 #' Note text for apa_flextable(note = ...)

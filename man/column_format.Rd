@@ -8,7 +8,8 @@ column_format(
   name = character(0),
   header = character(0),
   latex = character(0),
-  formatter = function() NULL
+  formatter = function() NULL,
+  abbreviation = character(0)
 )
 }
 \arguments{
@@ -19,12 +20,14 @@ column_format(
 \item{latex}{latex representation of header name}
 
 \item{formatter}{function that formats the column values. It should take a vector of values and return a character vector of formatted values.}
+
+\item{abbreviation}{what the header stands for, used by \code{\link[=apa_note]{apa_note()}} to define the abbreviations in a table's note (e.g., \code{"standardized coefficient"} defines β as "β = standardized coefficient"). The term defined is the header, unless the string is named (e.g., \code{c(CI = "confidence interval")} defines "CI" for a header such as "95\% CI"). Leave empty (the default) for symbols that need no definition, such as \emph{M}, \emph{SD}, \emph{t}, and \emph{p}.}
 }
 \value{
 column_format object
 }
 \description{
-This class is used to define the format of columns in tables, including the name, header, latex representation, and a formatter function.
+This class is used to define the format of columns in tables, including the name, header, latex representation, a formatter function, and what the header abbreviates.
 }
 \examples{
 R2 <- column_format(
@@ -40,4 +43,8 @@ R2 <- column_format(
 R2
 R2@header
 R2@formatter
+
+# Define an abbreviation in table notes
+SS <- column_formats()$Sum_Squares
+SS@abbreviation <- "sum of squares"
 }

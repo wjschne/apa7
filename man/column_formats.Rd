@@ -48,6 +48,8 @@ Returns an S7 object that contains a list of \code{column_format} objects that c
 \item{\code{get_header_rename_latex}}{getter for column names with latex headers as names}
 
 \item{\code{get_tibble}}{getter for tibble with column names, headers, latex headers, and formatters}
+
+\item{\code{get_abbreviations}}{getter for the abbreviations defined by the column formats, as a character vector of definitions named by the term defined}
 }}
 
 \examples{

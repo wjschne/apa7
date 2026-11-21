@@ -12,6 +12,7 @@
   * Small loadings are now blank strings rather than `NA`.
   * The unused `column_formats` argument has been removed.
 * New `apa_factor_cor()` makes a table of factor correlations from obliquely rotated `psych::fa()`, `psych::principal()`, and `parameters::factor_analysis()` solutions.
+* `column_format()` gains an `abbreviation` slot that says what a header stands for (e.g., `"standardized coefficient"` for &beta;). `apa_note()` defines every abbreviated header in a table from these slots, for any table type, so setting the slot in `column_formats` adds or changes a definition. The default column formats define common abbreviations (e.g., CI, *AIC*, *BIC*, RMSEA, effect sizes, and *R*^2^ variants), and `column_formats()` gains a `get_abbreviations` getter. New column formats `h2`, `u2`, and `Complexity` set the headers of those `apa_loadings()` columns.
 * `apa_flextable()` gains a `note` argument: `TRUE` adds the note from `apa_note()` below the table, and a character string adds a custom note. The note does not affect column widths.
 * `apa_flextable()` leaves alone any columns named in a `"no_format_columns"` attribute of the data, and draws a rule above the row named in a `"rule_above"` attribute.
 * Partial *η*^2^ columns (`Eta2_partial`) are now headed *η*^2^~p~. New column formats: `Sum_Squares`, `Mean_Square`, `Eta2_generalized`, `Omega2`, `Omega2_partial`, `Epsilon2`, and `Epsilon2_partial`.

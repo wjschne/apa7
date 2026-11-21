@@ -348,6 +348,7 @@ apa_anova.afex_aov <- function(
   if (!is.null(column_formats$Mean_Square)) {
     column_formats$Mean_Square@header <- "*MSE*"
     column_formats$Mean_Square@latex <- "$MSE$"
+    column_formats$Mean_Square@abbreviation <- "mean square error"
   }
 
   d_new <- format_apa_parameters(
@@ -361,16 +362,14 @@ apa_anova.afex_aov <- function(
 
   attr(d_new, "apa_note") <- anova_note_record(
     ss_type = afex_ss_type(fit),
-    es_column = intersect(anova_parameters, anova_es_columns)[1],
-    column_formats = column_formats,
+    abbreviations = attr(d_new, "apa_note", exact = TRUE)$abbreviations,
     starred = anova_marked(starred, anova_parameters),
     bolded = anova_marked(bolded, anova_parameters),
     correction = attr(fit$anova_table, "correction"),
     corrected_factors = afex_corrected_factors(
       fit,
       column_formats$Parameter@formatter
-    ),
-    mse = "Mean_Square" %in% anova_parameters
+    )
   )
 
   as_apa7_tbl(d_new)
@@ -580,6 +579,8 @@ apa_anova_table <- function(
     column_formats = column_formats,
     t_with_df = FALSE
   )
+  # Stratum rows are added with bind_rows(), which drops attributes
+  abbreviations <- attr(d_new, "apa_note", exact = TRUE)$abbreviations
 
   if (has_strata) {
     d_new <- add_stratum_rows(
@@ -590,8 +591,7 @@ apa_anova_table <- function(
 
   attr(d_new, "apa_note") <- anova_note_record(
     ss_type = if (is.null(note$ss_type)) NA else note$ss_type,
-    es_column = intersect(anova_parameters, anova_es_columns)[1],
-    column_formats = column_formats,
+    abbreviations = abbreviations,
     starred = anova_marked(starred, anova_parameters),
     bolded = anova_marked(bolded, anova_parameters)
   )

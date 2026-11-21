@@ -251,7 +251,7 @@ test_that("methods for column_format", {
 
   expect_equal(
     colnames(tibble::as_tibble(R2)),
-    c("name", "header", "latex", "formatter")
+    c("name", "header", "latex", "formatter", "abbreviation")
   )
   # str() prints to stdout and uses cli for headers; capture both to keep
   # the test console clean while still verifying the return value.

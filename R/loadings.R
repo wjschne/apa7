@@ -115,8 +115,15 @@ apa_loadings <- function(
   d <- tibble::tibble(Variable = variable) |>
     dplyr::bind_cols(tibble::as_tibble(loadings_chr))
 
+  cf <- the$column_formats
+  extra_header <- function(name, default) {
+    if (is.null(cf[[name]])) default else cf[[name]]@header
+  }
+  extra_columns <- c(h2 = communality, u2 = uniqueness, Complexity = complexity)
+  extra_columns <- names(extra_columns)[extra_columns]
+
   if (communality) {
-    d[["*h*^2^"]] <- align_chr(
+    d[[extra_header("h2", "*h*^2^")]] <- align_chr(
       1 - u2,
       accuracy = .1^digits,
       trim_leading_zeros = TRUE
@@ -124,7 +131,7 @@ apa_loadings <- function(
   }
 
   if (uniqueness) {
-    d[["*u*^2^"]] <- align_chr(
+    d[[extra_header("u2", "*u*^2^")]] <- align_chr(
       u2,
       accuracy = .1^digits,
       trim_leading_zeros = TRUE
@@ -132,7 +139,7 @@ apa_loadings <- function(
   }
 
   if (complexity) {
-    d[["Complexity"]] <- align_chr(
+    d[[extra_header("Complexity", "Complexity")]] <- align_chr(
       rowSums(L^2)^2 / rowSums(L^4),
       accuracy = .1^digits
     )
@@ -162,6 +169,7 @@ apa_loadings <- function(
     communality = communality,
     uniqueness = uniqueness,
     complexity = complexity,
+    abbreviations = column_abbreviations(extra_columns, cf),
     variance = variance && length(factor_columns) > 1
   )
   as_apa7_tbl(d)

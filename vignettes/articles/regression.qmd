@@ -212,6 +212,17 @@ apa_parameters(glm1, starred = "p") |>
 
 Do not use `note` with the `apa-note` chunk option, or the note will appear twice.
 
+The definitions come from the `abbreviation` slot of each column's format, so any column with a definition is defined in the note. Symbols such as *SE* and *t* have no definition by default. To add one, or to reword a definition, change the slot in the `column_formats` passed to `apa_parameters` (or set it for every table with `apa7_defaults(column_formats = cf)`):
+
+```{r}
+#| label: note-abbreviation
+cf <- column_formats()
+cf$SE@abbreviation <- "standard error"
+cf$Std_Coefficient@abbreviation <- "standardized regression coefficient"
+apa_parameters(lm1, column_formats = cf) |>
+  apa_note()
+```
+
 The generated note is a starting point. Add to it with `paste` (e.g., `paste(apa_note(tbl_lm), "Education was dummy coded with None as the reference group.")`), or use `collapse = NULL` to get one sentence per element, so you can drop or reword sentences. `apa_note` reads an attribute of the table that dplyr functions such as `mutate` and `filter` keep but some operations (e.g., joins) drop, so call it on the table that `apa_parameters` returned.
 
 # Printing Options

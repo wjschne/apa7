@@ -808,11 +808,12 @@ header_md <- function(x, level = 1) {
 # Column format ----
 #' Column format class
 #'
-#' This class is used to define the format of columns in tables, including the name, header, latex representation, and a formatter function.
+#' This class is used to define the format of columns in tables, including the name, header, latex representation, a formatter function, and what the header abbreviates.
 #' @param name name of column
 #' @param header markdown representation of header name
 #' @param latex latex representation of header name
 #' @param formatter function that formats the column values. It should take a vector of values and return a character vector of formatted values.
+#' @param abbreviation what the header stands for, used by [apa_note()] to define the abbreviations in a table's note (e.g., `"standardized coefficient"` defines &beta; as "&beta; = standardized coefficient"). The term defined is the header, unless the string is named (e.g., `c(CI = "confidence interval")` defines "CI" for a header such as "95% CI"). Leave empty (the default) for symbols that need no definition, such as *M*, *SD*, *t*, and *p*.
 #' @export
 #' @return column_format object
 #' @examples
@@ -829,14 +830,24 @@ header_md <- function(x, level = 1) {
 #' R2
 #' R2@header
 #' R2@formatter
+#'
+#' # Define an abbreviation in table notes
+#' SS <- column_formats()$Sum_Squares
+#' SS@abbreviation <- "sum of squares"
 column_format <- new_class(
   "column_format",
   properties = list(
     name = class_character,
     header = class_character,
     latex = class_character,
-    formatter = class_function
-  )
+    formatter = class_function,
+    abbreviation = class_character
+  ),
+  validator = function(self) {
+    if (length(self@abbreviation) > 1) {
+      "@abbreviation must be a single string (or empty)"
+    }
+  }
 )
 
 as_tibble <- S7::new_external_generic(
@@ -850,8 +861,17 @@ method(as_tibble, column_format) <- function(x, ...) {
     name = x@name,
     header = x@header,
     latex = ifelse(is.null(x@latex), NA, x@latex),
-    formatter = list(x@formatter)
+    formatter = list(x@formatter),
+    abbreviation = abbreviation_text(x)
   )
+}
+
+#' The abbreviation of a column format as "term = definition" (or NA)
+#' @keywords internal
+#' @noRd
+abbreviation_text <- function(x) {
+  a <- column_abbreviations(x@name, stats::setNames(list(x), x@name))
+  if (length(a) == 0) NA_character_ else paste0(names(a), " = ", a)
 }
 
 method(str, column_format) <- function(object, ...) {
@@ -1035,13 +1055,15 @@ the$columns <- list(
     name = "AIC",
     header = "*AIC*",
     latex = "$AIC$",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "Akaike information criterion"
   ),
   AICc = column_format(
     name = "AICc",
     header = "*AICc*",
     latex = "$AICc$",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "corrected Akaike information criterion"
   ),
   AIC_wt = column_format(
     name = "AIC_wt",
@@ -1077,13 +1099,15 @@ the$columns <- list(
     name = "BIC",
     header = "*BIC*",
     latex = "$BIC$",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "Bayesian information criterion"
   ),
   BICc = column_format(
     name = "BICc",
     header = "*BICc*",
     latex = "$BICc$",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "corrected Bayesian information criterion"
   ),
   BIC_wt = column_format(
     name = "BIC_wt",
@@ -1131,7 +1155,8 @@ the$columns <- list(
     name = "CFI",
     header = "CFI",
     latex = "CFI",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "comparative fit index"
   ),
   CI = column_format(
     name = "CI",
@@ -1143,19 +1168,22 @@ the$columns <- list(
         align_chr(u, accuracy = accuracy, ...),
         missing = is.na(l) | is.na(u)
       )
-    }
+    },
+    abbreviation = c(CI = "confidence interval")
   ),
   CI_high = column_format(
     name = "CI_high",
     header = "UL",
     latex = "UL",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "upper limit"
   ),
   CI_low = column_format(
     name = "CI_low",
     header = "LL",
     latex = "LL",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "lower limit"
   ),
   CI_percent = column_format(
     name = "CI_percent",
@@ -1172,7 +1200,8 @@ the$columns <- list(
       x_new <- paste0("[", lb, ", ", ub, "]")
       x_new[nchar(x) == 0 | is.na(x) | x == ""] <- NA
       x_new
-    }
+    },
+    abbreviation = c(CI = "confidence interval")
   ),
   cohens_d = column_format(
     name = "cohens_d",
@@ -1208,13 +1237,15 @@ the$columns <- list(
     name = "deltaR2",
     header = "&Delta;*R*^2^",
     latex = "$\\Delta R^2$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "change in *R*^2^"
   ),
   deltaR2_conditional = column_format(
     name = "deltaR2_conditional",
     header = "&Delta;*R*^2^~conditional~",
     latex = "$\\Delta R^2_{\\text{conditional}}$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "change in *R*^2^~conditional~"
   ),
   deltaAIC = column_format(
     name = "deltaAIC",
@@ -1256,43 +1287,50 @@ the$columns <- list(
     name = "eta2",
     header = "*&eta;*^2^",
     latex = "$\\eta^2$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "eta squared"
   ),
   Eta2 = column_format(
     name = "eta2",
     header = "*&eta;*^2^",
     latex = "$\\eta^2$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "eta squared"
   ),
   Eta2_partial = column_format(
     name = "Eta2_partial",
     header = "*&eta;*^2^~p~",
     latex = "$\\eta^2_p$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "partial eta squared"
   ),
   Eta2_generalized = column_format(
     name = "Eta2_generalized",
     header = "*&eta;*^2^~G~",
     latex = "$\\eta^2_G$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "generalized eta squared"
   ),
   Epsilon2 = column_format(
     name = "Epsilon2",
     header = "*&epsilon;*^2^",
     latex = "$\\epsilon^2$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "epsilon squared"
   ),
   Epsilon2_partial = column_format(
     name = "Epsilon2_partial",
     header = "*&epsilon;*^2^~p~",
     latex = "$\\epsilon^2_p$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "partial epsilon squared"
   ),
   Exp_Coefficient = column_format(
     name = "Exp_Coefficient",
     header = "Exp(*B*)",
     latex = "Exp($B$)",
-    formatter = the$sci_number_formatter
+    formatter = the$sci_number_formatter,
+    abbreviation = "exponentiated coefficient"
   ),
   Exp_CI = column_format(
     name = "Exp_CI",
@@ -1304,7 +1342,8 @@ the$columns <- list(
         sci_md(u, digits = digits, align = TRUE),
         missing = is.na(l) | is.na(u)
       )
-    }
+    },
+    abbreviation = c(CI = "confidence interval")
   ),
   `F` = column_format(
     name = "F",
@@ -1346,7 +1385,8 @@ the$columns <- list(
     name = "NFI",
     header = "NFI",
     latex = "NFI",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "normed fit index"
   ),
   omega = column_format(
     name = "omega",
@@ -1358,13 +1398,15 @@ the$columns <- list(
     name = "Omega2",
     header = "*&omega;*^2^",
     latex = "$\\omega^2$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "omega squared"
   ),
   Omega2_partial = column_format(
     name = "Omega2_partial",
     header = "*&omega;*^2^~p~",
     latex = "$\\omega^2_p$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "partial omega squared"
   ),
   Mean_Square = column_format(
     name = "Mean_Square",
@@ -1418,31 +1460,57 @@ the$columns <- list(
     name = "R2_conditional",
     header = "*R*^2^~conditional~",
     latex = "$R^2_{\\text{conditional}}$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "variance explained by fixed and random effects"
   ),
   R2_marginal = column_format(
     name = "R2_marginal",
     header = "*R*^2^~marginal~",
     latex = "$R^2_{\\text{marginal}}$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "variance explained by fixed effects"
+  ),
+  h2 = column_format(
+    name = "h2",
+    header = "*h*^2^",
+    latex = "$h^2$",
+    formatter = the$trim_leading_zero,
+    abbreviation = "communality"
+  ),
+  u2 = column_format(
+    name = "u2",
+    header = "*u*^2^",
+    latex = "$u^2$",
+    formatter = the$trim_leading_zero,
+    abbreviation = "uniqueness"
+  ),
+  Complexity = column_format(
+    name = "Complexity",
+    header = "Complexity",
+    latex = "Complexity",
+    formatter = the$number_formatter,
+    abbreviation = "Hofmann's complexity index"
   ),
   ICC = column_format(
     name = "ICC",
     header = "ICC",
     latex = "ICC",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "intraclass correlation coefficient"
   ),
   RMSE = column_format(
     name = "RMSE",
     header = "*RMSE*",
     latex = "$RMSE$",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "root mean square error"
   ),
   RMSEA = column_format(
     name = "RMSEA",
     header = "RMSEA",
     latex = "RMSEA",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "root mean square error of approximation"
   ),
   s = column_format(
     name = "s",
@@ -1478,13 +1546,15 @@ the$columns <- list(
     name = "Sigma",
     header = "&sigma;~*e*~",
     latex = "$\\sigma_{e}$",
-    formatter = the$number_formatter
+    formatter = the$number_formatter,
+    abbreviation = "residual standard deviation"
   ),
   Std_Coefficient = column_format(
     name = "Std_Coefficient",
     header = "&beta;",
     latex = "$\\beta$",
-    formatter = the$trim_leading_zero
+    formatter = the$trim_leading_zero,
+    abbreviation = "standardized coefficient"
   ),
   t = column_format(
     name = "t",
@@ -1535,6 +1605,7 @@ the$columns <- list(
 #' @slot get_header_rename getter for column names with headers as names
 #' @slot get_header_rename_latex getter for column names with latex headers as names
 #' @slot get_tibble getter for tibble with column names, headers, latex headers, and formatters
+#' @slot get_abbreviations getter for the abbreviations defined by the column formats, as a character vector of definitions named by the term defined
 #'
 #' @return column_formats
 #' @export
@@ -1599,6 +1670,9 @@ column_formats <- new_class(
         latex = self@get_latex,
         formatter = self@get_formatters
       )
+    }),
+    get_abbreviations = new_property(getter = \(self) {
+      column_abbreviations(names(S7_data(self)), self)
     })
   ),
   constructor = function(

@@ -57,6 +57,18 @@ For \code{\link[=apa_parameters]{apa_parameters()}} tables of regression models 
 \item what stars or bold values mean.
 }
 
+Abbreviations are defined from the \code{abbreviation} slot of each column's
+\code{\link[=column_format]{column_format()}}, so a note defines every abbreviated header that has a
+definition. To define another header, or to change a definition, set the
+slot in the \code{column_formats} passed to the table function (or set the
+default with \code{\link[=apa7_defaults]{apa7_defaults()}}):
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{cf <- column_formats()
+cf$Sum_Squares@abbreviation <- "sum of squares"
+apa_anova(fit, anova_parameters = c("Parameter", "Sum_Squares", "df", "F", "p"),
+          column_formats = cf)
+}\if{html}{\out{</div>}}
+
 The sentences are in APA order: general notes first, then probability notes.
 The text does not start with "\emph{Note}." because apaquarto adds it. With
 \href{https://wjschne.github.io/apaquarto/}{apaquarto}, make the table in one

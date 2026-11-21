@@ -67,7 +67,8 @@ test_that("apa_note defines exponentiated coefficients", {
   fit_probit <- glm(am ~ wt, data = mtcars, family = binomial(link = "probit"))
   expect_equal(apa_note(apa_parameters(fit_probit, exponentiate = TRUE)), "Exp(*B*) = exponentiated coefficient.")
 
-  expect_equal(exp_coefficient_definition("*RR*"), "risk ratio")
+  fit_rr <- structure(list(family = binomial(link = "log")), class = c("glm", "lm"))
+  expect_equal(exp_coefficient_label(fit_rr)[["abbreviation"]], "risk ratio")
 })
 
 test_that("apa_note describes ordinal models", {
@@ -197,4 +198,67 @@ test_that("apa_flextable notes work for ANOVA and loadings tables", {
   expect_match(footer_text(ft), "Principal axis factoring with varimax rotation.", fixed = TRUE)
   # The rule above the variance rows is still drawn
   expect_true(ft$body$styles$cells$border.width.bottom$data[24, 1] > 0)
+})
+
+# column_format abbreviations ----
+test_that("column formats carry abbreviations", {
+  cf <- column_formats()
+  expect_equal(cf$Std_Coefficient@abbreviation, "standardized coefficient")
+  expect_equal(cf$p@abbreviation, character(0))
+  expect_equal(cf@get_abbreviations[["CI"]], "confidence interval")
+  expect_equal(cf@get_abbreviations[["*AIC*"]], "Akaike information criterion")
+  expect_error(
+    column_format("x", header = "x", latex = "x", formatter = identity, abbreviation = c("a", "b")),
+    "single string"
+  )
+  expect_equal(
+    tibble::as_tibble(cf$Std_Coefficient)$abbreviation,
+    "&beta; = standardized coefficient"
+  )
+})
+
+test_that("column_abbreviations names terms by header and drops duplicates", {
+  cf <- column_formats()
+  a <- column_abbreviations(c("Parameter", "Std_Coefficient", "CI", "Exp_CI", "p"), cf)
+  expect_equal(names(a), c("&beta;", "CI"))
+  expect_equal(abbreviation_sentence(a), "&beta; = standardized coefficient; CI = confidence interval.")
+  expect_null(abbreviation_sentence(character(0)))
+})
+
+test_that("custom abbreviations appear in notes for any table type", {
+  cf <- column_formats()
+  cf$SE@abbreviation <- "standard error"
+  cf$Std_Coefficient@abbreviation <- "standardized regression coefficient"
+  x <- apa_parameters(fit_lm, column_formats = cf)
+  expect_equal(
+    apa_note(x),
+    "*SE* = standard error; &beta; = standardized regression coefficient."
+  )
+
+  # A named abbreviation defines a term other than the header
+  cf2 <- column_formats()
+  cf2$t@abbreviation <- c(`*t*` = "Student's *t*")
+  x2 <- apa_parameters(fit_lm, column_formats = cf2)
+  expect_match(apa_note(x2), "*t* = Student's *t*", fixed = TRUE)
+
+  # ANOVA
+  d <- transform(mtcars, cyl = factor(cyl), am = factor(am))
+  cf3 <- column_formats()
+  cf3$Sum_Squares@abbreviation <- "sum of squares"
+  tbl <- apa_anova(
+    aov(mpg ~ cyl * am, data = d),
+    anova_parameters = c("Parameter", "Sum_Squares", "df", "F", "p", "Effect_Size"),
+    column_formats = cf3
+  )
+  expect_match(apa_note(tbl), "*SS* = sum of squares; *&eta;*^2^~p~ = partial eta squared.", fixed = TRUE)
+})
+
+test_that("loadings notes use column format abbreviations", {
+  fit_fa <- psych::fa(Harman74.cor$cov, 2, fm = "pa", rotate = "varimax")
+  tbl <- apa_loadings(fit_fa, communality = TRUE, complexity = TRUE)
+  expect_match(
+    apa_note(tbl),
+    "*h*^2^ = communality; Complexity = Hofmann's complexity index.",
+    fixed = TRUE
+  )
 })
