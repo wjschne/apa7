@@ -6,7 +6,7 @@
 \alias{apa7-package}
 \title{apa7: Writing Documents in American Psychological Association Style, Seventh Edition}
 \description{
-Create American Psychological Association Style, Seventh Edition documents. Format numbers and text consistent with APA style. Create tables that comply with APA style by extending flextable functions.
+Create American Psychological Association Style, Seventh Edition documents. Format numbers and text consistent with APA style. Create tables that comply with APA style by extending 'flextable' functions.
 }
 \seealso{
 Useful links:

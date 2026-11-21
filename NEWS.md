@@ -1,3 +1,7 @@
+# apa7 (development version)
+
+* New `apa_htest()` runs *t* tests (Welch's or Student's, two-group or one-sample), Wilcoxon rank-sum and signed-rank tests, correlation tests (Pearson, Spearman, or Kendall), and chi-square tests of independence on the variables in a data frame, and makes a table with one row per outcome (e.g., `apa_htest(d, mpg + hp ~ am)`). It shows group means and standard deviations (or medians) under group spanners, the test statistic, *df*, *p*, and an effect size with a two-sided confidence interval: Cohen's *d* or Hedges' *g*, the rank-biserial correlation, or Cramér's *V*, *φ*, or Cohen's *w*. Effect sizes are computed from the data, so they do not depend on where the function is called, and Cohen's *d* for Welch's test is exact rather than approximated from *t*. `apa_note()` says which tests were done, how *d* was standardized, and what the abbreviations stand for.
+
 # apa7 0.2.0 _2026-10-18_
 
 * New `apa_anova()` makes APA-style ANOVA source tables for `aov` and `lm` models (Type 1 sums of squares, or Types 2 and 3 via `car::Anova()`), repeated-measures `aov` models with `Error()` strata, `afex` models, and tables from `stats::anova()` and `car::Anova()`. Effect sizes (partial, non-partial, or generalized *η*^2^, *ω*^2^, or *ε*^2^) and their two-sided confidence intervals come from `effectsize`.

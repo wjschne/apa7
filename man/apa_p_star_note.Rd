@@ -19,5 +19,6 @@ Make star notes for p-values
 }
 \examples{
 apa_p_star_note()
-apa_p_star_note(x = c(.10, .05, .01, .001), first_alpha_marginal = TRUE)
+apa_p_star_note(x = c(0.10, 0.05, 0.01, 0.001),
+                first_alpha_marginal = TRUE)
 }

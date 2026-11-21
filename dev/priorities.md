@@ -43,11 +43,17 @@ Last reviewed: 2026-11-20
 
 ### 2. htest objects
 
-- [ ] Single `htest` table via `parameters::model_parameters()` (`t.test`, `wilcox.test`, `cor.test`, `chisq.test`)
-- [ ] Effect sizes via `effectsize` (Cohen's *d*, Hedges' *g*, rank-biserial *r*, Cramér's V)
-- [ ] List method that stacks several tests into one table
-- [ ] Group-comparison table: *M* and *SD* by group, plus *t*, *df*, *p*, *d*
-- [ ] Tests
+Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, because `htest` objects don't keep their data, so `effectsize` can't reliably find it (the formula interface never works, and Cohen's *d* silently falls back to an approximation from *t*).
+
+- [x] `apa_htest()` for *t* tests (Welch, Student, one-sample), Wilcoxon (rank-sum, signed-rank), correlation (Pearson, Spearman, Kendall), and chi-square tests of independence
+- [x] Effect sizes computed from the data with `effectsize` (Cohen's *d*, Hedges' *g*, rank-biserial *r*, Cramér's *V*, *φ*, Cohen's *w*), with two-sided CIs
+- [x] Several outcomes stacked into one table (`y1 + y2 ~ group`)
+- [x] Group-comparison table: *M* and *SD* by group (group spanners), plus *t*, *df*, *p*, *d*
+- [x] Table note via `apa_note()`
+- [x] Tests (`tests/testthat/test-htest.R`)
+- [ ] Paired *t* tests and Wilcoxon signed-rank tests of paired variables (e.g., `pre + post` in wide data)
+- [ ] Accept a plain `htest` object, with effect sizes computed from the test statistic (and the note saying so)
+- [ ] Stack different kinds of tests in one table (list method)
 - [ ] Vignette article
 
 ### 3. Factor analysis (`apa_loadings()`)

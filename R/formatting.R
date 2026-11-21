@@ -1225,6 +1225,12 @@ the$columns <- list(
     latex = "$B$",
     formatter = the$number_formatter
   ),
+  Cohens_w = column_format(
+    name = "Cohens_w",
+    header = "Cohen's *w*",
+    latex = "Cohen's $w$",
+    formatter = the$number_formatter
+  ),
   Cramers_v = column_format(
     name = "Cramers_v",
     header = "Cram\u00E9r's *V*",
@@ -1373,6 +1379,12 @@ the$columns <- list(
     latex = "$Mean$",
     formatter = the$number_formatter
   ),
+  Mdn = column_format(
+    name = "Mdn",
+    header = "*Mdn*",
+    latex = "$Mdn$",
+    formatter = the$number_formatter
+  ),
   n = column_format(
     name = "n",
     header = "*n*",
@@ -1448,6 +1460,20 @@ the$columns <- list(
     latex = "$r$",
     formatter = the$trim_leading_zero
   ),
+  r_rank_biserial = column_format(
+    name = "r_rank_biserial",
+    header = "*r*~rb~",
+    latex = "$r_{\\text{rb}}$",
+    formatter = the$trim_leading_zero,
+    abbreviation = "rank-biserial correlation"
+  ),
+  rho = column_format(
+    name = "rho",
+    header = "&rho;",
+    latex = "$\\rho$",
+    formatter = the$trim_leading_zero,
+    abbreviation = "Spearman's rank correlation"
+  ),
   R2 = column_format(
     name = "R2",
     header = "*R*^2^",
@@ -1473,6 +1499,12 @@ the$columns <- list(
     latex = "$R^2_{\\text{marginal}}$",
     formatter = the$trim_leading_zero,
     abbreviation = "variance explained by fixed effects"
+  ),
+  Hedges_g = column_format(
+    name = "Hedges_g",
+    header = "Hedges' *g*",
+    latex = "Hedges' $g$",
+    formatter = the$number_formatter
   ),
   h2 = column_format(
     name = "h2",
@@ -1578,11 +1610,23 @@ the$columns <- list(
     latex = "$\\tau$",
     formatter = the$number_formatter
   ),
+  V = column_format(
+    name = "V",
+    header = "*V*",
+    latex = "$V$",
+    formatter = the$number_formatter
+  ),
   Variable = column_format(
     name = "Variable",
     header = "Variable",
     latex = "Variable",
     formatter = the$variable_name_formatter
+  ),
+  W = column_format(
+    name = "W",
+    header = "*W*",
+    latex = "$W$",
+    formatter = the$number_formatter
   ),
   z = column_format(
     name = "z",

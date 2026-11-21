@@ -26,6 +26,15 @@
 #' For [apa_factor_cor()] tables, the note says how the factors were
 #' extracted and rotated.
 #'
+#' For [apa_htest()] tables, the note can say
+#'
+#' * which tests were done (e.g., Welch's *t* tests) and what the groups were
+#'   compared with or the variables were correlated with,
+#' * that *p*-values are one-sided, if they are,
+#' * how Cohen's *d* (or Hedges' *g*) was standardized,
+#' * what the effect size and its confidence interval stand for, and
+#' * what stars or bold values mean.
+#'
 #' For [apa_parameters()] tables of regression models (`lm`, `glm`, `polr`,
 #' `clm`, and `lme4` models, or a list of models), the note can say
 #'
@@ -77,7 +86,7 @@
 #' (e.g., `bind_rows()` and joins) drop it, so call `apa_note()` on the
 #' table that the table function returned.
 #'
-#' @param x a table made by [apa_anova()], [apa_parameters()], [apa_loadings()], or [apa_factor_cor()]
+#' @param x a table made by [apa_anova()], [apa_htest()], [apa_parameters()], [apa_loadings()], or [apa_factor_cor()]
 #' @param collapse string that joins the sentences. Use `NULL` to get a character vector with one sentence per element.
 #'
 #' @returns character
@@ -113,7 +122,7 @@ apa_note <- function(x, collapse = " ") {
   if (is.null(record)) {
     cli::cli_abort(c(
       "{.arg x} has no table note information.",
-      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_parameters}, {.fn apa_loadings}, and {.fn apa_factor_cor}.",
+      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, and {.fn apa_factor_cor}.",
       i = "The information is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop. Call {.fn apa_note} on the table before changing it."
     ))
   }
@@ -124,6 +133,7 @@ apa_note <- function(x, collapse = " ") {
     loadings = loadings_note_sentences(record),
     factor_cor = fa_method_sentence(record),
     parameters = parameters_note_sentences(record),
+    htest = htest_note_sentences(record),
     cli::cli_abort("Unknown table type {.val {record$table}}.") # nocov
   )
 
@@ -593,21 +603,13 @@ parameters_note_sentences <- function(record) {
   sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
 
   # Probability notes
-  if (isTRUE(record$starred) || isTRUE(record$performance_starred)) {
-    sentences <- c(sentences, paste0(apa_p_star_note(), "."))
-  }
-  if (isTRUE(record$bolded)) {
-    sentences <- c(
-      sentences,
-      paste0(
-        "Bold values are statistically significant at *p*",
-        intToUtf8(c(160, 8804, 160)),
-        ".05."
-      )
+  c(
+    sentences,
+    probability_note_sentences(
+      starred = isTRUE(record$starred) || isTRUE(record$performance_starred),
+      bolded = record$bolded
     )
-  }
-
-  sentences
+  )
 }
 
 #' Note text for apa_flextable(note = ...)
@@ -623,7 +625,7 @@ note_text <- function(data, note) {
   if (isTRUE(note)) {
     if (is.null(attr(data, "apa_note", exact = TRUE))) {
       cli::cli_abort(c(
-        "{.code note = TRUE} needs a table made by {.fn apa_anova}, {.fn apa_parameters}, {.fn apa_loadings}, or {.fn apa_factor_cor}.",
+        "{.code note = TRUE} needs a table made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, or {.fn apa_factor_cor}.",
         i = "The information for the note is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop.",
         i = "To write your own note, pass it as text (e.g., {.code note = \"Data are from ...\"})."
       ))

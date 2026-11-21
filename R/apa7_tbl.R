@@ -1,6 +1,6 @@
 #' Tables ready for `apa_flextable`
 #'
-#' The tibbles returned by [apa_anova()], [apa_factor_cor()], [apa_loadings()], [apa_parameters()],
+#' The tibbles returned by [apa_anova()], [apa_factor_cor()], [apa_htest()], [apa_loadings()], [apa_parameters()],
 #' [apa_performance()], and [apa_performance_comparison()] have class
 #' `apa7_tbl`. They are ordinary
 #' tibbles for post-processing with dplyr, but in knitr and Quarto documents

@@ -11,6 +11,7 @@ reference:
       - apa_chisq
       - apa_cor
       - apa_factor_cor
+      - apa_htest
       - apa_loadings
       - apa_parameters
       - apa_performance

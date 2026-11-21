@@ -7,7 +7,7 @@
 apa_note(x, collapse = " ")
 }
 \arguments{
-\item{x}{a table made by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_parameters]{apa_parameters()}}, \code{\link[=apa_loadings]{apa_loadings()}}, or \code{\link[=apa_factor_cor]{apa_factor_cor()}}}
+\item{x}{a table made by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_htest]{apa_htest()}}, \code{\link[=apa_parameters]{apa_parameters()}}, \code{\link[=apa_loadings]{apa_loadings()}}, or \code{\link[=apa_factor_cor]{apa_factor_cor()}}}
 
 \item{collapse}{string that joins the sentences. Use \code{NULL} to get a character vector with one sentence per element.}
 }
@@ -43,6 +43,16 @@ factors are correlated.
 
 For \code{\link[=apa_factor_cor]{apa_factor_cor()}} tables, the note says how the factors were
 extracted and rotated.
+
+For \code{\link[=apa_htest]{apa_htest()}} tables, the note can say
+\itemize{
+\item which tests were done (e.g., Welch's \emph{t} tests) and what the groups were
+compared with or the variables were correlated with,
+\item that \emph{p}-values are one-sided, if they are,
+\item how Cohen's \emph{d} (or Hedges' \emph{g}) was standardized,
+\item what the effect size and its confidence interval stand for, and
+\item what stars or bold values mean.
+}
 
 For \code{\link[=apa_parameters]{apa_parameters()}} tables of regression models (\code{lm}, \code{glm}, \code{polr},
 \code{clm}, and \code{lme4} models, or a list of models), the note can say
