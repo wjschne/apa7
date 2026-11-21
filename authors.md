@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/wjschne/apa7/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/wjschne/apa7/blob/0.2.0/DESCRIPTION)
 
 Schneider W (2026). *apa7: Writing Documents in American Psychological
 Association Style, Seventh Edition*. R package version 0.2.0,
