@@ -4,11 +4,11 @@
 #'
 #' @param fit an `aov` or `lm` model, a repeated-measures `aov` model with an `Error()` term (class `aovlist`), an `afex` model (class `afex_aov`), or an ANOVA table from [stats::anova()] or `car::Anova()`.
 #' @param anova_parameters columns to display. `"Effect_Size"` stands for whichever effect size `effect_size`, `partial`, and `generalized` select, and `"CI"` adds its confidence interval as \[*LL*, *UL*\]. Columns not in the ANOVA table are silently dropped.
-#' @param effect_size effect size to display: `"eta"` (*&eta;*^2^, default), `"omega"` (*&omega;*^2^), or `"epsilon"` (*&epsilon;*^2^). If `NULL`, no effect size is computed.
-#' @param partial if `TRUE` (default), partial effect sizes (e.g., *&eta;*^2^~p~) are displayed. For one-way designs, partial and non-partial effect sizes are the same.
-#' @param generalized if `TRUE`, generalized *&eta;*^2^ (*&eta;*^2^~G~) is displayed instead, which is comparable across between- and within-subjects designs. Only for `effect_size = "eta"`.
+#' @param effect_size effect size to display: `"eta"` (\eqn{\eta^2}{eta^2}, default), `"omega"` (\eqn{\omega^2}{omega^2}), or `"epsilon"` (\eqn{\epsilon^2}{epsilon^2}). If `NULL`, no effect size is computed.
+#' @param partial if `TRUE` (default), partial effect sizes (e.g., \eqn{\eta^2_p}{eta^2_p}) are displayed. For one-way designs, partial and non-partial effect sizes are the same.
+#' @param generalized if `TRUE`, generalized \eqn{\eta^2}{eta^2} (\eqn{\eta^2_G}{eta^2_G}) is displayed instead, which is comparable across between- and within-subjects designs. Only for `effect_size = "eta"`.
 #' @param type type of sums of squares for `aov` and `lm` models: `1` (sequential, default, as in [stats::anova()]), `2`, or `3`. Types 2 and 3 are computed with `car::Anova()`. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., `contr.sum`) and covariates are centered. Ignored for ANOVA tables, which already have a type.
-#' @param ci confidence level for the effect size interval, shown if `anova_parameters` includes `"CI"`. Intervals are two-sided, so a 90% interval excludes 0 when the *F* test is significant at *&alpha;* = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized *&eta;*^2^, because those computed by `effectsize` can exclude the point estimate.
+#' @param ci confidence level for the effect size interval, shown if `anova_parameters` includes `"CI"`. Intervals are two-sided, so a 90% interval excludes 0 when the *F* test is significant at \eqn{\alpha}{alpha} = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized \eqn{\eta^2}{eta^2}, because those computed by `effectsize` can exclude the point estimate.
 #' @param residual_label label for residual (error) rows
 #' @param starred columns to star with significant *p*-values (e.g., `"F"`)
 #' @param bolded columns to bold, if significant
@@ -232,7 +232,7 @@ apa_anova.anova <- function(
 }
 
 #' @details
-#' For `afex` models (`afex::aov_car()`, `afex::aov_ez()`, `afex::aov_4()`), each effect has its own error term, so the table shows each effect's degrees of freedom (*df*~effect~, *df*~error~), mean squared error (*MSE*), *F*, *p*, and effect size, as in `afex`'s own `nice()` tables. Degrees of freedom and *p*-values reflect the sphericity correction set in `afex` (Greenhouse-Geisser by default), and generalized *&eta;*^2^ is the default effect size, as in `afex`.
+#' For `afex` models (`afex::aov_car()`, `afex::aov_ez()`, `afex::aov_4()`), each effect has its own error term, so the table shows each effect's degrees of freedom (*df*~effect~, *df*~error~), mean squared error (*MSE*), *F*, *p*, and effect size, as in `afex`'s own `nice()` tables. Degrees of freedom and *p*-values reflect the sphericity correction set in `afex` (Greenhouse-Geisser by default), and generalized \eqn{\eta^2}{eta^2} is the default effect size, as in `afex`.
 #' @export
 #' @rdname apa_anova
 #' @examples

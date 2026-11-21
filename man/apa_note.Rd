@@ -51,9 +51,9 @@ For \code{\link[=apa_parameters]{apa_parameters()}} tables of regression models 
 \item how the degrees of freedom of mixed-model \emph{t} tests were approximated
 (Kenward-Roger or Satterthwaite),
 \item that ordinal-model thresholds are not tested,
-\item what the standardized coefficient (β), exponentiated coefficient
+\item what the standardized coefficient (\eqn{\beta}{beta}), exponentiated coefficient
 (e.g., \emph{OR}), confidence interval, and model-comparison (e.g.,
-Δ\emph{R}^2^) columns stand for, and
+\eqn{\Delta R^2}{Delta R^2}) columns stand for, and
 \item what stars or bold values mean.
 }
 

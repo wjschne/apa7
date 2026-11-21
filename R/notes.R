@@ -33,9 +33,9 @@
 #' * how the degrees of freedom of mixed-model *t* tests were approximated
 #'   (Kenward-Roger or Satterthwaite),
 #' * that ordinal-model thresholds are not tested,
-#' * what the standardized coefficient (&beta;), exponentiated coefficient
+#' * what the standardized coefficient (\eqn{\beta}{beta}), exponentiated coefficient
 #'   (e.g., *OR*), confidence interval, and model-comparison (e.g.,
-#'   &Delta;*R*^2^) columns stand for, and
+#'   \eqn{\Delta R^2}{Delta R^2}) columns stand for, and
 #' * what stars or bold values mean.
 #'
 #' Abbreviations are defined from the `abbreviation` slot of each column's

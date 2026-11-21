@@ -21,7 +21,7 @@ column_format(
 
 \item{formatter}{function that formats the column values. It should take a vector of values and return a character vector of formatted values.}
 
-\item{abbreviation}{what the header stands for, used by \code{\link[=apa_note]{apa_note()}} to define the abbreviations in a table's note (e.g., \code{"standardized coefficient"} defines β as "β = standardized coefficient"). The term defined is the header, unless the string is named (e.g., \code{c(CI = "confidence interval")} defines "CI" for a header such as "95\% CI"). Leave empty (the default) for symbols that need no definition, such as \emph{M}, \emph{SD}, \emph{t}, and \emph{p}.}
+\item{abbreviation}{what the header stands for, used by \code{\link[=apa_note]{apa_note()}} to define the abbreviations in a table's note (e.g., \code{"standardized coefficient"} defines the \verb{&beta;} header as \code{"&beta; = standardized coefficient"}). The term defined is the header, unless the string is named (e.g., \code{c(CI = "confidence interval")} defines "CI" for a header such as "95\% CI"). Leave empty (the default) for symbols that need no definition, such as \emph{M}, \emph{SD}, \emph{t}, and \emph{p}.}
 }
 \value{
 column_format object

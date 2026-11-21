@@ -1466,10 +1466,12 @@ apa_parameters.glm <- function(
 #' @export
 #' @rdname apa_parameters
 #' @examples
+#' \donttest{
 #' if (requireNamespace("MASS", quietly = TRUE) &&
 #'     requireNamespace("carData", quietly = TRUE)) {
 #'   MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
 #'     apa_parameters()
+#' }
 #' }
 apa_parameters.polr <- function(
   fit,
@@ -1629,10 +1631,12 @@ apa_parameters_ordinal <- function(
 #' @export
 #' @rdname apa_parameters
 #' @examples
+#' \donttest{
 #' if (requireNamespace("lme4", quietly = TRUE) &&
 #'     requireNamespace("pbkrtest", quietly = TRUE)) {
 #'   lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy) |>
 #'     apa_parameters()
+#' }
 #' }
 apa_parameters.merMod <- function(
   fit,

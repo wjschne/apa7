@@ -179,14 +179,18 @@ if (requireNamespace("sandwich", quietly = TRUE)) {
 glm(am ~ wt + hp, data = mtcars, family = binomial) |>
    apa_parameters() |>
    apa_flextable()
+\donttest{
 if (requireNamespace("MASS", quietly = TRUE) &&
     requireNamespace("carData", quietly = TRUE)) {
   MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
     apa_parameters()
 }
+}
+\donttest{
 if (requireNamespace("lme4", quietly = TRUE) &&
     requireNamespace("pbkrtest", quietly = TRUE)) {
   lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy) |>
     apa_parameters()
+}
 }
 }

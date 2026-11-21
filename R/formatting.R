@@ -438,7 +438,7 @@ is_numeric_like <- function(x, elementwise = FALSE) {
 #'
 #' @examples
 #' num_pad(c("a", "bb"))
-#' num_pad(c("−1", "1"), font_family = "Times New Roman")
+#' num_pad(c(paste0(intToUtf8(8722), "1"), "1"), font_family = "Times New Roman")
 num_pad <- function(
   x,
   pad_left = TRUE,
@@ -813,7 +813,7 @@ header_md <- function(x, level = 1) {
 #' @param header markdown representation of header name
 #' @param latex latex representation of header name
 #' @param formatter function that formats the column values. It should take a vector of values and return a character vector of formatted values.
-#' @param abbreviation what the header stands for, used by [apa_note()] to define the abbreviations in a table's note (e.g., `"standardized coefficient"` defines &beta; as "&beta; = standardized coefficient"). The term defined is the header, unless the string is named (e.g., `c(CI = "confidence interval")` defines "CI" for a header such as "95% CI"). Leave empty (the default) for symbols that need no definition, such as *M*, *SD*, *t*, and *p*.
+#' @param abbreviation what the header stands for, used by [apa_note()] to define the abbreviations in a table's note (e.g., `"standardized coefficient"` defines the `&beta;` header as `"&beta; = standardized coefficient"`). The term defined is the header, unless the string is named (e.g., `c(CI = "confidence interval")` defines "CI" for a header such as "95% CI"). Leave empty (the default) for symbols that need no definition, such as *M*, *SD*, *t*, and *p*.
 #' @export
 #' @return column_format object
 #' @examples

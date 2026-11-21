@@ -56,8 +56,17 @@ The next model adds days of sleep restriction as a fixed effect. Each participan
 
 ```{r}
 #| label: sleep1
-sleep1 <- lmer(Reaction ~ Days + (1 | Participant), data = d_sleep)
-apa_parameters(sleep1, predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),)
+sleep1 <- lmer(Reaction ~ Days + (1 | Participant), 
+               data = d_sleep)
+
+apa_parameters(
+  sleep1,
+  predictor_parameters = c(
+    "Parameter", 
+    "Coefficient", 
+    "SE", "CI", 
+    "t", "df_error", "p")
+)
 
 ```
 
@@ -71,8 +80,17 @@ Do participants differ in how quickly they deteriorate? Adding a random slope fo
 
 ```{r}
 #| label: sleep2
-sleep2 <- lmer(Reaction ~ Days + (Days | Participant), data = d_sleep)
-apa_parameters(sleep2, predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),)
+sleep2 <- lmer(Reaction ~ Days + (Days | Participant), 
+               data = d_sleep)
+
+apa_parameters(
+  sleep2,
+  predictor_parameters = c(
+    "Parameter", 
+    "Coefficient", 
+    "SE", "CI", 
+    "t", "df_error", "p"),
+)
 ```
 
 The average slope is unchanged, but its standard error is larger, because the model now recognizes that participants' slopes vary: the *SD* of the slopes is about 7 ms per day around the average of 11 ms per day. The correlation (*r*) between participants' intercepts and slopes is small. When all fixed effects share the same degrees of freedom, as here, they appear in the *t* column header.

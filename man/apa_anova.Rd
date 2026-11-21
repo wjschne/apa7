@@ -96,15 +96,15 @@ apa_anova(
 
 \item{anova_parameters}{columns to display. \code{"Effect_Size"} stands for whichever effect size \code{effect_size}, \code{partial}, and \code{generalized} select, and \code{"CI"} adds its confidence interval as [\emph{LL}, \emph{UL}]. Columns not in the ANOVA table are silently dropped.}
 
-\item{effect_size}{effect size to display: \code{"eta"} (\emph{η}^2^, default), \code{"omega"} (\emph{ω}^2^), or \code{"epsilon"} (\emph{ε}^2^). If \code{NULL}, no effect size is computed.}
+\item{effect_size}{effect size to display: \code{"eta"} (\eqn{\eta^2}{eta^2}, default), \code{"omega"} (\eqn{\omega^2}{omega^2}), or \code{"epsilon"} (\eqn{\epsilon^2}{epsilon^2}). If \code{NULL}, no effect size is computed.}
 
-\item{partial}{if \code{TRUE} (default), partial effect sizes (e.g., \emph{η}^2^~p~) are displayed. For one-way designs, partial and non-partial effect sizes are the same.}
+\item{partial}{if \code{TRUE} (default), partial effect sizes (e.g., \eqn{\eta^2_p}{eta^2_p}) are displayed. For one-way designs, partial and non-partial effect sizes are the same.}
 
-\item{generalized}{if \code{TRUE}, generalized \emph{η}^2^ (\emph{η}^2^~G~) is displayed instead, which is comparable across between- and within-subjects designs. Only for \code{effect_size = "eta"}.}
+\item{generalized}{if \code{TRUE}, generalized \eqn{\eta^2}{eta^2} (\eqn{\eta^2_G}{eta^2_G}) is displayed instead, which is comparable across between- and within-subjects designs. Only for \code{effect_size = "eta"}.}
 
 \item{type}{type of sums of squares for \code{aov} and \code{lm} models: \code{1} (sequential, default, as in \code{\link[stats:anova]{stats::anova()}}), \code{2}, or \code{3}. Types 2 and 3 are computed with \code{car::Anova()}. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., \code{contr.sum}) and covariates are centered. Ignored for ANOVA tables, which already have a type.}
 
-\item{ci}{confidence level for the effect size interval, shown if \code{anova_parameters} includes \code{"CI"}. Intervals are two-sided, so a 90\% interval excludes 0 when the \emph{F} test is significant at \emph{α} = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized \emph{η}^2^, because those computed by \code{effectsize} can exclude the point estimate.}
+\item{ci}{confidence level for the effect size interval, shown if \code{anova_parameters} includes \code{"CI"}. Intervals are two-sided, so a 90\% interval excludes 0 when the \emph{F} test is significant at \eqn{\alpha}{alpha} = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized \eqn{\eta^2}{eta^2}, because those computed by \code{effectsize} can exclude the point estimate.}
 
 \item{residual_label}{label for residual (error) rows}
 
@@ -127,7 +127,7 @@ For repeated-measures models fit with \code{aov(y ~ a * b + Error(id / b))}, eac
 
 Model comparisons (e.g., \code{anova(m1, m2)}) are not ANOVA source tables. Use \code{\link[=apa_performance_comparison]{apa_performance_comparison()}} for them.
 
-For \code{afex} models (\code{afex::aov_car()}, \code{afex::aov_ez()}, \code{afex::aov_4()}), each effect has its own error term, so the table shows each effect's degrees of freedom (\emph{df}~effect~, \emph{df}~error~), mean squared error (\emph{MSE}), \emph{F}, \emph{p}, and effect size, as in \code{afex}'s own \code{nice()} tables. Degrees of freedom and \emph{p}-values reflect the sphericity correction set in \code{afex} (Greenhouse-Geisser by default), and generalized \emph{η}^2^ is the default effect size, as in \code{afex}.
+For \code{afex} models (\code{afex::aov_car()}, \code{afex::aov_ez()}, \code{afex::aov_4()}), each effect has its own error term, so the table shows each effect's degrees of freedom (\emph{df}~effect~, \emph{df}~error~), mean squared error (\emph{MSE}), \emph{F}, \emph{p}, and effect size, as in \code{afex}'s own \code{nice()} tables. Degrees of freedom and \emph{p}-values reflect the sphericity correction set in \code{afex} (Greenhouse-Geisser by default), and generalized \eqn{\eta^2}{eta^2} is the default effect size, as in \code{afex}.
 }
 \examples{
 d <- mtcars
