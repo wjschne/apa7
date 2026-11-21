@@ -52,6 +52,6 @@ character vector
 ``` r
 num_pad(c("a", "bb"))
 #> [1] "&numsp;a" "bb"      
-num_pad(c("−1", "1"), font_family = "Times New Roman")
+num_pad(c(paste0(intToUtf8(8722), "1"), "1"), font_family = "Times New Roman")
 #> [1] "−1"       "&numsp;1"
 ```

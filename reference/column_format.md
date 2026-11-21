@@ -40,11 +40,12 @@ column_format(
   what the header stands for, used by
   [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
   to define the abbreviations in a table's note (e.g.,
-  `"standardized coefficient"` defines β as "β = standardized
-  coefficient"). The term defined is the header, unless the string is
-  named (e.g., `c(CI = "confidence interval")` defines "CI" for a header
-  such as "95% CI"). Leave empty (the default) for symbols that need no
-  definition, such as *M*, *SD*, *t*, and *p*.
+  `"standardized coefficient"` defines the `&beta;` header as
+  `"&beta; = standardized coefficient"`). The term defined is the
+  header, unless the string is named (e.g.,
+  `c(CI = "confidence interval")` defines "CI" for a header such as "95%
+  CI"). Leave empty (the default) for symbols that need no definition,
+  such as *M*, *SD*, *t*, and *p*.
 
 ## Value
 
@@ -79,7 +80,7 @@ R2@formatter
 #>     align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, 
 #>         ...)
 #> }
-#> <environment: 0x5a20376602b0>
+#> <environment: 0x5a562368bd58>
 
 # Define an abbreviation in table notes
 SS <- column_formats()$Sum_Squares

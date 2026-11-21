@@ -77,9 +77,9 @@ models, or a list of models), the note can say
 
 - that ordinal-model thresholds are not tested,
 
-- what the standardized coefficient (β), exponentiated coefficient
-  (e.g., *OR*), confidence interval, and model-comparison (e.g.,
-  Δ*R*^2^) columns stand for, and
+- what the standardized coefficient (\\\beta\\), exponentiated
+  coefficient (e.g., *OR*), confidence interval, and model-comparison
+  (e.g., \\\Delta R^2\\) columns stand for, and
 
 - what stars or bold values mean.
 

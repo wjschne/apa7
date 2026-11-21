@@ -117,20 +117,21 @@ apa_anova(fit, ...)
 
 - effect_size:
 
-  effect size to display: `"eta"` (*η*^2^, default), `"omega"` (*ω*^2^),
-  or `"epsilon"` (*ε*^2^). If `NULL`, no effect size is computed.
+  effect size to display: `"eta"` (\\\eta^2\\, default), `"omega"`
+  (\\\omega^2\\), or `"epsilon"` (\\\epsilon^2\\). If `NULL`, no effect
+  size is computed.
 
 - partial:
 
-  if `TRUE` (default), partial effect sizes (e.g., *η*^2^~p~) are
+  if `TRUE` (default), partial effect sizes (e.g., \\\eta^2_p\\) are
   displayed. For one-way designs, partial and non-partial effect sizes
   are the same.
 
 - generalized:
 
-  if `TRUE`, generalized *η*^2^ (*η*^2^~G~) is displayed instead, which
-  is comparable across between- and within-subjects designs. Only for
-  `effect_size = "eta"`.
+  if `TRUE`, generalized \\\eta^2\\ (\\\eta^2_G\\) is displayed instead,
+  which is comparable across between- and within-subjects designs. Only
+  for `effect_size = "eta"`.
 
 - type:
 
@@ -147,10 +148,10 @@ apa_anova(fit, ...)
 
   confidence level for the effect size interval, shown if
   `anova_parameters` includes `"CI"`. Intervals are two-sided, so a 90%
-  interval excludes 0 when the *F* test is significant at *α* = .05, and
-  its lower bound is 0 otherwise. Intervals are not shown for
-  generalized *η*^2^, because those computed by `effectsize` can exclude
-  the point estimate.
+  interval excludes 0 when the *F* test is significant at \\\alpha\\ =
+  .05, and its lower bound is 0 otherwise. Intervals are not shown for
+  generalized \\\eta^2\\, because those computed by `effectsize` can
+  exclude the point estimate.
 
 - residual_label:
 
@@ -197,8 +198,8 @@ effect has its own error term, so the table shows each effect's degrees
 of freedom (*df*~effect~, *df*~error~), mean squared error (*MSE*), *F*,
 *p*, and effect size, as in `afex`'s own `nice()` tables. Degrees of
 freedom and *p*-values reflect the sphericity correction set in `afex`
-(Greenhouse-Geisser by default), and generalized *η*^2^ is the default
-effect size, as in `afex`.
+(Greenhouse-Geisser by default), and generalized \\\eta^2\\ is the
+default effect size, as in `afex`.
 
 ## Examples
 

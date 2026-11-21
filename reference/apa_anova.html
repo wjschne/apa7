@@ -151,15 +151,15 @@
 
 
 <dt id="arg-effect-size">effect_size<a class="anchor" aria-label="anchor" href="#arg-effect-size"></a></dt>
-<dd><p>effect size to display: <code>"eta"</code> (<em>η</em>^2^, default), <code>"omega"</code> (<em>ω</em>^2^), or <code>"epsilon"</code> (<em>ε</em>^2^). If <code>NULL</code>, no effect size is computed.</p></dd>
+<dd><p>effect size to display: <code>"eta"</code> (\(\eta^2\), default), <code>"omega"</code> (\(\omega^2\)), or <code>"epsilon"</code> (\(\epsilon^2\)). If <code>NULL</code>, no effect size is computed.</p></dd>
 
 
 <dt id="arg-partial">partial<a class="anchor" aria-label="anchor" href="#arg-partial"></a></dt>
-<dd><p>if <code>TRUE</code> (default), partial effect sizes (e.g., <em>η</em>^2^~p~) are displayed. For one-way designs, partial and non-partial effect sizes are the same.</p></dd>
+<dd><p>if <code>TRUE</code> (default), partial effect sizes (e.g., \(\eta^2_p\)) are displayed. For one-way designs, partial and non-partial effect sizes are the same.</p></dd>
 
 
 <dt id="arg-generalized">generalized<a class="anchor" aria-label="anchor" href="#arg-generalized"></a></dt>
-<dd><p>if <code>TRUE</code>, generalized <em>η</em>^2^ (<em>η</em>^2^~G~) is displayed instead, which is comparable across between- and within-subjects designs. Only for <code>effect_size = "eta"</code>.</p></dd>
+<dd><p>if <code>TRUE</code>, generalized \(\eta^2\) (\(\eta^2_G\)) is displayed instead, which is comparable across between- and within-subjects designs. Only for <code>effect_size = "eta"</code>.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
@@ -167,7 +167,7 @@
 
 
 <dt id="arg-ci">ci<a class="anchor" aria-label="anchor" href="#arg-ci"></a></dt>
-<dd><p>confidence level for the effect size interval, shown if <code>anova_parameters</code> includes <code>"CI"</code>. Intervals are two-sided, so a 90% interval excludes 0 when the <em>F</em> test is significant at <em>α</em> = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized <em>η</em>^2^, because those computed by <code>effectsize</code> can exclude the point estimate.</p></dd>
+<dd><p>confidence level for the effect size interval, shown if <code>anova_parameters</code> includes <code>"CI"</code>. Intervals are two-sided, so a 90% interval excludes 0 when the <em>F</em> test is significant at \(\alpha\) = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized \(\eta^2\), because those computed by <code>effectsize</code> can exclude the point estimate.</p></dd>
 
 
 <dt id="arg-residual-label">residual_label<a class="anchor" aria-label="anchor" href="#arg-residual-label"></a></dt>
@@ -198,7 +198,7 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For repeated-measures models fit with <code>aov(y ~ a * b + Error(id / b))</code>, each error stratum is introduced by a heading row ("Between subjects" or "Within subjects"), and each stratum's error term follows its effects.</p>
 <p>Model comparisons (e.g., <code>anova(m1, m2)</code>) are not ANOVA source tables. Use <code><a href="apa_performance_comparison.html">apa_performance_comparison()</a></code> for them.</p>
-<p>For <code>afex</code> models (<code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_car()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_ez()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_4()</a></code>), each effect has its own error term, so the table shows each effect's degrees of freedom (<em>df</em>~effect~, <em>df</em>~error~), mean squared error (<em>MSE</em>), <em>F</em>, <em>p</em>, and effect size, as in <code>afex</code>'s own <code>nice()</code> tables. Degrees of freedom and <em>p</em>-values reflect the sphericity correction set in <code>afex</code> (Greenhouse-Geisser by default), and generalized <em>η</em>^2^ is the default effect size, as in <code>afex</code>.</p>
+<p>For <code>afex</code> models (<code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_car()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_ez()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_4()</a></code>), each effect has its own error term, so the table shows each effect's degrees of freedom (<em>df</em>~effect~, <em>df</em>~error~), mean squared error (<em>MSE</em>), <em>F</em>, <em>p</em>, and effect size, as in <code>afex</code>'s own <code>nice()</code> tables. Degrees of freedom and <em>p</em>-values reflect the sphericity correction set in <code>afex</code> (Greenhouse-Geisser by default), and generalized \(\eta^2\) is the default effect size, as in <code>afex</code>.</p>
     </div>
 
     <div class="section level2">

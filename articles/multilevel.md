@@ -73,8 +73,17 @@ assumed to slow down at the same rate.
 
 ``` r
 
-sleep1 <- lmer(Reaction ~ Days + (1 | Participant), data = d_sleep)
-apa_parameters(sleep1, predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),)
+sleep1 <- lmer(Reaction ~ Days + (1 | Participant), 
+               data = d_sleep)
+
+apa_parameters(
+  sleep1,
+  predictor_parameters = c(
+    "Parameter", 
+    "Coefficient", 
+    "SE", "CI", 
+    "t", "df_error", "p")
+)
 ```
 
 | Variable                  | B      | SE    | 95% CI             | t     | df     | p      |
@@ -106,8 +115,17 @@ slope for days lets each participant have their own rate of change.
 
 ``` r
 
-sleep2 <- lmer(Reaction ~ Days + (Days | Participant), data = d_sleep)
-apa_parameters(sleep2, predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),)
+sleep2 <- lmer(Reaction ~ Days + (Days | Participant), 
+               data = d_sleep)
+
+apa_parameters(
+  sleep2,
+  predictor_parameters = c(
+    "Parameter", 
+    "Coefficient", 
+    "SE", "CI", 
+    "t", "df_error", "p"),
+)
 ```
 
 | Variable                      | B      | SE   | 95% CI             | t(17) | p      |
