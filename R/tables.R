@@ -852,6 +852,7 @@ apa_cor <- function(
 #' @param pretty_widths apply `pretty_widths` function
 #' @param no_format_columns Column name or tidyselect function. selected columns are not formatted. Columns named in a `"no_format_columns"` attribute of `data` (set by functions such as [apa_loadings()]) are not formatted either. Likewise, a rule is drawn above the first body row whose first-column text matches a `"rule_above"` attribute of `data`.
 #' @param add_breaks_between_spanners add breaks between spanners if TRUE
+#' @param note table note placed below the table, after "*Note*.". If `TRUE`, the note is written by [apa_note()] from what a table function such as [apa_anova()], [apa_parameters()], or [apa_loadings()] recorded. A character string is used as the note (markdown is allowed), and `NULL` or `FALSE` (default) adds no note. Use this for documents that are not made with apaquarto. With apaquarto, use the `apa-note` chunk option instead (e.g., `#| apa-note: !expr apa7::apa_note(tbl)`), so that the note is placed and styled by apaquarto and is not added twice.
 #' @inheritParams apa_style
 #' @param ... arguments passed to `apa_style`
 
@@ -909,6 +910,7 @@ apa_flextable <- function(
   column_formats = NULL,
   pretty_widths = TRUE,
   add_breaks_between_spanners = TRUE,
+  note = NULL,
   ...
 ) {
   # Prevent check warning
@@ -1181,6 +1183,17 @@ apa_flextable <- function(
     attr(data, "rule_above", exact = TRUE),
     border_color = border_color,
     border_width = border_width
+  )
+
+  # Added last so that the note does not affect column widths
+  ft <- add_note_footer(
+    ft,
+    note_text(data, note),
+    font_family = font_family,
+    font_size = font_size,
+    text_color = text_color,
+    line_spacing = line_spacing,
+    horizontal_padding = horizontal_padding
   )
 
   class(ft) <- unique(c("apaflextable", class(ft)))

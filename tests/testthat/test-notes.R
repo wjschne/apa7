@@ -135,3 +135,66 @@ test_that("ANOVA tables keep their own notes", {
   fit <- aov(mpg ~ factor(cyl), data = mtcars)
   expect_match(apa_note(apa_anova(fit)), "^Sums of squares are sequential")
 })
+
+# apa_flextable(note = ...) ----
+footer_text <- function(ft) {
+  chunks <- flextable::information_data_chunk(ft)
+  paste(chunks$txt[chunks$.part == "footer"], collapse = "")
+}
+
+test_that("apa_flextable adds the generated note with note = TRUE", {
+  tbl <- apa_parameters(fit_lm, starred = "p")
+  ft <- apa_flextable(tbl, note = TRUE)
+  expect_equal(flextable::nrow_part(ft, "footer"), 1)
+  text <- footer_text(ft)
+  expect_true(startsWith(text, "Note. "))
+  expect_match(text, "standardized coefficient", fixed = TRUE)
+  expect_match(text, "p.<.[.]05")
+
+  # The note does not change column widths
+  expect_equal(ft$body$colwidths, apa_flextable(tbl)$body$colwidths)
+
+  # The note is left aligned
+  expect_equal(unique(ft$footer$styles$pars$text.align$data[1, ]), "left")
+})
+
+test_that("apa_flextable uses custom note text", {
+  tbl <- apa_parameters(fit_lm)
+  ft <- apa_flextable(tbl, note = "Data are from *mtcars*.")
+  expect_equal(footer_text(ft), "Note. Data are from mtcars.")
+
+  # Works for any data frame, and several strings are joined
+  ft2 <- apa_flextable(mtcars[1:3, 1:3], note = c("First.", "Second."))
+  expect_equal(footer_text(ft2), "Note. First. Second.")
+})
+
+test_that("apa_flextable adds no note by default or when there is nothing to say", {
+  tbl <- apa_parameters(fit_lm)
+  expect_equal(flextable::nrow_part(apa_flextable(tbl), "footer"), 0)
+  expect_equal(flextable::nrow_part(apa_flextable(tbl, note = FALSE), "footer"), 0)
+  expect_equal(flextable::nrow_part(apa_flextable(tbl, note = ""), "footer"), 0)
+
+  # The generated note is empty when no column needs a definition
+  no_std <- apa_parameters(
+    fit_lm,
+    predictor_parameters = c("Parameter", "Coefficient", "SE", "t", "df_error", "p")
+  )
+  expect_equal(flextable::nrow_part(apa_flextable(no_std, note = TRUE), "footer"), 0)
+})
+
+test_that("apa_flextable note errors are informative", {
+  expect_error(apa_flextable(mtcars[1:3, 1:3], note = TRUE), "needs a table made by")
+  expect_error(apa_flextable(apa_parameters(fit_lm), note = 3), "must be")
+})
+
+test_that("apa_flextable notes work for ANOVA and loadings tables", {
+  fit <- aov(mpg ~ cyl * am, data = transform(mtcars, cyl = factor(cyl), am = factor(am)))
+  expect_match(footer_text(apa_flextable(apa_anova(fit), note = TRUE)), "^Note[.] Sums of squares")
+
+  fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")
+  tbl <- apa_loadings(fit_fa, variance = TRUE)
+  ft <- apa_flextable(tbl, note = TRUE)
+  expect_match(footer_text(ft), "Principal axis factoring with varimax rotation.", fixed = TRUE)
+  # The rule above the variance rows is still drawn
+  expect_true(ft$body$styles$cells$border.width.bottom$data[24, 1] > 0)
+})

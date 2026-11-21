@@ -192,15 +192,25 @@ apa_parameters(glm1, starred = "p") |>
   apa_note()
 ```
 
-The text is in markdown and does not start with "*Note*." because apaquarto adds that. With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option with `!expr`. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_lm` was made above) and display it in the chunk with the note:
+The text is in markdown and does not start with "*Note*." because apaquarto adds that. With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option with `!expr`. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_lm` was made above) and display it in the chunk with the note. Write it as `apa7::apa_note`, because in documents with cached chunks, chunk options can be evaluated before `library(apa7)` takes effect:
 
 ```{r}
 #| label: tbl-lm-note
 #| tbl-cap: Hierarchical Regression Predicting ACT Scores
-#| apa-note: !expr apa_note(tbl_lm)
+#| apa-note: !expr apa7::apa_note(tbl_lm)
 #| echo: fenced
 tbl_lm
 ```
+
+Without apaquarto (e.g., in a plain Quarto or R Markdown document, or a table saved to Word with `flextable::save_as_docx`), `apa_flextable` can put the note below the table itself. With `note = TRUE`, it uses the note from `apa_note`; a character string is used as the note instead. The note is added after the column widths are set, so a long note does not stretch the table.
+
+```{r}
+#| label: lm-flextable-note
+apa_parameters(glm1, starred = "p") |>
+  apa_flextable(note = TRUE)
+```
+
+Do not use `note` with the `apa-note` chunk option, or the note will appear twice.
 
 The generated note is a starting point. Add to it with `paste` (e.g., `paste(apa_note(tbl_lm), "Education was dummy coded with None as the reference group.")`), or use `collapse = NULL` to get one sentence per element, so you can drop or reword sentences. `apa_note` reads an attribute of the table that dplyr functions such as `mutate` and `filter` keep but some operations (e.g., joins) drop, so call it on the table that `apa_parameters` returned.
 

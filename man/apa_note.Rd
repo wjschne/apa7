@@ -61,7 +61,8 @@ The sentences are in APA order: general notes first, then probability notes.
 The text does not start with "\emph{Note}." because apaquarto adds it. With
 \href{https://wjschne.github.io/apaquarto/}{apaquarto}, make the table in one
 chunk and display it in another, using the note as the \code{apa-note} chunk
-option:
+option. Write \code{apa7::apa_note()} there, because in documents with cached
+chunks, chunk options can be evaluated before \code{library(apa7)} takes effect:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{```\{r\}
 #| label: anova-fit
@@ -71,7 +72,7 @@ tbl <- apa_anova(fit, type = 3)
 ```\{r\}
 #| label: tbl-anova
 #| tbl-cap: Analysis of Variance
-#| apa-note: !expr apa_note(tbl)
+#| apa-note: !expr apa7::apa_note(tbl)
 tbl
 ```
 }\if{html}{\out{</div>}}

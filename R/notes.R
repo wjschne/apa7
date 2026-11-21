@@ -42,7 +42,8 @@
 #' The text does not start with "*Note*." because apaquarto adds it. With
 #' [apaquarto](https://wjschne.github.io/apaquarto/), make the table in one
 #' chunk and display it in another, using the note as the `apa-note` chunk
-#' option:
+#' option. Write `apa7::apa_note()` there, because in documents with cached
+#' chunks, chunk options can be evaluated before `library(apa7)` takes effect:
 #'
 #' ````
 #' ```{r}
@@ -53,7 +54,7 @@
 #' ```{r}
 #' #| label: tbl-anova
 #' #| tbl-cap: Analysis of Variance
-#' #| apa-note: !expr apa_note(tbl)
+#' #| apa-note: !expr apa7::apa_note(tbl)
 #' tbl
 #' ```
 #' ````
@@ -624,4 +625,77 @@ exp_coefficient_definition <- function(header, exp_label = NULL) {
     `*RR*` = "risk ratio",
     "exponentiated coefficient"
   )
+}
+
+#' Note text for apa_flextable(note = ...)
+#' @param data the data passed to apa_flextable()
+#' @param note `NULL`, `FALSE`, `TRUE`, or a character string
+#' @returns note text, or NULL for no note
+#' @keywords internal
+#' @noRd
+note_text <- function(data, note) {
+  if (is.null(note) || isFALSE(note)) {
+    return(NULL)
+  }
+  if (isTRUE(note)) {
+    if (is.null(attr(data, "apa_note", exact = TRUE))) {
+      cli::cli_abort(c(
+        "{.code note = TRUE} needs a table made by {.fn apa_anova}, {.fn apa_parameters}, {.fn apa_loadings}, or {.fn apa_factor_cor}.",
+        i = "The information for the note is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop.",
+        i = "To write your own note, pass it as text (e.g., {.code note = \"Data are from ...\"})."
+      ))
+    }
+    text <- apa_note(data)
+  } else if (is.character(note)) {
+    text <- paste(note[!is.na(note)], collapse = " ")
+  } else {
+    cli::cli_abort(
+      "{.arg note} must be {.code TRUE}, {.code FALSE}, {.code NULL}, or a character string, not {.obj_type_friendly {note}}."
+    )
+  }
+  if (length(text) == 0 || !nzchar(trimws(text))) {
+    return(NULL)
+  }
+  text
+}
+
+#' Add a table note below a flextable, styled like apa_style() footers
+#' @keywords internal
+#' @noRd
+add_note_footer <- function(
+  ft,
+  text,
+  font_family = NULL,
+  font_size = 12,
+  text_color = "black",
+  line_spacing = 2,
+  horizontal_padding = 3
+) {
+  if (is.null(text)) {
+    return(ft)
+  }
+  if (is.null(font_family)) {
+    font_family <- the$font_family
+  }
+  n_before <- flextable::nrow_part(ft, "footer")
+  ft <- flextable::add_footer_lines(
+    ft,
+    values = ftExtra::as_paragraph_md(paste0("*Note*. ", text))
+  )
+  i <- n_before + 1
+  ft |>
+    flextable::font(i = i, part = "footer", fontname = font_family) |>
+    flextable::fontsize(i = i, part = "footer", size = font_size) |>
+    flextable::color(i = i, part = "footer", color = text_color) |>
+    flextable::line_spacing(i = i, part = "footer", space = line_spacing) |>
+    flextable::align(i = i, part = "footer", align = "left") |>
+    flextable::valign(i = i, part = "footer", valign = "top") |>
+    flextable::padding(
+      i = i,
+      part = "footer",
+      padding.top = 2,
+      padding.bottom = 0,
+      padding.left = horizontal_padding,
+      padding.right = horizontal_padding
+    )
 }

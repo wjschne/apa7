@@ -38,6 +38,7 @@ apa_flextable(
   column_formats = NULL,
   pretty_widths = TRUE,
   add_breaks_between_spanners = TRUE,
+  note = NULL,
   ...
 )
 }
@@ -107,6 +108,8 @@ apa_flextable(
 \item{pretty_widths}{apply \code{pretty_widths} function}
 
 \item{add_breaks_between_spanners}{add breaks between spanners if TRUE}
+
+\item{note}{table note placed below the table, after "\emph{Note}.". If \code{TRUE}, the note is written by \code{\link[=apa_note]{apa_note()}} from what a table function such as \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_parameters]{apa_parameters()}}, or \code{\link[=apa_loadings]{apa_loadings()}} recorded. A character string is used as the note (markdown is allowed), and \code{NULL} or \code{FALSE} (default) adds no note. Use this for documents that are not made with apaquarto. With apaquarto, use the \code{apa-note} chunk option instead (e.g., \verb{#| apa-note: !expr apa7::apa_note(tbl)}), so that the note is placed and styled by apaquarto and is not added twice.}
 
 \item{...}{arguments passed to \code{apa_style}}
 }
