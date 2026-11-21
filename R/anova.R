@@ -125,6 +125,7 @@ apa_anova.lm <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
+    note = list(ss_type = type),
     ...
   )
 }
@@ -170,6 +171,7 @@ apa_anova.aovlist <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
+    note = list(ss_type = 1L),
     ...
   )
 }
@@ -224,6 +226,7 @@ apa_anova.anova <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
+    note = list(ss_type = anova_heading_type(fit)),
     ...
   )
 }
@@ -347,15 +350,57 @@ apa_anova.afex_aov <- function(
     column_formats$Mean_Square@latex <- "$MSE$"
   }
 
-  format_apa_parameters(
+  d_new <- format_apa_parameters(
     d,
     predictor_parameters = anova_parameters,
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
     t_with_df = FALSE
-  ) |>
-    as_apa7_tbl()
+  )
+
+  attr(d_new, "apa_note") <- anova_note_record(
+    ss_type = afex_ss_type(fit),
+    es_column = intersect(anova_parameters, anova_es_columns)[1],
+    column_formats = column_formats,
+    starred = anova_marked(starred, anova_parameters),
+    bolded = anova_marked(bolded, anova_parameters),
+    correction = attr(fit$anova_table, "correction"),
+    corrected_factors = afex_corrected_factors(
+      fit,
+      column_formats$Parameter@formatter
+    ),
+    mse = "Mean_Square" %in% anova_parameters
+  )
+
+  as_apa7_tbl(d_new)
+}
+
+#' Type of sums of squares of an afex model
+#' @keywords internal
+#' @noRd
+afex_ss_type <- function(fit) {
+  type <- attr(fit, "type")
+  if (is.null(type)) {
+    return(NA_integer_) # nocov
+  }
+  anova_ss_type(type)
+}
+
+#' Within-subjects factors whose effects get a sphericity correction (those
+#' with more than two levels), formatted like the table's effect names
+#' @keywords internal
+#' @noRd
+afex_corrected_factors <- function(fit, formatter) {
+  within <- attr(fit, "within")
+  if (length(within) == 0) {
+    return(character(0))
+  }
+  factors <- names(within)[lengths(within) > 2]
+  if (length(factors) == 0) {
+    return(character(0))
+  }
+  formatter(factors)
 }
 
 #' @export
@@ -434,6 +479,7 @@ apa_anova_table <- function(
   starred,
   bolded,
   column_formats,
+  note = list(),
   ...
 ) {
   # Prevent warnings
@@ -541,6 +587,14 @@ apa_anova_table <- function(
       anova_stratum_labels(strata, column_formats$Parameter@formatter)
     )
   }
+
+  attr(d_new, "apa_note") <- anova_note_record(
+    ss_type = if (is.null(note$ss_type)) NA else note$ss_type,
+    es_column = intersect(anova_parameters, anova_es_columns)[1],
+    column_formats = column_formats,
+    starred = anova_marked(starred, anova_parameters),
+    bolded = anova_marked(bolded, anova_parameters)
+  )
 
   as_apa7_tbl(d_new)
 }

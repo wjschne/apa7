@@ -271,15 +271,38 @@ The sphericity correction is set when the model is fit or printed in afex (e.g.,
 
 ## Notes
 
-The table does not say which type of sums of squares or which sphericity correction was used, so say so in a table note. With [apaquarto](https://wjschne.github.io/apaquarto/), add the note with the `apa-note` chunk option:
+The table does not say which type of sums of squares or which sphericity correction was used, so say so in a table note. `apa_anova` records how the table was made, and `apa_note` turns that record into note text:
 
 ```{r}
-#| label: tbl-moore
-#| tbl-cap: Conformity by Authoritarianism and Partner Status
-#| apa-note: Type 2 sums of squares.
-#| echo: fenced
-apa_anova(fit_moore, type = 2)
+#| label: note-moore
+tbl_moore <- apa_anova(fit_moore, type = 2)
+apa_note(tbl_moore)
 ```
+
+The note says which type of sums of squares was used and defines the effect size. For afex models, it also says which effects have sphericity-corrected degrees of freedom. afex corrects only effects that involve a within-subjects factor with more than two levels, so the note names those factors:
+
+```{r}
+#| label: note-obk
+tbl_obk <- apa_anova(fit_obk, starred = "F")
+apa_note(tbl_obk)
+```
+
+When stars or bold values are used, the note explains them, after the general notes as APA style requires. The text is in markdown, and it does not start with "*Note*." because apaquarto adds that.
+
+With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option with `!expr`. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_obk` was made above) and display it in the chunk with the note:
+
+```{r}
+#| label: tbl-obk
+#| tbl-cap: Mixed ANOVA of Treatment and Phase
+#| apa-note: !expr apa_note(tbl_obk)
+#| echo: fenced
+tbl_obk
+
+```
+
+The generated note is a starting point. To add to it, combine it with your own text (e.g., `paste(apa_note(tbl_obk), "Outliers were removed.")`). With `collapse = NULL`, `apa_note` returns one sentence per element, so you can drop or reword sentences.
+
+`apa_note` reads an attribute of the table. dplyr functions such as `mutate` and `filter` keep it, but some operations (e.g., joins) drop it, so call `apa_note` on the table that `apa_anova` returned.
 
 
 ## Labels and post-processing

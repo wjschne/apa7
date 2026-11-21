@@ -58,6 +58,7 @@ reference:
   - title: Misc
     desc: Other Functions
     contents:
+      - apa_note
       - apa_p_star_note
       - is_numeric_like
       - str_wrap_equal

@@ -195,3 +195,149 @@ test_that("apa_anova rejects unsupported objects", {
   expect_error(apa_anova(stats::anova(g, test = "Chisq")), "no F|has none")
   expect_error(apa_anova(1:3), "does not support")
 })
+
+# apa_note ----
+test_that("apa_note describes aov tables", {
+  fit <- aov(mpg ~ cyl * am, data = d_anova)
+  notes <- apa_note(apa_anova(fit), collapse = NULL)
+  expect_equal(
+    notes,
+    c(
+      "Sums of squares are sequential (Type I).",
+      "*&eta;*^2^~p~ = partial eta squared."
+    )
+  )
+  expect_equal(apa_note(apa_anova(fit)), paste(notes, collapse = " "))
+
+  # Effect size choices
+  expect_match(
+    apa_note(apa_anova(fit, effect_size = "omega", partial = FALSE)),
+    "*&omega;*^2^ = omega squared.",
+    fixed = TRUE
+  )
+  expect_match(
+    apa_note(apa_anova(fit, effect_size = "epsilon")),
+    "partial epsilon squared",
+    fixed = TRUE
+  )
+  expect_equal(
+    apa_note(apa_anova(fit, effect_size = NULL)),
+    "Sums of squares are sequential (Type I)."
+  )
+
+  # Stars and bold
+  starred <- apa_note(apa_anova(fit, starred = "F"), collapse = NULL)
+  expect_equal(utils::tail(starred, 1), paste0(apa_p_star_note(), "."))
+  bolded <- apa_note(apa_anova(fit, bolded = "Parameter"), collapse = NULL)
+  expect_match(utils::tail(bolded, 1), "^Bold values")
+  expect_false(any(grepl("Bold", apa_note(apa_anova(fit, starred = "F")))))
+})
+
+test_that("apa_note gives the type of sums of squares", {
+  skip_if_not_installed("car")
+  fit <- aov(mpg ~ cyl * am, data = d_anova)
+  expect_match(
+    apa_note(suppressMessages(apa_anova(fit, type = 2))),
+    "^Type II sums of squares[.]"
+  )
+  expect_match(
+    apa_note(suppressMessages(apa_anova(fit, type = 3))),
+    "^Type III sums of squares[.]"
+  )
+  fit_lm <- lm(mpg ~ cyl * am, data = d_anova)
+  expect_match(
+    apa_note(suppressMessages(apa_anova(car::Anova(fit_lm, type = 3)))),
+    "^Type III"
+  )
+  expect_match(
+    apa_note(apa_anova(car::Anova(fit_lm, type = 2))),
+    "^Type II sums"
+  )
+  expect_match(apa_note(apa_anova(stats::anova(fit_lm))), "^Sums of squares are sequential")
+
+  # Unknown heading: no sentence about sums of squares
+  tab <- stats::anova(fit_lm)
+  attr(tab, "heading") <- NULL
+  expect_false(grepl("sums of squares", apa_note(apa_anova(tab)), ignore.case = TRUE))
+})
+
+test_that("apa_note describes repeated-measures aov tables", {
+  d <- anova_rm_data()
+  fit <- aov(y ~ group * phase + Error(id / phase), data = d)
+  expect_match(apa_note(apa_anova(fit)), "^Sums of squares are sequential")
+})
+
+test_that("apa_note describes afex tables and sphericity corrections", {
+  skip_if_not_installed("afex")
+  data(obk.long, package = "afex")
+  fit_gg <- suppressMessages(afex::aov_ez(
+    "id", "value", obk.long,
+    between = "treatment", within = c("phase", "hour"),
+    fun_aggregate = mean
+  ))
+  notes <- apa_note(apa_anova(fit_gg), collapse = NULL)
+  expect_equal(notes[1], "Type III sums of squares.")
+  expect_equal(
+    notes[2],
+    paste0(
+      "Degrees of freedom and *p*-values for effects involving Phase or Hour are Greenhouse",
+      intToUtf8(8211),
+      "Geisser corrected."
+    )
+  )
+  expect_equal(
+    notes[3],
+    "*MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared."
+  )
+
+  # Huynh-Feldt and no correction
+  fit_hf <- suppressMessages(afex::aov_ez(
+    "id", "value", obk.long,
+    between = "treatment", within = "phase",
+    fun_aggregate = mean, anova_table = list(correction = "HF")
+  ))
+  expect_match(apa_note(apa_anova(fit_hf)), "Huynh", fixed = TRUE)
+  expect_match(apa_note(apa_anova(fit_hf)), "involving Phase are", fixed = TRUE)
+
+  fit_none <- suppressMessages(afex::aov_ez(
+    "id", "value", obk.long,
+    between = "treatment", within = "phase",
+    fun_aggregate = mean, anova_table = list(correction = "none")
+  ))
+  expect_match(
+    apa_note(apa_anova(fit_none)),
+    "Degrees of freedom are not corrected for violations of sphericity.",
+    fixed = TRUE
+  )
+
+  # Between-subjects only, or two-level within factors: nothing to correct
+  fit_between <- suppressMessages(afex::aov_ez(
+    "id", "value", obk.long,
+    between = c("treatment", "gender"),
+    fun_aggregate = mean
+  ))
+  expect_false(grepl("sphericity|corrected", apa_note(apa_anova(fit_between))))
+
+  d2 <- obk.long[obk.long$phase != "fup", ]
+  d2$phase <- droplevels(d2$phase)
+  fit_two <- suppressMessages(afex::aov_ez(
+    "id", "value", d2,
+    within = "phase", fun_aggregate = mean
+  ))
+  expect_false(grepl("corrected", apa_note(apa_anova(fit_two))))
+
+  # No MSE column, no MSE definition
+  no_mse <- apa_anova(
+    fit_gg,
+    anova_parameters = c("Parameter", "df", "df_error", "F", "p", "Effect_Size")
+  )
+  expect_false(grepl("MSE", apa_note(no_mse), fixed = TRUE))
+})
+
+test_that("apa_note survives dplyr verbs and errors without a record", {
+  fit <- aov(mpg ~ cyl * am, data = d_anova)
+  tbl <- apa_anova(fit)
+  expect_equal(apa_note(dplyr::filter(tbl, Source != "Error")), apa_note(tbl))
+  expect_error(apa_note(mtcars), "no table note information")
+  expect_equal(apa_note(apa_parameters(fit)), apa_note(tbl))
+})
