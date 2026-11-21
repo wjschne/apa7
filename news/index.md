@@ -2,6 +2,108 @@
 
 ## apa7 0.2.0 *2026-10-18*
 
+- New
+  [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)
+  makes APA-style ANOVA source tables for `aov` and `lm` models (Type 1
+  sums of squares, or Types 2 and 3 via
+  [`car::Anova()`](https://rdrr.io/pkg/car/man/Anova.html)),
+  repeated-measures `aov` models with `Error()` strata, `afex` models,
+  and tables from [`stats::anova()`](https://rdrr.io/r/stats/anova.html)
+  and [`car::Anova()`](https://rdrr.io/pkg/car/man/Anova.html). Effect
+  sizes (partial, non-partial, or generalized *η*², *ω*², or *ε*²) and
+  their two-sided confidence intervals come from `effectsize`.
+
+- New
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  writes the text of a table note. For
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  tables of regression models (including lists of models and `lme4`
+  models), it says which robust standard errors were used, how
+  mixed-model degrees of freedom were approximated, and that ordinal
+  thresholds are not tested, and it defines the standardized
+  coefficient, exponentiated coefficient (e.g., *OR*), confidence
+  interval, and *R*² change columns. For
+  [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+  and
+  [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
+  tables, it gives the extraction method and rotation, says that oblique
+  loadings are pattern coefficients, and explains omitted and bolded
+  loadings and the *h*², *u*², and Complexity columns. For
+  [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)
+  tables, it gives the type of sums of squares, which effects have
+  sphericity-corrected degrees of freedom (`afex` models), what the
+  effect size and *MSE* stand for, and what stars or bold values mean.
+  With apaquarto, use it as `#| apa-note: !expr apa7::apa_note(tbl)`.
+  Without apaquarto, `apa_flextable(note = TRUE)` places the note below
+  the table.
+
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  now returns the ANOVA table for `aov`, repeated-measures `aov`, and
+  `afex` models. Before, `aov` models were treated as `lm` models and
+  gave a coefficients table.
+
+- [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+  has been reworked:
+
+  - It now returns an `apa7_tbl`, so it renders as a flextable in Quarto
+    and R Markdown. It supports
+    [`psych::principal()`](https://rdrr.io/pkg/psych/man/principal.html)
+    as well as [`psych::fa()`](https://rdrr.io/pkg/psych/man/fa.html),
+    and output from
+    [`parameters::factor_analysis()`](https://easystats.github.io/parameters/reference/principal_components.html)
+    and
+    [`parameters::principal_components()`](https://easystats.github.io/parameters/reference/principal_components.html)
+    (including unrotated components from
+    [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html)).
+  - New `bold_max` argument bolds the largest loading in each row.
+  - New `factor_names` argument relabels the factors.
+  - New `variance` argument adds rows for the sum of squared loadings
+    and the proportion and cumulative proportion of variance explained,
+    with a rule above them.
+  - New `communality`, `digits`, and `format_variable_names` arguments.
+    [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+    no longer reformats item text in the `Variable` column.
+  - Small loadings are now blank strings rather than `NA`.
+  - The unused `column_formats` argument has been removed.
+
+- New
+  [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
+  makes a table of factor correlations from obliquely rotated
+  [`psych::fa()`](https://rdrr.io/pkg/psych/man/fa.html),
+  [`psych::principal()`](https://rdrr.io/pkg/psych/man/principal.html),
+  and
+  [`parameters::factor_analysis()`](https://easystats.github.io/parameters/reference/principal_components.html)
+  solutions.
+
+- [`column_format()`](https://wjschne.github.io/apa7/reference/column_format.md)
+  gains an `abbreviation` slot that says what a header stands for (e.g.,
+  `"standardized coefficient"` for β).
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  defines every abbreviated header in a table from these slots, for any
+  table type, so setting the slot in `column_formats` adds or changes a
+  definition. The default column formats define common abbreviations
+  (e.g., CI, *AIC*, *BIC*, RMSEA, effect sizes, and *R*² variants), and
+  [`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md)
+  gains a `get_abbreviations` getter. New column formats `h2`, `u2`, and
+  `Complexity` set the headers of those
+  [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+  columns.
+
+- [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  gains a `note` argument: `TRUE` adds the note from
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  below the table, and a character string adds a custom note. The note
+  does not affect column widths.
+
+- [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  leaves alone any columns named in a `"no_format_columns"` attribute of
+  the data, and draws a rule above the row named in a `"rule_above"`
+  attribute.
+
+- Partial *η*² columns (`Eta2_partial`) are now headed *η*²_(p). New
+  column formats: `Sum_Squares`, `Mean_Square`, `Eta2_generalized`,
+  `Omega2`, `Omega2_partial`, `Epsilon2`, and `Epsilon2_partial`.
+
 - [`make_apaquarto()`](https://wjschne.github.io/apa7/reference/make_apaquarto.md)
   and
   [`install_apaquarto()`](https://wjschne.github.io/apa7/reference/install_apaquarto.md)

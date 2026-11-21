@@ -3,9 +3,11 @@
 <url><loc>https://wjschne.github.io/apa7/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/CONTRIBUTING.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/LICENSE.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/articles/anova.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/articles/apa7.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/articles/chisquare.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/articles/correlations.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/articles/factor-analysis.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/articles/index.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/articles/multilevel.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/articles/regression.html</loc></url>
@@ -20,11 +22,14 @@
 <url><loc>https://wjschne.github.io/apa7/reference/apa7-package.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa7_defaults.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa7_tbl.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/reference/apa_anova.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_chisq.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_cor.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/reference/apa_factor_cor.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_flextable.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_format_columns.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_loadings.html</loc></url>
+<url><loc>https://wjschne.github.io/apa7/reference/apa_note.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_p.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_p_star_note.html</loc></url>
 <url><loc>https://wjschne.github.io/apa7/reference/apa_parameters.html</loc></url>

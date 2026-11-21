@@ -271,10 +271,10 @@ cf_predictor
 #> 
 #> ── column_format ──
 #> 
-#> # A tibble: 1 × 4
-#>   name      header   latex    formatter
-#>   <chr>     <chr>    <chr>    <list>   
-#> 1 Predictor Variable Variable <fn>
+#> # A tibble: 1 × 5
+#>   name      header   latex    formatter abbreviation
+#>   <chr>     <chr>    <chr>    <list>    <chr>       
+#> 1 Predictor Variable Variable <fn>      <NA>
 ```
 
 The `column_formats` function creates a default list of `column_format`
@@ -348,6 +348,7 @@ my_formats@get_tibble |>
 | Coefficient | \*B\* | \$B\$ |
 | cohens_d | Cohen's \*d\* | Cohen's \$d\$ |
 | Cohens_d | Cohen's \*d\* | Cohen's \$d\$ |
+| Complexity | Complexity | Complexity |
 | Cramers_v | Cramér's \*V\* | Cramér's \$V\$ |
 | cronbach | Cronbach's &alpha; | Cronbach's \$\alpha\$ |
 | deltaAIC | &Delta;\*AIC\* | \$\Delta AIC\$ |
@@ -358,20 +359,27 @@ my_formats@get_tibble |>
 | df | \*df\* | \$df\$ |
 | df_diff | &Delta;\*df\* | \$\Delta df\$ |
 | df_error | \*df\* | \$df\$ |
+| Epsilon2 | \*&epsilon;\*^2^ | \$\epsilon^2\$ |
+| Epsilon2_partial | \*&epsilon;\*^2^~p~ | \$\epsilon^2_p\$ |
 | eta2 | \*&eta;\*^2^ | \$\eta^2\$ |
 | Eta2 | \*&eta;\*^2^ | \$\eta^2\$ |
-| Eta2_partial | \*&eta;\*^2^ | \$\eta^2\$ |
+| Eta2_generalized | \*&eta;\*^2^~G~ | \$\eta^2_G\$ |
+| Eta2_partial | \*&eta;\*^2^~p~ | \$\eta^2_p\$ |
 | Exp_CI | {round(ci \* 100)}% CI for Exp(\*B\*) | {round(ci \* 100)}\\ CI for Exp(\$B\$) |
 | Exp_Coefficient | Exp(\*B\*) | Exp(\$B\$) |
 | F | \*F\* | \$F\$ |
+| h2 | \*h\*^2^ | \$h^2\$ |
 | ICC | ICC | ICC |
 | m | \*m\* | \$m\$ |
 | M | \*M\* | \$M\$ |
 | Mean | \*Mean\* | \$Mean\$ |
+| Mean_Square | \*MS\* | \$MS\$ |
 | n | \*n\* | \$n\$ |
 | N | \*N\* | \$N\$ |
 | NFI | NFI | NFI |
 | omega | &omega; | \$\omega\$ |
+| Omega2 | \*&omega;\*^2^ | \$\omega^2\$ |
+| Omega2_partial | \*&omega;\*^2^~p~ | \$\omega^2_p\$ |
 | p | \*p\* | \$p\$ |
 | p_Chi2 | \*p\* | \$p\$ |
 | Parameter | Variable | Variable |
@@ -391,9 +399,11 @@ my_formats@get_tibble |>
 | SE_B | \*SE_B\* | \$SE~B\$ |
 | Sigma | &sigma;~\*e\*~ | \$\sigma\_{e}\$ |
 | Std_Coefficient | &beta; | \$\beta\$ |
+| Sum_Squares | \*SS\* | \$SS\$ |
 | t | \*t\* | \$t\$ |
 | t_df | \*t\*({df}) | \$t\$({df}) |
 | tau | &tau; | \$\tau\$ |
+| u2 | \*u\*^2^ | \$u^2\$ |
 | Variable | Variable | Variable |
 | z | \*z\* | \$z\$ |
 
@@ -1102,22 +1112,23 @@ d <- psych::bfi |>
   rename(any_of(rename_items))
 
 # Analysis
-fit <- fa(d, nfactors = 5, fm = "pa", )
+fit <- fa(d, nfactors = 5, fm = "pa")
 #> Loading required namespace: GPArotation
 
+# Factor names, in the order the factors appear in the table
+big5 <- c("Neuroticism",
+          "Extraversion",
+          "Conscientiousness",
+          "Agreeableness",
+          "Openness")
 
 # Make table
-fit |>
-  apa_loadings() |> 
-  rename(Extraversion = PA1,
-         Neuroticism = PA2,
-         Conscientiousness = PA3,
-         Openness = PA4,
-         Agreeableness = PA5) |> 
-  apa_flextable(no_format_columns = Variable) 
+apa_loadings(fit,
+             factor_names = big5,
+             format_variable_names = FALSE)
 ```
 
-| Variable | Openness | Neuroticism | Conscientiousness | Extraversion | Agreeableness |
+| Variable | Neuroticism | Extraversion | Conscientiousness | Agreeableness | Openness |
 |----|----|----|----|----|----|
 | Get angry easily |  .81 |  |  |  |  |
 | Get irritated easily |  .78 |  |  |  |  |
@@ -1144,6 +1155,118 @@ fit |>
 | Am full of ideas |  |  |  |  |  .51 |
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
+
+`apa_loadings` returns a tibble that is rendered as a flextable in
+Quarto and R Markdown documents. Loadings smaller than `min_loading`
+(default .20) are blank, and the rows are sorted so that items are
+grouped by the factor with their largest loading. The `factor_names`
+argument relabels the factors in the order they appear in the table
+(psych orders factors by the variance they explain). A named vector such
+as `c(PA1 = "Neuroticism")` also works, but be careful with it: after an
+oblimin rotation, the labels psych gives the factors (PA1, PA2, …) can
+change from one run to the next even when the solution is the same, so
+check the table each time. Because the bfi item text is already in
+sentence case, `format_variable_names = FALSE` keeps it as it is.
+
+Optional columns show communalities (`communality`), uniquenesses
+(`uniqueness`), and complexity (`complexity`). With `variance = TRUE`,
+rows for the sum of squared loadings and the proportion of variance
+explained by each factor are added at the bottom.
+
+``` r
+
+apa_loadings(fit,
+             factor_names = big5,
+             format_variable_names = FALSE,
+             min_loading = .3,
+             communality = TRUE,
+             variance = TRUE)
+```
+
+| Variable | Neuroticism | Extraversion | Conscientiousness | Agreeableness | Openness | h2 |
+|----|----|----|----|----|----|----|
+| Get angry easily |  .81 |  |  |  |  | .65 |
+| Get irritated easily |  .78 |  |  |  |  | .60 |
+| Have frequent mood swings |  .71 |  |  |  |  | .55 |
+| Panic easily |  .49 |  |  |  |  | .35 |
+| Often feel blue |  .47 | −.39 |  |  |  | .49 |
+| Find it difficult to approach others |  | −.68 |  |  |  | .54 |
+| Make friends easily |  |  .59 |  |  |  | .53 |
+| Don’t talk a lot |  | −.56 |  |  |  | .35 |
+| Take charge |  |  .42 |  |  |  | .40 |
+| Know how to captivate people |  |  .42 |  |  |  | .44 |
+| Continue until everything is perfect |  |  |  .67 |  |  | .45 |
+| Do things in a half-way manner |  |  | −.61 |  |  | .45 |
+| Do things according to a plan |  |  |  .57 |  |  | .32 |
+| Waste my time |  |  | −.55 |  |  | .43 |
+| Am exacting in my work |  |  |  .55 |  |  | .33 |
+| Know how to comfort others |  |  |  |  .66 |  | .52 |
+| Inquire about others’ well-being |  |  |  |  .64 |  | .45 |
+| Make people feel at ease |  |  |  |  .53 |  | .46 |
+| Love children |  |  |  |  .43 |  | .28 |
+| Am indifferent to the feelings of others |  |  |  | −.41 |  | .19 |
+| Carry the conversation to a higher level |  |  |  |  |  .61 | .46 |
+| Will not probe deeply into a subject |  |  |  |  | −.54 | .30 |
+| Am full of ideas |  |  |  |  |  .51 | .31 |
+| Avoid difficult reading material |  |  |  |  | −.46 | .26 |
+| Spend time reflecting on things |  | −.32 |  |  |  .37 | .25 |
+| Sum of squared loadings | 2.57 | 2.20 | 2.03 | 1.98 | 1.59 |  |
+| Proportion of variance | .10 | .09 | .08 | .08 | .06 |  |
+| Cumulative proportion | .10 | .19 | .27 | .35 | .41 |  |
+
+The default oblimin rotation lets the factors correlate.
+`apa_factor_cor` makes a table of the factor correlations, with the
+factors in the same order as in `apa_loadings`.
+
+``` r
+
+apa_factor_cor(fit, factor_names = big5)
+```
+
+| Factor               | 1    | 2    | 3    | 4    | 5   |
+|----------------------|------|------|------|------|-----|
+| 1. Neuroticism       | —    |      |      |      |     |
+| 2. Extraversion      | −.21 | —    |      |      |     |
+| 3. Conscientiousness | −.19 |  .23 | —    |      |     |
+| 4. Agreeableness     | −.04 |  .33 |  .20 | —    |     |
+| 5. Openness          | −.01 |  .17 |  .19 |  .19 | —   |
+
+`apa_loadings` and `apa_factor_cor` also work with principal components
+from [`psych::principal`](https://rdrr.io/pkg/psych/man/principal.html).
+
+``` r
+
+principal(d, nfactors = 5, rotate = "varimax") |>
+  apa_loadings(format_variable_names = FALSE, min_loading = .3)
+```
+
+| Variable                                 | RC2  | RC1  | RC3  | RC5  | RC4  |
+|------------------------------------------|------|------|------|------|------|
+| Get angry easily                         |  .79 |      |      |      |      |
+| Have frequent mood swings                |  .79 |      |      |      |      |
+| Get irritated easily                     |  .79 |      |      |      |      |
+| Often feel blue                          |  .65 | −.34 |      |      |      |
+| Panic easily                             |  .63 |      |      |      |      |
+| Find it difficult to approach others     |      | −.72 |      |      |      |
+| Make friends easily                      |      |  .70 |      |      |      |
+| Don’t talk a lot                         |      | −.68 |      |      |      |
+| Know how to captivate people             |      |  .63 |      |      |      |
+| Take charge                              |      |  .58 |  .34 |      |      |
+| Continue until everything is perfect     |      |      |  .74 |      |      |
+| Do things according to a plan            |      |      |  .67 |      |      |
+| Do things in a half-way manner           |      |      | −.67 |      |      |
+| Am exacting in my work                   |      |      |  .65 |      |      |
+| Waste my time                            |  .33 |      | −.62 |      |      |
+| Inquire about others’ well-being         |      |      |      |  .71 |      |
+| Know how to comfort others               |      |  .35 |      |  .68 |      |
+| Am indifferent to the feelings of others |      |      |      | −.63 |      |
+| Make people feel at ease                 |      |  .44 |      |  .56 |      |
+| Love children                            |      |      |      |  .53 |      |
+| Will not probe deeply into a subject     |      |      |      |      | −.68 |
+| Carry the conversation to a higher level |      |  .36 |      |      |  .64 |
+| Avoid difficult reading material         |      |      |      |      | −.59 |
+| Am full of ideas                         |      |      |      |      |  .59 |
+| Spend time reflecting on things          |      |      |      |      |  .50 |
 
 ## Limitations
 

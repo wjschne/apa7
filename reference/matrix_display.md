@@ -18,6 +18,11 @@ matrix_display(x, bracket = c("[", "(", "|", ""), include_names = TRUE)
 
   type of bracket: bmatrix, Bmatrix, pmatrix, vmatrix, Vmatrix, , matrix
 
+- include_names:
+
+  if `TRUE` (default), the matrix's row and column names are displayed
+  above and to the left of the matrix
+
 ## Value
 
 character

@@ -74,32 +74,15 @@ assumed to slow down at the same rate.
 ``` r
 
 sleep1 <- lmer(Reaction ~ Days + (1 | Participant), data = d_sleep)
-model_parameters(sleep1, ci_method = "boot") |> 
-  tibble::as_tibble()
+apa_parameters(sleep1, predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),)
 ```
 
-    Computing bootstrap confidence intervals ...
-
-    # A tibble: 4 × 11
-      Parameter      Coefficient    SE    CI CI_low CI_high     t df_error         p
-      <chr>                <dbl> <dbl> <dbl>  <dbl>   <dbl> <dbl>    <int>     <dbl>
-    1 (Intercept)          268.  10.9   0.95 246.     288.   24.6      140  8.83e-53
-    2 Days                  11.4  1.10  0.95   9.38    13.3  10.4      140  3.88e-19
-    3 SD (Intercept)        41.8 NA     0.95  28.2     56.1  NA         NA NA
-    4 SD (Observati…        30.2 NA     0.95  26.6     34.7  NA         NA NA
-    # ℹ 2 more variables: Effects <chr>, Group <chr>
-
-``` r
-
-apa_parameters(sleep1)
-```
-
-| Variable                  | B      | SE    | t     | df     | p      |
-|---------------------------|--------|-------|-------|--------|--------|
-| Constant                  | 267.97 | 10.87 | 24.65 |  22.15 | \<.001 |
-| Days                      |  11.44 |  1.10 | 10.41 | 125.00 | \<.001 |
-| Participant:SD (Constant) |  41.80 |       |       |        |        |
-| Residual SD               |  30.22 |       |       |        |        |
+| Variable                  | B      | SE    | 95% CI             | t     | df     | p      |
+|---------------------------|--------|-------|--------------------|-------|--------|--------|
+| Constant                  | 267.97 | 10.87 | \[245.43, 290.50\] | 24.65 |  22.15 | \<.001 |
+| Days                      |  11.44 |  1.10 | \[  9.26,  13.61\] | 10.41 | 125.00 | \<.001 |
+| Participant:SD (Constant) |  41.80 |       |                    |       |        |        |
+| Residual SD               |  30.22 |       |                    |       |        |        |
 
 The table has two parts. The fixed effects are read like ordinary
 regression coefficients: at baseline, the average reaction time is about
@@ -124,17 +107,17 @@ slope for days lets each participant have their own rate of change.
 ``` r
 
 sleep2 <- lmer(Reaction ~ Days + (Days | Participant), data = d_sleep)
-apa_parameters(sleep2)
+apa_parameters(sleep2, predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),)
 ```
 
-| Variable                      | B      | SE   | t(17) | p      |
-|-------------------------------|--------|------|-------|--------|
-| Constant                      | 267.97 | 8.27 | 32.42 | \<.001 |
-| Days                          |  11.44 | 1.85 |  6.20 | \<.001 |
-| Participant:SD (Constant)     |  30.96 |      |       |        |
-| Participant:SD (Days)         |   6.77 |      |       |        |
-| Participant:r (Constant Days) |    .18 |      |       |        |
-| Residual SD                   |  25.53 |      |       |        |
+| Variable                      | B      | SE   | 95% CI             | t(17) | p      |
+|-------------------------------|--------|------|--------------------|-------|--------|
+| Constant                      | 267.97 | 8.27 | \[250.53, 285.41\] | 32.42 | \<.001 |
+| Days                          |  11.44 | 1.85 | \[  7.54,  15.33\] |  6.20 | \<.001 |
+| Participant:SD (Constant)     |  30.96 |      |                    |       |        |
+| Participant:SD (Days)         |   6.77 |      |                    |       |        |
+| Participant:r (Constant Days) |    .18 |      |                    |       |        |
+| Residual SD                   |  25.53 |      |                    |       |        |
 
 The average slope is unchanged, but its standard error is larger,
 because the model now recognizes that participants’ slopes vary: the
@@ -186,33 +169,39 @@ as it should be.
 
 ``` r
 
-apa_parameters(list(sleep0, sleep1, sleep2))
+apa_parameters(list(sleep0, sleep1, sleep2)) |> 
+  # as_tibble() |> 
+  rename(`Marginal_*R*^2^` = `*R*^2^~marginal~`,
+         `Marginal_&Delta;*R*^2^`=`&Delta;*R*^2^~marginal~`,
+         `Conditional_*R*^2^` = `*R*^2^~conditional~`,
+         `Conditional_&Delta;*R*^2^`=`&Delta;*R*^2^~conditional~`) |> 
+  apa_flextable() |> 
+  flextable::merge_h_range(i = ~ Model != "", j1 = 1, j2 = 2)
 ```
 
-| Model | Variable | B | SE | t | df | p | R2marginal | ΔR2marginal | R2conditional | ΔR2conditional |
-|----|----|----|----|----|----|----|----|----|----|----|
-| Model 1 |  |  |  |  |  |  | .00 |  | .49 |  |
-|  | Constant | 307.99 | 10.17 | 30.29 |  17.00 | \<.001 |  |  |  |  |
-|  | Participant:SD (Constant) |  40.62 |  |  |  |  |  |  |  |  |
-|  | Residual SD |  41.11 |  |  |  |  |  |  |  |  |
-| Model 2 |  |  |  |  |  |  | .21 | .21\*\*\* | .73 | .23 |
-|  | Constant | 267.97 | 10.87 | 24.65 |  22.15 | \<.001 |  |  |  |  |
-|  | Days |  11.44 |  1.10 | 10.41 | 125.00 | \<.001 |  |  |  |  |
-|  | Participant:SD (Constant) |  41.80 |  |  |  |  |  |  |  |  |
-|  | Residual SD |  30.22 |  |  |  |  |  |  |  |  |
-| Model 3 |  |  |  |  |  |  | .21 | .00\*\*\* | .81 | .08 |
-|  | Constant | 267.97 |  8.27 | 32.42 |  17.00 | \<.001 |  |  |  |  |
-|  | Days |  11.44 |  1.85 |  6.20 |  17.00 | \<.001 |  |  |  |  |
-|  | Participant:SD (Constant) |  30.96 |  |  |  |  |  |  |  |  |
-|  | Participant:SD (Days) |   6.77 |  |  |  |  |  |  |  |  |
-|  | Participant:r (Constant Days) |    .18 |  |  |  |  |  |  |  |  |
-|  | Residual SD |  25.53 |  |  |  |  |  |  |  |  |
+| Model | Variable | B | SE | t | df | p | Marginal |  |  | Conditional |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|
+|  |  |  |  |  |  |  | R2 | ΔR2 |  | R2 | ΔR2 |
+| Model 1 |  |  |  |  |  |  | .00 |  |  | .49 |  |
+|  | Constant | 307.99 | 10.17 | 30.29 |  17.00 | \<.001 |  |  |  |  |  |
+|  | Participant:SD (Constant) |  40.62 |  |  |  |  |  |  |  |  |  |
+|  | Residual SD |  41.11 |  |  |  |  |  |  |  |  |  |
+| Model 2 |  |  |  |  |  |  | .21 | .21\*\*\* |  | .73 | .23 |
+|  | Constant | 267.97 | 10.87 | 24.65 |  22.15 | \<.001 |  |  |  |  |  |
+|  | Days |  11.44 |  1.10 | 10.41 | 125.00 | \<.001 |  |  |  |  |  |
+|  | Participant:SD (Constant) |  41.80 |  |  |  |  |  |  |  |  |  |
+|  | Residual SD |  30.22 |  |  |  |  |  |  |  |  |  |
+| Model 3 |  |  |  |  |  |  | .21 | .00\*\*\* |  | .81 | .08 |
+|  | Constant | 267.97 |  8.27 | 32.42 |  17.00 | \<.001 |  |  |  |  |  |
+|  | Days |  11.44 |  1.85 |  6.20 |  17.00 | \<.001 |  |  |  |  |  |
+|  | Participant:SD (Constant) |  30.96 |  |  |  |  |  |  |  |  |  |
+|  | Participant:SD (Days) |   6.77 |  |  |  |  |  |  |  |  |  |
+|  | Participant:r (Constant Days) |    .18 |  |  |  |  |  |  |  |  |  |
+|  | Residual SD |  25.53 |  |  |  |  |  |  |  |  |  |
 
 The random slope does not change the marginal *R*², because the fixed
 effects are the same in both models, but the likelihood ratio test shows
-that the slopes vary across participants. (A likelihood ratio test of a
-variance is conservative, because a variance cannot be negative, so the
-true *p* value is smaller than the one shown.)
+that the slopes vary across participants.
 
 The comparison can also be displayed on its own with
 `apa_performance_comparison`, here including the model with no
@@ -220,7 +209,7 @@ predictors:
 
 ``` r
 
-apa_performance_comparison(list(sleep0, sleep1, sleep2)) |> 
+apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>  
   apa_flextable()
 ```
 
@@ -274,12 +263,12 @@ apa_parameters(glmer_va)
 | Variable             | B     | SE   | OR   | z      | p      |
 |----------------------|-------|------|------|--------|--------|
 | Constant             |  0.55 | 0.39 | 1.74 |   1.43 |  .15   |
-| Anger                |  0.06 | 0.02 | 1.06 |   3.42 | \<.001 |
+| Anger                |  0.06 | 0.02 | 1.06 |   3.41 | \<.001 |
 | Gender–Male          |  0.32 | 0.19 | 1.38 |   1.67 |  .09   |
-| Behavior–Scold       | −1.06 | 0.18 | 0.35 |  −5.74 | \<.001 |
-| Behavior–Shout       | −2.10 | 0.19 | 0.12 | −11.23 | \<.001 |
+| Behavior–Scold       | −1.06 | 0.18 | 0.35 |  −5.73 | \<.001 |
+| Behavior–Shout       | −2.10 | 0.19 | 0.12 | −11.20 | \<.001 |
 | Mode–Do              | −0.71 | 0.15 | 0.49 |  −4.67 | \<.001 |
-| Situation–Self       | −1.05 | 0.15 | 0.35 |  −6.96 | \<.001 |
+| Situation–Self       | −1.05 | 0.15 | 0.35 |  −6.94 | \<.001 |
 | Person:SD (Constant) |  1.34 |      |      |        |        |
 | Item:SD (Constant)   |  0.34 |      |      |        |        |
 

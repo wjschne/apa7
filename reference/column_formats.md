@@ -79,6 +79,11 @@ column_formats
   getter for tibble with column names, headers, latex headers, and
   formatters
 
+- `get_abbreviations`:
+
+  getter for the abbreviations defined by the column formats, as a
+  character vector of definitions named by the term defined
+
 ## Examples
 
 ``` r

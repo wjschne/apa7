@@ -6,12 +6,16 @@ Convert objects to flextables
 
 - [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
   : Convert data to flextable consistent with APA style
+- [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)
+  : Format ANOVA tables in APA style
 - [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
   : Make contingency table with chi-square test of independence
 - [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md) :
   APA-formatted correlation table
+- [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
+  : Factor correlation table
 - [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
-  : print loadings
+  : Factor loadings table
 - [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
   : format model parameters in APA style
 - [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
@@ -114,6 +118,9 @@ Functions for creating apaquarto documents
 ## Misc
 
 Other Functions
+
+- [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md) :
+  Write a table note
 
 - [`apa_p_star_note()`](https://wjschne.github.io/apa7/reference/apa_p_star_note.md)
   : Make star notes for p-values

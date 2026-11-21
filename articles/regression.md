@@ -139,58 +139,23 @@ apa_parameters(list(lm1, lm2, lm3))
 
 ## Binary Logistic Regression
 
-Psychologists who study volunteers have long worried that the people who
-sign up for experiments differ from the people who do not. If
-personality predicts who volunteers, findings from volunteer samples may
-not generalize. Cowles and Davis (1987) asked 1,421 students whether
-they would volunteer for a psychology experiment and measured their
-neuroticism and extraversion with the Eysenck Personality Inventory. The
-data are in the `Cowles` data set from the carData package.
-
-Neuroticism and extraversion are centered at their means so that, when
-the model includes their interaction, each trait’s coefficient is its
-effect for a person of average standing on the other trait.
-
-``` r
-
-d_vol <- carData::Cowles |>
-  mutate(
-    Volunteer = volunteer == "yes",
-    Sex = sex,
-    Neuroticism = neuroticism - mean(neuroticism),
-    Extraversion = extraversion - mean(extraversion)
-  )
-
-glm_vol1 <- glm(
-  Volunteer ~ Sex + Neuroticism + Extraversion,
-  data = d_vol,
-  family = binomial
-)
-```
-
-`apa_parameters` accepts `glm` objects. The table reports the
-coefficients on the log-odds scale (*B*), their standard errors, the
-exponentiated coefficients, and the test statistics. For logistic
+`apa_parameters` also accepts `glm` objects. The table reports
+coefficients on the link scale (*B*), their standard errors, the
+exponentiated coefficient, and the test statistic. For logistic
 regression, the exponentiated coefficient is the odds ratio (*OR*), and
 the test statistic is *z*.
 
 ``` r
 
-apa_parameters(glm_vol1)
+glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
+apa_parameters(glm1)
 ```
 
-| Variable     | B     | SE   | OR   | z     | p      |
-|--------------|-------|------|------|-------|--------|
-| Constant     | −0.22 | 0.07 | 0.80 | −3.04 |  .002  |
-| Sex–Male     | −0.24 | 0.11 | 0.79 | −2.12 |  .03   |
-| Neuroticism  |  0.01 | 0.01 | 1.01 |  0.56 |  .57   |
-| Extraversion |  0.07 | 0.01 | 1.07 |  4.65 | \<.001 |
-
-Each odds ratio is the multiplicative change in the odds of volunteering
-for a one-point increase in the predictor (or, for Sex, for men compared
-with women), holding the other predictors constant. For the constant,
-the exponentiated coefficient is the odds of volunteering for a woman of
-average neuroticism and extraversion, not an odds ratio.
+| Variable | B     | SE   | OR        | z     | p    |
+|----------|-------|------|-----------|-------|------|
+| Constant | 18.87 | 7.44 | 1.56×108  |  2.53 | .01  |
+| Wt       | −8.08 | 3.07 | 3.09×10−4 | −2.63 | .008 |
+| Hp       |  0.04 | 0.02 | 1.04      |  2.04 | .04  |
 
 Exponentiated coefficients are added whenever the link function is logit
 or log. They are labeled *OR* for logit links, *IRR* (incidence rate
@@ -200,15 +165,14 @@ or `exponentiate = TRUE` to add them for other links such as probit.
 
 ``` r
 
-apa_parameters(glm_vol1, exponentiate = FALSE)
+apa_parameters(glm1, exponentiate = FALSE)
 ```
 
-| Variable     | B     | SE   | z     | p      |
-|--------------|-------|------|-------|--------|
-| Constant     | −0.22 | 0.07 | −3.04 |  .002  |
-| Sex–Male     | −0.24 | 0.11 | −2.12 |  .03   |
-| Neuroticism  |  0.01 | 0.01 |  0.56 |  .57   |
-| Extraversion |  0.07 | 0.01 |  4.65 | \<.001 |
+| Variable | B     | SE   | z     | p    |
+|----------|-------|------|-------|------|
+| Constant | 18.87 | 7.44 |  2.53 | .01  |
+| Wt       | −8.08 | 3.07 | −2.63 | .008 |
+| Hp       |  0.04 | 0.02 |  2.04 | .04  |
 
 To choose and order the columns, use `predictor_parameters`. Columns
 that the model does not report (for example, *t* for a model tested with
@@ -217,77 +181,73 @@ that the model does not report (for example, *t* for a model tested with
 ``` r
 
 apa_parameters(
-  glm_vol1,
+  glm1,
   predictor_parameters = c("Parameter", "Exp_Coefficient", "z", "p")
 )
 ```
 
-| Variable     | OR   | z     | p      |
-|--------------|------|-------|--------|
-| Constant     | 0.80 | −3.04 |  .002  |
-| Sex–Male     | 0.79 | −2.12 |  .03   |
-| Neuroticism  | 1.01 |  0.56 |  .57   |
-| Extraversion | 1.07 |  4.65 | \<.001 |
+| Variable | OR        | z     | p    |
+|----------|-----------|-------|------|
+| Constant | 1.56×108  |  2.53 | .01  |
+| Wt       | 3.09×10−4 | −2.63 | .008 |
+| Hp       | 1.04      |  2.04 | .04  |
 
 As with `lm`, `starred` and `bolded` mark significant coefficients.
 
 ``` r
 
-apa_parameters(glm_vol1, starred = "Coefficient", bolded = "p")
+apa_parameters(glm1, starred = "Coefficient", bolded = "p")
 ```
 
-| Variable     | B           | SE   | OR   | z     | p      |
-|--------------|-------------|------|------|-------|--------|
-| Constant     | −0.22\*\*   | 0.07 | 0.80 | −3.04 |  .002  |
-| Sex–Male     | −0.24\*     | 0.11 | 0.79 | −2.12 |  .03   |
-| Neuroticism  |  0.01       | 0.01 | 1.01 |  0.56 |  .57   |
-| Extraversion |  0.07\*\*\* | 0.01 | 1.07 |  4.65 | \<.001 |
+| Variable | B         | SE   | OR        | z     | p    |
+|----------|-----------|------|-----------|-------|------|
+| Constant | 18.87\*   | 7.44 | 1.56×108  |  2.53 | .01  |
+| Wt       | −8.08\*\* | 3.07 | 3.09×10−4 | −2.63 | .008 |
+| Hp       |  0.04\*   | 0.02 | 1.04      |  2.04 | .04  |
+
+``` r
+
+sci_md(c(123251,45, .00045), align = TRUE)
+```
+
+    [1] " 1.23×10^5^ " "45.00     "   " 4.50×10^−4^"
 
 ### Comparing logistic regression models
 
-Does the effect of extraversion depend on neuroticism? A second model
-adds their interaction. A list of `glm` models is displayed with a
-pseudo-*R*² (Tjur’s for logistic regression, as chosen by
+A list of `glm` models is displayed with a pseudo-*R*² (Tjur’s for
+logistic regression, as chosen by
 [`performance::r2`](https://easystats.github.io/performance/reference/r2.html))
 and a likelihood ratio test of the change, because the binomial family
 has a fixed dispersion parameter.
 
 ``` r
 
-glm_vol2 <- update(glm_vol1, . ~ . + Neuroticism:Extraversion)
-apa_parameters(list(glm_vol1, glm_vol2))
+glm0 <- glm(am ~ wt, data = mtcars, family = binomial)
+apa_parameters(list(glm0, glm1))
 ```
 
-| Model   | Variable                   | B     | SE   | OR   | z     | p      | R2Tjur | ΔR2Tjur |
-|---------|----------------------------|-------|------|------|-------|--------|--------|---------|
-| Model 1 |                            |       |      |      |       |        | .02    |         |
-|         | Constant                   | −0.22 | 0.07 | 0.80 | −3.04 |  .002  |        |         |
-|         | Sex–Male                   | −0.24 | 0.11 | 0.79 | −2.12 |  .03   |        |         |
-|         | Neuroticism                |  0.01 | 0.01 | 1.01 |  0.56 |  .57   |        |         |
-|         | Extraversion               |  0.07 | 0.01 | 1.07 |  4.65 | \<.001 |        |         |
-| Model 2 |                            |       |      |      |       |        | .03    | .01\*\* |
-|         | Constant                   | −0.24 | 0.07 | 0.79 | −3.22 |  .001  |        |         |
-|         | Sex–Male                   | −0.25 | 0.11 | 0.78 | −2.21 |  .03   |        |         |
-|         | Neuroticism                |  0.00 | 0.01 | 1.00 |  0.43 |  .67   |        |         |
-|         | Extraversion               |  0.07 | 0.01 | 1.07 |  4.76 | \<.001 |        |         |
-|         | Neuroticism × Extraversion | −0.01 | 0.00 | 0.99 | −2.92 |  .004  |        |         |
-
-The interaction improves the fit, but the gain in Tjur’s *R*² is small.
-Its odds ratio is below 1: the more neurotic a person is, the less
-extraversion increases the odds of volunteering.
+| Model   | Variable | B     | SE   | OR        | z     | p    | R2Tjur | ΔR2Tjur |
+|---------|----------|-------|------|-----------|-------|------|--------|---------|
+| Model 1 |          |       |      |           |       |      | .62    |         |
+|         | Constant | 12.04 | 4.51 | 1.69×105  |  2.67 | .008 |        |         |
+|         | Wt       | −4.02 | 1.44 | 0.02      | −2.80 | .005 |        |         |
+| Model 2 |          |       |      |           |       |      | .81    | .19\*\* |
+|         | Constant | 18.87 | 7.44 | 1.56×108  |  2.53 | .01  |        |         |
+|         | Wt       | −8.08 | 3.07 | 3.09×10−4 | −2.63 | .008 |        |         |
+|         | Hp       |  0.04 | 0.02 | 1.04      |  2.04 | .04  |        |         |
 
 The model comparison can also be displayed separately with
 `apa_performance_comparison`.
 
 ``` r
 
-apa_performance_comparison(list(glm_vol1, glm_vol2))
+apa_performance_comparison(list(glm0, glm1))
 ```
 
 | Model   | R2Tjur | ΔR2Tjur | χ2   | df  | p    |
 |---------|--------|---------|------|-----|------|
-| Model 1 | .02    | .02     |      |     |      |
-| Model 2 | .03    | .01     | 8.62 | 1   | .003 |
+| Model 1 | .62    | .62     |      |     |      |
+| Model 2 | .81    | .19     | 9.12 | 1   | .003 |
 
 ## Count Regression
 
@@ -322,6 +282,153 @@ apa_parameters(glm_qpois)
 | Constant | 0.14 | 0.27 | 1.15 | 0.51  |  .61   |
 | Wt       | 0.00 | 0.09 | 1.00 | 0.05  |  .96   |
 | Hp       | 0.01 | 0.00 | 1.01 | 4.92  | \<.001 |
+
+## Table Notes
+
+A regression table often needs a note that defines its symbols and
+explains its stars. `apa_parameters` records how each table was made,
+and `apa_note` turns that record into note text. For the hierarchical
+regression above, the note defines the standardized coefficient and the
+change in *R*² and explains the stars on the change in *R*²:
+
+``` r
+
+tbl_lm <- apa_parameters(list(lm1, lm2, lm3))
+apa_note(tbl_lm)
+```
+
+    [1] "&beta; = standardized coefficient; &Delta;*R*^2^ = change in *R*^2^. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+
+The note changes with the table. With robust standard errors (`vcov`)
+and confidence intervals, it says which standard errors were used and
+defines CI:
+
+``` r
+
+apa_parameters(
+  lm3,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
+  vcov = "HC3"
+) |>
+  apa_note()
+```
+
+    [1] "Standard errors are heteroskedasticity-consistent (HC3). CI = confidence interval."
+
+For logistic regression, it defines the odds ratio. For count models, it
+defines the incidence rate ratio, and for ordinal models, it says that
+thresholds are not tested. For mixed models (`lme4`), it gives the
+method used to approximate the degrees of freedom of the *t* tests
+(Kenward–Roger by default).
+
+``` r
+
+apa_parameters(glm1, starred = "p") |>
+  apa_note()
+```
+
+    [1] "*OR* = odds ratio. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+
+The text is in markdown and does not start with “*Note*.” because
+apaquarto adds that. With
+[apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the
+`apa-note` chunk option with `!expr`. Chunk options are evaluated before
+the chunk runs, so make the table in an earlier chunk (as `tbl_lm` was
+made above) and display it in the chunk with the note. Write it as
+[`apa7::apa_note`](https://wjschne.github.io/apa7/reference/apa_note.md),
+because in documents with cached chunks, chunk options can be evaluated
+before [`library(apa7)`](https://github.com/wjschne/apa7) takes effect:
+
+```` markdown
+```{r}
+#| label: tbl-lm-note
+#| tbl-cap: Hierarchical Regression Predicting ACT Scores
+#| apa-note: !expr apa7::apa_note(tbl_lm)
+tbl_lm
+```
+````
+
+| Model   | Variable               | B     | SE   | β    | t     | df  | p      | R2  | ΔR2       |
+|---------|------------------------|-------|------|------|-------|-----|--------|-----|-----------|
+| Model 1 |                        |       |      |      |       |     |        | .01 |           |
+|         | Constant               | 27.35 | 0.59 |  .00 | 46.55 | 684 | \<.001 |     |           |
+|         | Age                    |  0.06 | 0.02 |  .11 |  2.93 | 684 |  .004  |     |           |
+|         | Gender–Female          | −0.40 | 0.38 | −.04 | −1.03 | 684 |  .30   |     |           |
+| Model 2 |                        |       |      |      |       |     |        | .04 | .02\*\*\* |
+|         | Constant               | 27.54 | 0.80 |  .00 | 34.47 | 679 | \<.001 |     |           |
+|         | Age                    |  0.02 | 0.03 |  .03 |  0.60 | 679 |  .55   |     |           |
+|         | Gender–Female          | −0.57 | 0.38 | −.06 | −1.49 | 679 |  .14   |     |           |
+|         | Education–High School  | −0.24 | 0.97 | −.01 | −0.25 | 679 |  .81   |     |           |
+|         | Education–Some College | −0.78 | 1.00 | −.04 | −0.78 | 679 |  .44   |     |           |
+|         | Education–Bachelor     |  0.86 | 0.71 |  .09 |  1.20 | 679 |  .23   |     |           |
+|         | Education–Master       |  1.57 | 0.83 |  .13 |  1.89 | 679 |  .06   |     |           |
+|         | Education–Doctorate    |  1.99 | 0.89 |  .17 |  2.25 | 679 |  .03   |     |           |
+| Model 3 |                        |       |      |      |       |     |        | .43 | .39\*\*\* |
+|         | Constant               |  8.15 | 1.09 |  .00 |  7.46 | 677 | \<.001 |     |           |
+|         | Age                    |  0.05 | 0.02 |  .11 |  2.77 | 677 |  .006  |     |           |
+|         | Gender–Female          |  0.23 | 0.30 |  .02 |  0.75 | 677 |  .45   |     |           |
+|         | Education–High School  |  0.08 | 0.75 |  .00 |  0.10 | 677 |  .92   |     |           |
+|         | Education–Some College |  0.14 | 0.77 |  .01 |  0.18 | 677 |  .85   |     |           |
+|         | Education–Bachelor     |  0.86 | 0.55 |  .09 |  1.57 | 677 |  .12   |     |           |
+|         | Education–Master       |  1.12 | 0.64 |  .09 |  1.75 | 677 |  .08   |     |           |
+|         | Education–Doctorate    |  1.05 | 0.69 |  .09 |  1.52 | 677 |  .13   |     |           |
+|         | SATV                   |  0.01 | 0.00 |  .31 |  8.01 | 677 | \<.001 |     |           |
+|         | SATQ                   |  0.02 | 0.00 |  .39 | 10.12 | 677 | \<.001 |     |           |
+
+Table 1: Hierarchical Regression Predicting ACT Scores
+
+*Note*. β = standardized coefficient; Δ*R*² = change in *R*².
+^(\* )*p* \< .05. ^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
+
+Without apaquarto (e.g., in a plain Quarto or R Markdown document, or a
+table saved to Word with
+[`flextable::save_as_docx`](https://davidgohel.github.io/flextable/reference/save_as_docx.html)),
+`apa_flextable` can put the note below the table itself. With
+`note = TRUE`, it uses the note from `apa_note`; a character string is
+used as the note instead. The note is added after the column widths are
+set, so a long note does not stretch the table.
+
+``` r
+
+apa_parameters(glm1, starred = "p") |>
+  apa_flextable(note = TRUE)
+```
+
+| Variable | B | SE | OR | z | p |
+|----|----|----|----|----|----|
+| Constant | 18.87 | 7.44 | 1.56×108  |  2.53 | .01 \*  |
+| Wt | −8.08 | 3.07 | 3.09×10−4 | −2.63 | .008\*\* |
+| Hp |  0.04 | 0.02 | 1.04      |  2.04 | .04 \*  |
+| Note. OR = odds ratio. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |
+
+Do not use `note` with the `apa-note` chunk option, or the note will
+appear twice.
+
+The definitions come from the `abbreviation` slot of each column’s
+format, so any column with a definition is defined in the note. Symbols
+such as *SE* and *t* have no definition by default. To add one, or to
+reword a definition, change the slot in the `column_formats` passed to
+`apa_parameters` (or set it for every table with
+`apa7_defaults(column_formats = cf)`):
+
+``` r
+
+cf <- column_formats()
+cf$SE@abbreviation <- "standard error"
+cf$Std_Coefficient@abbreviation <- "standardized regression coefficient"
+apa_parameters(lm1, column_formats = cf) |>
+  apa_note()
+```
+
+    [1] "*SE* = standard error; &beta; = standardized regression coefficient."
+
+The generated note is a starting point. Add to it with `paste` (e.g.,
+`paste(apa_note(tbl_lm), "Education was dummy coded with None as the reference group.")`),
+or use `collapse = NULL` to get one sentence per element, so you can
+drop or reword sentences. `apa_note` reads an attribute of the table
+that dplyr functions such as `mutate` and `filter` keep but some
+operations (e.g., joins) drop, so call it on the table that
+`apa_parameters` returned.
 
 ## Printing Options
 
