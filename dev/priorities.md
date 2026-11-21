@@ -22,7 +22,7 @@ Last reviewed: 2026-11-20
   - [x] Move packages used unconditionally in package code (`cli`, `knitr`, `snakecase`, `tidyselect`) from Suggests to Imports, and replace `R.utils::insert()` with a base helper
 - [x] Run `devtools::check_win_devel()` and `rhub` checks (2026-11-21: rhub Linux and macOS arm64 pass; rhub Windows fails only because its runner's Quarto R session cannot find the temporary library, while win-builder builds the vignette fine; win-builder resubmitted after fixing the PDF manual and example timing)
 - [x] Run `spelling::spell_check_package()` and `urlchecker::url_check()` (2026-11-20: no typos; terms added to `inst/WORDLIST`; redundant `doi.apa.org` URLs removed from `refs.bib`, whose DOIs remain)
-- [ ] Rebuild the pkgdown site and vignettes
+- [x] Rebuild the pkgdown site and vignettes (deployed from `4b7c1ff` by the pkgdown workflow on 2026-11-21)
 - [x] Update `cran-comments.md` (confirm the win-builder resubmission is clean before submitting)
 
 ## easystats tables
