@@ -115,7 +115,9 @@
   [`install.packages()`](https://rdrr.io/r/utils/install.packages.html)
   command to run.
 
-## apa7 0.1.2 *2026-05-25*
+## apa7 0.1.3 *2026-05-25*
+
+CRAN release: 2026-05-26
 
 - Used AI (Claude) and old-fashioned effort to generate a more complete
   set of unit tests, fix minor bugs, and make documentation more

@@ -80,7 +80,7 @@ R2@formatter
 #>     align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, 
 #>         ...)
 #> }
-#> <environment: 0x5a562368bd58>
+#> <environment: 0x5f3546895620>
 
 # Define an abbreviation in table notes
 SS <- column_formats()$Sum_Squares
