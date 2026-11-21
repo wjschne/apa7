@@ -94,7 +94,7 @@ keeps them as they are.
 apa_loadings(fit_bfi, format_variable_names = FALSE)
 ```
 
-| Variable                                 | PA1  | PA2  | PA5  | PA3  | PA4  |
+| Variable                                 | PA3  | PA2  | PA4  | PA1  | PA5  |
 |------------------------------------------|------|------|------|------|------|
 | Get angry easily                         |  .81 |      |      |      |      |
 | Get irritated easily                     |  .78 |      |      |      |      |
