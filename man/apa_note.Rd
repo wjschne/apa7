@@ -7,7 +7,7 @@
 apa_note(x, collapse = " ")
 }
 \arguments{
-\item{x}{a table made by \code{\link[=apa_anova]{apa_anova()}} (or \code{\link[=apa_parameters]{apa_parameters()}} for \code{aov} and \code{afex} models)}
+\item{x}{a table made by \code{\link[=apa_anova]{apa_anova()}} (or \code{\link[=apa_parameters]{apa_parameters()}} for \code{aov} and \code{afex} models), \code{\link[=apa_loadings]{apa_loadings()}}, or \code{\link[=apa_factor_cor]{apa_factor_cor()}}}
 
 \item{collapse}{string that joins the sentences. Use \code{NULL} to get a character vector with one sentence per element.}
 }
@@ -29,6 +29,20 @@ two levels are corrected),
 \item what the effect size (and \emph{MSE}, for \code{afex} models) stands for, and
 \item what stars or bold values mean.
 }
+
+For \code{\link[=apa_loadings]{apa_loadings()}} tables, the note can say
+\itemize{
+\item how the factors were extracted and rotated (e.g., "Principal axis
+factoring with oblimin rotation"), and that loadings after an oblique
+rotation are pattern coefficients,
+\item which loadings are omitted (\code{min_loading}) or bolded (\code{bold_max}),
+\item what the \emph{h}^2^, \emph{u}^2^, and Complexity columns stand for, and
+\item that the cumulative proportion of variance is approximate when the
+factors are correlated.
+}
+
+For \code{\link[=apa_factor_cor]{apa_factor_cor()}} tables, the note says how the factors were
+extracted and rotated.
 
 The sentences are in APA order: general notes first, then probability notes.
 The text does not start with "\emph{Note}." because apaquarto adds it. With
@@ -70,4 +84,9 @@ if (requireNamespace("afex", quietly = TRUE)) {
   )
   apa_note(apa_anova(fit_afex))
 }
+
+# Factor analysis
+fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")
+apa_loadings(fit_fa, min_loading = .3, communality = TRUE) |>
+  apa_note()
 }

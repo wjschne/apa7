@@ -228,3 +228,72 @@ test_that("apa_loadings and apa_factor_cor accept parameters output", {
   pc_rot <- parameters::principal_components(d, n = 3, rotation = "varimax")
   expect_equal(apa_loadings(pc_rot), apa_loadings(attr(pc_rot, "model")))
 })
+
+# apa_note ----
+test_that("apa_note describes loadings tables", {
+  expect_equal(
+    apa_note(apa_loadings(fit_v), collapse = NULL),
+    c(
+      "Principal axis factoring with varimax rotation.",
+      "Loadings smaller than .20 in absolute value are omitted."
+    )
+  )
+
+  notes <- apa_note(
+    apa_loadings(
+      fit_v,
+      min_loading = .3,
+      bold_max = TRUE,
+      communality = TRUE,
+      uniqueness = TRUE,
+      complexity = TRUE
+    ),
+    collapse = NULL
+  )
+  expect_equal(notes[2], "Loadings smaller than .30 in absolute value are omitted.")
+  expect_equal(notes[3], "The largest loading for each variable is in bold.")
+  expect_equal(
+    notes[4],
+    "*h*^2^ = communality; *u*^2^ = uniqueness; Complexity = Hofmann's complexity index."
+  )
+
+  # No cutoff sentence when every loading is shown
+  expect_false(grepl("omitted", apa_note(apa_loadings(fit_v, min_loading = 0))))
+  expect_false(grepl("omitted", apa_note(apa_loadings(fit_v, min_loading = NA))))
+  expect_match(apa_note(apa_loadings(fit_v, min_loading = .25)), "than .25 in", fixed = TRUE)
+})
+
+test_that("apa_note describes oblique solutions", {
+  notes <- apa_note(apa_loadings(fit_p, variance = TRUE), collapse = NULL)
+  expect_equal(notes[1], "Principal axis factoring with promax rotation.")
+  expect_equal(notes[2], "Loadings are pattern coefficients.")
+  expect_match(utils::tail(notes, 1), "^Because the factors are correlated")
+
+  # Orthogonal rotation: no overlap sentence
+  expect_false(grepl("overlap", apa_note(apa_loadings(fit_v, variance = TRUE))))
+
+  expect_equal(
+    apa_note(apa_factor_cor(fit_p)),
+    "Principal axis factoring with promax rotation."
+  )
+})
+
+test_that("apa_note names extraction methods and handles special cases", {
+  f_ml <- psych::fa(Harman74.cor$cov, 2, fm = "ml", rotate = "varimax")
+  expect_match(apa_note(apa_loadings(f_ml)), "^Maximum likelihood factor analysis with varimax")
+
+  # One factor: no rotation is mentioned
+  f1 <- psych::fa(Harman74.cor$cov, 1, fm = "minres")
+  expect_match(apa_note(apa_loadings(f1)), "^Minimum residual factor analysis[.]")
+
+  pc <- psych::principal(Harman74.cor$cov, 3, rotate = "promax")
+  pc_notes <- apa_note(apa_loadings(pc, variance = TRUE), collapse = NULL)
+  expect_equal(pc_notes[1], "Principal components analysis with promax rotation.")
+  expect_match(utils::tail(pc_notes, 1), "components are correlated", fixed = TRUE)
+
+  pc0 <- parameters::principal_components(mtcars[, 1:7], n = 2)
+  expect_match(apa_note(apa_loadings(pc0)), "^Principal components analysis without rotation[.]")
+
+  f_geo <- psych::fa(Harman74.cor$cov, 3, rotate = "geominQ")
+  expect_match(apa_note(apa_loadings(f_geo)), "geomin (oblique) rotation", fixed = TRUE)
+})

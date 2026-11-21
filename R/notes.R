@@ -13,6 +13,19 @@
 #' * what the effect size (and *MSE*, for `afex` models) stands for, and
 #' * what stars or bold values mean.
 #'
+#' For [apa_loadings()] tables, the note can say
+#'
+#' * how the factors were extracted and rotated (e.g., "Principal axis
+#'   factoring with oblimin rotation"), and that loadings after an oblique
+#'   rotation are pattern coefficients,
+#' * which loadings are omitted (`min_loading`) or bolded (`bold_max`),
+#' * what the *h*^2^, *u*^2^, and Complexity columns stand for, and
+#' * that the cumulative proportion of variance is approximate when the
+#'   factors are correlated.
+#'
+#' For [apa_factor_cor()] tables, the note says how the factors were
+#' extracted and rotated.
+#'
 #' The sentences are in APA order: general notes first, then probability notes.
 #' The text does not start with "*Note*." because apaquarto adds it. With
 #' [apaquarto](https://wjschne.github.io/apaquarto/), make the table in one
@@ -38,7 +51,7 @@
 #' (e.g., `bind_rows()` and joins) drop it, so call `apa_note()` on the
 #' table that the table function returned.
 #'
-#' @param x a table made by [apa_anova()] (or [apa_parameters()] for `aov` and `afex` models)
+#' @param x a table made by [apa_anova()] (or [apa_parameters()] for `aov` and `afex` models), [apa_loadings()], or [apa_factor_cor()]
 #' @param collapse string that joins the sentences. Use `NULL` to get a character vector with one sentence per element.
 #'
 #' @returns character
@@ -59,12 +72,17 @@
 #'   )
 #'   apa_note(apa_anova(fit_afex))
 #' }
+#'
+#' # Factor analysis
+#' fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")
+#' apa_loadings(fit_fa, min_loading = .3, communality = TRUE) |>
+#'   apa_note()
 apa_note <- function(x, collapse = " ") {
   record <- attr(x, "apa_note", exact = TRUE)
   if (is.null(record)) {
     cli::cli_abort(c(
       "{.arg x} has no table note information.",
-      i = "{.fn apa_note} works with tables made by {.fn apa_anova}.",
+      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_loadings}, and {.fn apa_factor_cor}.",
       i = "The information is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop. Call {.fn apa_note} on the table before changing it."
     ))
   }
@@ -72,6 +90,8 @@ apa_note <- function(x, collapse = " ") {
   sentences <- switch(
     record$table,
     anova = anova_note_sentences(record),
+    loadings = loadings_note_sentences(record),
+    factor_cor = fa_method_sentence(record),
     cli::cli_abort("Unknown table type {.val {record$table}}.") # nocov
   )
 
@@ -254,4 +274,113 @@ anova_heading_type <- function(tab) {
 anova_marked <- function(marked, anova_parameters) {
   marked <- marked[!is.na(marked) & marked != ""]
   length(intersect(marked, anova_parameters)) > 0
+}
+
+#' "Principal axis factoring with oblimin rotation."
+#' @keywords internal
+#' @noRd
+fa_method_sentence <- function(record) {
+  method <- if (is.null(record$method)) NULL else fa_method_labels[[record$method]]
+  if (is.null(method)) {
+    # Methods without a known name are given as psych calls them
+    method <- paste0("Factor analysis (", record$method, " extraction)")
+  }
+  rotation <- if (is.null(record$rotation)) "none" else record$rotation
+  # A single factor cannot be rotated, so rotation is not worth mentioning
+  if (identical(record$nfactors, 1L)) {
+    return(paste0(method, "."))
+  }
+  if (identical(rotation, "none")) {
+    return(paste0(method, " without rotation."))
+  }
+  rotation_label <- fa_rotation_labels[[rotation]]
+  if (is.null(rotation_label)) {
+    rotation_label <- rotation
+  }
+  paste0(method, " with ", rotation_label, " rotation.")
+}
+
+#' @keywords internal
+#' @noRd
+fa_method_labels <- list(
+  pca = "Principal components analysis",
+  pa = "Principal axis factoring",
+  minres = "Minimum residual factor analysis",
+  uls = "Unweighted least squares factor analysis",
+  ols = "Ordinary least squares factor analysis",
+  wls = "Weighted least squares factor analysis",
+  gls = "Generalized least squares factor analysis",
+  ml = "Maximum likelihood factor analysis",
+  minchi = "Minimum chi-square factor analysis",
+  minrank = "Minimum rank factor analysis",
+  alpha = "Alpha factor analysis"
+)
+
+#' @keywords internal
+#' @noRd
+fa_rotation_labels <- list(
+  geominT = "geomin (orthogonal)",
+  geominQ = "geomin (oblique)",
+  bentlerT = "Bentler (orthogonal)",
+  bentlerQ = "Bentler (oblique)",
+  targetT = "target (orthogonal)",
+  targetQ = "target (oblique)",
+  TargetT = "target (orthogonal)",
+  TargetQ = "target (oblique)",
+  Promax = "promax",
+  cluster = "cluster",
+  biquartimin = "biquartimin"
+)
+
+#' @keywords internal
+#' @noRd
+loadings_note_sentences <- function(record) {
+  sentences <- fa_method_sentence(record)
+  is_pca <- identical(record$method, "pca")
+
+  if (isTRUE(record$oblique)) {
+    sentences <- c(sentences, "Loadings are pattern coefficients.")
+  }
+
+  if (!is.null(record$min_loading) && !is.na(record$min_loading)) {
+    cutoff <- sub("^0", "", format(record$min_loading, nsmall = 2))
+    sentences <- c(
+      sentences,
+      paste0("Loadings smaller than ", cutoff, " in absolute value are omitted.")
+    )
+  }
+
+  if (isTRUE(record$bold_max)) {
+    sentences <- c(
+      sentences,
+      "The largest loading for each variable is in bold."
+    )
+  }
+
+  abbreviations <- character(0)
+  if (isTRUE(record$communality)) {
+    abbreviations <- c(abbreviations, "*h*^2^ = communality")
+  }
+  if (isTRUE(record$uniqueness)) {
+    abbreviations <- c(abbreviations, "*u*^2^ = uniqueness")
+  }
+  if (isTRUE(record$complexity)) {
+    abbreviations <- c(abbreviations, "Complexity = Hofmann's complexity index")
+  }
+  if (length(abbreviations) > 0) {
+    sentences <- c(sentences, paste0(paste(abbreviations, collapse = "; "), "."))
+  }
+
+  if (isTRUE(record$variance) && isTRUE(record$oblique)) {
+    sentences <- c(
+      sentences,
+      paste0(
+        "Because the ",
+        if (is_pca) "components" else "factors",
+        " are correlated, the variance they explain overlaps, and the cumulative proportion is approximate."
+      )
+    )
+  }
+
+  sentences
 }

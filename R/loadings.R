@@ -150,6 +150,20 @@ apa_loadings <- function(
   colnames(d)[match(factor_columns, colnames(d))] <- new_names
 
   attr(d, "no_format_columns") <- "Variable"
+  attr(d, "apa_note") <- list(
+    table = "loadings",
+    method = parts$method,
+    rotation = parts$rotation,
+    oblique = !is.null(parts$Phi),
+    nfactors = length(factor_columns),
+    min_loading = if (!is.na(min_loading) && min_loading > 0) min_loading else NA,
+    digits = digits,
+    bold_max = bold_max,
+    communality = communality,
+    uniqueness = uniqueness,
+    complexity = complexity,
+    variance = variance && length(factor_columns) > 1
+  )
   as_apa7_tbl(d)
 }
 
@@ -210,6 +224,12 @@ apa_factor_cor <- function(
     dplyr::bind_cols(tibble::as_tibble(R))
 
   attr(d, "no_format_columns") <- "Factor"
+  attr(d, "apa_note") <- list(
+    table = "factor_cor",
+    method = parts$method,
+    nfactors = k,
+    rotation = parts$rotation
+  )
   as_apa7_tbl(d)
 }
 
@@ -239,7 +259,8 @@ fa_parts <- function(fit) {
         ss = ss,
         prop = ss / nrow(L),
         Phi = NULL,
-        rotation = "none"
+        rotation = "none",
+        method = "pca"
       ))
     }
     cli::cli_abort( # nocov start
@@ -264,13 +285,18 @@ fa_parts <- function(fit) {
   }
   V <- V[, colnames(L), drop = FALSE]
 
+  # One factor cannot be rotated, although psych reports the rotation it was
+  # asked for
+  rotation <- if (ncol(L) == 1 || is.null(fit$rotation)) "none" else fit$rotation
+
   list(
     loadings = L,
     uniqueness = fit$uniquenesses,
     ss = V["SS loadings", ],
     prop = V["Proportion Var", ],
     Phi = fit$Phi,
-    rotation = fit$rotation
+    rotation = rotation,
+    method = if (inherits(fit, "principal")) "pca" else fit$fm
   )
 }
 

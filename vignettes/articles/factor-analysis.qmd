@@ -260,19 +260,41 @@ The names are split into words and put in title case (e.g., SentenceCompletion b
 
 ## Notes
 
-A table of loadings should say how the factors were extracted and rotated and which loadings were omitted. With [apaquarto](https://wjschne.github.io/apaquarto/), add a note with the `apa-note` chunk option:
+A table of loadings should say how the factors were extracted and rotated and which loadings were omitted. `apa_loadings` records these details, and `apa_note` turns them into note text:
+
+```{r}
+#| label: note-loadings
+tbl_bfi <- apa_loadings(fit_bfi,
+                        factor_names = big5,
+                        format_variable_names = FALSE,
+                        min_loading = .30,
+                        bold_max = TRUE,
+                        communality = TRUE,
+                        variance = TRUE)
+apa_note(tbl_bfi)
+```
+
+The note names the extraction method and rotation, says that loadings after an oblique rotation are pattern coefficients, gives the cutoff for omitted loadings, explains bold values, and defines *h*^2^ (and *u*^2^ and Complexity, if shown). When there are variance rows and the factors are correlated, it says that the cumulative proportion is approximate. The text is in markdown and does not start with "*Note*." because apaquarto adds that.
+
+With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option with `!expr`. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_bfi` was made above) and display it in the chunk with the note:
 
 ```{r}
 #| label: tbl-note
 #| tbl-cap: Factor Loadings of Big Five Personality Items
-#| apa-note: Principal axis factoring with oblimin rotation. Loadings smaller than .30 are omitted. *h*^2^ = communality.
+#| apa-note: !expr apa_note(tbl_bfi)
 #| echo: fenced
-apa_loadings(fit_bfi,
-             factor_names = big5,
-             format_variable_names = FALSE,
-             min_loading = .30,
-             communality = TRUE)
+tbl_bfi
 ```
+
+`apa_note` also works for factor correlation tables:
+
+```{r}
+#| label: note-cor
+apa_factor_cor(fit_bfi, factor_names = big5) |>
+  apa_note()
+```
+
+The generated note is a starting point. Add to it with `paste` (e.g., to give the sample size), or use `collapse = NULL` to get one sentence per element, so you can drop or reword sentences. `apa_note` reads an attribute of the table that dplyr functions such as `mutate` and `filter` keep but some operations (e.g., joins) drop, so call it on the table that `apa_loadings` returned.
 
 ## Post-processing
 
