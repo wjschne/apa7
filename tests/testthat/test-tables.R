@@ -140,6 +140,7 @@ test_that("apa_parameters.glm reports odds ratios and z for logistic models", {
 })
 
 test_that("apa_parameters.glm labels exponentiated coefficients by link", {
+  skip_if_not_installed("MASS")
   pois <- glm(carb ~ wt, data = mtcars, family = poisson)
   expect_true("*IRR*" %in% colnames(apa_parameters(pois)))
 
@@ -259,6 +260,7 @@ test_that("apa_performance.glm uses a labeled pseudo-R2", {
 })
 
 test_that("apa_performance_comparison uses LRT for fixed-dispersion GLMs", {
+  skip_if_not_installed("MASS")
   fits <- suppressWarnings(list(
     glm(am ~ wt, data = mtcars, family = binomial),
     glm(am ~ wt + hp, data = mtcars, family = binomial)
@@ -359,6 +361,7 @@ test_that("apa_parameters.polr reports ORs, z tests, and thresholds", {
 })
 
 test_that("apa_parameters.clm matches apa_parameters.polr", {
+  skip_if_not_installed("MASS")
   skip_if_not_installed("ordinal")
   skip_if_not_installed("carData")
   f <- poverty ~ gender + age
@@ -571,6 +574,7 @@ test_that("apa_parameters.lm shows confidence intervals", {
 })
 
 test_that("apa_parameters.lm passes vcov to model_parameters (robust SEs)", {
+  skip_if_not_installed("sandwich")
   fit <- lm(mpg ~ cyl + wt, data = mtcars)
   classic <- apa_parameters(fit, predictor_parameters = lm_ci_parameters)
   robust <- apa_parameters(fit, predictor_parameters = lm_ci_parameters, vcov = "HC3")
@@ -636,6 +640,7 @@ test_that("apa_parameters.glm shows exponentiated confidence intervals", {
 })
 
 test_that("apa_parameters.glm passes vcov to model_parameters (robust SEs)", {
+  skip_if_not_installed("sandwich")
   fit <- glm(carb ~ wt, data = mtcars, family = poisson)
   classic <- apa_parameters(fit, predictor_parameters = exp_ci_parameters)
   robust <- apa_parameters(fit, predictor_parameters = exp_ci_parameters, vcov = "HC3")

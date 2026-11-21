@@ -127,7 +127,7 @@ For repeated-measures models fit with \code{aov(y ~ a * b + Error(id / b))}, eac
 
 Model comparisons (e.g., \code{anova(m1, m2)}) are not ANOVA source tables. Use \code{\link[=apa_performance_comparison]{apa_performance_comparison()}} for them.
 
-For \code{afex} models (\code{afex::aov_car()}, \code{afex::aov_ez()}, \code{afex::aov_4()}), each effect has its own error term, so the table shows each effect's degrees of freedom (\emph{df}~effect~, \emph{df}~error~), mean squared error (\emph{MSE}), \emph{F}, \emph{p}, and effect size, as in \code{afex}'s own \code{nice()} tables. Degrees of freedom and \emph{p}-values reflect the sphericity correction set in \code{afex} (Greenhouse–Geisser by default), and generalized \emph{η}^2^ is the default effect size, as in \code{afex}.
+For \code{afex} models (\code{afex::aov_car()}, \code{afex::aov_ez()}, \code{afex::aov_4()}), each effect has its own error term, so the table shows each effect's degrees of freedom (\emph{df}~effect~, \emph{df}~error~), mean squared error (\emph{MSE}), \emph{F}, \emph{p}, and effect size, as in \code{afex}'s own \code{nice()} tables. Degrees of freedom and \emph{p}-values reflect the sphericity correction set in \code{afex} (Greenhouse-Geisser by default), and generalized \emph{η}^2^ is the default effect size, as in \code{afex}.
 }
 \examples{
 d <- mtcars

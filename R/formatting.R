@@ -472,20 +472,20 @@ num_pad <- function(
 
 # Spaces used to fill padding, widest first
 padding_spaces <- c(
-  figure = " ",
-  punctuation = " ",
-  thin = " ",
-  hair = " "
+  figure = "\u2007",
+  punctuation = "\u2008",
+  thin = "\u2009",
+  hair = "\u200a"
 )
 
 md_entities <- c(
-  "&numsp;" = " ",
-  "&puncsp;" = " ",
-  "&thinsp;" = " ",
-  "&hairsp;" = " ",
-  "&nbsp;" = " ",
-  "&minus;" = "−",
-  "&times;" = "×",
+  "&numsp;" = "\u2007",
+  "&puncsp;" = "\u2008",
+  "&thinsp;" = "\u2009",
+  "&hairsp;" = "\u200a",
+  "&nbsp;" = "\u00a0",
+  "&minus;" = "\u2212",
+  "&times;" = "\u00d7",
   "&lt;" = "<",
   "&gt;" = ">",
   "&amp;" = "&"
@@ -903,7 +903,7 @@ variable_name_formatter <- function(
     `\\^(\\d+)\\^` = " Apasevencaret \\1 Apasevencaret",
     `\\^(\\d+)` = " Apasevencaret \\1 Apasevencaret",
     `\\^` = "Apasevencaret",
-    `–` = "Apasevenendash ",
+    `\\u2013` = "Apasevenendash ",
     # Ordinal thresholds (e.g., "Low|High")
     ` ?\\| ?` = " Apasevenpipe ",
     ` \\[([^]]+)\\]` = "Apasevenendash \\1",
@@ -912,7 +912,7 @@ variable_name_formatter <- function(
   )
 
   post_p2r <- c(
-    ` ?Apasevenendash ?` = "–",
+    ` ?Apasevenendash ?` = "\u2013",
     ` ?Apasevenpipe ?` = " | ",
     ` Apasevendotspace` = ".\u2007",
     `Apasevendotspace` = ".\u2007",
@@ -975,7 +975,7 @@ variable_name_formatter <- function(
         "Apasevencaret",
         "Apasevenendash",
         "Apasevenpipe",
-        "–",
+        "\u2013",
         "\t",
         "\n"
       )
@@ -2018,10 +2018,7 @@ apa_format_columns <- function(
 
     if (!is.null(f1)) {
       if (cl %in% colnames(data)) {
-        data <- dplyr::mutate(
-          data,
-          {{ cl }} := f1[[1]](data[, cl, drop = TRUE])
-        )
+        data[[cl]] <- f1[[1]](data[[cl]])
       }
     }
   }

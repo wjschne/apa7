@@ -62,13 +62,26 @@ add_break_columns <- function(
 
   where_numbers <- seq(1, ncol(d))[colnames(d) %in% where_names]
   shifter <- ifelse(.before, 0, 1)
-  keys <- R.utils::insert(
+  keys <- insert_at(
     colnames(d),
     ats = where_numbers + shifter,
     values = blank_names
   )
   d[, blank_names] <- NA
   d[, keys]
+}
+
+#' Insert values into a vector
+#'
+#' Like `R.utils::insert()`: each value is inserted before the element at the
+#' matching position of the original vector (`length(x) + 1` appends).
+#' @param x vector
+#' @param ats positions in `x`, one per value
+#' @param values values to insert
+#' @keywords internal
+#' @noRd
+insert_at <- function(x, ats, values) {
+  c(x, values)[order(c(seq_along(x), ats - 0.5))]
 }
 
 #' Make a column into a list column
@@ -201,7 +214,7 @@ add_star_column <- function(
   star_names <- paste0(where_names, "apa7starcolumn")
 
   where_numbers <- seq(1, ncol(data))[colnames(data) %in% where_names]
-  keys <- R.utils::insert(
+  keys <- insert_at(
     colnames(data),
     ats = where_numbers + 1,
     values = star_names
@@ -1223,7 +1236,7 @@ align_padded_columns <- function(
   horizontal_padding
 ) {
   # Spaces that align_chr and num_pad use for padding
-  pad_re <- "[ - ]|&numsp;"
+  pad_re <- "[\u2002-\u200a]|&numsp;"
 
   keys <- intersect(ft$col_keys[-1], colnames(d))
 
@@ -1286,12 +1299,14 @@ align_padded_columns <- function(
 #'    apa_flextable()
 #'
 #' # Confidence intervals with robust (HC3) standard errors
-#' lm(mpg ~ cyl + wt, data = mtcars) |>
-#'    apa_parameters(
-#'      predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
-#'      vcov = "HC3"
-#'    ) |>
-#'    apa_flextable()
+#' if (requireNamespace("sandwich", quietly = TRUE)) {
+#'   lm(mpg ~ cyl + wt, data = mtcars) |>
+#'     apa_parameters(
+#'       predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
+#'       vcov = "HC3"
+#'     ) |>
+#'     apa_flextable()
+#' }
 apa_parameters <- function(
   fit,
   predictor_parameters = c(
@@ -1451,8 +1466,11 @@ apa_parameters.glm <- function(
 #' @export
 #' @rdname apa_parameters
 #' @examples
-#' MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
-#'    apa_parameters()
+#' if (requireNamespace("MASS", quietly = TRUE) &&
+#'     requireNamespace("carData", quietly = TRUE)) {
+#'   MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
+#'     apa_parameters()
+#' }
 apa_parameters.polr <- function(
   fit,
   predictor_parameters = c(
@@ -1607,7 +1625,7 @@ apa_parameters_ordinal <- function(
 
 #' @param random for mixed models, if `TRUE` (default), random-effect standard deviations and correlations (and the residual standard deviation, for linear mixed models) are displayed below the fixed effects.
 #' @details
-#' For mixed models fit with `lme4` (`lmer` and `glmer`), fixed effects are displayed as for `lm` and `glm` models. For linear mixed models, *t* tests and confidence intervals use Kenward–Roger degrees of freedom by default (`ci_method = "kenward"`, which requires the pbkrtest package); pass another `ci_method` (e.g., `"satterthwaite"`, which requires lmerTest, or `"wald"`) to change this. When the degrees of freedom differ across fixed effects, they are shown in a *df* column rather than in the *t* column header. Random-effect rows show only the estimated standard deviation (*SD*) or correlation (*r*), labeled by grouping factor.
+#' For mixed models fit with `lme4` (`lmer` and `glmer`), fixed effects are displayed as for `lm` and `glm` models. For linear mixed models, *t* tests and confidence intervals use Kenward-Roger degrees of freedom by default (`ci_method = "kenward"`, which requires the pbkrtest package); pass another `ci_method` (e.g., `"satterthwaite"`, which requires lmerTest, or `"wald"`) to change this. When the degrees of freedom differ across fixed effects, they are shown in a *df* column rather than in the *t* column header. Random-effect rows show only the estimated standard deviation (*SD*) or correlation (*r*), labeled by grouping factor.
 #' @export
 #' @rdname apa_parameters
 #' @examples
@@ -2004,6 +2022,9 @@ apa_parameters.list <- function(
   performance_parameters = c("R2", "deltaR2"),
   ...
 ) {
+  # Prevent warnings
+  Model <- NULL
+
   # Mixed models also show the conditional R2 and its change by default
   if (
     missing(performance_parameters) &&
@@ -2240,7 +2261,7 @@ use_pseudo_r2 <- function(data, column_formats) {
     R2_Tjur = "Tjur",
     R2_Nagelkerke = "Nagelkerke",
     R2_McFadden = "McFadden",
-    R2_CoxSnell = "Cox–Snell",
+    R2_CoxSnell = "Cox\u2013Snell",
     # Mixed models: variance explained by the fixed effects
     R2_marginal = "marginal"
   )

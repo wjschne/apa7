@@ -10,6 +10,8 @@ matrix_display(x, bracket = c("[", "(", "|", ""), include_names = TRUE)
 \item{x}{a matrix}
 
 \item{bracket}{type of bracket: bmatrix, Bmatrix, pmatrix, vmatrix, Vmatrix, , matrix}
+
+\item{include_names}{if \code{TRUE} (default), the matrix's row and column names are displayed above and to the left of the matrix}
 }
 \value{
 character

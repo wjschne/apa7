@@ -232,7 +232,7 @@ apa_anova.anova <- function(
 }
 
 #' @details
-#' For `afex` models (`afex::aov_car()`, `afex::aov_ez()`, `afex::aov_4()`), each effect has its own error term, so the table shows each effect's degrees of freedom (*df*~effect~, *df*~error~), mean squared error (*MSE*), *F*, *p*, and effect size, as in `afex`'s own `nice()` tables. Degrees of freedom and *p*-values reflect the sphericity correction set in `afex` (Greenhouse–Geisser by default), and generalized *&eta;*^2^ is the default effect size, as in `afex`.
+#' For `afex` models (`afex::aov_car()`, `afex::aov_ez()`, `afex::aov_4()`), each effect has its own error term, so the table shows each effect's degrees of freedom (*df*~effect~, *df*~error~), mean squared error (*MSE*), *F*, *p*, and effect size, as in `afex`'s own `nice()` tables. Degrees of freedom and *p*-values reflect the sphericity correction set in `afex` (Greenhouse-Geisser by default), and generalized *&eta;*^2^ is the default effect size, as in `afex`.
 #' @export
 #' @rdname apa_anova
 #' @examples

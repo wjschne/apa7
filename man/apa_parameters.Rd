@@ -160,7 +160,7 @@ For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \e
 
 For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coefficients are tested with Wald \emph{z} tests. (\code{parameters} reports \emph{t} for \code{polr}, but the test is asymptotically normal, and \code{clm} reports \emph{z} for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled \emph{OR}. Threshold rows show only the estimate, its standard error, and its confidence interval, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful. Confidence intervals (\code{"CI"}, \code{"Exp_CI"}) are Wald \emph{z} intervals, consistent with the \emph{z} tests.
 
-For mixed models fit with \code{lme4} (\code{lmer} and \code{glmer}), fixed effects are displayed as for \code{lm} and \code{glm} models. For linear mixed models, \emph{t} tests and confidence intervals use Kenward–Roger degrees of freedom by default (\code{ci_method = "kenward"}, which requires the pbkrtest package); pass another \code{ci_method} (e.g., \code{"satterthwaite"}, which requires lmerTest, or \code{"wald"}) to change this. When the degrees of freedom differ across fixed effects, they are shown in a \emph{df} column rather than in the \emph{t} column header. Random-effect rows show only the estimated standard deviation (\emph{SD}) or correlation (\emph{r}), labeled by grouping factor.
+For mixed models fit with \code{lme4} (\code{lmer} and \code{glmer}), fixed effects are displayed as for \code{lm} and \code{glm} models. For linear mixed models, \emph{t} tests and confidence intervals use Kenward-Roger degrees of freedom by default (\code{ci_method = "kenward"}, which requires the pbkrtest package); pass another \code{ci_method} (e.g., \code{"satterthwaite"}, which requires lmerTest, or \code{"wald"}) to change this. When the degrees of freedom differ across fixed effects, they are shown in a \emph{df} column rather than in the \emph{t} column header. Random-effect rows show only the estimated standard deviation (\emph{SD}) or correlation (\emph{r}), labeled by grouping factor.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
@@ -168,17 +168,22 @@ lm(mpg ~ cyl + wt, data = mtcars) |>
    apa_flextable()
 
 # Confidence intervals with robust (HC3) standard errors
-lm(mpg ~ cyl + wt, data = mtcars) |>
-   apa_parameters(
-     predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
-     vcov = "HC3"
-   ) |>
-   apa_flextable()
+if (requireNamespace("sandwich", quietly = TRUE)) {
+  lm(mpg ~ cyl + wt, data = mtcars) |>
+    apa_parameters(
+      predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
+      vcov = "HC3"
+    ) |>
+    apa_flextable()
+}
 glm(am ~ wt + hp, data = mtcars, family = binomial) |>
    apa_parameters() |>
    apa_flextable()
-MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
-   apa_parameters()
+if (requireNamespace("MASS", quietly = TRUE) &&
+    requireNamespace("carData", quietly = TRUE)) {
+  MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE) |>
+    apa_parameters()
+}
 if (requireNamespace("lme4", quietly = TRUE) &&
     requireNamespace("pbkrtest", quietly = TRUE)) {
   lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy) |>

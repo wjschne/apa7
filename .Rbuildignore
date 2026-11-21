@@ -10,12 +10,13 @@ _quarto.yml
 ^README\.Rmd$
 math-rendered-by-lua-filter.html
 ^vignettes/articles/\.quarto$
-^vignettes/articles/*_files$
+^vignettes/articles/.*_files$
 ^vignettes/articles$
 ^[\.]?air\.toml$
 ^\.vscode$
 ^vignettes/\.quarto$
-^vignettes/*_files$
+^vignettes/.*_files$
+^vignettes/apa7[.](html|pdf)$
 ^dev$
 ^doc$
 ^Meta$

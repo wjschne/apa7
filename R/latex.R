@@ -7,6 +7,7 @@ knit_print.latex <- function(x, ...) {
 #'
 #' @param x a matrix
 #' @param bracket type of bracket: bmatrix, Bmatrix, pmatrix, vmatrix, Vmatrix, , matrix
+#' @param include_names if `TRUE` (default), the matrix's row and column names are displayed above and to the left of the matrix
 #'
 #' @returns character
 #' @export
