@@ -22,8 +22,6 @@ tests pass, with S7 1.0.0.
 
 0 errors | 0 warnings | 0 notes
 
-* The package was built with `--compact-vignettes=qpdf`. Without it, the
-  check notes that the vignette PDF can be compacted.
 * The first win-builder run reported LaTeX errors in the PDF manual (Unicode
   Greek letters in the Rd files) and a NOTE that the `apa_parameters` examples
   took more than 10 seconds. Both are fixed: the Rd files use `\eqn{}` and are

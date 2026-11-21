@@ -11,7 +11,7 @@ Last reviewed: 2026-11-20
 - [x] Make `apa_parameters()` handle `aov` objects correctly (they now return the `apa_anova()` table)
 - [ ] Put new model packages (e.g., `afex`, `car`, `glmmTMB`) in Suggests and guard them with `requireNamespace()` in examples and tests (`afex`, `car`, `lme4`, `MASS`, `carData`, `ordinal`, and `sandwich` done; add `glmmTMB` with its methods)
 - [x] Update NEWS.md with the new functions and methods
-- [x] Run `R CMD check --as-cran` locally with 0 errors, 0 warnings, and 0 notes (clean on 2026-11-20 with R 4.6.2 on Windows). Build with `--compact-vignettes=qpdf` (e.g., `devtools::build(args = "--compact-vignettes=qpdf")`), or the vignette PDF gives a size NOTE. Issues fixed from the earlier 2026-11-20 check:
+- [x] Run `R CMD check --as-cran` locally with 0 errors, 0 warnings, and 0 notes (clean on 2026-11-20 with R 4.6.2 on Windows). (An earlier size NOTE about `inst/doc/apa7.pdf` came from a stale `vignettes/apa7.pdf`, now deleted; the vignette is HTML only.) Issues fixed from the earlier 2026-11-20 check:
   - [x] Add `sandwich` to Suggests (the `vcov = "HC3"` example and two robust-SE tests fail without it) and guard those with `requireNamespace()` / `skip_if_not_installed()`
   - [x] Add `withr` to Suggests (used in tests)
   - [x] Replace non-ASCII characters in code with `\u` escapes in `R/formatting.R`, `R/tables.R`, and `R/anova.R`
