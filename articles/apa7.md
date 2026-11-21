@@ -965,7 +965,7 @@ fit_3 <- list(
 fit_3 |> 
   apa_parameters(performance_parameters = NULL) |>
   apa_flextable(row_title_column = Model, 
-                row_title_align = "center", )
+                row_title_align = "center")
 ```
 
 | Variable | B         | SE     | β    | t      | df     | p      |

@@ -124,7 +124,7 @@ apa_parameters(
     "Parameter", 
     "Coefficient", 
     "SE", "CI", 
-    "t", "df_error", "p"),
+    "t", "df_error", "p")
 )
 ```
 
