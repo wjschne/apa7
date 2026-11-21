@@ -1243,6 +1243,42 @@ the$columns <- list(
     latex = "Cronbach's $\\alpha$",
     formatter = the$trim_leading_zero
   ),
+  d_av = column_format(
+    name = "d_av",
+    header = "*d*~av~",
+    latex = "$d_{\\text{av}}$",
+    formatter = the$number_formatter
+  ),
+  d_z = column_format(
+    name = "d_z",
+    header = "*d*~z~",
+    latex = "$d_{\\text{z}}$",
+    formatter = the$number_formatter
+  ),
+  d_rm = column_format(
+    name = "d_rm",
+    header = "*d*~rm~",
+    latex = "$d_{\\text{rm}}$",
+    formatter = the$number_formatter
+  ),
+  g_av = column_format(
+    name = "g_av",
+    header = "*g*~av~",
+    latex = "$g_{\\text{av}}$",
+    formatter = the$number_formatter
+  ),
+  g_z = column_format(
+    name = "g_z",
+    header = "*g*~z~",
+    latex = "$g_{\\text{z}}$",
+    formatter = the$number_formatter
+  ),
+  g_rm = column_format(
+    name = "g_rm",
+    header = "*g*~rm~",
+    latex = "$g_{\\text{rm}}$",
+    formatter = the$number_formatter
+  ),
   deltaR2 = column_format(
     name = "deltaR2",
     header = "&Delta;*R*^2^",

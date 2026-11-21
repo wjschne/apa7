@@ -13,13 +13,16 @@
 #'   grouping or predictor variable on the right. Several outcomes are joined
 #'   with `+` (e.g., `mpg + hp ~ am`), and each gets its own row. For one-sample
 #'   *t* tests and Wilcoxon signed-rank tests, use `1` on the right (e.g.,
-#'   `mpg ~ 1`).
+#'   `mpg ~ 1`). For paired tests, put each pair of variables in `Pair()` with
+#'   `1` on the right (e.g., `Pair(pre, post) ~ 1`, or
+#'   `Pair(anx1, anx2) + Pair(dep1, dep2) ~ 1` for several pairs).
 #' @param test type of test:
 #'
 #'   * `"t"`: *t* test comparing the means of two groups (Welch's test unless
-#'     `var_equal = TRUE`), or a one-sample *t* test comparing a mean with `mu`
+#'     `var_equal = TRUE`), a paired *t* test, or a one-sample *t* test
+#'     comparing a mean with `mu`
 #'   * `"wilcoxon"`: Wilcoxon rank-sum test comparing two groups, or a Wilcoxon
-#'     signed-rank test comparing a variable with `mu`
+#'     signed-rank test of paired variables or of a variable compared with `mu`
 #'   * `"cor"`: correlation test of each outcome with the variable on the right
 #'   * `"chisq"`: chi-square test of independence of each outcome with the
 #'     variable on the right
@@ -30,6 +33,15 @@
 #'   (`"hedges_g"`), and chi-square tests can show \eqn{\phi}{phi} (`"phi"`, for
 #'   2 \eqn{\times}{x} 2 tables) or Cohen's *w* (`"cohens_w"`). Use `"none"` for
 #'   no effect size. Correlation tests show the correlation itself.
+#'
+#'   For paired *t* tests, Cohen's *d* is *d*~av~ (`"d_av"`), which divides the
+#'   mean difference by the average of the two variables' standard deviations,
+#'   so it is comparable to *d* for two independent groups. Other choices are
+#'   *d*~z~ (`"d_z"`, divided by the standard deviation of the differences) and
+#'   *d*~rm~ (`"d_rm"`, *d*~z~ corrected for the correlation between the
+#'   variables), and Hedges' *g* versions with a small-sample correction
+#'   (`"g_av"`, `"g_z"`, `"g_rm"`; `"hedges_g"` is `"g_av"`). These come from
+#'   [effectsize::repeated_measures_d()].
 #' @param ci confidence level of the effect size interval (for correlation
 #'   tests, the interval of Pearson's *r*). Intervals are two-sided.
 #' @param var_equal if `TRUE`, two-group *t* tests assume equal variances
@@ -43,6 +55,11 @@
 #' @param descriptives if `TRUE` (default), the table shows each group's mean
 #'   and standard deviation (*t* tests) or median (Wilcoxon tests), or each
 #'   variable's sample size (correlation and chi-square tests).
+#' @param pair_labels for paired tests, labels of the first and second
+#'   variable of each pair, used as the headings above their descriptive
+#'   statistics (e.g., `c("Pretest", "Posttest")`). If `NULL` (default), the
+#'   headings are the variable names when there is one pair, and "First" and
+#'   "Second" otherwise.
 #' @param starred columns to star with significant *p*-values (e.g., `"t"`)
 #' @param bolded columns to bold, if significant
 #' @param column_formats column_formats object to format columns. If NULL, the
@@ -54,7 +71,9 @@
 #' Each test uses the rows in which both the outcome and the grouping (or
 #' predictor) variable are observed. For two-group tests, the grouping
 #' variable must have exactly two observed values, and differences are the
-#' first group (in factor level order) minus the second.
+#' first group (in factor level order) minus the second. Paired tests use the
+#' rows in which both variables of the pair are observed, and differences are
+#' the first variable minus the second.
 #'
 #' Effect sizes are computed from the data rather than from the test
 #' statistic, so Cohen's *d* for Welch's test is exact rather than
@@ -78,6 +97,10 @@
 #' # One-sample t test
 #' apa_htest(d, mpg ~ 1, mu = 20)
 #'
+#' # Paired t test with d_av
+#' d_sleep <- data.frame(drug1 = sleep$extra[1:10], drug2 = sleep$extra[11:20])
+#' apa_htest(d_sleep, Pair(drug1, drug2) ~ 1)
+#'
 #' # Wilcoxon rank-sum tests with rank-biserial correlations
 #' apa_htest(d, mpg + hp ~ am, test = "wilcoxon", exact = FALSE)
 #'
@@ -100,6 +123,7 @@ apa_htest <- function(
   mu = 0,
   method = c("pearson", "spearman", "kendall"),
   descriptives = TRUE,
+  pair_labels = NULL,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
@@ -121,41 +145,65 @@ apa_htest <- function(
     cli::cli_abort("{.arg ci} must be a number between 0 and 1.")
   }
 
-  outcomes <- all.vars(formula[[2]])
+  outcomes <- htest_outcomes(formula[[2]])
   predictor <- all.vars(formula[[3]])
-  if (length(outcomes) == 0) {
-    cli::cli_abort("{.arg formula} needs at least one outcome variable on the left.")
-  }
   if (length(predictor) > 1) {
     cli::cli_abort(c(
       "{.arg formula} can have only one variable on the right.",
       i = "To test several outcomes, put them on the left (e.g., {.code y1 + y2 ~ group})."
     ))
   }
-  one_sample <- length(predictor) == 0
+  paired <- is.list(outcomes)
+  if (paired) {
+    if (length(predictor) > 0) {
+      cli::cli_abort(c(
+        "Paired tests need {.code 1} on the right side of {.arg formula}.",
+        i = "For example, {.code Pair(pre, post) ~ 1}."
+      ))
+    }
+    if (!(test %in% c("t", "wilcoxon"))) {
+      cli::cli_abort(
+        "{.fn Pair} works only with {.code test = \"t\"} or {.code test = \"wilcoxon\"}."
+      )
+    }
+  }
+  one_sample <- !paired && length(predictor) == 0
   if (one_sample && !(test %in% c("t", "wilcoxon"))) {
     cli::cli_abort(
       "{.code test = \"{test}\"} needs a variable on the right side of {.arg formula}."
     )
   }
-  missing_vars <- setdiff(c(outcomes, predictor), colnames(data))
+  missing_vars <- setdiff(c(unlist(outcomes), predictor), colnames(data))
   if (length(missing_vars) > 0) {
     cli::cli_abort("{.arg data} has no {cli::qty(missing_vars)} column{?s} {.val {missing_vars}}.")
   }
 
-  effect_size <- htest_effect_size(test, effect_size)
+  effect_size <- htest_effect_size(test, effect_size, paired)
 
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
   }
 
-  # Two-group tests share the groups of the grouping variable
+  # Two-group tests share the groups of the grouping variable, and paired
+  # tests label the first and second variable of each pair
+  name_formatter <- column_formats$Parameter@formatter
   groups <- NULL
-  if (!one_sample && test %in% c("t", "wilcoxon")) {
+  if (paired) {
+    groups <- htest_pair_labels(pair_labels, outcomes, name_formatter)
+  } else if (!one_sample && test %in% c("t", "wilcoxon")) {
     groups <- htest_groups(data[[predictor]], predictor)
   }
 
   rows <- purrr::map(outcomes, \(v) {
+    if (paired) {
+      row <- switch(
+        test,
+        t = htest_t_paired(data[[v[1]]], data[[v[2]]], v, mu, effect_size, ci, ...),
+        wilcoxon = htest_wilcoxon_paired(data[[v[1]]], data[[v[2]]], v, mu, effect_size, ci, ...)
+      )
+      row$Parameter <- paste(name_formatter(v[1]), "vs.", name_formatter(v[2]))
+      return(row)
+    }
     y <- data[[v]]
     x <- if (one_sample) NULL else data[[predictor]]
     row <- switch(
@@ -165,7 +213,7 @@ apa_htest <- function(
       cor = htest_cor(y, x, v, method, ci, ...),
       chisq = htest_chisq(y, x, v, effect_size, ci, ...)
     )
-    row$Parameter <- v
+    row$Parameter <- name_formatter(v)
     row
   })
   method_names <- unique(purrr::map_chr(rows, \(r) attr(r, "method")))
@@ -177,12 +225,20 @@ apa_htest <- function(
   es_col <- intersect(colnames(d), htest_es_columns)[1]
   cf <- column_formats
   cf <- htest_group_formats(cf, groups)
+  # Row labels are already formatted (e.g., "Pre vs. Post")
+  cf$Parameter@formatter <- \(x, ...) x
 
   if (test == "cor") {
     es_col <- intersect(c("r", "rho", "tau"), colnames(d))[1]
     if (!is.null(cf$tau)) {
-      cf$tau@formatter <- the$trim_leading_zero
       cf$tau@abbreviation <- "Kendall's rank correlation"
+    }
+  }
+  # Bounded effect sizes have no leading zero, and exact values such as -1
+  # keep their decimals (-1.00)
+  if (!is.na(es_col) && es_col %in% htest_bounded_es && !is.null(cf[[es_col]])) {
+    cf[[es_col]]@formatter <- \(x, accuracy = the$accuracy, ...) {
+      align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, format_integers = TRUE)
     }
   }
 
@@ -190,7 +246,7 @@ apa_htest <- function(
     d$CI <- ci
     if (!is.null(cf$CI)) {
       # Bounded effect sizes have no leading zero
-      if (es_col %in% c("r", "r_rank_biserial", "Cramers_v", "phi", "rho")) {
+      if (es_col %in% htest_bounded_es) {
         cf <- es_ci_format(cf)
       }
       es_header <- if (is.null(cf[[es_col]])) es_col else cf[[es_col]]@header
@@ -229,6 +285,7 @@ apa_htest <- function(
     test = test,
     n_tests = nrow(d),
     one_sample = one_sample,
+    paired = paired,
     var_equal = var_equal,
     mu = mu,
     method = method,
@@ -236,7 +293,8 @@ apa_htest <- function(
     alternative = alternative,
     effect_size = if (is.na(es_col)) NULL else es_col,
     effect_size_header = if (is.na(es_col) || is.null(cf[[es_col]])) NULL else cf[[es_col]]@header,
-    predictor = if (one_sample) NULL else cf$Parameter@formatter(predictor),
+    predictor = if (one_sample || paired) NULL else name_formatter(predictor),
+    pair = if (paired && length(outcomes) == 1) name_formatter(outcomes[[1]]) else NULL,
     abbreviations = record$abbreviations,
     starred = record$starred,
     bolded = record$bolded
@@ -244,12 +302,23 @@ apa_htest <- function(
   as_apa7_tbl(d_new)
 }
 
+#' Effect sizes between -1 and 1
+#' @keywords internal
+#' @noRd
+htest_bounded_es <- c("r", "rho", "tau", "r_rank_biserial", "Cramers_v", "phi")
+
 #' Effect size columns from effectsize
 #' @keywords internal
 #' @noRd
 htest_es_columns <- c(
   "Cohens_d",
   "Hedges_g",
+  "d_av",
+  "d_z",
+  "d_rm",
+  "g_av",
+  "g_z",
+  "g_rm",
   "r_rank_biserial",
   "Cramers_v",
   "phi",
@@ -259,10 +328,14 @@ htest_es_columns <- c(
 #' Check and resolve the effect_size argument of apa_htest()
 #' @keywords internal
 #' @noRd
-htest_effect_size <- function(test, effect_size) {
+htest_effect_size <- function(test, effect_size, paired = FALSE) {
   allowed <- switch(
     test,
-    t = c("cohens_d", "hedges_g"),
+    t = if (paired) {
+      c("d_av", "d_z", "d_rm", "g_av", "g_z", "g_rm", "cohens_d", "hedges_g")
+    } else {
+      c("cohens_d", "hedges_g")
+    },
     wilcoxon = "rank_biserial",
     cor = character(0),
     chisq = c("cramers_v", "phi", "cohens_w")
@@ -287,7 +360,65 @@ htest_effect_size <- function(test, effect_size) {
       "For {.code test = \"{test}\"}, {.arg effect_size} must be {.or {.val {c(allowed, 'none')}}}, not {.val {effect_size}}."
     )
   }
+  if (paired) {
+    effect_size <- switch(effect_size, cohens_d = "d_av", hedges_g = "g_av", effect_size)
+  }
   effect_size
+}
+
+#' Outcomes on the left side of an apa_htest() formula
+#'
+#' @returns character vector of outcome names, or a list of length-2
+#'   character vectors for `Pair()` terms
+#' @keywords internal
+#' @noRd
+htest_outcomes <- function(lhs) {
+  split_plus <- function(e) {
+    if (is.call(e) && identical(e[[1]], as.name("+")) && length(e) == 3) {
+      c(split_plus(e[[2]]), list(e[[3]]))
+    } else {
+      list(e)
+    }
+  }
+  terms <- split_plus(lhs)
+  is_pair <- purrr::map_lgl(terms, \(e) is.call(e) && identical(e[[1]], as.name("Pair")))
+  if (any(is_pair) && !all(is_pair)) {
+    cli::cli_abort(c(
+      "{.arg formula} can't mix {.fn Pair} terms with single outcomes.",
+      i = "Make one table of paired tests and another of the other tests."
+    ))
+  }
+  if (all(is_pair)) {
+    pair_error <- "{.fn Pair} takes two variable names, as in {.code Pair(pre, post)}."
+    return(purrr::map(terms, \(e) {
+      args <- as.list(e)[-1]
+      if (length(args) != 2 || !all(purrr::map_lgl(args, is.name))) {
+        cli::cli_abort(pair_error)
+      }
+      purrr::map_chr(args, as.character)
+    }))
+  }
+  outcomes <- all.vars(lhs)
+  if (length(outcomes) == 0) {
+    cli::cli_abort("{.arg formula} needs at least one outcome variable on the left.")
+  }
+  outcomes
+}
+
+#' Headings for the first and second variables of paired tests
+#' @keywords internal
+#' @noRd
+htest_pair_labels <- function(pair_labels, pairs, formatter) {
+  if (!is.null(pair_labels)) {
+    if (!is.character(pair_labels) || length(pair_labels) != 2) {
+      cli::cli_abort("{.arg pair_labels} must be a character vector of length 2.")
+    }
+    return(pair_labels)
+  }
+  if (length(pairs) == 1) {
+    return(formatter(pairs[[1]]))
+  }
+  c("First", "Second")
 }
 
 #' The two groups of a grouping variable, in factor level order
@@ -444,6 +575,72 @@ htest_wilcoxon <- function(y, x, groups, name, mu, effect_size, ci, ...) {
   htest_row(row, wt)
 }
 
+#' Complete pairs of two paired variables
+#' @keywords internal
+#' @noRd
+htest_pairs <- function(y1, y2, vars, test) {
+  check_numeric_outcome(y1, vars[1], test)
+  check_numeric_outcome(y2, vars[2], test)
+  ok <- !is.na(y1) & !is.na(y2)
+  list(y1[ok], y2[ok])
+}
+
+#' @keywords internal
+#' @noRd
+htest_t_paired <- function(y1, y2, vars, mu, effect_size, ci, ...) {
+  xy <- htest_pairs(y1, y2, vars, "t")
+  tt <- stats::t.test(xy[[1]], xy[[2]], paired = TRUE, mu = mu, conf.level = ci, ...)
+  row <- tibble::tibble(
+    M_1 = mean(xy[[1]]),
+    SD_1 = stats::sd(xy[[1]]),
+    M_2 = mean(xy[[2]]),
+    SD_2 = stats::sd(xy[[2]]),
+    t = unname(tt$statistic),
+    df_error = unname(tt$parameter),
+    p = tt$p.value
+  )
+  if (effect_size != "none") {
+    es <- htest_es(
+      effectsize::repeated_measures_d,
+      xy[[1]],
+      xy[[2]],
+      mu = mu,
+      method = sub("^[dg]_", "", effect_size),
+      adjust = startsWith(effect_size, "g_"),
+      ci = ci
+    )
+    # effectsize names the column d_* even with the small-sample correction
+    colnames(es)[1] <- effect_size
+    row <- dplyr::bind_cols(row, es[setdiff(colnames(es), "CI")])
+  }
+  htest_row(row, tt)
+}
+
+#' @keywords internal
+#' @noRd
+htest_wilcoxon_paired <- function(y1, y2, vars, mu, effect_size, ci, ...) {
+  xy <- htest_pairs(y1, y2, vars, "wilcoxon")
+  wt <- stats::wilcox.test(xy[[1]], xy[[2]], paired = TRUE, mu = mu, ...)
+  row <- tibble::tibble(
+    Mdn_1 = stats::median(xy[[1]]),
+    Mdn_2 = stats::median(xy[[2]]),
+    V = unname(wt$statistic),
+    p = wt$p.value
+  )
+  if (effect_size != "none") {
+    es <- htest_es(
+      effectsize::rank_biserial,
+      xy[[1]],
+      xy[[2]],
+      paired = TRUE,
+      mu = mu,
+      ci = ci
+    )
+    row <- dplyr::bind_cols(row, es[setdiff(colnames(es), "CI")])
+  }
+  htest_row(row, wt)
+}
+
 #' @keywords internal
 #' @noRd
 htest_cor <- function(y, x, name, method, ci, ...) {
@@ -517,6 +714,7 @@ htest_note_record <- function(
   test,
   n_tests = 1L,
   one_sample = FALSE,
+  paired = FALSE,
   var_equal = FALSE,
   mu = 0,
   method = "pearson",
@@ -525,6 +723,7 @@ htest_note_record <- function(
   effect_size = NULL,
   effect_size_header = NULL,
   predictor = NULL,
+  pair = NULL,
   abbreviations = character(0),
   starred = FALSE,
   bolded = FALSE
@@ -534,6 +733,7 @@ htest_note_record <- function(
     test = test,
     n_tests = n_tests,
     one_sample = one_sample,
+    paired = isTRUE(paired),
     var_equal = var_equal,
     mu = mu,
     method = method,
@@ -542,6 +742,7 @@ htest_note_record <- function(
     effect_size = effect_size,
     effect_size_header = effect_size_header,
     predictor = predictor,
+    pair = pair,
     abbreviations = abbreviations,
     starred = isTRUE(starred),
     bolded = isTRUE(bolded)
@@ -552,16 +753,24 @@ htest_note_record <- function(
 #' @noRd
 htest_note_sentences <- function(record) {
   sentences <- character(0)
-  mu <- format(record$mu, trim = TRUE)
+  mu <- sub("-", "\u2212", format(record$mu, trim = TRUE), fixed = TRUE)
 
   # Which tests, in the singular for one test
   one <- isTRUE(record$n_tests == 1)
   tests <- if (one) " test " else " tests "
   verb <- if (one) "compares " else "compare "
   each <- if (one) "the " else "each "
+  # Paired tests compare the variables of each pair (named if just one pair)
+  pair_text <- if (length(record$pair) == 2) {
+    paste0(record$pair[1], " with ", record$pair[2])
+  } else {
+    "the two variables in each row"
+  }
   test_sentence <- switch(
     record$test,
-    t = if (record$one_sample) {
+    t = if (isTRUE(record$paired)) {
+      paste0("Paired *t*", tests, verb, pair_text, ".")
+    } else if (record$one_sample) {
       paste0("One-sample *t*", tests, verb, each, "mean with ", mu, ".")
     } else if (isTRUE(record$var_equal)) {
       paste0(
@@ -576,7 +785,9 @@ htest_note_sentences <- function(record) {
         " without assuming equal variances."
       )
     },
-    wilcoxon = if (record$one_sample) {
+    wilcoxon = if (isTRUE(record$paired)) {
+      paste0("Wilcoxon signed-rank", tests, verb, pair_text, ".")
+    } else if (record$one_sample) {
       paste0("Wilcoxon signed-rank", tests, verb, each, "variable with ", mu, ".")
     } else {
       paste0("Wilcoxon rank-sum", tests, verb, "the groups of ", record$predictor, ".")
@@ -611,7 +822,13 @@ htest_note_sentences <- function(record) {
   if (!record$one_sample && record$test %in% c("t", "wilcoxon") && record$mu != 0) {
     sentences <- c(
       sentences,
-      paste0("The hypothesized difference between groups is ", mu, ".")
+      paste0(
+        "The hypothesized difference between ",
+        if (isTRUE(record$paired)) "variables" else "groups",
+        " is ",
+        mu,
+        "."
+      )
     )
   }
 
@@ -647,9 +864,32 @@ htest_note_sentences <- function(record) {
     )
   }
 
+  if (isTRUE(record$paired) && isTRUE(record$effect_size %in% htest_paired_es)) {
+    how <- switch(
+      sub("^[dg]_", "", record$effect_size),
+      av = " divides the mean difference by the average of the two variables' standard deviations",
+      z = " divides the mean difference by the standard deviation of the differences",
+      rm = " divides the mean difference by the standard deviation of the differences, corrected for the correlation between the variables"
+    )
+    sentences <- c(
+      sentences,
+      paste0(
+        record$effect_size_header,
+        how,
+        if (startsWith(record$effect_size, "g_")) ", with a small-sample correction",
+        "."
+      )
+    )
+  }
+
   sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
   c(sentences, probability_note_sentences(record$starred, record$bolded))
 }
+
+#' Paired effect sizes from effectsize::repeated_measures_d()
+#' @keywords internal
+#' @noRd
+htest_paired_es <- c("d_av", "d_z", "d_rm", "g_av", "g_z", "g_rm")
 
 #' Probability notes for stars and bold values
 #' @keywords internal

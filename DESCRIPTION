@@ -1,7 +1,7 @@
 Package: apa7
 Title: Writing Documents in American Psychological Association
     Style, Seventh Edition
-Version: 0.2.9000
+Version: 0.2.0.9000
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0002-8393-5316"))

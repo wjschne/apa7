@@ -51,7 +51,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 - [x] Group-comparison table: *M* and *SD* by group (group spanners), plus *t*, *df*, *p*, *d*
 - [x] Table note via `apa_note()`
 - [x] Tests (`tests/testthat/test-htest.R`)
-- [ ] Paired *t* tests and Wilcoxon signed-rank tests of paired variables (e.g., `pre + post` in wide data)
+- [x] Paired *t* tests and Wilcoxon signed-rank tests of paired variables, with `Pair(pre, post) ~ 1` (*d*~av~ by default; *d*~z~, *d*~rm~, and *g* versions)
 - [ ] Accept a plain `htest` object, with effect sizes computed from the test statistic (and the note saying so)
 - [ ] Stack different kinds of tests in one table (list method)
 - [ ] Vignette article

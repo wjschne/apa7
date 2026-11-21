@@ -203,3 +203,121 @@ test_that("apa_htest tables render as flextables with group spanners", {
   expect_s3_class(ft, "flextable")
   expect_equal(flextable::nrow_part(ft, "header"), 2)
 })
+
+d_paired <- data.frame(
+  drug1 = sleep$extra[1:10],
+  drug2 = sleep$extra[11:20]
+)
+
+test_that("paired t tests use Pair() and d_av by default", {
+  result <- apa_htest(d_paired, Pair(drug1, drug2) ~ 1)
+  expect_equal(
+    colnames(result),
+    c(
+      "Variable", "Drug 1_*M*", "Drug 1_*SD*", "Drug 2_*M*", "Drug 2_*SD*",
+      "*t*(9)", "*p*", "*d*~av~", "95% CI"
+    )
+  )
+  expect_equal(result$Variable, "Drug 1 vs. Drug 2")
+  tt <- t.test(d_paired$drug1, d_paired$drug2, paired = TRUE)
+  expect_equal(as_num(result$`*t*(9)`), round(unname(tt$statistic), 2))
+  es <- effectsize::repeated_measures_d(
+    d_paired$drug1, d_paired$drug2, method = "av", adjust = FALSE
+  )
+  expect_equal(as_num(result$`*d*~av~`), round(es$d_av, 2))
+  expect_equal(
+    unname(ci_bounds(result$`95% CI`)[1, ]),
+    round(c(es$CI_low, es$CI_high), 2)
+  )
+  note <- apa_note(result)
+  expect_match(note, "Paired *t* test compares Drug 1 with Drug 2.", fixed = TRUE)
+  expect_match(note, "*d*~av~ divides the mean difference by the average", fixed = TRUE)
+})
+
+test_that("paired t tests offer d_z, d_rm, and Hedges' g versions", {
+  result_z <- apa_htest(d_paired, Pair(drug1, drug2) ~ 1, effect_size = "d_z")
+  es_z <- effectsize::repeated_measures_d(
+    d_paired$drug1, d_paired$drug2, method = "z", adjust = FALSE
+  )
+  expect_equal(as_num(result_z$`*d*~z~`), round(es_z$d_z, 2))
+  expect_match(apa_note(result_z), "standard deviation of the differences.", fixed = TRUE)
+
+  result_g <- apa_htest(d_paired, Pair(drug1, drug2) ~ 1, effect_size = "hedges_g")
+  es_g <- effectsize::repeated_measures_d(
+    d_paired$drug1, d_paired$drug2, method = "av", adjust = TRUE
+  )
+  expect_true("*g*~av~" %in% colnames(result_g))
+  expect_equal(as_num(result_g$`*g*~av~`), round(es_g$d_av, 2))
+  expect_match(apa_note(result_g), "with a small-sample correction", fixed = TRUE)
+
+  result_rm <- apa_htest(d_paired, Pair(drug1, drug2) ~ 1, effect_size = "d_rm")
+  expect_true("*d*~rm~" %in% colnames(result_rm))
+
+  expect_error(
+    apa_htest(d_paired, Pair(drug1, drug2) ~ 1, effect_size = "cramers_v"),
+    "d_av"
+  )
+})
+
+test_that("several pairs share pair_labels headings", {
+  set.seed(1)
+  dw <- data.frame(
+    anx_pre = rnorm(30, 10), anx_post = rnorm(30, 9),
+    dep_pre = rnorm(30, 5), dep_post = rnorm(30, 5)
+  )
+  result <- apa_htest(
+    dw,
+    Pair(anx_pre, anx_post) + Pair(dep_pre, dep_post) ~ 1,
+    pair_labels = c("Pretest", "Posttest")
+  )
+  expect_equal(result$Variable, c("Anx Pre vs. Anx Post", "Dep Pre vs. Dep Post"))
+  expect_true(all(c("Pretest_*M*", "Posttest_*SD*") %in% colnames(result)))
+  expect_match(
+    apa_note(result),
+    "Paired *t* tests compare the two variables in each row.",
+    fixed = TRUE
+  )
+
+  result_default <- apa_htest(dw, Pair(anx_pre, anx_post) + Pair(dep_pre, dep_post) ~ 1)
+  expect_true("First_*M*" %in% colnames(result_default))
+  expect_error(
+    apa_htest(dw, Pair(anx_pre, anx_post) ~ 1, pair_labels = "Pre"),
+    "length 2"
+  )
+})
+
+test_that("paired Wilcoxon signed-rank tests show medians and rank-biserial r", {
+  result <- apa_htest(d_paired, Pair(drug1, drug2) ~ 1, test = "wilcoxon", exact = FALSE)
+  expect_equal(
+    colnames(result),
+    c("Variable", "Drug 1_*Mdn*", "Drug 2_*Mdn*", "*V*", "*p*", "*r*~rb~", "95% CI")
+  )
+  # Exact values keep their decimals
+  expect_equal(trimws(result$`*r*~rb~`), paste0(intToUtf8(8722), "1.00"))
+  expect_match(
+    apa_note(result),
+    "Wilcoxon signed-rank test compares Drug 1 with Drug 2.",
+    fixed = TRUE
+  )
+})
+
+test_that("paired tests use complete pairs and say what mu is", {
+  dd <- d_paired
+  dd$drug2[1] <- NA
+  result <- apa_htest(dd, Pair(drug1, drug2) ~ 1, mu = -1)
+  expect_true("*t*(8)" %in% colnames(result))
+  expect_match(
+    apa_note(result),
+    paste0("hypothesized difference between variables is ", intToUtf8(8722), "1."),
+    fixed = TRUE
+  )
+})
+
+test_that("Pair() gives clear errors", {
+  expect_error(apa_htest(d_paired, Pair(drug1, drug2) + drug1 ~ 1), "mix")
+  expect_error(apa_htest(d_paired, Pair(drug1) ~ 1), "two variable names")
+  expect_error(apa_htest(d_paired, Pair(drug1, drug2 * 2) ~ 1), "two variable names")
+  expect_error(apa_htest(d_htest, Pair(mpg, hp) ~ am), "1")
+  expect_error(apa_htest(d_paired, Pair(drug1, drug2) ~ 1, test = "cor"), "Pair")
+  expect_error(apa_htest(d_paired, Pair(drug1, nope) ~ 1), "nope")
+})

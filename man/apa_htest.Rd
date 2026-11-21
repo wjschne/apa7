@@ -14,6 +14,7 @@ apa_htest(
   mu = 0,
   method = c("pearson", "spearman", "kendall"),
   descriptives = TRUE,
+  pair_labels = NULL,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
@@ -27,14 +28,17 @@ apa_htest(
 grouping or predictor variable on the right. Several outcomes are joined
 with \code{+} (e.g., \code{mpg + hp ~ am}), and each gets its own row. For one-sample
 \emph{t} tests and Wilcoxon signed-rank tests, use \code{1} on the right (e.g.,
-\code{mpg ~ 1}).}
+\code{mpg ~ 1}). For paired tests, put each pair of variables in \code{Pair()} with
+\code{1} on the right (e.g., \code{Pair(pre, post) ~ 1}, or
+\code{Pair(anx1, anx2) + Pair(dep1, dep2) ~ 1} for several pairs).}
 
 \item{test}{type of test:
 \itemize{
 \item \code{"t"}: \emph{t} test comparing the means of two groups (Welch's test unless
-\code{var_equal = TRUE}), or a one-sample \emph{t} test comparing a mean with \code{mu}
+\code{var_equal = TRUE}), a paired \emph{t} test, or a one-sample \emph{t} test
+comparing a mean with \code{mu}
 \item \code{"wilcoxon"}: Wilcoxon rank-sum test comparing two groups, or a Wilcoxon
-signed-rank test comparing a variable with \code{mu}
+signed-rank test of paired variables or of a variable compared with \code{mu}
 \item \code{"cor"}: correlation test of each outcome with the variable on the right
 \item \code{"chisq"}: chi-square test of independence of each outcome with the
 variable on the right
@@ -46,7 +50,16 @@ correlation (\code{"rank_biserial"}) for Wilcoxon tests, and Cramér's \emph{V}
 (\code{"cramers_v"}) for chi-square tests. \emph{t} tests can also show Hedges' \emph{g}
 (\code{"hedges_g"}), and chi-square tests can show \eqn{\phi}{phi} (\code{"phi"}, for
 2 \eqn{\times}{x} 2 tables) or Cohen's \emph{w} (\code{"cohens_w"}). Use \code{"none"} for
-no effect size. Correlation tests show the correlation itself.}
+no effect size. Correlation tests show the correlation itself.
+
+For paired \emph{t} tests, Cohen's \emph{d} is \emph{d}~av~ (\code{"d_av"}), which divides the
+mean difference by the average of the two variables' standard deviations,
+so it is comparable to \emph{d} for two independent groups. Other choices are
+\emph{d}~z~ (\code{"d_z"}, divided by the standard deviation of the differences) and
+\emph{d}~rm~ (\code{"d_rm"}, \emph{d}~z~ corrected for the correlation between the
+variables), and Hedges' \emph{g} versions with a small-sample correction
+(\code{"g_av"}, \code{"g_z"}, \code{"g_rm"}; \code{"hedges_g"} is \code{"g_av"}). These come from
+\code{\link[effectsize:repeated_measures_d]{effectsize::repeated_measures_d()}}.}
 
 \item{ci}{confidence level of the effect size interval (for correlation
 tests, the interval of Pearson's \emph{r}). Intervals are two-sided.}
@@ -65,6 +78,12 @@ or \code{"kendall"}}
 \item{descriptives}{if \code{TRUE} (default), the table shows each group's mean
 and standard deviation (\emph{t} tests) or median (Wilcoxon tests), or each
 variable's sample size (correlation and chi-square tests).}
+
+\item{pair_labels}{for paired tests, labels of the first and second
+variable of each pair, used as the headings above their descriptive
+statistics (e.g., \code{c("Pretest", "Posttest")}). If \code{NULL} (default), the
+headings are the variable names when there is one pair, and "First" and
+"Second" otherwise.}
 
 \item{starred}{columns to star with significant \emph{p}-values (e.g., \code{"t"})}
 
@@ -92,7 +111,9 @@ effect sizes are computed from the data with the effectsize package (e.g.,
 Each test uses the rows in which both the outcome and the grouping (or
 predictor) variable are observed. For two-group tests, the grouping
 variable must have exactly two observed values, and differences are the
-first group (in factor level order) minus the second.
+first group (in factor level order) minus the second. Paired tests use the
+rows in which both variables of the pair are observed, and differences are
+the first variable minus the second.
 
 Effect sizes are computed from the data rather than from the test
 statistic, so Cohen's \emph{d} for Welch's test is exact rather than
@@ -112,6 +133,10 @@ apa_htest(d, mpg ~ am, var_equal = TRUE, effect_size = "hedges_g")
 
 # One-sample t test
 apa_htest(d, mpg ~ 1, mu = 20)
+
+# Paired t test with d_av
+d_sleep <- data.frame(drug1 = sleep$extra[1:10], drug2 = sleep$extra[11:20])
+apa_htest(d_sleep, Pair(drug1, drug2) ~ 1)
 
 # Wilcoxon rank-sum tests with rank-biserial correlations
 apa_htest(d, mpg + hp ~ am, test = "wilcoxon", exact = FALSE)
