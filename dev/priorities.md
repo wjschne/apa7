@@ -21,7 +21,7 @@ Last reviewed: 2026-11-20
   - [x] Shorten the long file path under `vignettes/apa7_files/libs/` (the build-ignore pattern is now `^vignettes/.*_files$`)
   - [x] Move packages used unconditionally in package code (`cli`, `knitr`, `snakecase`, `tidyselect`) from Suggests to Imports, and replace `R.utils::insert()` with a base helper
 - [ ] Run `devtools::check_win_devel()` and `rhub` checks
-- [ ] Run `spelling::spell_check_package()` and `urlchecker::url_check()`
+- [x] Run `spelling::spell_check_package()` and `urlchecker::url_check()` (2026-11-20: no typos; terms added to `inst/WORDLIST`; redundant `doi.apa.org` URLs removed from `refs.bib`, whose DOIs remain)
 - [ ] Rebuild the pkgdown site and vignettes
 - [ ] Update `cran-comments.md`
 
