@@ -38,7 +38,8 @@ apa_style(
 
 \item{border_width}{border width in pixels}
 
-\item{line_spacing}{spacing between lines}
+\item{line_spacing}{spacing between lines of the header and body. Table
+notes are single-spaced.}
 
 \item{horizontal_padding}{horizontal padding (in pixels)}
 

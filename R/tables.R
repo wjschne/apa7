@@ -769,7 +769,7 @@ apa_cor <- function(
           ) |>
           flextable::line_spacing(
             part = "footer",
-            space = line_spacing
+            space = 1
           ) |>
           flextable::color(
             part = "footer",
@@ -785,7 +785,7 @@ apa_cor <- function(
       ) |>
         flextable::font(part = "footer", fontname = font_family) |>
         flextable::fontsize(part = "footer", size = font_size) |>
-        flextable::line_spacing(part = "footer", space = line_spacing) |>
+        flextable::line_spacing(part = "footer", space = 1) |>
         flextable::color(part = "footer", color = text_color)
     }
 
@@ -865,7 +865,7 @@ apa_cor <- function(
 #' @param pretty_widths apply `pretty_widths` function
 #' @param no_format_columns Column name or tidyselect function. selected columns are not formatted. Columns named in a `"no_format_columns"` attribute of `data` (set by functions such as [apa_loadings()]) are not formatted either. Likewise, a rule is drawn above the first body row whose first-column text matches a `"rule_above"` attribute of `data`.
 #' @param add_breaks_between_spanners add breaks between spanners if TRUE
-#' @param note table note placed below the table, after "*Note*.". If `TRUE`, the note is written by [apa_note()] from what a table function such as [apa_anova()], [apa_parameters()], or [apa_loadings()] recorded. A character string is used as the note (markdown is allowed), and `NULL` or `FALSE` (default) adds no note. Use this for documents that are not made with apaquarto. With apaquarto, use the `apa-note` chunk option instead (e.g., `#| apa-note: !expr apa7::apa_note(tbl)`), so that the note is placed and styled by apaquarto and is not added twice.
+#' @param note table note placed below the table, after "*Note*.". The note is single-spaced. If `TRUE`, the note is written by [apa_note()] from what a table function such as [apa_anova()], [apa_parameters()], or [apa_loadings()] recorded. A character string is used as the note (markdown is allowed), and `NULL` or `FALSE` (default) adds no note. Use this for documents that are not made with apaquarto. With apaquarto, use the `apa-note` chunk option instead (e.g., `#| apa-note: !expr apa7::apa_note(tbl)`), so that the note is placed and styled by apaquarto and is not added twice.
 #' @inheritParams apa_style
 #' @param ... arguments passed to `apa_style`
 
@@ -1205,7 +1205,6 @@ apa_flextable <- function(
     font_family = font_family,
     font_size = font_size,
     text_color = text_color,
-    line_spacing = line_spacing,
     horizontal_padding = horizontal_padding
   )
 
@@ -2629,7 +2628,8 @@ model_names <- function(models) {
 #' @param text_color text color
 #' @param border_color border color
 #' @param border_width border width in pixels
-#' @param line_spacing spacing between lines
+#' @param line_spacing spacing between lines of the header and body. Table
+#'   notes are single-spaced.
 #' @param horizontal_padding horizontal padding (in pixels)
 #' @param markdown apply markdown formatting to header and body
 #' @param markdown_header apply markdown formatting to header
@@ -2722,7 +2722,6 @@ apa_style <- function(
     flextable::valign(part = "all", valign = "top") |>
     flextable::align(part = "header", align = "center") |>
     flextable::line_spacing(space = 1, part = "all") |>
-    flextable::line_spacing(space = line_spacing, part = "footer") |>
     flextable::padding(
       padding.top = pd,
       padding.bottom = pd,

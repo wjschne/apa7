@@ -53,7 +53,8 @@ apa_cor(
 
 \item{border_width}{border width in pixels}
 
-\item{line_spacing}{spacing between lines}
+\item{line_spacing}{spacing between lines of the header and body. Table
+notes are single-spaced.}
 
 \item{table_width}{table width (in pixels, 0 for auto)}
 

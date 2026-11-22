@@ -644,7 +644,8 @@ note_text <- function(data, note) {
   text
 }
 
-#' Add a table note below a flextable, styled like apa_style() footers
+#' Add a table note below a flextable, styled like apa_style() footers but
+#' single-spaced
 #' @keywords internal
 #' @noRd
 add_note_footer <- function(
@@ -653,7 +654,6 @@ add_note_footer <- function(
   font_family = NULL,
   font_size = 12,
   text_color = "black",
-  line_spacing = 2,
   horizontal_padding = 3
 ) {
   if (is.null(text)) {
@@ -672,7 +672,7 @@ add_note_footer <- function(
     flextable::font(i = i, part = "footer", fontname = font_family) |>
     flextable::fontsize(i = i, part = "footer", size = font_size) |>
     flextable::color(i = i, part = "footer", color = text_color) |>
-    flextable::line_spacing(i = i, part = "footer", space = line_spacing) |>
+    flextable::line_spacing(i = i, part = "footer", space = 1) |>
     flextable::align(i = i, part = "footer", align = "left") |>
     flextable::valign(i = i, part = "footer", valign = "top") |>
     flextable::padding(

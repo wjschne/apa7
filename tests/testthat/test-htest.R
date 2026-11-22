@@ -321,3 +321,9 @@ test_that("Pair() gives clear errors", {
   expect_error(apa_htest(d_paired, Pair(drug1, drug2) ~ 1, test = "cor"), "Pair")
   expect_error(apa_htest(d_paired, Pair(drug1, nope) ~ 1), "nope")
 })
+
+test_that("paired row labels keep 'vs.' in flextables", {
+  result <- apa_htest(d_paired, Pair(drug1, drug2) ~ 1)
+  ft <- apa_flextable(result)
+  expect_equal(ft$body$dataset[[1]], "Drug 1 vs. Drug 2")
+})

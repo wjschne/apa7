@@ -157,6 +157,9 @@ test_that("apa_flextable adds the generated note with note = TRUE", {
 
   # The note is left aligned
   expect_equal(unique(ft$footer$styles$pars$text.align$data[1, ]), "left")
+
+  # The note is single-spaced, even when the table is double-spaced
+  expect_equal(unique(ft$footer$styles$pars$line_spacing$data[1, ]), 1)
 })
 
 test_that("apa_flextable uses custom note text", {
@@ -261,4 +264,19 @@ test_that("loadings notes use column format abbreviations", {
     "*h*^2^ = communality; Complexity = Hofmann's complexity index.",
     fixed = TRUE
   )
+})
+
+test_that("table notes are single-spaced in all table functions", {
+  footer_spacing <- function(ft) {
+    unique(as.vector(ft$footer$styles$pars$line_spacing$data))
+  }
+  # apa_chisq() note, styled by apa_style()
+  expect_equal(footer_spacing(apa_chisq(mtcars[, c("am", "vs")])), 1)
+  # apa_cor() note
+  expect_equal(footer_spacing(apa_cor(mtcars[, 1:3])), 1)
+  # apa_style() footer added by the user
+  ft <- flextable::flextable(head(mtcars[, 1:3])) |>
+    flextable::add_footer_lines("A note.") |>
+    apa_style(line_spacing = 2)
+  expect_equal(footer_spacing(ft), 1)
 })

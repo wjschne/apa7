@@ -54,7 +54,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 - [x] Paired *t* tests and Wilcoxon signed-rank tests of paired variables, with `Pair(pre, post) ~ 1` (*d*~av~ by default; *d*~z~, *d*~rm~, and *g* versions)
 - [ ] Accept a plain `htest` object, with effect sizes computed from the test statistic (and the note saying so)
 - [ ] Stack different kinds of tests in one table (list method)
-- [ ] Vignette article
+- [x] Vignette article (`vignettes/articles/htest.qmd`)
 
 ### 3. Factor analysis (`apa_loadings()`)
 

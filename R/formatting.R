@@ -912,12 +912,15 @@ variable_name_formatter <- function(
     ` ?\\| ?` = " Apasevenpipe ",
     ` \\[([^]]+)\\]` = "Apasevenendash \\1",
     `\\&numsp;` = "Apasevennumsp",
-    `\\&nbsp;` = "Apasevennbsp"
+    `\\&nbsp;` = "Apasevennbsp",
+    # "vs." in paired-test labels (e.g., "Pre vs. Post")
+    ` vs\\. ` = " Apasevenvs "
   )
 
   post_p2r <- c(
     ` ?Apasevenendash ?` = "\u2013",
     ` ?Apasevenpipe ?` = " | ",
+    ` ?Apasevenvs ?` = " vs. ",
     ` Apasevendotspace` = ".\u2007",
     `Apasevendotspace` = ".\u2007",
     `Apasevennumsp` = "\u2007",
@@ -979,6 +982,7 @@ variable_name_formatter <- function(
         "Apasevencaret",
         "Apasevenendash",
         "Apasevenpipe",
+        "Apasevenvs",
         "\u2013",
         "\t",
         "\n"
