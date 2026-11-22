@@ -194,19 +194,23 @@ cross_model <- "visual =~ x1 + x2 + x3 + x9
                 textual =~ x4 + x5 + x6
                 speed =~ x7 + x8 + x9"
 
-test_that("apa_loadings() shows standardized CFA loadings in model order", {
+test_that("apa_loadings() shows standardized CFA loadings sorted as in EFA", {
   skip_if_not_installed("lavaan")
   fit <- lavaan::cfa(cross_model, data = lavaan::HolzingerSwineford1939)
   result <- apa_loadings(fit, communality = TRUE)
   expect_equal(colnames(result), c("Variable", "Visual", "Textual", "Speed", "*h*^2^"))
-  expect_equal(result$Variable, paste0("X", c(1, 2, 3, 9, 4:8)))
+  # Grouped by the factor with the largest loading, largest first; X9 loads
+  # more on Speed than on Visual
+  expect_equal(result$Variable, paste0("X", c(1, 3, 2, 5, 4, 6, 8, 7, 9)))
   std <- lavaan::lavInspect(fit, "std")
-  expect_equal(as_num(result$Visual[1]), round(std$lambda["x1", "visual"], 2))
+  row <- \(v) result$Variable == v
+  expect_equal(as_num(result$Visual[row("X1")]), round(std$lambda["x1", "visual"], 2))
   # The cross-loading is shown; loadings fixed at 0 are blank
-  expect_equal(as_num(result$Speed[4]), round(std$lambda["x9", "speed"], 2))
-  expect_equal(trimws(result$Textual[1]), "")
+  expect_equal(as_num(result$Visual[row("X9")]), round(std$lambda["x9", "visual"], 2))
+  expect_equal(as_num(result$Speed[row("X9")]), round(std$lambda["x9", "speed"], 2))
+  expect_equal(trimws(result$Textual[row("X1")]), "")
   expect_equal(
-    as_num(result$`*h*^2^`[1]),
+    as_num(result$`*h*^2^`[row("X1")]),
     round(1 - diag(std$theta)[["x1"]], 2)
   )
   note <- apa_note(result)
@@ -217,16 +221,17 @@ test_that("apa_loadings() shows standardized CFA loadings in model order", {
   expect_no_match(note, "pattern coefficients", fixed = TRUE)
   expect_equal(apa_flextable(result)$body$dataset[[1]], result$Variable)
 
-  # Sorting, cutoffs, and names can still be chosen
-  sorted <- apa_loadings(
+  # Syntax order, cutoffs, and names can be chosen
+  unsorted <- apa_loadings(
     fit,
-    sort_loading = TRUE,
+    sort_loading = FALSE,
     min_loading = .5,
     factor_names = c(speed = "Processing speed")
   )
-  expect_equal(colnames(sorted)[4], "Processing speed")
-  expect_equal(trimws(sorted$Visual[sorted$Variable == "X9"]), "")
-  expect_match(apa_note(sorted), "smaller than .50", fixed = TRUE)
+  expect_equal(unsorted$Variable, paste0("X", c(1, 2, 3, 9, 4:8)))
+  expect_equal(colnames(unsorted)[4], "Processing speed")
+  expect_equal(trimws(unsorted$Visual[unsorted$Variable == "X9"]), "")
+  expect_match(apa_note(unsorted), "smaller than .50", fixed = TRUE)
 })
 
 test_that("apa_factor_cor() shows latent correlations for lavaan models", {

@@ -27,7 +27,7 @@ library(ggdiagram)
 <<setup>>
 ```
 
-Confirmatory factor analyses (CFA) and structural equation models (SEM) fit with the [lavaan](https://lavaan.ugent.be/) package are usually reported with two tables: one with the fit of the model to the data, and one with the estimated parameters (factor loadings, regression paths, and correlations). apa7 makes both:
+Confirmatory factor analyses (CFA) and structural equation models (SEM) fit with the [lavaan](https://lavaan.ugent.be/) package are usually reported with at least two tables: one with the fit of the model to the data, and one with the estimated parameters (factor loadings, regression paths, and correlations). A CFA can also be reported as a matrix of loadings, like an exploratory factor analysis, and a sequence of nested models (e.g., tests of measurement invariance) as a table comparing their fit. The apa7 package makes all four types of tables:
 
 | Table | Function | Contents |
 |---|---|---|
@@ -182,7 +182,7 @@ Variances (labeled "residual" for indicators and outcomes), intercepts, and thre
 
 ## Loading matrix
 
-A CFA can also be reported in the matrix form used for exploratory factor analysis, with a row for each indicator and a column for each factor. `apa_loadings` shows the standardized loadings in the order of the model syntax, and leaves blank the loadings fixed at 0. Suppose that *S*~3~ (counting dots and capital letters) loads on Visual as well as on Speed:
+A CFA can also be reported in the matrix form used for exploratory factor analysis, with a row for each indicator and a column for each factor. `apa_loadings` shows the standardized loadings and leaves blank the loadings fixed at 0. As in exploratory factor analysis, the rows are grouped by the factor with each indicator's largest loading and sorted by the size of that loading (`sort_loading = FALSE` keeps the order of the model syntax). Suppose that *S*~3~ (counting dots and capital letters) loads on Visual as well as on Speed:
 
 ```{r}
 #| label: hs-loadings

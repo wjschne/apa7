@@ -15,9 +15,11 @@
 #'
 #' For a [lavaan::cfa()] or [lavaan::sem()] model, the loadings are the fully
 #' standardized estimates (as in [lavaan::standardizedSolution()]), and loadings
-#' fixed at 0 are left blank. The rows keep the order of the model syntax, and
-#' every estimated loading is shown, unless `sort_loading` or `min_loading` is
-#' set. The communality is the proportion of an indicator's variance explained
+#' fixed at 0 are left blank. As for exploratory analyses, the rows are sorted
+#' by the factor with each variable's largest loading and by the size of that
+#' loading (use `sort_loading = FALSE` to keep the order of the model syntax).
+#' Every estimated loading is shown, unless `min_loading` is set. The
+#' communality is the proportion of an indicator's variance explained
 #' by the factors (\eqn{R^2}{R^2}), and the uniqueness is its standardized
 #' residual variance. Variable and factor names are shown as written in the
 #' model, with the first letter capitalized and underscores replaced by
@@ -42,7 +44,7 @@
 #' table is rendered.
 #'
 #' @param fit a `psych::fa`, `psych::principal`, `parameters::factor_analysis`, `parameters::principal_components`, or `lavaan` object
-#' @param sort_loading sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in [psych::fa.sort()]). `TRUE` by default, except for `lavaan` models.
+#' @param sort_loading sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in [psych::fa.sort()]). If `FALSE`, the rows keep the order of the model (for `lavaan` models, the order of the model syntax).
 #' @param min_loading minimum absolute loading to display. Use `NA` or 0 to show all loadings. Defaults to .2, except for `lavaan` models, whose estimated loadings are all shown.
 #' @param factor_names names for the factors. Either an unnamed character vector in the order the factors appear in the table (psych orders factors by variance explained), or a named vector that maps the original names to new names (e.g., `c(PA1 = "Verbal")`). The unnamed form is safer: after an oblimin rotation, the labels psych assigns (PA1, PA2, ...) can change from one run to the next, but the order of the factors does not.
 #' @param variance add rows for the variance explained by each factor
@@ -97,11 +99,9 @@ apa_loadings <- function(
 ) {
   parts <- fa_parts(fit)
   is_cfa <- identical(parts$method, "lavaan")
-  if (is_cfa) {
-    # A confirmatory model keeps the order in which it was written, and every
-    # estimated loading is shown
-    if (missing(sort_loading)) sort_loading <- FALSE
-    if (missing(min_loading)) min_loading <- NA
+  if (is_cfa && missing(min_loading)) {
+    # Every loading estimated in a confirmatory model is shown
+    min_loading <- NA
   }
   L <- parts$loadings
   factor_columns <- colnames(L)

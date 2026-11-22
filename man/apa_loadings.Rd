@@ -21,7 +21,7 @@ apa_loadings(
 \arguments{
 \item{fit}{a \code{psych::fa}, \code{psych::principal}, \code{parameters::factor_analysis}, \code{parameters::principal_components}, or \code{lavaan} object}
 
-\item{sort_loading}{sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in \code{\link[psych:fa.sort]{psych::fa.sort()}}). \code{TRUE} by default, except for \code{lavaan} models.}
+\item{sort_loading}{sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in \code{\link[psych:fa.sort]{psych::fa.sort()}}). If \code{FALSE}, the rows keep the order of the model (for \code{lavaan} models, the order of the model syntax).}
 
 \item{min_loading}{minimum absolute loading to display. Use \code{NA} or 0 to show all loadings. Defaults to .2, except for \code{lavaan} models, whose estimated loadings are all shown.}
 
@@ -61,9 +61,11 @@ standardized (the default, \code{standardize = TRUE}).
 
 For a \code{\link[lavaan:cfa]{lavaan::cfa()}} or \code{\link[lavaan:sem]{lavaan::sem()}} model, the loadings are the fully
 standardized estimates (as in \code{\link[lavaan:standardizedSolution]{lavaan::standardizedSolution()}}), and loadings
-fixed at 0 are left blank. The rows keep the order of the model syntax, and
-every estimated loading is shown, unless \code{sort_loading} or \code{min_loading} is
-set. The communality is the proportion of an indicator's variance explained
+fixed at 0 are left blank. As for exploratory analyses, the rows are sorted
+by the factor with each variable's largest loading and by the size of that
+loading (use \code{sort_loading = FALSE} to keep the order of the model syntax).
+Every estimated loading is shown, unless \code{min_loading} is set. The
+communality is the proportion of an indicator's variance explained
 by the factors (\eqn{R^2}{R^2}), and the uniqueness is its standardized
 residual variance. Variable and factor names are shown as written in the
 model, with the first letter capitalized and underscores replaced by
