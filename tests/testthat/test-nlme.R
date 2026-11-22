@@ -9,13 +9,17 @@ test_that("apa_parameters.lme shows fixed effects with nlme's df and random effe
   expect_equal(
     result$Variable,
     c(
-      "Constant", "Days", "Subject: *SD* (Constant)", "Subject: *SD* (Days)",
-      "Subject: *r* (Constant, Days)", "Residual *SD*"
+      "Fixed effects",
+      paste0("\u2003", c("Constant", "Days")),
+      "Random effects (*SD*)",
+      "\u2003Subject",
+      paste0("\u2003\u2003", c("Constant", "Days", "*r* (Constant, Days)")),
+      "\u2003Residual"
     )
   )
   tt <- summary(fit)$tTable
-  expect_equal(as_num(result$`*B*`[1:2]), unname(round(tt[, "Value"], 2)))
-  expect_equal(as_num(result$`*t*(161)`[1:2]), unname(round(tt[, "t-value"], 2)))
+  expect_equal(as_num(result$`*B*`[2:3]), unname(round(tt[, "Value"], 2)))
+  expect_equal(as_num(result$`*t*(161)`[2:3]), unname(round(tt[, "t-value"], 2)))
   expect_match(apa_note(result), "computed by nlme from the grouping levels", fixed = TRUE)
   # Labels are not formatted again in flextables
   expect_equal(apa_flextable(result)$body$dataset[[1]], result$Variable)
@@ -33,7 +37,7 @@ test_that("residual correlation structures get rows and a note", {
   # df differ across fixed effects, so they get a column
   expect_true("*df*" %in% colnames(result))
   phi <- stats::coef(fit$modelStruct$corStruct, unconstrained = FALSE)
-  row <- result$Variable == "Residual autocorrelation (*φ*)"
+  row <- result$Variable == paste0("\u2003", "Residual autocorrelation (*φ*)")
   expect_equal(as_num(result$`*B*`[row]), unname(round(phi, 2)))
   expect_match(
     apa_note(result),
@@ -52,7 +56,7 @@ test_that("variance functions get rows and a note", {
   )
   result <- apa_parameters(fit_ident)
   ratio <- stats::coef(fit_ident$modelStruct$varStruct, unconstrained = FALSE)
-  row <- result$Variable == "Residual *SD* ratio: Female"
+  row <- result$Variable == paste0("\u2003", "Residual *SD* ratio: Female")
   expect_equal(as_num(result$`*B*`[row]), unname(round(ratio, 2)))
   expect_match(apa_note(result), "The residual *SD* is that of Male", fixed = TRUE)
 
@@ -65,7 +69,7 @@ test_that("variance functions get rows and a note", {
   )
   result_power <- apa_parameters(fit_power)
   expect_true(all(
-    c("Residual correlation (*ρ*)", "Residual *SD* power (*δ*)") %in%
+    paste0("\u2003", c("Residual correlation (*ρ*)", "Residual *SD* power (*δ*)")) %in%
       result_power$Variable
   ))
   note <- apa_note(result_power)

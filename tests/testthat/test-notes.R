@@ -97,13 +97,16 @@ test_that("apa_note describes mixed models", {
   m1 <- lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
   expect_equal(
     apa_note(apa_parameters(m1)),
-    paste0("Degrees of freedom are Kenward", intToUtf8(8211), "Roger approximations.")
+    paste0(
+      "Degrees of freedom are Kenward", intToUtf8(8211), "Roger approximations. ",
+      "*SD* = standard deviation; *r* = correlation."
+    )
   )
 
   m0 <- lme4::lmer(Reaction ~ 1 + (1 | Subject), data = lme4::sleepstudy)
   notes <- apa_note(apa_parameters(list(m0, m1)), collapse = NULL)
   expect_match(notes[1], "Kenward", fixed = TRUE)
-  expect_match(notes[2], "^[*]R[*]\\^2\\^ = variance explained by fixed effects;")
+  expect_match(notes[2], "^[*]SD[*] = standard deviation; [*]r[*] = correlation; [*]R[*]\\^2\\^ = variance explained by fixed effects;")
   expect_match(notes[2], "variance explained by fixed and random effects", fixed = TRUE)
   expect_equal(notes[3], star_note)
 })
@@ -114,7 +117,7 @@ test_that("apa_note describes satterthwaite df", {
   m1 <- lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
   expect_equal(
     apa_note(apa_parameters(m1, ci_method = "satterthwaite")),
-    "Degrees of freedom are Satterthwaite approximations."
+    "Degrees of freedom are Satterthwaite approximations. *SD* = standard deviation; *r* = correlation."
   )
 })
 

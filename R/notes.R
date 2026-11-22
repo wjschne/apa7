@@ -574,7 +574,8 @@ parameters_note_record <- function(
   list(
     table = "parameters",
     headers = headers,
-    abbreviations = abbreviations,
+    # Symbols of random effects (e.g., *SD* and *r*) are defined, too
+    abbreviations = combine_abbreviations(abbreviations, note$random_abbreviations),
     vcov = note$vcov,
     df_method = note$df_method,
     thresholds = note$thresholds,

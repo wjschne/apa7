@@ -19,7 +19,7 @@ library(parameters)
 <<setup>>
 ```
 
-When observations are nested (trials within participants, students within classrooms) or crossed (participants responding to the same set of items), ordinary regression treats correlated observations as independent and understates uncertainty. Multilevel (mixed-effects) models account for the nesting with random effects. `apa_parameters` accepts models fit with `lme4::lmer`, `lme4::glmer`, `nlme::lme`, and `glmmTMB::glmmTMB` and displays the fixed effects as in an ordinary regression table, followed by the random-effect standard deviations and correlations.
+When observations are nested (trials within participants, students within classrooms) or crossed (participants responding to the same set of items), ordinary regression treats correlated observations as independent and understates uncertainty. Multilevel (mixed-effects) models account for the nesting with random effects. `apa_parameters` accepts models fit with `lme4::lmer`, `lme4::glmer`, `nlme::lme`, and `glmmTMB::glmmTMB` and displays the fixed effects as in an ordinary regression table, followed by the random-effect standard deviations and correlations, each under its own heading.
 
 # Linear Mixed Models
 
@@ -67,7 +67,7 @@ apa_parameters(
 
 ```
 
-The table has two parts. The fixed effects are read like ordinary regression coefficients: at baseline, the average reaction time is about 268 ms, and it increases by about 11 ms per day of sleep restriction. Below them, the random effects show the standard deviation (*SD*) of participants' intercepts around the average intercept, and the residual *SD* of observations around each participant's own line.
+The table has two parts, each under a heading. The fixed effects are read like ordinary regression coefficients: at baseline, the average reaction time is about 268 ms, and it increases by about 11 ms per day of sleep restriction. Below them, the random effects show the standard deviation (*SD*) of participants' intercepts around the average intercept, and the residual *SD* of observations around each participant's own line.
 
 For linear mixed models, `apa_parameters` tests fixed effects with *t* tests that use Kenward–Roger degrees of freedom, which account for the number of participants as well as the number of observations. Because the intercept and the slope have different degrees of freedom here, they are shown in a *df* column. To use a different method, pass `ci_method` (e.g., `ci_method = "satterthwaite"`, which requires the lmerTest package).
 
@@ -92,7 +92,14 @@ apa_parameters(
 
 The average slope is unchanged, but its standard error is larger, because the model now recognizes that participants' slopes vary: the *SD* of the slopes is about 7 ms per day around the average of 11 ms per day. The correlation (*r*) between participants' intercepts and slopes is small. When all fixed effects share the same degrees of freedom, as here, they appear in the *t* column header.
 
-The random-effect rows can be omitted with `random = FALSE`, and confidence intervals can be added with `"CI"`.
+The "Random effects" heading names the statistic of the rows below it (*SD*), and each cluster (here, Participant) has a subheading with its terms indented below it. The correlation names its own statistic (*r*). With several clusters, crossed or nested, each gets its own subheading. With `random_scale = "variance"`, the random effects are variances (*Var*) and covariances (*Cov*) instead:
+
+```{r}
+#| label: sleep2-variance
+apa_parameters(sleep2, random_scale = "variance")
+```
+
+The random-effect rows can be omitted with `random = FALSE`, and the "Fixed effects" and "Random effects" headings can be omitted with `effect_headings = FALSE`, in which case each random-effect label names its cluster and statistic (e.g., Participant: *SD* (Days)). Confidence intervals can be added with `"CI"`.
 
 ```{r}
 #| label: sleep2-ci
@@ -266,7 +273,7 @@ tbl_zip <- apa_parameters(tmb_zip)
 tbl_zip
 ```
 
-Each part of the model has its own heading. Only the conditional model's coefficients are exponentiated, because the zero-inflation coefficients are log odds: the probability of an excess zero is about .26 at unmined sites (the inverse logit of −1.05) and .69 at mined sites (the inverse logit of −1.05 + 1.84). Mined sites have both more excess zeros and fewer salamanders otherwise. The table note says what the zero-inflation coefficients are:
+Each part of the model has its own heading, with its fixed and random effects under subheadings. Only the conditional model's coefficients are exponentiated, because the zero-inflation coefficients are log odds: the probability of an excess zero is about .26 at unmined sites (the inverse logit of −1.05) and .69 at mined sites (the inverse logit of −1.05 + 1.84). Mined sites have both more excess zeros and fewer salamanders otherwise. The table note says what the zero-inflation coefficients are:
 
 ```{r}
 #| label: salamander-zip-note

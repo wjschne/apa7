@@ -494,7 +494,8 @@ apa_chisq <- function(
 
 #' APA-formatted correlation table
 #'
-#' @param data data.frame or tibble with variables to be
+#' @param data data.frame or tibble with variables to be correlated, or the
+#'   output of [correlation::correlation()] (see Details)
 #' @param note Custom note to appear below table. (Overrides automatic note.)
 #' @param p_value p-value needed to be flagged as significant
 #' @param digits Number of digits for rounding
@@ -506,7 +507,22 @@ apa_chisq <- function(
 #' @param keep_empty_star_columns Keep remove empty star columns (Default: `TRUE`)
 #' @param column_formats column_formats object
 #' @inheritParams apa_style
-#' @param ... <[`data-masking`][rlang::args_data_masking]> parameters passed to psych::corTest
+#' @param ... <[`data-masking`][rlang::args_data_masking]> parameters passed to psych::corTest (not used for [correlation::correlation()] output)
+#' @details
+#' By default, `apa_cor()` computes Pearson correlations with
+#' [psych::corTest()], and the stars are for unadjusted *p*-values.
+#'
+#' For other kinds of correlations (e.g., Spearman, Kendall, robust, or
+#' partial correlations), compute them with [correlation::correlation()] and
+#' pass the result as `data`. The table shows its correlations and
+#' *p*-values, and the summary columns are computed from the data that
+#' [correlation::correlation()] keeps with its results. The note says what
+#' kind of correlations are shown (unless they are ordinary Pearson
+#' correlations) and how the *p*-values were adjusted for multiple
+#' comparisons: [correlation::correlation()] uses Holm's method by default,
+#' so the stars are for adjusted *p*-values unless `p_adjust = "none"`.
+#' Correlations computed by group, between two sets of variables, or with
+#' Bayesian methods are not yet supported.
 #' @importFrom rlang .data
 #'
 #' @return flextable::flextable
@@ -517,6 +533,12 @@ apa_chisq <- function(
 #' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")],
 #'         output = "tibble",
 #'         star_significant = FALSE)
+#'
+#' # Spearman correlations from the correlation package
+#' if (requireNamespace("correlation", quietly = TRUE)) {
+#'   correlation::correlation(trees, method = "spearman") |>
+#'     apa_cor()
+#' }
 apa_cor <- function(
   data,
   note = NULL,
@@ -543,8 +565,6 @@ apa_cor <- function(
     font_family <- the$font_family
   }
   output <- match.arg(output)
-  v_names <- colnames(data)
-  v_seq <- seq_len(ncol(data))
   if (is.null(column_formats)) {
     column_formats <- column_formats()
   }
@@ -553,8 +573,26 @@ apa_cor <- function(
     star_significant <- FALSE
   }
 
-  ct <- psych::corTest(data, ...) |>
-    suppressWarnings()
+  # Correlations computed by correlation::correlation()
+  cor_sentences <- character(0)
+  if (inherits(data, "easycorrelation")) {
+    parts <- correlation_parts(data)
+    ct <- parts$ct
+    cor_sentences <- parts$sentences
+    data <- parts$data
+    if (is.null(data)) {
+      # Without the data, there is nothing to summarize
+      summary_functions <- NULL
+      data <- tibble::as_tibble(
+        stats::setNames(rep(list(numeric(0)), length(parts$vars)), parts$vars)
+      )
+    }
+  } else {
+    ct <- psych::corTest(data, ...) |>
+      suppressWarnings()
+  }
+  v_names <- colnames(data)
+  v_seq <- seq_len(ncol(data))
 
   R <- apply(
     X = ct$r,
@@ -721,6 +759,7 @@ apa_cor <- function(
     cf$Variable <- NULL
     d_R <- d_R |>
       apa_format_columns(column_formats = cf)
+    d_tbl <- d_R
 
     d <- apa_flextable(
       d_R,
@@ -734,31 +773,49 @@ apa_cor <- function(
     )
 
     if (is.null(note)) {
-      if (
-        significance_note &&
-          (bold_significant || star_significant) &&
-          length(k_p) > 0
-      ) {
-        if (bold_significant) {
-          my_paragraph <- flextable::as_paragraph(
+      show_significance <- significance_note &&
+        (bold_significant || star_significant) &&
+        length(k_p) > 0
+      cutoff <- formatC(p_value[1], digits = 2, format = "fg") |>
+        gsub(pattern = "^0", replacement = "")
+      # General note (e.g., the kind of correlation and the p-value
+      # adjustment from correlation::correlation()), then probability notes
+      paragraphs <- list()
+      general <- if (length(cor_sentences) > 0) paste(cor_sentences, collapse = " ")
+      if (bold_significant && show_significance) {
+        if (is.null(general)) {
+          paragraphs <- list(flextable::as_paragraph(
             flextable::as_i("Note. "),
             "Correlations significant at ",
             flextable::as_i("p"),
             " < ",
-            formatC(p_value[1], digits = 2, format = "fg") |>
-              gsub(pattern = "^0", replacement = ""),
+            cutoff,
             " are ",
             flextable::as_b("bolded"),
             "."
-          )
+          ))
         } else {
-          my_paragraph <- ftExtra::as_paragraph_md(
-            paste0(p_note[k_p], collapse = ". ")
-          )
+          paragraphs <- list(ftExtra::as_paragraph_md(paste0(
+            "*Note*. ", general,
+            " Correlations significant at *p* < ", cutoff, " are **bolded**."
+          )))
         }
+      } else {
+        if (!is.null(general)) {
+          paragraphs <- c(paragraphs, list(ftExtra::as_paragraph_md(paste0("*Note*. ", general))))
+        }
+        if (show_significance && any(k_p > 0)) {
+          paragraphs <- c(paragraphs, list(ftExtra::as_paragraph_md(
+            paste0(p_note[k_p], collapse = ". ")
+          )))
+        }
+      }
 
+      if (length(paragraphs) > 0) {
+        for (paragraph in paragraphs) {
+          d <- flextable::add_footer_lines(d, values = paragraph)
+        }
         d <- d |>
-          flextable::add_footer_lines(values = my_paragraph) |>
           flextable::font(
             part = "footer",
             fontname = font_family
@@ -787,6 +844,26 @@ apa_cor <- function(
         flextable::fontsize(part = "footer", size = font_size) |>
         flextable::line_spacing(part = "footer", space = 1) |>
         flextable::color(part = "footer", color = text_color)
+    }
+
+    # Summary columns (e.g., M and SD) hold plain numbers padded with figure
+    # spaces to equal width, so centering them keeps the decimals aligned.
+    # apa_flextable() instead left-aligns padded columns with a left padding
+    # computed from the column width, which is off once the widths change
+    # below, and in HTML, where browsers size columns to their contents.
+    summary_keys <- setdiff(
+      intersect(colnames(d_tbl), d$col_keys),
+      c("apa7listcolumn", "Variable", as.character(v_seq), star_names)
+    )
+    if (length(summary_keys) > 0) {
+      d <- d |>
+        flextable::align(j = summary_keys, align = "center", part = "body") |>
+        flextable::padding(
+          j = summary_keys,
+          padding.left = 3,
+          padding.right = 3,
+          part = "body"
+        )
     }
 
     d_R <- d |>
@@ -1222,7 +1299,8 @@ apa_flextable <- function(
 #' of padded columns are left-aligned, so only the left side's padding matters.
 #' A uniform left padding centers the widest cell under the header. An
 #' inaccurate width estimate shifts all rows equally, so it does not misalign
-#' them.
+#' them. A nearly equal right padding keeps the block centered where columns
+#' are sized to their contents (HTML).
 #' @param ft flextable
 #' @param d data used to make `ft`
 #' @keywords internal
@@ -1266,12 +1344,18 @@ align_padded_columns <- function(
     block_width <- max(md_text_width(v, font_family)) * font_size
     col_width <- ft$body$colwidths[[match(k, ft$col_keys)]] * 72
     padding_left <- max(horizontal_padding, (col_width - block_width) / 2)
+    # Browsers size HTML table columns to their cells, so a right padding is
+    # needed to balance the left one. It is smaller by the horizontal padding,
+    # so that an underestimated text width does not make cells wrap where
+    # the column width is fixed (e.g., Word).
+    padding_right <- max(horizontal_padding, padding_left - horizontal_padding)
     ft <- ft |>
       flextable::align(i = rows, j = k, align = "left", part = "body") |>
       flextable::padding(
         i = rows,
         j = k,
         padding.left = padding_left,
+        padding.right = padding_right,
         part = "body"
       )
   }
@@ -1625,8 +1709,10 @@ apa_parameters_ordinal <- function(
 }
 
 #' @param random for mixed models, if `TRUE` (default), random-effect standard deviations and correlations (and the residual standard deviation, for linear mixed models) are displayed below the fixed effects.
+#' @param effect_headings for mixed models, if `TRUE` (default), the fixed and random effects are introduced by heading rows ("Fixed effects" and "Random effects"), with the effects indented below them. Headings are added only when random effects are displayed. The random-effects heading names the statistic of the *SD* (or variance) rows (e.g., "Random effects (*SD*)"), and each cluster (grouping factor) gets a subheading with its terms indented below it; correlation (or covariance) rows name their own statistic (e.g., "*r* (Constant, Days)"). Without headings, each random-effect label names its cluster and statistic (e.g., "Subject: *SD* (Days)").
+#' @param random_scale for mixed models, `"sd"` (default) displays random effects as standard deviations (*SD*) and correlations (*r*), and `"variance"` displays them as variances (*Var*) and covariances (*Cov*).
 #' @details
-#' For mixed models fit with `lme4` (`lmer` and `glmer`), fixed effects are displayed as for `lm` and `glm` models. For linear mixed models, *t* tests and confidence intervals use Kenward-Roger degrees of freedom by default (`ci_method = "kenward"`, which requires the pbkrtest package); pass another `ci_method` (e.g., `"satterthwaite"`, which requires lmerTest, or `"wald"`) to change this. When the degrees of freedom differ across fixed effects, they are shown in a *df* column rather than in the *t* column header. Random-effect rows show only the estimated standard deviation (*SD*) or correlation (*r*), labeled by grouping factor.
+#' For mixed models fit with `lme4` (`lmer` and `glmer`), fixed effects are displayed as for `lm` and `glm` models. For linear mixed models, *t* tests and confidence intervals use Kenward-Roger degrees of freedom by default (`ci_method = "kenward"`, which requires the pbkrtest package); pass another `ci_method` (e.g., `"satterthwaite"`, which requires lmerTest, or `"wald"`) to change this. When the degrees of freedom differ across fixed effects, they are shown in a *df* column rather than in the *t* column header. Random-effect rows show only the estimated standard deviation (*SD*) or correlation (*r*), or with `random_scale = "variance"`, the variance (*Var*) or covariance (*Cov*), grouped by cluster (grouping factor) under a subheading for each cluster, with nested clusters named, e.g., "Classroom in School". The fixed and random effects are introduced by heading rows (`effect_headings = TRUE`). The random-effects heading names the statistic of the *SD* or variance rows (e.g., "Random effects (*SD*)"), and correlation or covariance rows name their own (e.g., "*r* (Constant, Days)"). [apa_note()] defines the symbols.
 #' @export
 #' @rdname apa_parameters
 #' @examples
@@ -1655,12 +1741,15 @@ apa_parameters.merMod <- function(
   t_with_df = TRUE,
   exponentiate = NULL,
   random = TRUE,
+  effect_headings = TRUE,
+  random_scale = c("sd", "variance"),
   ...
 ) {
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
   }
   names(predictor_parameters) <- NULL
+  random_scale <- match.arg(random_scale)
 
   dots <- list(...)
   is_glmm <- inherits(fit, "glmerMod")
@@ -1696,19 +1785,25 @@ apa_parameters.merMod <- function(
     d_b$df_error <- NULL
   }
 
+  random_abbreviations <- NULL
   if (random) {
     d_r <- parameters::model_parameters(fit, effects = "random", ci = NULL) |>
       tibble::as_tibble()
-    # Correlations have no leading zero; SDs are formatted like coefficients
-    coef_chr <- random_effect_coefficients(d_r, column_formats@accuracy)
-    fixed_chr <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
-    d_b$Coefficient <- fixed_chr
-    d_b <- dplyr::bind_rows(
+    random_rows <- random_effect_rows(
+      d_r,
+      name_formatter,
+      column_formats@accuracy,
+      scale = random_scale,
+      symbols_in_labels = !effect_headings
+    )
+    kinds <- attr(random_rows, "kinds")
+    random_abbreviations <- random_effect_abbreviations(random_scale, kinds)
+    d_b$Coefficient <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
+    d_b <- mixed_effect_sections(
       d_b,
-      tibble::tibble(
-        Parameter = random_effect_labels(d_r$Parameter, d_r$Group, name_formatter),
-        Coefficient = coef_chr
-      )
+      random_rows,
+      headings = effect_headings,
+      random_heading = random_effects_heading(random_scale, kinds)
     )
   }
 
@@ -1722,7 +1817,10 @@ apa_parameters.merMod <- function(
     bolded = bolded,
     column_formats = column_formats,
     t_with_df = t_with_df,
-    note = list(df_method = if (!is_glmm) dots$ci_method)
+    note = list(
+      df_method = if (!is_glmm) dots$ci_method,
+      random_abbreviations = random_abbreviations
+    )
   ) |>
     labels_formatted()
 }
@@ -1762,6 +1860,8 @@ apa_parameters.glmmTMB <- function(
   t_with_df = TRUE,
   exponentiate = NULL,
   random = TRUE,
+  effect_headings = TRUE,
+  random_scale = c("sd", "variance"),
   ...
 ) {
   if (is.null(column_formats)) {
@@ -1769,6 +1869,7 @@ apa_parameters.glmmTMB <- function(
   }
   names(predictor_parameters) <- NULL
 
+  random_scale <- match.arg(random_scale)
   mp <- parameters::model_parameters(fit, effects = "fixed", ...)
   d_b <- tibble::as_tibble(mp)
   if (!("Component" %in% colnames(d_b))) {
@@ -1808,6 +1909,7 @@ apa_parameters.glmmTMB <- function(
   }
 
   d_r <- NULL
+  random_abbreviations <- NULL
   if (random) {
     d_r <- parameters::model_parameters(fit, effects = "random", ci = NULL) |>
       tibble::as_tibble()
@@ -1815,10 +1917,26 @@ apa_parameters.glmmTMB <- function(
       d_r$Component <- "conditional"
     }
     d_b$Coefficient <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
-    d_r <- tibble::tibble(
-      Parameter = random_effect_labels(d_r$Parameter, d_r$Group, name_formatter),
-      Coefficient = random_effect_coefficients(d_r, column_formats@accuracy),
-      Component = d_r$Component
+    # Rows are made for each part, because covariances use the SDs of the
+    # same part
+    d_r <- purrr::map(unique(d_r$Component), \(component) {
+      part <- d_r[d_r$Component == component, ]
+      rows <- random_effect_rows(
+        part,
+        name_formatter,
+        column_formats@accuracy,
+        scale = random_scale,
+        symbols_in_labels = !effect_headings
+      )
+      kinds <- attr(rows, "kinds")
+      rows$Component <- component
+      rows$.kinds <- paste(kinds, collapse = " ")
+      rows
+    }) |>
+      dplyr::bind_rows()
+    random_abbreviations <- random_effect_abbreviations(
+      random_scale,
+      unlist(strsplit(unique(d_r$.kinds), " ", fixed = TRUE))
     )
   }
 
@@ -1827,10 +1945,25 @@ apa_parameters.glmmTMB <- function(
     c("conditional", "zero_inflated", "dispersion"),
     c(d_b$Component, d_r$Component)
   )
+  # Fixed and random effects get headings in every part when any part has
+  # random effects
+  any_random <- !is.null(d_r) && nrow(d_r) > 0
   pieces <- purrr::map(components, \(component) {
-    dplyr::bind_rows(
-      d_b[d_b$Component == component, ],
-      d_r[d_r$Component == component, ]
+    fixed <- d_b[d_b$Component == component, ]
+    fixed$Component <- NULL
+    random_rows <- if (is.null(d_r)) NULL else d_r[d_r$Component == component, ]
+    kinds <- character(0)
+    if (!is.null(random_rows)) {
+      kinds <- unlist(strsplit(unique(random_rows$.kinds), " ", fixed = TRUE))
+      random_rows$Component <- NULL
+      random_rows$.kinds <- NULL
+    }
+    mixed_effect_sections(
+      fixed,
+      random_rows,
+      headings = effect_headings && any_random,
+      always = TRUE,
+      random_heading = random_effects_heading(random_scale, kinds)
     )
   })
   if (length(components) > 1) {
@@ -1848,7 +1981,6 @@ apa_parameters.glmmTMB <- function(
     })
   }
   d_b <- dplyr::bind_rows(pieces)
-  d_b$Component <- NULL
 
   # Names were formatted above
   column_formats$Parameter@formatter <- \(x, ...) x
@@ -1860,7 +1992,10 @@ apa_parameters.glmmTMB <- function(
     bolded = bolded,
     column_formats = column_formats,
     t_with_df = t_with_df,
-    note = list(components = setdiff(components, "conditional"))
+    note = list(
+      components = setdiff(components, "conditional"),
+      random_abbreviations = random_abbreviations
+    )
   ) |>
     labels_formatted()
 }
@@ -1911,6 +2046,8 @@ apa_parameters.lme <- function(
   column_formats = NULL,
   t_with_df = TRUE,
   random = TRUE,
+  effect_headings = TRUE,
+  random_scale = c("sd", "variance"),
   ...
 ) {
   if (inherits(fit, "glmmPQL")) {
@@ -1924,6 +2061,7 @@ apa_parameters.lme <- function(
   }
   names(predictor_parameters) <- NULL
 
+  random_scale <- match.arg(random_scale)
   d_b <- parameters::model_parameters(fit, effects = "fixed", ...) |>
     tibble::as_tibble()
 
@@ -1931,19 +2069,34 @@ apa_parameters.lme <- function(
   name_formatter <- column_formats$Parameter@formatter
   d_b$Parameter <- name_formatter(parameters::format_parameters(fit))
 
-  residual <- lme_residual_structures(fit, name_formatter, column_formats@accuracy)
+  residual <- lme_residual_structures(
+    fit,
+    name_formatter,
+    column_formats@accuracy,
+    scale = random_scale
+  )
 
+  random_abbreviations <- NULL
   if (random) {
     d_r <- parameters::model_parameters(fit, effects = "random", ci = NULL) |>
       tibble::as_tibble()
     d_b$Coefficient <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
-    d_b <- dplyr::bind_rows(
+    random_rows <- random_effect_rows(
+      d_r,
+      name_formatter,
+      column_formats@accuracy,
+      scale = random_scale,
+      symbols_in_labels = !effect_headings
+    )
+    kinds <- attr(random_rows, "kinds")
+    random_abbreviations <- random_effect_abbreviations(random_scale, kinds)
+    # Residual correlations and variance functions are random-effect
+    # parameters, too
+    d_b <- mixed_effect_sections(
       d_b,
-      tibble::tibble(
-        Parameter = random_effect_labels(d_r$Parameter, d_r$Group, name_formatter),
-        Coefficient = random_effect_coefficients(d_r, column_formats@accuracy)
-      ),
-      residual$rows
+      dplyr::bind_rows(random_rows, residual$rows),
+      headings = effect_headings,
+      random_heading = random_effects_heading(random_scale, kinds)
     )
   }
 
@@ -1957,7 +2110,11 @@ apa_parameters.lme <- function(
     bolded = bolded,
     column_formats = column_formats,
     t_with_df = t_with_df,
-    note = list(df_method = "nlme", residual = residual$note)
+    note = list(
+      df_method = "nlme",
+      residual = residual$note,
+      random_abbreviations = random_abbreviations
+    )
   ) |>
     labels_formatted()
 }
@@ -1968,7 +2125,8 @@ apa_parameters.lme <- function(
 #'   and `note` (character vector of sentences)
 #' @keywords internal
 #' @noRd
-lme_residual_structures <- function(fit, formatter, accuracy) {
+lme_residual_structures <- function(fit, formatter, accuracy, scale = "sd") {
+  on_variance <- identical(scale, "variance")
   rows <- tibble::tibble(Parameter = character(0), Coefficient = character(0))
   note <- character(0)
   groups_text <- function(struct) {
@@ -2037,33 +2195,39 @@ lme_residual_structures <- function(fit, formatter, accuracy) {
       rows <- dplyr::bind_rows(
         rows,
         tibble::tibble(
-          Parameter = paste0("Residual *SD* ratio: ", names(values)),
-          Coefficient = signs::signs(values, accuracy = accuracy)
+          Parameter = paste0(
+            if (on_variance) "Residual variance ratio: " else "Residual *SD* ratio: ",
+            names(values)
+          ),
+          Coefficient = signs::signs(if (on_variance) values^2 else values, accuracy = accuracy)
         )
       )
       groups <- groups_text(vs)
+      what <- if (on_variance) "variance" else "*SD*"
       note <- c(
         note,
         paste0(
           "Each level of ",
           paste(groups, collapse = " and "),
-          " has its own residual *SD*. The residual *SD* is that of ",
+          " has its own residual ", what, ". The residual ", what, " is that of ",
           reference,
           ", and the others are shown as ratios to it."
         )
       )
     } else if (length(values) > 0) {
+      # On the variance scale, the power and exponent of the SD double
       labels <- switch(
         cls,
-        varPower = "Residual *SD* power (*\u03B4*)",
-        varExp = "Residual *SD* exponent (*\u03B4*)",
+        varPower = if (on_variance) "Residual variance power (2*\u03B4*)" else "Residual *SD* power (*\u03B4*)",
+        varExp = if (on_variance) "Residual variance exponent (2*\u03B4*)" else "Residual *SD* exponent (*\u03B4*)",
         paste0("Residual variance: ", names(values))
       )
+      shown <- if (on_variance && cls %in% c("varPower", "varExp")) 2 * values else values
       rows <- dplyr::bind_rows(
         rows,
         tibble::tibble(
           Parameter = labels,
-          Coefficient = signs::signs(values, accuracy = accuracy)
+          Coefficient = signs::signs(shown, accuracy = accuracy)
         )
       )
     }
@@ -2083,60 +2247,202 @@ lme_residual_structures <- function(fit, formatter, accuracy) {
   list(rows = rows, note = note)
 }
 
-#' Random-effect SDs formatted like coefficients and correlations without a
-#' leading zero
+#' Fixed effects, then random effects, each under a heading row
+#'
+#' @param fixed rows of fixed effects
+#' @param random rows of random effects (or NULL)
+#' @param headings add "Fixed effects" and "Random effects" heading rows, with
+#'   the effects indented below them
+#' @param random_heading heading of the random effects (e.g., "Random effects
+#'   (*SD*)")
+#' @param always if `TRUE`, the fixed effects get their heading even when
+#'   there are no random effects (for model parts without random effects in a
+#'   table whose other parts have them)
 #' @keywords internal
 #' @noRd
-random_effect_coefficients <- function(d_r, accuracy) {
-  is_cor <- startsWith(d_r$Parameter, "Cor ")
-  out <- character(nrow(d_r))
-  out[is_cor] <- signs::signs(
-    d_r$Coefficient[is_cor],
-    accuracy = accuracy,
-    trim_leading_zeros = TRUE
+mixed_effect_sections <- function(
+  fixed,
+  random = NULL,
+  headings = TRUE,
+  always = FALSE,
+  random_heading = "Random effects"
+) {
+  has_random <- !is.null(random) && nrow(random) > 0
+  if (!headings || (!has_random && !always)) {
+    return(dplyr::bind_rows(fixed, random))
+  }
+  indent <- function(d) {
+    d$Parameter <- paste0("\u2003", d$Parameter)
+    d
+  }
+  pieces <- list(
+    tibble::tibble(Parameter = "Fixed effects"),
+    indent(fixed)
   )
-  out[!is_cor] <- signs::signs(d_r$Coefficient[!is_cor], accuracy = accuracy)
-  out
+  if (has_random) {
+    pieces <- c(pieces, list(
+      tibble::tibble(Parameter = random_heading),
+      indent(random)
+    ))
+  }
+  dplyr::bind_rows(pieces)
 }
 
-#' Labels for random-effect parameters
+#' Rows for the random effects of a mixed model
 #'
-#' Converts `parameters` labels such as "SD (Days)", "Cor (Intercept~Days)",
-#' and "SD (Observations)" into "Subject: *SD* (Days)",
-#' "Subject: *r* (Constant, Days)", and "Residual *SD*".
-#' @param parameter random-effect parameter labels from `parameters`
-#' @param group grouping factor of each parameter
+#' Converts `parameters` random-effect estimates (e.g., "SD (Days)" and
+#' "Cor (Intercept~Days)" for group Subject, and "SD (Observations)" for the
+#' residual) into labeled rows on the standard deviation or variance scale.
+#' @param d_r random-effect parameters from parameters::model_parameters()
 #' @param formatter formats term names (e.g., "(Intercept)" to "Constant")
+#' @param accuracy accuracy of the coefficients
+#' @param scale `"sd"` (standard deviations and correlations) or `"variance"`
+#'   (variances and covariances)
+#' @param symbols_in_labels if `TRUE` (no headings), each row is labeled with
+#'   its cluster and statistic (e.g., "Subject: *SD* (Days)"). If `FALSE`,
+#'   each cluster gets a subheading row with its terms indented below it
+#'   (e.g., "Subject", then "Days"), and the heading above names the SD (or
+#'   variance). Correlations (or covariances) always name their statistic
+#'   (e.g., "*r* (Constant, Days)").
+#' @returns tibble with `Parameter` and `Coefficient` (formatted), and a
+#'   `kinds` attribute: the kinds of statistics in the rows (`"spread"` for
+#'   SDs or variances, `"association"` for correlations or covariances)
 #' @keywords internal
 #' @noRd
-random_effect_labels <- function(parameter, group, formatter) {
-  terms <- stringr::str_match(parameter, "^(SD|Cor) \\((.*)\\)$")
+random_effect_rows <- function(d_r, formatter, accuracy, scale = "sd", symbols_in_labels = FALSE) {
+  terms <- stringr::str_match(d_r$Parameter, "^(SD|Cor) \\((.*)\\)$")
   type <- terms[, 2]
   inner <- terms[, 3]
-  purrr::pmap_chr(
-    list(type, inner, group, parameter),
-    \(type, inner, group, parameter) {
-      if (is.na(type)) {
-        return(parameter) # nocov
+  group <- d_r$Group
+  value <- d_r$Coefficient
+  is_cor <- !is.na(type) & type == "Cor"
+  is_residual <- group == "Residual"
+  symbols <- random_effect_symbols(scale)
+
+  # parameters drops the parentheses around Intercept in these labels
+  term_label <- function(x) {
+    x[x == "Intercept"] <- "(Intercept)"
+    formatter(x)
+  }
+
+  # Values on the requested scale: variances are squared SDs, and
+  # covariances are correlations times the two SDs in the same cluster
+  out_value <- value
+  if (scale == "variance") {
+    for (i in seq_len(nrow(d_r))) {
+      if (is.na(type[i])) next # nocov
+      if (is_cor[i]) {
+        parts <- strsplit(inner[i], "~", fixed = TRUE)[[1]]
+        sd_of <- function(term) {
+          k <- which(!is_cor & group == group[i] & inner == term)
+          if (length(k) == 0) NA_real_ else value[k[1]]
+        }
+        out_value[i] <- value[i] * sd_of(parts[1]) * sd_of(parts[2])
+      } else {
+        out_value[i] <- value[i]^2
       }
-      if (group == "Residual") {
-        return("Residual *SD*")
-      }
-      parts <- strsplit(inner, "~", fixed = TRUE)[[1]]
-      # parameters drops the parentheses around Intercept in these labels
-      parts[parts == "Intercept"] <- "(Intercept)"
-      parts <- formatter(parts)
-      symbol <- if (type == "SD") "*SD*" else "*r*"
-      paste0(
-        formatter(group),
-        ": ",
-        symbol,
-        " (",
-        paste(parts, collapse = ", "),
-        ")"
-      )
     }
-  )
+  }
+
+  # Labels without the cluster: "Days", "*r* (Constant, Days)", "Residual"
+  term_text <- purrr::map_chr(seq_len(nrow(d_r)), \(i) {
+    if (is.na(type[i])) {
+      return(d_r$Parameter[i]) # nocov
+    }
+    if (is_residual[i]) {
+      return(if (symbols_in_labels) paste0("Residual ", symbols[["spread"]]) else "Residual")
+    }
+    parts <- term_label(strsplit(inner[i], "~", fixed = TRUE)[[1]])
+    if (is_cor[i]) {
+      paste0(symbols[["association"]], " (", paste(parts, collapse = ", "), ")")
+    } else if (symbols_in_labels) {
+      paste0(symbols[["spread"]], " (", parts, ")")
+    } else {
+      parts
+    }
+  })
+
+  # Correlations have no leading zero; the others are formatted like
+  # coefficients
+  coef_chr <- character(nrow(d_r))
+  bounded <- is_cor & scale == "sd"
+  coef_chr[bounded] <- signs::signs(out_value[bounded], accuracy = accuracy, trim_leading_zeros = TRUE)
+  coef_chr[!bounded] <- signs::signs(out_value[!bounded], accuracy = accuracy)
+
+  cluster <- purrr::map_chr(group, \(g) cluster_label(g, formatter))
+  if (symbols_in_labels) {
+    labels <- ifelse(is_residual, term_text, paste0(cluster, ": ", term_text))
+    rows <- tibble::tibble(Parameter = labels, Coefficient = coef_chr)
+  } else {
+    # A subheading for each cluster, in order of appearance, with its terms
+    # indented below it. The residual (and any residual structure added
+    # later) is at the level of the clusters.
+    clusters <- unique(group[!is_residual])
+    pieces <- purrr::map(clusters, \(g) {
+      k <- which(group == g & !is_residual)
+      tibble::tibble(
+        Parameter = c(cluster[k[1]], paste0("\u2003", term_text[k])),
+        Coefficient = c(NA_character_, coef_chr[k])
+      )
+    })
+    residual_rows <- tibble::tibble(
+      Parameter = term_text[is_residual],
+      Coefficient = coef_chr[is_residual]
+    )
+    rows <- dplyr::bind_rows(c(pieces, list(residual_rows)))
+  }
+  attr(rows, "kinds") <- c(if (any(!is_cor)) "spread", if (any(is_cor)) "association")
+  rows
+}
+
+#' Name of a cluster (grouping factor), with nesting spelled out
+#'
+#' lme4 names nested clusters "inner:outer" (e.g., "Classroom:School" for
+#' `(1 | School/Classroom)`), which becomes "Classroom in School".
+#' @keywords internal
+#' @noRd
+cluster_label <- function(group, formatter) {
+  parts <- strsplit(group, ":", fixed = TRUE)[[1]]
+  paste(formatter(parts), collapse = " in ")
+}
+
+#' Symbols of random-effect statistics on each scale
+#' @keywords internal
+#' @noRd
+random_effect_symbols <- function(scale = "sd") {
+  if (scale == "variance") {
+    c(spread = "*Var*", association = "*Cov*")
+  } else {
+    c(spread = "*SD*", association = "*r*")
+  }
+}
+
+#' Definitions of the random-effect symbols in a table
+#' @param kinds kinds of statistics shown (see random_effect_rows())
+#' @keywords internal
+#' @noRd
+random_effect_abbreviations <- function(scale = "sd", kinds = c("spread", "association")) {
+  symbols <- random_effect_symbols(scale)
+  meanings <- if (scale == "variance") {
+    c(spread = "variance", association = "covariance")
+  } else {
+    c(spread = "standard deviation", association = "correlation")
+  }
+  kinds <- intersect(c("spread", "association"), kinds)
+  stats::setNames(unname(meanings[kinds]), unname(symbols[kinds]))
+}
+
+#' "Random effects (*SD*)"
+#'
+#' The heading names the statistic of the SD (or variance) rows. Correlation
+#' (or covariance) rows name their own statistic.
+#' @keywords internal
+#' @noRd
+random_effects_heading <- function(scale = "sd", kinds = c("spread", "association")) {
+  if (!("spread" %in% kinds)) {
+    return("Random effects") # nocov
+  }
+  paste0("Random effects (", random_effect_symbols(scale)[["spread"]], ")")
 }
 
 #' Add exponentiated coefficients and confidence limits

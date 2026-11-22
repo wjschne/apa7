@@ -13,6 +13,7 @@ Belenky
 Bentler
 bfi
 biserial
+Blomqvist's
 bmatrix
 Bmatrix
 Boeckel
@@ -35,6 +36,7 @@ communality
 configural
 Configural
 corTest
+Cov
 Cramér's
 Cran
 de
@@ -62,8 +64,10 @@ Gohel
 Greiner
 gtsummary
 heteroskedasticity
+Hoeffding's
 Hofmann
 Hofmann's
+Holm's
 Holzinger
 intraclass
 IRR
@@ -81,6 +85,7 @@ lmerTest
 lmerTest's
 Lupas
 Mdn
+midcorrelation
 MLR
 Nagelkerke's
 nlme
@@ -94,6 +99,7 @@ pbkrtest
 Pelham
 Piscitello
 pmatrix
+Polychoric
 purrr
 ragg
 rb
@@ -117,6 +123,7 @@ SRMR
 Steiger
 svglite
 Swineford
+Tetrachoric
 th
 tibble
 tibbles

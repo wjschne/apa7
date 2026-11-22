@@ -27,7 +27,8 @@ apa_cor(
 )
 }
 \arguments{
-\item{data}{data.frame or tibble with variables to be}
+\item{data}{data.frame or tibble with variables to be correlated, or the
+output of \code{\link[correlation:correlation]{correlation::correlation()}} (see Details)}
 
 \item{note}{Custom note to appear below table. (Overrides automatic note.)}
 
@@ -64,7 +65,7 @@ notes are single-spaced.}
 
 \item{column_formats}{column_formats object}
 
-\item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> parameters passed to psych::corTest}
+\item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> parameters passed to psych::corTest (not used for \code{\link[correlation:correlation]{correlation::correlation()}} output)}
 }
 \value{
 flextable::flextable
@@ -72,9 +73,31 @@ flextable::flextable
 \description{
 APA-formatted correlation table
 }
+\details{
+By default, \code{apa_cor()} computes Pearson correlations with
+\code{\link[psych:corTest]{psych::corTest()}}, and the stars are for unadjusted \emph{p}-values.
+
+For other kinds of correlations (e.g., Spearman, Kendall, robust, or
+partial correlations), compute them with \code{\link[correlation:correlation]{correlation::correlation()}} and
+pass the result as \code{data}. The table shows its correlations and
+\emph{p}-values, and the summary columns are computed from the data that
+\code{\link[correlation:correlation]{correlation::correlation()}} keeps with its results. The note says what
+kind of correlations are shown (unless they are ordinary Pearson
+correlations) and how the \emph{p}-values were adjusted for multiple
+comparisons: \code{\link[correlation:correlation]{correlation::correlation()}} uses Holm's method by default,
+so the stars are for adjusted \emph{p}-values unless \code{p_adjust = "none"}.
+Correlations computed by group, between two sets of variables, or with
+Bayesian methods are not yet supported.
+}
 \examples{
 apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
 apa_cor(mtcars[, c("mpg", "am", "gear", "carb")],
         output = "tibble",
         star_significant = FALSE)
+
+# Spearman correlations from the correlation package
+if (requireNamespace("correlation", quietly = TRUE)) {
+  correlation::correlation(trees, method = "spearman") |>
+    apa_cor()
+}
 }

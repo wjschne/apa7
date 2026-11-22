@@ -83,7 +83,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
   - [x] CFA loading matrix with `apa_loadings()` (and latent correlations with `apa_factor_cor()`)
   - [x] Nested-model and measurement-invariance comparisons with `apa_performance_comparison()` (each model against the previous one)
 - [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR`
-- [ ] Let `apa_cor()` accept output from `correlation::correlation()`
+- [x] Let `apa_cor()` accept output from `correlation::correlation()` (not yet: grouped, two-set, or Bayesian correlations)
 
 ## Table notes
 

@@ -25,6 +25,7 @@ library(flextable)
 library(ftExtra)
 library(tidyr)
 library(stringr)
+library(correlation)
 ```
 
 ```{r loading}
@@ -33,11 +34,11 @@ library(stringr)
 
 Some tables, like correlation matrices, can be standardized and automated. Others are uniquely tied to a specific purpose, and no function could anticipate their structure. The apa7 package has a few functions to automate what can be automated and a styling function to make the final styling of a complex table a little easier.
 
-By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/flextable/), with significant correlations bolded.
+By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/flextable/), with significant correlations starred.
 
 ```{r}
 #| label: tbl-treesflex
-#| tbl-cap: Correlation table using flextable via `apa_cor`
+#| tbl-cap: Correlation Table
 #| message: false
 trees |> 
   apa_cor()
@@ -47,13 +48,36 @@ Significant correlations can be bolded instead.
 
 ```{r}
 #| label: tbl-stars
-#| tbl-cap: Bolding significant correlations
+#| tbl-cap: Bolding Significant Correlations
 #| message: false
-trees |> 
+trees |>
   apa_cor(bold_significant = TRUE)
 ```
 
+# Summary functions
 
+You can include any named list of summary functions:
+
+
+
+
+```{r}
+# Named list of descriptive functions
+my_summaries <- list(Median = median, "Interquartile Range" = IQR)
+
+apa_cor(trees, summary_functions = my_summaries)
+
+
+```
+
+
+You can also use a plain vector of descriptive functions from these options: `"IQR", "Interquartile Range", "Kurtosis", "MAD", "Median Absolute Deviation", "M", "Mean", "Med", "Median", "n", "N", "Quantile", "Range", "SD", "Skewness", "Var", "Variance"`
+
+```{r}
+my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
+
+apa_cor(trees, summary_functions = my_summaries)
+```
 
 
 # Styling options
@@ -61,7 +85,7 @@ trees |>
 Your styling options include:
 
 * `note` A custom markdown formatted note. Overrides automatic note about bolded correlations being significant. Default: `NULL`
-* `p_value` Significance value. Default: `.05`
+* `p_value` Significance value. Default: `0.05`
 * `digits` Number of digits for rounding. Default: `2`
 * `bold_significant` Whether to bold significant correlations. Default:  `FALSE`
 * `star_significant` Whether to star significant correlations. Default: `TRUE`
@@ -77,17 +101,15 @@ Your styling options include:
 
 For example, 
 
-```{r altstyle}
-# Named list of descriptive functions
-my_summaries <- list(Median = median, "Interquartile Range" = IQR)
+```{r}
+#| label: tbl-altstyle
+#| tbl-cap: Alternative Styling
 
-apa_cor(trees, summary_functions = my_summaries)
-# or a vector descriptives
-my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
+
 
 trees |>
   apa_cor(
-    p_value = .001,
+    p_value = 0.001,
     digits = 2,
     bold_significant = TRUE,
     significance_note = TRUE,
@@ -103,7 +125,9 @@ trees |>
 
 To remove summary statistics entirely, set `summary_functions` to `NA` or `NULL`.
 
-```{r nosummary}
+```{r}
+#| label: tbl-nosummary
+#| tbl-cap: Removing Summary Functions
 apa_cor(trees, summary_functions = NA, bold_significant = FALSE)
 ```
 
@@ -112,7 +136,9 @@ apa_cor(trees, summary_functions = NA, bold_significant = FALSE)
 The styling options for `apa_cor` are minimal, but flextable allows for all kinds of customization. Just place whatever code from flextable you want after `apa_cor`. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
 
 
-```{r altflextable}
+```{r}
+#| label: tbl-altflextable
+#| tbl-cap: Styling a Table with flextable Functions
 apa_cor(trees) |>
   flextable::footnote(
     i = 2,
@@ -132,6 +158,8 @@ apa_cor(trees) |>
 If you need to process the underlying data before converting to flextable (or use another table-creating function from another package), you can output a tibble and then process the table however you want. Here we add a row title.
 
 ```{r}
+#| label: tbl-tibble
+#| tbl-cap: Customizing a Table with flextable Functions.
 apa_cor(trees, output = "tibble") |>
   mutate(apa7listcolumn = str_trim(apa7listcolumn)) |>
   unite(col = Variable, 
@@ -145,3 +173,45 @@ apa_cor(trees, output = "tibble") |>
           padding.left = 15) 
 ```
 
+# Correlations from the correlation package
+
+`apa_cor` computes Pearson correlations with `psych::corTest`. For other kinds of correlations, compute them with `correlation::correlation` from the [correlation](https://easystats.github.io/correlation/) package, and give the result to `apa_cor`. For example, Spearman rank correlations:
+
+```{r}
+#| label: tbl-spearman
+#| tbl-cap: Spearman rank correlations from the correlation package
+#| message: false
+correlation(trees, method = "spearman") |>
+  apa_cor()
+```
+
+The note says what kind of correlations are shown. Other options from the `correlation::correlation` function include:
+
+| Option        | Correlation                    |
+|:--------------|:-------------------------------|
+| `pearson`     | Pearson's Correlation (default)|
+| `spearman`    | Spearman's Rank Correlation    |
+| `kendall`     | Kendall's Rank Correlation     |
+| `biserial`    | Biserial Correlation           |
+| `polychoric`  | Polychoric Correlation         |
+| `tetrachoric` | Tetrachoric Correlation        |
+| `biweight`    | Biweight midcorrelation        |
+| `distance`    | Distance Correlation           |
+| `percentage`  | Percentage Bend Correlation    |
+| `blomqvist`   | Blomqvist's coefficient        |
+| `hoeffding`   | Hoeffding's D                  |
+| `gamma`       | Gamma Correlation             |
+| `gaussian`    | for Gaussian Rank correlation  | 
+| `shepherd`    | for Shepherd's Pi correlation  |
+
+By default, `correlation::correlation` adjusts the *p*-values for multiple comparisons with Holm's method, so the stars are for the adjusted *p*-values, and the note says so (use `p_adjust = "none"` for unadjusted *p*-values). Partial correlations, each controlling for the other variables in the table, work the same way:
+
+```{r}
+#| label: tbl-partial
+#| tbl-cap: Partial correlations from the correlation package
+#| message: false
+correlation(trees, partial = TRUE, p_adjust = "none") |>
+  apa_cor()
+```
+
+The means and standard deviations come from the data that `correlation::correlation` keeps with its results. Correlations computed by group, between two sets of variables, or with Bayesian methods are not yet supported.

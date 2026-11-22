@@ -129,6 +129,8 @@ apa_parameters(
   t_with_df = TRUE,
   exponentiate = NULL,
   random = TRUE,
+  effect_headings = TRUE,
+  random_scale = c("sd", "variance"),
   ...
 )
 
@@ -142,6 +144,8 @@ apa_parameters(
   t_with_df = TRUE,
   exponentiate = NULL,
   random = TRUE,
+  effect_headings = TRUE,
+  random_scale = c("sd", "variance"),
   ...
 )
 
@@ -153,6 +157,8 @@ apa_parameters(
   column_formats = NULL,
   t_with_df = TRUE,
   random = TRUE,
+  effect_headings = TRUE,
+  random_scale = c("sd", "variance"),
   ...
 )
 
@@ -196,6 +202,10 @@ apa_parameters(
 
 \item{random}{for mixed models, if \code{TRUE} (default), random-effect standard deviations and correlations (and the residual standard deviation, for linear mixed models) are displayed below the fixed effects.}
 
+\item{effect_headings}{for mixed models, if \code{TRUE} (default), the fixed and random effects are introduced by heading rows ("Fixed effects" and "Random effects"), with the effects indented below them. Headings are added only when random effects are displayed. The random-effects heading names the statistic of the \emph{SD} (or variance) rows (e.g., "Random effects (\emph{SD})"), and each cluster (grouping factor) gets a subheading with its terms indented below it; correlation (or covariance) rows name their own statistic (e.g., "\emph{r} (Constant, Days)"). Without headings, each random-effect label names its cluster and statistic (e.g., "Subject: \emph{SD} (Days)").}
+
+\item{random_scale}{for mixed models, \code{"sd"} (default) displays random effects as standard deviations (\emph{SD}) and correlations (\emph{r}), and \code{"variance"} displays them as variances (\emph{Var}) and covariances (\emph{Cov}).}
+
 \item{performance_parameters}{for lists of models, model comparison metrics passed to \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}. If \code{NULL}, no metrics are added. By default, \code{R2} and \code{deltaR2}; for lists of mixed models (\code{lme4}), the default also includes the conditional \emph{R}^2^ and its change (\code{R2_conditional}, \code{deltaR2_conditional}), and \code{R2} is the marginal \emph{R}^2^.}
 }
 \value{
@@ -215,7 +225,7 @@ For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \e
 
 For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coefficients are tested with Wald \emph{z} tests. (\code{parameters} reports \emph{t} for \code{polr}, but the test is asymptotically normal, and \code{clm} reports \emph{z} for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled \emph{OR}. Threshold rows show only the estimate, its standard error, and its confidence interval, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful. Confidence intervals (\code{"CI"}, \code{"Exp_CI"}) are Wald \emph{z} intervals, consistent with the \emph{z} tests.
 
-For mixed models fit with \code{lme4} (\code{lmer} and \code{glmer}), fixed effects are displayed as for \code{lm} and \code{glm} models. For linear mixed models, \emph{t} tests and confidence intervals use Kenward-Roger degrees of freedom by default (\code{ci_method = "kenward"}, which requires the pbkrtest package); pass another \code{ci_method} (e.g., \code{"satterthwaite"}, which requires lmerTest, or \code{"wald"}) to change this. When the degrees of freedom differ across fixed effects, they are shown in a \emph{df} column rather than in the \emph{t} column header. Random-effect rows show only the estimated standard deviation (\emph{SD}) or correlation (\emph{r}), labeled by grouping factor.
+For mixed models fit with \code{lme4} (\code{lmer} and \code{glmer}), fixed effects are displayed as for \code{lm} and \code{glm} models. For linear mixed models, \emph{t} tests and confidence intervals use Kenward-Roger degrees of freedom by default (\code{ci_method = "kenward"}, which requires the pbkrtest package); pass another \code{ci_method} (e.g., \code{"satterthwaite"}, which requires lmerTest, or \code{"wald"}) to change this. When the degrees of freedom differ across fixed effects, they are shown in a \emph{df} column rather than in the \emph{t} column header. Random-effect rows show only the estimated standard deviation (\emph{SD}) or correlation (\emph{r}), or with \code{random_scale = "variance"}, the variance (\emph{Var}) or covariance (\emph{Cov}), grouped by cluster (grouping factor) under a subheading for each cluster, with nested clusters named, e.g., "Classroom in School". The fixed and random effects are introduced by heading rows (\code{effect_headings = TRUE}). The random-effects heading names the statistic of the \emph{SD} or variance rows (e.g., "Random effects (\emph{SD})"), and correlation or covariance rows name their own (e.g., "\emph{r} (Constant, Days)"). \code{\link[=apa_note]{apa_note()}} defines the symbols.
 
 For mixed models fit with \code{glmmTMB::glmmTMB()}, fixed effects are tested with \emph{z} tests, and random effects are displayed as for \code{lme4} models. Coefficients of log and logit links are exponentiated by default (e.g., \emph{IRR} for Poisson and negative binomial models). When the model has a zero-inflation part (\code{ziformula}) or a dispersion part (\code{dispformula}), each part is introduced by a heading row ("Conditional model", "Zero-inflation model", or "Dispersion model"), and only the conditional model's coefficients are exponentiated. A dispersion parameter that is not modeled (i.e., without a \code{dispformula}) is not displayed.
 

@@ -429,18 +429,24 @@ test_that("apa_parameters.merMod shows fixed and random effects", {
   expect_equal(
     result$Variable,
     c(
-      "Constant",
-      "Days",
-      "Subject: *SD* (Constant)",
-      "Subject: *SD* (Days)",
-      "Subject: *r* (Constant, Days)",
-      "Residual *SD*"
+      "Fixed effects",
+      paste0("\u2003", c("Constant", "Days")),
+      "Random effects (*SD*)",
+      "\u2003Subject",
+      paste0("\u2003\u2003", c("Constant", "Days", "*r* (Constant, Days)")),
+      "\u2003Residual"
     )
   )
+  # Without headings, the effects are not indented
+  expect_equal(
+    apa_parameters(fit, effect_headings = FALSE)$Variable[c(1, 3)],
+    c("Constant", "Subject: *SD* (Constant)")
+  )
   # Random-effect rows show only the estimate; correlations lack a leading zero
-  expect_true(all(result[["*p*"]][3:6] %in% c("", NA)))
-  expect_equal(gsub("[ -  ]", "", result[["*B*"]][5]), ".07")
+  expect_true(all(result[["*p*"]][5:9] %in% c("", NA)))
+  expect_equal(gsub("[ -  ]", "", result[["*B*"]][8]), ".07")
 
+  # Without random effects, there are no headings
   expect_equal(nrow(apa_parameters(fit, random = FALSE)), 2L)
   # Other ci_methods pass through
   expect_true("*t*(174)" %in% colnames(apa_parameters(fit, ci_method = "wald")))
@@ -463,9 +469,12 @@ test_that("apa_parameters.merMod reports odds ratios for glmer", {
   )
   result <- apa_parameters(fit)
   expect_true(all(c("*OR*", "*z*") %in% colnames(result)))
-  expect_equal(result$Variable[5], "Herd: *SD* (Constant)")
   expect_equal(
-    as.numeric(gsub("[ -  ]", "", result[["*OR*"]][2])),
+    result$Variable[6:8],
+    c("Random effects (*SD*)", "\u2003Herd", "\u2003\u2003Constant")
+  )
+  expect_equal(
+    as.numeric(gsub("[ -  ]", "", result[["*OR*"]][3])),
     round(exp(lme4::fixef(fit)[["period2"]]), 2)
   )
 })
@@ -725,6 +734,12 @@ test_that("apa_flextable left-aligns padded columns and centers the block", {
   expect_true(all(pad[, "*z*"] > 3))
   # Uniform padding within the column
   expect_equal(length(unique(pad[, "*z*"])), 1L)
+  # A nearly equal right padding keeps the block centered where columns are
+  # sized to their contents (HTML), and the block still fits the column
+  pad_right <- ft$body$styles$pars$padding.right$data
+  expect_equal(unique(pad_right[, "*z*"]), unique(pad[, "*z*"]) - 3)
+  width <- ft$body$colwidths[[match("*z*", ft$col_keys)]] * 72
+  expect_lte(unique(pad[, "*z*"]) + unique(pad_right[, "*z*"]), width)
 
   # Unpadded columns stay centered
   d2 <- tibble::tibble(Variable = c("a", "b"), x = c("one", "two"))
@@ -913,4 +928,116 @@ test_that("pivot_wider_name_first ", {
     pivot_wider_name_first(d, names_from = c(Model, p), values_from = c(t, p)),
     "Only one names_from variable is allowed."
   )
+})
+
+test_that("apa_cor centers every summary column", {
+  # Body cells of the summary columns are centered, with equal padding
+  summary_alignment <- function(ft) {
+    info <- flextable::information_data_paragraph(ft)
+    keys <- setdiff(ft$col_keys, c("apa7listcolumn", "Variable"))
+    keys <- keys[!grepl("apa7starcolumn$|^[0-9]+$", keys)]
+    body <- info[info$.part == "body" & info$.col_id %in% keys, ]
+    list(
+      keys = keys,
+      align = unique(body$text.align),
+      balanced = all(body$padding.left == body$padding.right)
+    )
+  }
+  a <- summary_alignment(apa_cor(trees))
+  expect_equal(a$keys, c("*M*", "*SD*"))
+  expect_equal(a$align, "center")
+  expect_true(a$balanced)
+
+  b <- summary_alignment(apa_cor(
+    mtcars[, c("mpg", "hp", "wt")],
+    summary_functions = c("n", "M", "SD", "Skewness", "Kurtosis", "Median", "IQR", "Var")
+  ))
+  expect_length(b$keys, 8)
+  expect_equal(b$align, "center")
+  expect_true(b$balanced)
+})
+
+test_that("random effects can be shown as variances and covariances", {
+  skip_if_not_installed("lme4")
+  skip_if_not_installed("pbkrtest")
+  fit <- lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
+  result <- apa_parameters(fit, random_scale = "variance")
+  expect_equal(result$Variable[4:5], c("Random effects (*Var*)", "\u2003Subject"))
+  expect_equal(result$Variable[8], "\u2003\u2003*Cov* (Constant, Days)")
+  vc <- as.data.frame(lme4::VarCorr(fit))
+  values <- as.numeric(gsub("[^0-9.\u2212-]", "", result[["*B*"]][c(6:8, 9)]))
+  expect_equal(values, round(vc$vcov, 2))
+  note <- apa_note(result)
+  expect_match(note, "*Var* = variance; *Cov* = covariance.", fixed = TRUE)
+  expect_no_match(note, "standard deviation", fixed = TRUE)
+
+  # The SD scale defines its symbols, too
+  expect_match(
+    apa_note(apa_parameters(fit)),
+    "*SD* = standard deviation; *r* = correlation.",
+    fixed = TRUE
+  )
+
+  # Without headings, the labels name the statistic
+  plain <- apa_parameters(fit, random_scale = "variance", effect_headings = FALSE)
+  expect_equal(
+    plain$Variable[3:6],
+    c(
+      "Subject: *Var* (Constant)", "Subject: *Var* (Days)",
+      "Subject: *Cov* (Constant, Days)", "Residual *Var*"
+    )
+  )
+  expect_error(apa_parameters(fit, random_scale = "precision"), "should be one of")
+})
+
+test_that("variance-scale nlme residual structures are squared or doubled", {
+  skip_if_not_installed("nlme")
+  fit <- nlme::lme(
+    distance ~ age + Sex,
+    random = ~ 1 | Subject,
+    weights = nlme::varIdent(form = ~ 1 | Sex),
+    data = nlme::Orthodont
+  )
+  result <- apa_parameters(fit, random_scale = "variance")
+  ratio <- stats::coef(fit$modelStruct$varStruct, unconstrained = FALSE)
+  row <- result$Variable == "\u2003Residual variance ratio: Female"
+  expect_equal(as_num(result[["*B*"]][row]), unname(round(ratio^2, 2)))
+  expect_match(apa_note(result), "has its own residual variance", fixed = TRUE)
+
+  fit_power <- nlme::lme(
+    distance ~ age,
+    random = ~ 1 | Subject,
+    weights = nlme::varPower(form = ~ age),
+    data = nlme::Orthodont
+  )
+  delta <- stats::coef(fit_power$modelStruct$varStruct, unconstrained = FALSE)
+  power <- apa_parameters(fit_power, random_scale = "variance")
+  row <- grepl("variance power", power$Variable, fixed = TRUE)
+  expect_equal(as_num(power[["*B*"]][row]), unname(round(2 * delta, 2)))
+})
+
+test_that("each cluster gets a subheading; nested clusters are spelled out", {
+  skip_if_not_installed("lme4")
+  set.seed(1)
+  d <- data.frame(
+    school = rep(1:6, each = 20),
+    classroom = rep(1:4, each = 5, times = 6),
+    item = rep(1:5, times = 24)
+  )
+  d$y <- rnorm(120) + rep(rnorm(6), each = 20) + rep(rnorm(24), each = 5) + rnorm(5)[d$item]
+  nested <- suppressMessages(lme4::lmer(y ~ 1 + (1 | school / classroom), data = d))
+  result <- apa_parameters(nested, ci_method = "wald")
+  expect_equal(
+    result$Variable[3:8],
+    c(
+      "Random effects (*SD*)",
+      "\u2003Classroom in School", "\u2003\u2003Constant",
+      "\u2003School", "\u2003\u2003Constant",
+      "\u2003Residual"
+    )
+  )
+  crossed <- suppressMessages(lme4::lmer(y ~ 1 + (1 | school) + (1 | item), data = d))
+  labels <- apa_parameters(crossed, ci_method = "wald")$Variable
+  expect_true(all(c("\u2003School", "\u2003Item") %in% labels))
+  expect_equal(sum(labels == "\u2003\u2003Constant"), 2)
 })
