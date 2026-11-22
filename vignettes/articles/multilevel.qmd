@@ -19,7 +19,7 @@ library(parameters)
 <<setup>>
 ```
 
-When observations are nested (trials within participants, students within classrooms) or crossed (participants responding to the same set of items), ordinary regression treats correlated observations as independent and understates uncertainty. Multilevel (mixed-effects) models account for the nesting with random effects. `apa_parameters` accepts models fit with `lme4::lmer` and `lme4::glmer` and displays the fixed effects as in an ordinary regression table, followed by the random-effect standard deviations and correlations.
+When observations are nested (trials within participants, students within classrooms) or crossed (participants responding to the same set of items), ordinary regression treats correlated observations as independent and understates uncertainty. Multilevel (mixed-effects) models account for the nesting with random effects. `apa_parameters` accepts models fit with `lme4::lmer`, `lme4::glmer`, and `glmmTMB::glmmTMB` and displays the fixed effects as in an ordinary regression table, followed by the random-effect standard deviations and correlations.
 
 # Linear Mixed Models
 
@@ -175,3 +175,101 @@ apa_parameters(glmer_va)
 ```
 
 Each point of trait anger multiplies the odds of endorsing an item by about 1.06. Scolding and shouting are endorsed less often than cursing, reactions are endorsed less often when the respondent is to blame than when someone else is, and people are less likely to say they would *do* something than that they would *want* to. The random-effect *SD*s are on the log-odds scale and show that people differ much more than items do, after the item characteristics are taken into account.
+
+# Count Outcomes with glmmTMB
+
+Counts often vary more than a Poisson model allows (overdispersion) or have more zeros than it predicts. The [glmmTMB](https://glmmtmb.github.io/glmmTMB/) package fits mixed models for such data, including negative binomial models and models with a separate zero-inflation part. `apa_parameters` displays them like `glmer` models.
+
+The `Salamanders` data set from the glmmTMB package has 644 counts of salamanders at 23 stream sites, some of which were affected by mountaintop removal coal mining. Each site was surveyed for seven species (or life stages). Do mined sites have fewer salamanders?
+
+```{r}
+#| label: salamander-data
+data(Salamanders, package = "glmmTMB")
+d_sal <- Salamanders |>
+  mutate(
+    Mined = factor(mined, levels = c("no", "yes"), labels = c("No", "Yes"))
+  ) |>
+  rename(Count = count, Site = site, Species = spp)
+```
+
+The counts have a mean of 1.32 but a variance of 6.95, and 60% of them are zeros, far more variability than a Poisson model allows.
+
+## Negative binomial models
+
+A negative binomial model adds a dispersion parameter that lets the variance grow faster than the mean. Sites are a random effect, because each site was surveyed for every species.
+
+```{r}
+#| label: salamander-nb
+tmb_nb <- glmmTMB::glmmTMB(
+  Count ~ Mined + Species + (1 | Site),
+  family = glmmTMB::nbinom2,
+  data = d_sal
+)
+apa_parameters(tmb_nb)
+```
+
+As with `glmer`, coefficients are tested with *z* tests, and coefficients of models with a log link are exponentiated. For count models, the exponentiated coefficients are incidence rate ratios (*IRR*): mined sites have about one tenth as many salamanders as unmined sites of the same species. The site *SD* is on the log scale. The dispersion parameter itself is not displayed, because it is not tested.
+
+## Zero-inflated models
+
+Another account of the many zeros is that some surveys could not have found any salamanders (e.g., because the stream was buried by mining), while the others produced counts as usual. A zero-inflated model has two parts: a conditional model of the counts, and a logistic model of whether a zero is one of these excess zeros. Here a zero-inflated Poisson model lets the probability of an excess zero differ between mined and unmined sites:
+
+```{r}
+#| label: salamander-zip
+tmb_zip <- glmmTMB::glmmTMB(
+  Count ~ Mined + Species + (1 | Site),
+  ziformula = ~ Mined,
+  family = poisson,
+  data = d_sal
+)
+tbl_zip <- apa_parameters(tmb_zip)
+tbl_zip
+```
+
+Each part of the model has its own heading. Only the conditional model's coefficients are exponentiated, because the zero-inflation coefficients are log odds: the probability of an excess zero is about .26 at unmined sites (the inverse logit of −1.05) and .69 at mined sites (the inverse logit of −1.05 + 1.84). Mined sites have both more excess zeros and fewer salamanders otherwise. The table note says what the zero-inflation coefficients are:
+
+```{r}
+#| label: salamander-zip-note
+apa_note(tbl_zip)
+```
+
+The two models explain the zeros differently, and their *AIC*s can be compared with `apa_performance`. Here the negative binomial model fits better:
+
+```{r}
+#| label: salamander-aic
+apa_performance(
+  list(`Negative binomial` = tmb_nb, `Zero-inflated Poisson` = tmb_zip),
+  metrics = c("AIC", "BIC")
+)
+```
+
+## Dispersion models
+
+With `dispformula`, the dispersion parameter itself is modeled, and the table has a "Dispersion model" part. For negative binomial models, a larger dispersion parameter means less overdispersion, so the negative coefficient here means that counts at mined sites are more overdispersed. As the note says, dispersion coefficients are on the log scale.
+
+```{r}
+#| label: salamander-disp
+glmmTMB::glmmTMB(
+  Count ~ Mined + Species + (1 | Site),
+  dispformula = ~ Mined,
+  family = glmmTMB::nbinom2,
+  data = d_sal
+) |>
+  apa_parameters()
+```
+
+## Fit and comparisons
+
+`apa_performance` reports the marginal and conditional *R*^2^ and the ICC of glmmTMB models, and nested models are compared with likelihood ratio tests, as for lme4 models:
+
+```{r}
+#| label: salamander-compare
+tmb_nb0 <- glmmTMB::glmmTMB(
+  Count ~ Mined + (1 | Site),
+  family = glmmTMB::nbinom2,
+  data = d_sal
+)
+apa_performance_comparison(
+  list(`Mining` = tmb_nb0, `Mining and species` = tmb_nb)
+)
+```

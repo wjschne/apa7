@@ -162,6 +162,8 @@ glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
 
+For nested counts, or counts with many zeros, negative binomial and zero-inflated mixed models fit with glmmTMB are described in the [multilevel article](multilevel.html#count-outcomes-with-glmmtmb).
+
 # Table Notes
 
 A regression table often needs a note that defines its symbols and explains its stars. `apa_parameters` records how each table was made, and `apa_note` turns that record into note text. For the hierarchical regression above, the note defines the standardized coefficient and the change in *R*^2^ and explains the stars on the change in *R*^2^:

@@ -1699,18 +1699,8 @@ apa_parameters.merMod <- function(
   if (random) {
     d_r <- parameters::model_parameters(fit, effects = "random", ci = NULL) |>
       tibble::as_tibble()
-    is_cor <- startsWith(d_r$Parameter, "Cor ")
     # Correlations have no leading zero; SDs are formatted like coefficients
-    coef_chr <- character(nrow(d_r))
-    coef_chr[is_cor] <- signs::signs(
-      d_r$Coefficient[is_cor],
-      accuracy = column_formats@accuracy,
-      trim_leading_zeros = TRUE
-    )
-    coef_chr[!is_cor] <- signs::signs(
-      d_r$Coefficient[!is_cor],
-      accuracy = column_formats@accuracy
-    )
+    coef_chr <- random_effect_coefficients(d_r, column_formats@accuracy)
     fixed_chr <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
     d_b$Coefficient <- fixed_chr
     d_b <- dplyr::bind_rows(
@@ -1733,7 +1723,177 @@ apa_parameters.merMod <- function(
     column_formats = column_formats,
     t_with_df = t_with_df,
     note = list(df_method = if (!is_glmm) dots$ci_method)
+  ) |>
+    labels_formatted()
+}
+
+#' @details
+#' For mixed models fit with `glmmTMB::glmmTMB()`, fixed effects are tested with *z* tests, and random effects are displayed as for `lme4` models. Coefficients of log and logit links are exponentiated by default (e.g., *IRR* for Poisson and negative binomial models). When the model has a zero-inflation part (`ziformula`) or a dispersion part (`dispformula`), each part is introduced by a heading row ("Conditional model", "Zero-inflation model", or "Dispersion model"), and only the conditional model's coefficients are exponentiated. A dispersion parameter that is not modeled (i.e., without a `dispformula`) is not displayed.
+#' @export
+#' @rdname apa_parameters
+#' @examples
+#' \donttest{
+#' if (requireNamespace("glmmTMB", quietly = TRUE)) {
+#'   data(Salamanders, package = "glmmTMB")
+#'   glmmTMB::glmmTMB(
+#'     count ~ mined + (1 | site),
+#'     ziformula = ~ mined,
+#'     family = poisson,
+#'     data = Salamanders
+#'   ) |>
+#'     apa_parameters()
+#' }
+#' }
+apa_parameters.glmmTMB <- function(
+  fit,
+  predictor_parameters = c(
+    "Parameter",
+    "Coefficient",
+    "SE",
+    "Exp_Coefficient",
+    "t",
+    "z",
+    "df_error",
+    "p"
+  ),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  random = TRUE,
+  ...
+) {
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+  names(predictor_parameters) <- NULL
+
+  mp <- parameters::model_parameters(fit, effects = "fixed", ...)
+  d_b <- tibble::as_tibble(mp)
+  if (!("Component" %in% colnames(d_b))) {
+    d_b$Component <- "conditional"
+  }
+  # A dispersion parameter that is not modeled has no standard error
+  d_b <- d_b[!(d_b$Component == "dispersion" & is.na(d_b$SE)), ]
+
+  # Format variable names here, because headings and random-effect labels are
+  # built below
+  name_formatter <- column_formats$Parameter@formatter
+  pretty <- attr(mp, "pretty_names")
+  labels <- unname(pretty[d_b$Parameter])
+  labels[is.na(labels)] <- d_b$Parameter[is.na(labels)]
+  d_b$Parameter <- name_formatter(labels)
+
+  # Only the conditional model is exponentiated (e.g., IRR), because the
+  # zero-inflation and dispersion parts have other links and meanings
+  if (is.null(exponentiate)) {
+    exponentiate <- stats::family(fit)$link %in% c("logit", "log")
+  }
+  if (exponentiate) {
+    d_b <- add_exp_columns(d_b, predictor_parameters)
+    not_conditional <- d_b$Component != "conditional"
+    for (col in intersect(c("Exp_Coefficient", "Exp_CI_low", "Exp_CI_high"), colnames(d_b))) {
+      d_b[[col]][not_conditional] <- NA
+    }
+    column_formats <- label_exp_columns(
+      column_formats,
+      exp_coefficient_label(fit)
+    )
+  }
+
+  # z tests have infinite df, which should not be displayed
+  if ("df_error" %in% colnames(d_b) && all(is.infinite(d_b$df_error))) {
+    d_b$df_error <- NULL
+  }
+
+  d_r <- NULL
+  if (random) {
+    d_r <- parameters::model_parameters(fit, effects = "random", ci = NULL) |>
+      tibble::as_tibble()
+    if (!("Component" %in% colnames(d_r))) {
+      d_r$Component <- "conditional"
+    }
+    d_b$Coefficient <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
+    d_r <- tibble::tibble(
+      Parameter = random_effect_labels(d_r$Parameter, d_r$Group, name_formatter),
+      Coefficient = random_effect_coefficients(d_r, column_formats@accuracy),
+      Component = d_r$Component
+    )
+  }
+
+  # Each part of the model: fixed effects, then random effects
+  components <- intersect(
+    c("conditional", "zero_inflated", "dispersion"),
+    c(d_b$Component, d_r$Component)
   )
+  pieces <- purrr::map(components, \(component) {
+    dplyr::bind_rows(
+      d_b[d_b$Component == component, ],
+      d_r[d_r$Component == component, ]
+    )
+  })
+  if (length(components) > 1) {
+    headings <- c(
+      conditional = "Conditional model",
+      zero_inflated = "Zero-inflation model",
+      dispersion = "Dispersion model"
+    )
+    pieces <- purrr::map2(pieces, components, \(piece, component) {
+      piece$Parameter <- paste0("\u2003", piece$Parameter)
+      dplyr::bind_rows(
+        tibble::tibble(Parameter = headings[[component]]),
+        piece
+      )
+    })
+  }
+  d_b <- dplyr::bind_rows(pieces)
+  d_b$Component <- NULL
+
+  # Names were formatted above
+  column_formats$Parameter@formatter <- \(x, ...) x
+
+  format_apa_parameters(
+    d_b,
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df,
+    note = list(components = setdiff(components, "conditional"))
+  ) |>
+    labels_formatted()
+}
+
+#' Mark the first (label) column as already formatted
+#'
+#' Row labels such as "Subject: *SD* (Constant)" or headings such as
+#' "Zero-inflation model" are formatted when the table is made. Formatting them
+#' again in apa_flextable() would drop their punctuation and indentation.
+#' @keywords internal
+#' @noRd
+labels_formatted <- function(d) {
+  attr(d, "no_format_columns") <- union(
+    attr(d, "no_format_columns", exact = TRUE),
+    colnames(d)[1]
+  )
+  d
+}
+
+#' Random-effect SDs formatted like coefficients and correlations without a
+#' leading zero
+#' @keywords internal
+#' @noRd
+random_effect_coefficients <- function(d_r, accuracy) {
+  is_cor <- startsWith(d_r$Parameter, "Cor ")
+  out <- character(nrow(d_r))
+  out[is_cor] <- signs::signs(
+    d_r$Coefficient[is_cor],
+    accuracy = accuracy,
+    trim_leading_zeros = TRUE
+  )
+  out[!is_cor] <- signs::signs(d_r$Coefficient[!is_cor], accuracy = accuracy)
+  out
 }
 
 #' Labels for random-effect parameters
@@ -1837,7 +1997,7 @@ exp_coefficient_label <- function(fit) {
     return(c(header = "*OR*", latex = "$OR$", abbreviation = "odds ratio"))
   }
   if (fam$link == "log") {
-    if (grepl("poisson|negative binomial", family)) {
+    if (grepl("poisson|negative binomial|nbinom|genpois|compois", family)) {
       return(c(
         header = "*IRR*",
         latex = "$IRR$",
@@ -2031,7 +2191,7 @@ apa_parameters.list <- function(
   # Mixed models also show the conditional R2 and its change by default
   if (
     missing(performance_parameters) &&
-      all(purrr::map_lgl(fit, \(m) inherits(m, "merMod")))
+      all(purrr::map_lgl(fit, \(m) inherits(m, c("merMod", "glmmTMB"))))
   ) {
     performance_parameters <- c(
       "R2",
@@ -2092,6 +2252,11 @@ apa_parameters.list <- function(
         by = dplyr::join_by(Model)
       ) |>
       dplyr::mutate(dplyr::across(.cols = dplyr::where(is.character), \(x) dplyr::replace_values(x, from = NA, to = "")))
+  }
+
+  # Labels of each model's table were formatted when it was made
+  if (any(purrr::map_lgl(model_tables, \(x) !is.null(attr(x, "no_format_columns", exact = TRUE))))) {
+    attr(d_fit, "no_format_columns") <- colnames(d_fit)[2]
   }
 
   attr(d_fit, "apa_note") <- merge_parameters_note_records(
@@ -2202,7 +2367,7 @@ apa_performance.polr <- apa_performance.glm
 apa_performance.clm <- apa_performance.glm
 
 #' @details
-#' For mixed models (`lme4::lmer` and `lme4::glmer`), the default metrics are the marginal *R*^2^ (variance explained by the fixed effects), the conditional *R*^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by [performance::model_performance()].
+#' For mixed models (`lme4::lmer`, `lme4::glmer`, and `glmmTMB::glmmTMB`), the default metrics are the marginal *R*^2^ (variance explained by the fixed effects), the conditional *R*^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by [performance::model_performance()].
 #' @export
 #' @rdname apa_performance
 apa_performance.merMod <- function(
@@ -2212,6 +2377,10 @@ apa_performance.merMod <- function(
 ) {
   apa_performance.lm(fit, metrics = metrics, column_formats = column_formats)
 }
+
+#' @export
+#' @rdname apa_performance
+apa_performance.glmmTMB <- apa_performance.merMod
 
 #' @details
 #' For a list of models, each model's metrics are displayed in a row, labeled in a `Model` column by the list's names (or "Model 1", "Model 2", ... for unnamed elements). If `metrics` is `NULL` (default), each model's default metrics are used.
@@ -2305,7 +2474,7 @@ use_pseudo_r2 <- function(data, column_formats) {
 #' @noRd
 has_fixed_dispersion <- function(fit) {
   # Nested mixed models are also compared with likelihood ratio tests
-  if (inherits(fit, c("polr", "clm", "merMod"))) {
+  if (inherits(fit, c("polr", "clm", "merMod", "glmmTMB"))) {
     return(TRUE)
   }
   if (!inherits(fit, "glm")) {
@@ -2356,7 +2525,7 @@ apa_performance_comparison <- function(
   }
   use_lrt <- all(purrr::map_lgl(models, has_fixed_dispersion))
   # Mixed models have marginal and conditional R2
-  is_mixed <- all(purrr::map_lgl(models, \(m) inherits(m, "merMod")))
+  is_mixed <- all(purrr::map_lgl(models, \(m) inherits(m, c("merMod", "glmmTMB"))))
   conditional_r2 <- if (is_mixed) c("R2_conditional", "deltaR2_conditional")
 
   if (is.null(metrics)) {

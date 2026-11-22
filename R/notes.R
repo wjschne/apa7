@@ -36,12 +36,14 @@
 #' * what stars or bold values mean.
 #'
 #' For [apa_parameters()] tables of regression models (`lm`, `glm`, `polr`,
-#' `clm`, and `lme4` models, or a list of models), the note can say
+#' `clm`, `lme4`, and `glmmTMB` models, or a list of models), the note can say
 #'
 #' * which robust standard errors were used (e.g., `vcov = "HC3"`),
 #' * how the degrees of freedom of mixed-model *t* tests were approximated
 #'   (Kenward-Roger or Satterthwaite),
 #' * that ordinal-model thresholds are not tested,
+#' * the scale of the zero-inflation and dispersion coefficients of `glmmTMB`
+#'   models,
 #' * what the standardized coefficient (\eqn{\beta}{beta}), exponentiated coefficient
 #'   (e.g., *OR*), confidence interval, and model-comparison (e.g.,
 #'   \eqn{\Delta R^2}{Delta R^2}) columns stand for, and
@@ -521,6 +523,7 @@ parameters_note_record <- function(
     vcov = note$vcov,
     df_method = note$df_method,
     thresholds = note$thresholds,
+    components = note$components,
     starred = isTRUE(starred),
     bolded = isTRUE(bolded),
     performance = NULL,
@@ -583,6 +586,7 @@ merge_parameters_note_records <- function(
     vcov = pick("vcov"),
     df_method = pick("df_method"),
     thresholds = pick("thresholds"),
+    components = pick("components"),
     starred = any(purrr::map_lgl(records, "starred")),
     bolded = any(purrr::map_lgl(records, "bolded")),
     performance = performance_headers,
@@ -636,6 +640,20 @@ parameters_note_sentences <- function(record) {
         link_name,
         " scale and are not tested."
       )
+    )
+  }
+
+  # Zero-inflation and dispersion parts of glmmTMB models
+  if ("zero_inflated" %in% record$components) {
+    sentences <- c(
+      sentences,
+      "Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the conditional model)."
+    )
+  }
+  if ("dispersion" %in% record$components) {
+    sentences <- c(
+      sentences,
+      "Dispersion coefficients are on the log scale."
     )
   }
 

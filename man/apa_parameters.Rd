@@ -10,6 +10,7 @@
 \alias{apa_parameters.polr}
 \alias{apa_parameters.clm}
 \alias{apa_parameters.merMod}
+\alias{apa_parameters.glmmTMB}
 \alias{apa_parameters.list}
 \title{format model parameters in APA style}
 \usage{
@@ -113,6 +114,19 @@ apa_parameters(
   ...
 )
 
+\method{apa_parameters}{glmmTMB}(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "t", "z",
+    "df_error", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  random = TRUE,
+  ...
+)
+
 \method{apa_parameters}{list}(
   fit,
   predictor_parameters = NULL,
@@ -161,6 +175,8 @@ For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \e
 For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coefficients are tested with Wald \emph{z} tests. (\code{parameters} reports \emph{t} for \code{polr}, but the test is asymptotically normal, and \code{clm} reports \emph{z} for the same model.) With a logit link, exponentiated coefficients are cumulative odds ratios, labeled \emph{OR}. Threshold rows show only the estimate, its standard error, and its confidence interval, because their exponentiated values are not odds ratios, and testing whether a threshold equals 0 is not meaningful. Confidence intervals (\code{"CI"}, \code{"Exp_CI"}) are Wald \emph{z} intervals, consistent with the \emph{z} tests.
 
 For mixed models fit with \code{lme4} (\code{lmer} and \code{glmer}), fixed effects are displayed as for \code{lm} and \code{glm} models. For linear mixed models, \emph{t} tests and confidence intervals use Kenward-Roger degrees of freedom by default (\code{ci_method = "kenward"}, which requires the pbkrtest package); pass another \code{ci_method} (e.g., \code{"satterthwaite"}, which requires lmerTest, or \code{"wald"}) to change this. When the degrees of freedom differ across fixed effects, they are shown in a \emph{df} column rather than in the \emph{t} column header. Random-effect rows show only the estimated standard deviation (\emph{SD}) or correlation (\emph{r}), labeled by grouping factor.
+
+For mixed models fit with \code{glmmTMB::glmmTMB()}, fixed effects are tested with \emph{z} tests, and random effects are displayed as for \code{lme4} models. Coefficients of log and logit links are exponentiated by default (e.g., \emph{IRR} for Poisson and negative binomial models). When the model has a zero-inflation part (\code{ziformula}) or a dispersion part (\code{dispformula}), each part is introduced by a heading row ("Conditional model", "Zero-inflation model", or "Dispersion model"), and only the conditional model's coefficients are exponentiated. A dispersion parameter that is not modeled (i.e., without a \code{dispformula}) is not displayed.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
@@ -190,6 +206,18 @@ if (requireNamespace("MASS", quietly = TRUE) &&
 if (requireNamespace("lme4", quietly = TRUE) &&
     requireNamespace("pbkrtest", quietly = TRUE)) {
   lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy) |>
+    apa_parameters()
+}
+}
+\donttest{
+if (requireNamespace("glmmTMB", quietly = TRUE)) {
+  data(Salamanders, package = "glmmTMB")
+  glmmTMB::glmmTMB(
+    count ~ mined + (1 | site),
+    ziformula = ~ mined,
+    family = poisson,
+    data = Salamanders
+  ) |>
     apa_parameters()
 }
 }

@@ -9,7 +9,7 @@ Last reviewed: 2026-11-20
 - [x] Commit the current changes in `R/tables.R`, `vignettes/articles/multilevel.qmd`, and `vignettes/articles/regression.qmd`
 - [x] Make the version numbers match (both are 0.2.0)
 - [x] Make `apa_parameters()` handle `aov` objects correctly (they now return the `apa_anova()` table)
-- [ ] Put new model packages (e.g., `afex`, `car`, `glmmTMB`) in Suggests and guard them with `requireNamespace()` in examples and tests (`afex`, `car`, `lme4`, `MASS`, `carData`, `ordinal`, and `sandwich` done; add `glmmTMB` with its methods)
+- [x] Put new model packages (e.g., `afex`, `car`, `glmmTMB`) in Suggests and guard them with `requireNamespace()` in examples and tests (`afex`, `car`, `glmmTMB`, `lme4`, `lmerTest`, `MASS`, `carData`, `ordinal`, and `sandwich` done)
 - [x] Update NEWS.md with the new functions and methods
 - [x] Run `R CMD check --as-cran` locally with 0 errors, 0 warnings, and 0 notes (clean on 2026-11-20 with R 4.6.2 on Windows). (An earlier size NOTE about `inst/doc/apa7.pdf` came from a stale `vignettes/apa7.pdf`, now deleted; the vignette is HTML only.) Issues fixed from the earlier 2026-11-20 check:
   - [x] Add `sandwich` to Suggests (the `vcov = "HC3"` example and two robust-SE tests fail without it) and guard those with `requireNamespace()` / `skip_if_not_installed()`
@@ -70,7 +70,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 
 ### 4. More mixed-model classes
 
-- [ ] `glmmTMB` methods for `apa_parameters()` and `apa_performance()`
+- [x] `glmmTMB` methods for `apa_parameters()` and `apa_performance()` (zero-inflation and dispersion parts under their own headings; only the conditional model exponentiated)
 - [ ] `nlme::lme` methods
 - [ ] Tests
 

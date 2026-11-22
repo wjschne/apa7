@@ -299,7 +299,7 @@ apa_htest <- function(
     starred = record$starred,
     bolded = record$bolded
   )
-  as_apa7_tbl(d_new)
+  as_apa7_tbl(labels_formatted(d_new))
 }
 
 #' Effect sizes between -1 and 1

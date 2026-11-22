@@ -47,6 +47,7 @@ Suggests:
     forcats,
     fresh,
     ggplot2,
+    glmmTMB,
     lme4,
     lmerTest,
     MASS,
