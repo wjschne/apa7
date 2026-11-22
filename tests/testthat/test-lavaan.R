@@ -144,7 +144,7 @@ test_that("variances and CIs can be added; fixed standardized values are not tes
   expect_equal(trimws(result$`*SE*`[latent]), "")
 })
 
-test_that("robust and bootstrap standard errors are named; groups are not yet supported", {
+test_that("robust and bootstrap standard errors are named", {
   skip_if_not_installed("lavaan")
   fit_r <- lavaan::cfa(hs_model, data = lavaan::HolzingerSwineford1939, estimator = "MLR")
   expect_match(apa_note(apa_parameters(fit_r)), "Standard errors are robust.", fixed = TRUE)
@@ -158,12 +158,6 @@ test_that("robust and bootstrap standard errors are named; groups are not yet su
   # Few bootstrap samples (for speed) give warnings about interval endpoints
   note_b <- suppressWarnings(apa_note(apa_parameters(fit_b)))
   expect_match(note_b, "20 bootstrap samples", fixed = TRUE)
-  fit_g <- lavaan::cfa(
-    "visual =~ x1 + x2 + x3",
-    data = lavaan::HolzingerSwineford1939,
-    group = "school"
-  )
-  expect_error(apa_parameters(fit_g), "multiple-group")
 })
 
 test_that("RMSEA intervals keep decimals at 0; bootstrap CIs are named percentile", {
@@ -341,4 +335,96 @@ test_that("robust lavaan comparisons name the scaled difference test", {
   expect_error(apa_performance_comparison(fits[1:2], metrics = "GFI"), "Choose from")
   expect_error(apa_performance_comparison(fits[1]), "at least two")
   expect_equal(ncol(apa_performance_comparison(fits, metrics = "all")), 18)
+})
+
+mg_model <- paste(
+  sep = "\n",
+  hs_model,
+  "speed ~ c(a1, a2) * visual
+   ind1 := a1 * 2
+   diff := a1 - a2"
+)
+
+test_that("multiple-group models show groups side by side by default", {
+  skip_if_not_installed("lavaan")
+  fit <- lavaan::sem(
+    mg_model,
+    data = lavaan::HolzingerSwineford1939,
+    group = "school",
+    group.equal = "loadings",
+    group.partial = "visual=~x3"
+  )
+  result <- apa_parameters(fit)
+  expect_equal(
+    colnames(result),
+    c(
+      "Parameter",
+      paste0("Pasteur_", c("&beta;", "*SE*", "*p*")),
+      paste0("Grant-White_", c("&beta;", "*SE*", "*p*"))
+    )
+  )
+  ss <- lavaan::standardizedSolution(fit)
+  x1 <- result$Parameter == " Visual → X1"
+  expect_equal(
+    as_num(result$`Grant-White_&beta;`[x1]),
+    round(ss$est.std[ss$lhs == "visual" & ss$rhs == "x1" & ss$group == 2], 2)
+  )
+  # ind1 uses a group-1 label; diff combines groups, so both are in the
+  # first group's columns
+  defined <- result$Parameter %in% c(" Ind1", " Diff")
+  expect_true(all(trimws(result$`Pasteur_&beta;`[defined]) != ""))
+  expect_true(all(trimws(result$`Grant-White_&beta;`[defined]) == ""))
+
+  note <- apa_note(result)
+  expect_match(note, "*N* = 301 (Pasteur: *n* = 156; Grant-White: *n* = 145).", fixed = TRUE)
+  expect_match(
+    note,
+    "Loadings were constrained to be equal across groups, except Visual → X3.",
+    fixed = TRUE
+  )
+  expect_match(note, "Standardized estimates of equal parameters can differ", fixed = TRUE)
+  expect_match(note, "shown in the Pasteur columns", fixed = TRUE)
+
+  ft <- apa_flextable(result)
+  expect_equal(ft$body$dataset[[1]], result$Parameter)
+  expect_true(all(c("Pasteur", "Grant-White") %in% unlist(ft$header$dataset[1, ])))
+})
+
+test_that("multiple-group models can be stacked with group headings", {
+  skip_if_not_installed("lavaan")
+  fit <- lavaan::sem(
+    mg_model,
+    data = lavaan::HolzingerSwineford1939,
+    group = "school",
+    group.equal = c("loadings", "intercepts")
+  )
+  result <- apa_parameters(fit, groups = "rows", standardize = FALSE)
+  expect_equal(colnames(result), c("Parameter", "*B*", "*SE*", "*p*"))
+  headings <- c("Pasteur", "Grant-White", "Across groups")
+  expect_true(all(headings %in% result$Parameter))
+  expect_true(all(diff(match(headings, result$Parameter)) > 0))
+  expect_true("  Visual → X1" %in% result$Parameter)
+  # diff combines groups, so it is under its own heading
+  expect_gt(
+    match("  Diff", result$Parameter),
+    match("Across groups", result$Parameter)
+  )
+  note <- apa_note(result)
+  expect_match(note, "Loadings and intercepts were constrained", fixed = TRUE)
+  expect_no_match(note, "Standardized estimates of equal", fixed = TRUE)
+  expect_no_match(note, "columns", fixed = TRUE)
+  expect_match(note, "were fixed at 1", fixed = TRUE)
+})
+
+test_that("partial invariance labels name the freed parameters", {
+  expect_equal(
+    lavaan_partial_label(c("visual =~ x3", "x1 ~ 1", "speed ~ visual", "x1 ~~ x2", "u1|t1")),
+    c(
+      "Visual → X3",
+      "the intercept of X1",
+      "Speed ← Visual",
+      "X1 ↔ X2",
+      "U1 | t1"
+    )
+  )
 })

@@ -257,6 +257,18 @@ Constraining the loadings to be equal did not worsen the fit much, so metric inv
 
 With a robust estimator (e.g., `estimator = "MLR"`), the difference test is scaled (e.g., the Satorra–Bentler scaled difference test), and the note names it. Other metrics, such as `"deltaTLI"` and `"deltaSRMR"`, can be chosen with `metrics`, and `metrics = "all"` shows all of them.
 
+## Multiple-group parameter estimates
+
+`apa_parameters` shows the estimates of a multiple-group model side by side, with a column spanner for each group, so the groups can be compared row by row. Here are the estimates of the metric model:
+
+```{r}
+#| label: hs-metric-parameters
+apa_parameters(fit_metric) |>
+  apa_flextable(note = TRUE)
+```
+
+The note gives the size of each group and says which parameters were constrained to be equal. The unstandardized loadings of the metric model are equal at the two schools, but the standardized loadings differ, because each school's estimates are standardized with that school's variances. With many groups, or with more columns, `groups = "rows"` stacks the groups, each under a heading.
+
 # Structural Equation Models
 
 Does industrialization lead to democracy? In Bollen's (1989) classic `PoliticalDemocracy` data set from the lavaan package, industrialization in 1960 was measured in 75 developing countries with three indicators (*x*~1~ to *x*~3~), and political democracy was measured in 1960 and in 1965 with four indicators each (*y*~1~ to *y*~4~ and *y*~5~ to *y*~8~). The same democracy indicator measured in different years can share specific variance, so the residuals of matching indicators are allowed to correlate.
@@ -464,10 +476,6 @@ tbl_pd
 ```
 
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the note below the table.
-
-# What Is Not Yet Supported
-
-- Multiple-group models (e.g., `group = "school"`) in `apa_parameters`
 
 # References
 

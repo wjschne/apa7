@@ -76,10 +76,10 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 
 ### 5. After CRAN
 
-- [ ] lavaan CFA/SEM tables (arrows in path labels; standardized estimates by default)
+- [x] lavaan CFA/SEM tables (arrows in path labels; standardized estimates by default)
   - [x] Fit indices with `apa_performance()` (*χ*², CFI, TLI, RMSEA [90% CI], SRMR; scaled tests and robust indices for MLR/WLSMV; note with *N*, estimator, FIML)
   - [x] Parameter estimates with `apa_parameters()` (loadings, regressions, correlations, defined parameters under headings; standardized by default)
-  - [ ] Multiple-group models in `apa_parameters()`
+  - [x] Multiple-group models in `apa_parameters()` (groups side by side by default; stacked with `groups = "rows"`)
   - [x] CFA loading matrix with `apa_loadings()` (and latent correlations with `apa_factor_cor()`)
   - [x] Nested-model and measurement-invariance comparisons with `apa_performance_comparison()` (each model against the previous one)
 - [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR`

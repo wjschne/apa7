@@ -352,8 +352,11 @@ and_list <- function(x) {
 #' @param standardize for `lavaan` models, if `TRUE` (default), fully standardized estimates (\eqn{\beta}{beta}) are displayed with their standard errors and *p*-values. If `FALSE`, unstandardized estimates (*B*) are displayed.
 #' @param variances,intercepts for `lavaan` models, if `TRUE`, sections for (residual) variances or intercepts are added. Both are `FALSE` by default.
 #' @param ci for `lavaan` models, confidence level of intervals shown when `predictor_parameters` includes `"CI"`
+#' @param groups for multiple-group `lavaan` models, `"columns"` (default) shows the groups side by side, each under a column spanner, and `"rows"` stacks them, each under a heading row.
 #' @details
-#' For structural equation models and confirmatory factor analyses fit with `lavaan`, estimates come from [lavaan::standardizedSolution()] (`standardize = TRUE`, default) or [lavaan::parameterEstimates()] (`standardize = FALSE`). Each kind of parameter is introduced by a heading row: "Factor loadings" (e.g., Visual \eqn{\rightarrow}{->} x1), "Regressions" (e.g., Speed \eqn{\leftarrow}{<-} Visual), "Correlations" (or "Covariances", if unstandardized; e.g., Visual \eqn{\leftrightarrow}{<->} Textual), and "Defined parameters" (e.g., indirect effects defined with `:=`), followed, if requested, by variances, intercepts, and thresholds. The default columns are the estimate, its standard error, and its *p*-value; `"z"`, `"CI"`, and (with `standardize = TRUE`) `"Coefficient"` for unstandardized estimates can be added to `predictor_parameters`. Unstandardized parameters fixed to set the scale of a factor (e.g., marker loadings fixed at 1) are not tested. Variable names are shown as written in the model, with the first letter capitalized and underscores replaced by spaces. Multiple-group models are not yet supported.
+#' For structural equation models and confirmatory factor analyses fit with `lavaan`, estimates come from [lavaan::standardizedSolution()] (`standardize = TRUE`, default) or [lavaan::parameterEstimates()] (`standardize = FALSE`). Each kind of parameter is introduced by a heading row: "Factor loadings" (e.g., Visual \eqn{\rightarrow}{->} x1), "Regressions" (e.g., Speed \eqn{\leftarrow}{<-} Visual), "Correlations" (or "Covariances", if unstandardized; e.g., Visual \eqn{\leftrightarrow}{<->} Textual), and "Defined parameters" (e.g., indirect effects defined with `:=`), followed, if requested, by variances, intercepts, and thresholds. The default columns are the estimate, its standard error, and its *p*-value; `"z"`, `"CI"`, and (with `standardize = TRUE`) `"Coefficient"` for unstandardized estimates can be added to `predictor_parameters`. Unstandardized parameters fixed to set the scale of a factor (e.g., marker loadings fixed at 1) are not tested. Variable names are shown as written in the model, with the first letter capitalized and underscores replaced by spaces.
+#'
+#' For multiple-group models (e.g., `group = "school"`), the groups are shown side by side by default, with one row for each parameter and a column spanner for each group, so that the groups can be compared row by row. With `groups = "rows"`, each group has a heading row, with the kinds of parameters indented below it. A defined parameter that uses the labels of one group is shown with that group. One that combines groups (e.g., the difference between two groups' paths) is shown in the first group's columns, or under an "Across groups" heading. [apa_note()] gives the size of each group and names the parameters constrained to be equal across groups (`group.equal`), and any exceptions (`group.partial`). Standardized estimates of equal parameters can still differ across groups, because standardization uses each group's variances.
 #' @export
 #' @rdname apa_parameters
 #' @examples
@@ -364,6 +367,15 @@ and_list <- function(x) {
 #'             speed =~ x7 + x8 + x9
 #'             speed ~ visual + textual"
 #'   lavaan::sem(model, data = lavaan::HolzingerSwineford1939) |>
+#'     apa_parameters()
+#'
+#'   # Multiple groups, side by side
+#'   lavaan::cfa(
+#'     "visual =~ x1 + x2 + x3",
+#'     data = lavaan::HolzingerSwineford1939,
+#'     group = "school",
+#'     group.equal = "loadings"
+#'   ) |>
 #'     apa_parameters()
 #' }
 #' }
@@ -379,14 +391,13 @@ apa_parameters.lavaan <- function(
   intercepts = FALSE,
   thresholds = FALSE,
   ci = 0.95,
+  groups = c("columns", "rows"),
   ...
 ) {
   if (!requireNamespace("lavaan", quietly = TRUE)) {
     stop("lavaan models require the lavaan package. Install it with install.packages(\"lavaan\").") # nocov
   }
-  if (lavaan::lavInspect(fit, "ngroups") > 1) {
-    stop("apa_parameters() does not yet support multiple-group lavaan models.")
-  }
+  groups <- match.arg(groups)
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
   }
@@ -399,9 +410,14 @@ apa_parameters.lavaan <- function(
   }
   names(predictor_parameters) <- NULL
 
-  key <- c("lhs", "op", "rhs")
   pe <- lavaan::parameterEstimates(fit, level = ci)
   ss <- lavaan::standardizedSolution(fit, level = ci)
+  multigroup <- lavaan::lavInspect(fit, "ngroups") > 1
+  if (!multigroup) {
+    pe$group <- 1L
+    ss$group <- 1L
+  }
+  key <- c("lhs", "op", "rhs", "group")
   # Tests, standard errors, and intervals come from the solution displayed
   if (standardize) {
     src <- dplyr::left_join(
@@ -416,6 +432,7 @@ apa_parameters.lavaan <- function(
     lhs = src$lhs,
     op = src$op,
     rhs = src$rhs,
+    group = src$group,
     Coefficient = src$est,
     Std_Coefficient = src$est.std,
     SE = src$se,
@@ -428,7 +445,13 @@ apa_parameters.lavaan <- function(
   # Parameters fixed to set the scale (e.g., marker loadings fixed at 1, or
   # standardized variances of 1) are not tested
   pt <- lavaan::parTable(fit)
-  free <- pt$free[match(paste(d$lhs, d$op, d$rhs), paste(pt$lhs, pt$op, pt$rhs))]
+  if (!multigroup) {
+    pt$group <- 1L
+  }
+  free <- pt$free[match(
+    paste(d$lhs, d$op, d$rhs, d$group),
+    paste(pt$lhs, pt$op, pt$rhs, pt$group)
+  )]
   fixed <- !is.na(free) & free == 0 & d$op != ":="
   untested <- (fixed & !standardize) | (!is.na(d$SE) & d$SE == 0)
   for (col in c("SE", "z", "p", "CI_low", "CI_high")) {
@@ -438,15 +461,138 @@ apa_parameters.lavaan <- function(
     d$CI <- ci
   }
 
+  # Labels were made by lavaan_section_rows()
+  column_formats$Parameter@formatter <- \(x, ...) x
+  # Standardized intervals, like the estimates, have no leading zero
+  if (standardize) {
+    column_formats <- es_ci_format(column_formats)
+  }
+  if (column_formats$Parameter@header == "Variable") {
+    column_formats$Parameter@header <- "Parameter"
+    column_formats$Parameter@latex <- "Parameter"
+  }
+  format_rows <- function(rows) {
+    format_apa_parameters(
+      rows[setdiff(colnames(rows), ".key")],
+      predictor_parameters = predictor_parameters,
+      starred = starred,
+      bolded = bolded,
+      column_formats = column_formats,
+      t_with_df = FALSE
+    )
+  }
+  include <- c(variances = variances, intercepts = intercepts, thresholds = thresholds)
+
+  group_labels <- NULL
+  cross_group_defined <- FALSE
+  if (!multigroup) {
+    d_new <- format_rows(lavaan_section_rows(d, standardize, include))
+  } else {
+    group_labels <- lavaan::lavInspect(fit, "group.label")
+    # Defined parameters belong to a group when all the labels they use do
+    defined <- d$op == ":="
+    d$group[defined] <- lavaan_defined_group(d$rhs[defined], pt)
+    cross_group_defined <- any(d$group == 0)
+    by_group <- purrr::map(seq_along(group_labels), \(g) {
+      lavaan_section_rows(d[d$group == g, ], standardize, include)
+    })
+    across <- lavaan_section_rows(d[d$group == 0, ], standardize, include)
+
+    if (groups == "columns") {
+      # One row for each parameter in any group, in the order they first
+      # appear. Defined parameters that combine groups come last, in the
+      # first group's columns.
+      all_rows <- dplyr::bind_rows(c(by_group, list(across)))
+      keys <- unique(all_rows$.key)
+      labels <- all_rows$Parameter[match(keys, all_rows$.key)]
+      formatted <- purrr::map(seq_along(by_group), \(g) {
+        rows <- dplyr::bind_rows(by_group[[g]], if (g == 1) across)
+        rows <- rows[match(keys, rows$.key), ]
+        rows$Parameter <- labels
+        format_rows(rows)
+      })
+      spanners <- gsub("_", " ", group_labels, fixed = TRUE)
+      d_new <- formatted[[1]]["Parameter"]
+      for (g in seq_along(formatted)) {
+        values <- formatted[[g]][setdiff(colnames(formatted[[g]]), "Parameter")]
+        colnames(values) <- paste0(spanners[g], "_", colnames(values))
+        d_new <- dplyr::bind_cols(d_new, values)
+      }
+      attr(d_new, "apa_note") <- attr(formatted[[1]], "apa_note", exact = TRUE)
+    } else {
+      # Group headings, with the sections indented below them
+      # Defined parameters that combine groups get a heading of their own
+      blocks <- by_group
+      block_labels <- group_labels
+      if (nrow(across) > 0) {
+        blocks <- c(blocks, list(across))
+        block_labels <- c(block_labels, "Across groups")
+      }
+      pieces <- purrr::map(seq_along(blocks), \(g) {
+        rows <- blocks[[g]]
+        rows$Parameter <- paste0("\u2003", rows$Parameter)
+        dplyr::bind_rows(tibble::tibble(Parameter = block_labels[g]), rows)
+      })
+      d_new <- format_rows(dplyr::bind_rows(pieces))
+    }
+  }
+
+  options <- lavaan::lavInspect(fit, "options")
+  tests <- setdiff(
+    options$test,
+    c("standard", "none", "browne.residual.nt", "browne.residual.adf",
+      "browne.residual.nt.model", "browne.residual.adf.model")
+  )
+  fixed_loadings <- unique(d[fixed & d$op == "=~", c("lhs", "rhs")])
+  nobs <- lavaan::lavInspect(fit, "nobs")
+
+  record <- sem_note_record(
+    standardize = standardize,
+    n = sum(nobs),
+    estimator = lavaan_estimator_name(options, tests),
+    se = options$se,
+    bootstrap = if (identical(options$se, "bootstrap")) lavaan_boot_count(fit, options),
+    percentile_ci = identical(options$se, "bootstrap") && !standardize &&
+      "CI" %in% predictor_parameters,
+    missing = options$missing,
+    fixed = if (!standardize && nrow(fixed_loadings) > 0) {
+      paste0(lavaan_label(fixed_loadings$lhs), " \u2192 ", lavaan_label(fixed_loadings$rhs))
+    },
+    abbreviations = attr(d_new, "apa_note", exact = TRUE)$abbreviations,
+    starred = anova_marked(starred, predictor_parameters),
+    bolded = anova_marked(bolded, predictor_parameters)
+  )
+  if (multigroup) {
+    record$group_n <- stats::setNames(nobs, group_labels)
+    record$group_equal <- options$group.equal
+    record$group_partial <- options$group.partial
+    record$cross_group_defined <- cross_group_defined && groups == "columns"
+    record$first_group <- group_labels[1]
+  }
+  attr(d_new, "apa_note") <- record
+  as_apa7_tbl(labels_formatted(d_new))
+}
+
+#' Rows of a lavaan parameter table, under a heading for each kind of
+#' parameter
+#'
+#' @param d parameter estimates of one group
+#' @param include whether to add variances, intercepts, and thresholds
+#' @returns tibble with `.key` (section and parameter, to match rows across
+#'   groups), `Parameter` (labels, indented below the headings), and the
+#'   estimates
+#' @keywords internal
+#' @noRd
+lavaan_section_rows <- function(d, standardize, include) {
   name <- lavaan_label
   sections <- list(
     loadings = d$op == "=~",
     regressions = d$op == "~",
     correlations = d$op == "~~" & d$lhs != d$rhs,
     defined = d$op == ":=",
-    variances = d$op == "~~" & d$lhs == d$rhs & variances,
-    intercepts = d$op == "~1" & intercepts,
-    thresholds = d$op == "|" & thresholds
+    variances = d$op == "~~" & d$lhs == d$rhs & include[["variances"]],
+    intercepts = d$op == "~1" & include[["intercepts"]],
+    thresholds = d$op == "|" & include[["thresholds"]]
   )
   headings <- c(
     loadings = "Factor loadings",
@@ -479,59 +625,31 @@ apa_parameters.lavaan <- function(
       intercepts = name(rows$lhs),
       thresholds = paste0(name(rows$lhs), " | ", rows$rhs)
     )
+    rows$.key <- paste(section, rows$lhs, rows$op, rows$rhs)
     rows$Parameter <- paste0("\u2003", rows$Parameter)
     pieces[[section]] <- dplyr::bind_rows(
-      tibble::tibble(Parameter = headings[[section]]),
+      tibble::tibble(.key = section, Parameter = headings[[section]]),
       rows
     )
   }
-  d_b <- dplyr::bind_rows(pieces)
-  d_b <- d_b[setdiff(colnames(d_b), key)]
-
-  # Labels were made above
-  column_formats$Parameter@formatter <- \(x, ...) x
-  # Standardized intervals, like the estimates, have no leading zero
-  if (standardize) {
-    column_formats <- es_ci_format(column_formats)
+  out <- dplyr::bind_rows(pieces)
+  if (nrow(out) == 0) {
+    return(tibble::tibble(.key = character(0), Parameter = character(0)))
   }
-  if (column_formats$Parameter@header == "Variable") {
-    column_formats$Parameter@header <- "Parameter"
-    column_formats$Parameter@latex <- "Parameter"
-  }
+  out[setdiff(colnames(out), c("lhs", "op", "rhs", "group"))]
+}
 
-  options <- lavaan::lavInspect(fit, "options")
-  tests <- setdiff(
-    options$test,
-    c("standard", "none", "browne.residual.nt", "browne.residual.adf",
-      "browne.residual.nt.model", "browne.residual.adf.model")
-  )
-  fixed_loadings <- d[fixed & sections$loadings, ]
-
-  d_new <- format_apa_parameters(
-    d_b,
-    predictor_parameters = predictor_parameters,
-    starred = starred,
-    bolded = bolded,
-    column_formats = column_formats,
-    t_with_df = FALSE
-  )
-  attr(d_new, "apa_note") <- sem_note_record(
-    standardize = standardize,
-    n = sum(lavaan::lavInspect(fit, "nobs")),
-    estimator = lavaan_estimator_name(options, tests),
-    se = options$se,
-    bootstrap = if (identical(options$se, "bootstrap")) lavaan_boot_count(fit, options),
-    percentile_ci = identical(options$se, "bootstrap") && !standardize &&
-      "CI" %in% predictor_parameters,
-    missing = options$missing,
-    fixed = if (!standardize && nrow(fixed_loadings) > 0) {
-      paste0(name(fixed_loadings$lhs), " \u2192 ", name(fixed_loadings$rhs))
-    },
-    abbreviations = attr(d_new, "apa_note", exact = TRUE)$abbreviations,
-    starred = anova_marked(starred, predictor_parameters),
-    bolded = anova_marked(bolded, predictor_parameters)
-  )
-  as_apa7_tbl(labels_formatted(d_new))
+#' The group of each defined parameter: the group of the labels it uses, or 0
+#' when it uses labels of several groups
+#' @keywords internal
+#' @noRd
+lavaan_defined_group <- function(rhs, pt) {
+  labelled <- pt[pt$label != "" & pt$group > 0, c("label", "group")]
+  purrr::map_int(rhs, \(x) {
+    names_used <- regmatches(x, gregexpr("[A-Za-z.][A-Za-z0-9._]*", x))[[1]]
+    g <- unique(labelled$group[labelled$label %in% names_used])
+    if (length(g) == 1) as.integer(g) else 0L
+  })
 }
 
 #' Number of bootstrap draws lavaan used (failed draws are dropped)
@@ -590,7 +708,18 @@ sem_note_record <- function(
 #' @noRd
 sem_note_sentences <- function(record) {
   sentences <- character(0)
-  if (!is.na(record$n)) {
+  if (length(record$group_n) > 1) {
+    group_n <- paste0(
+      names(record$group_n), ": *n* = ", format(record$group_n, big.mark = ",", trim = TRUE)
+    )
+    sentences <- c(
+      sentences,
+      paste0(
+        "*N* = ", format(record$n, big.mark = ","),
+        " (", paste(group_n, collapse = "; "), ")."
+      )
+    )
+  } else if (!is.na(record$n)) {
     sentences <- c(sentences, paste0("*N* = ", format(record$n, big.mark = ","), "."))
   }
   if (length(record$estimator) > 0) {
@@ -602,6 +731,7 @@ sem_note_sentences <- function(record) {
       "Estimates are fully standardized, and their standard errors and *p*-values are for the standardized estimates."
     )
   }
+  sentences <- c(sentences, group_equal_sentences(record))
   if (identical(record$se, "bootstrap")) {
     sentences <- c(
       sentences,
@@ -634,8 +764,80 @@ sem_note_sentences <- function(record) {
       )
     )
   }
+  if (isTRUE(record$cross_group_defined)) {
+    sentences <- c(
+      sentences,
+      paste0(
+        "Defined parameters that combine groups are shown in the ",
+        record$first_group,
+        " columns."
+      )
+    )
+  }
   sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
   c(sentences, probability_note_sentences(record$starred, record$bolded))
+}
+
+#' Sentences about parameters constrained to be equal across groups
+#' @keywords internal
+#' @noRd
+group_equal_sentences <- function(record) {
+  kinds <- record$group_equal
+  if (length(record$group_n) < 2 || length(kinds) == 0) {
+    return(character(0))
+  }
+  words <- c(
+    loadings = "loadings",
+    composite.loadings = "composite loadings",
+    intercepts = "intercepts",
+    means = "latent means",
+    thresholds = "thresholds",
+    regressions = "regressions",
+    residuals = "residual variances",
+    residual.covariances = "residual covariances",
+    lv.variances = "latent variances",
+    lv.covariances = "latent covariances"
+  )
+  kinds <- ifelse(kinds %in% names(words), words[kinds], kinds)
+  sentence <- paste0(and_list(kinds), " were constrained to be equal across groups")
+  sentence <- paste0(toupper(substring(sentence, 1, 1)), substring(sentence, 2))
+  if (length(record$group_partial) > 0) {
+    sentence <- paste0(
+      sentence,
+      ", except ",
+      and_list(lavaan_partial_label(record$group_partial))
+    )
+  }
+  sentences <- paste0(sentence, ".")
+  if (isTRUE(record$standardize)) {
+    sentences <- c(
+      sentences,
+      "Standardized estimates of equal parameters can differ across groups because the groups' variances differ."
+    )
+  }
+  sentences
+}
+
+#' Label group.partial entries (e.g., "visual=~x3" as "Visual \u2192 X3")
+#' @keywords internal
+#' @noRd
+lavaan_partial_label <- function(x) {
+  x <- gsub(" ", "", x, fixed = TRUE)
+  ops <- c("=~" = " \u2192 ", "~~" = " \u2194 ", "~1" = "", "|" = " | ", "~" = " \u2190 ")
+  purrr::map_chr(x, \(item) {
+    for (op in names(ops)) {
+      parts <- strsplit(item, op, fixed = TRUE)[[1]]
+      if (length(parts) == 2 || (op == "~1" && endsWith(item, "~1"))) {
+        lhs <- lavaan_label(parts[1])
+        if (op == "~1") {
+          return(paste0("the intercept of ", lhs))
+        }
+        rhs <- if (op == "|") parts[2] else lavaan_label(parts[2])
+        return(paste0(lhs, ops[[op]], rhs))
+      }
+    }
+    item
+  })
 }
 
 #' What apa_loadings() and apa_factor_cor() need from a lavaan model

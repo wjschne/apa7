@@ -58,6 +58,7 @@
   intercepts = FALSE,
   thresholds = FALSE,
   ci = 0.95,
+  groups = c("columns", "rows"),
   ...
 )
 
@@ -189,6 +190,8 @@ apa_parameters(
 
 \item{ci}{for \code{lavaan} models, confidence level of intervals shown when \code{predictor_parameters} includes \code{"CI"}}
 
+\item{groups}{for multiple-group \code{lavaan} models, \code{"columns"} (default) shows the groups side by side, each under a column spanner, and \code{"rows"} stacks them, each under a heading row.}
+
 \item{exponentiate}{if \code{NULL} (default), exponentiated coefficients are added when the model's link function is logit or log (i.e., odds ratios, risk ratios, or incidence rate ratios). If \code{TRUE}, exponentiated coefficients are always added. If \code{FALSE}, they are never added.}
 
 \item{random}{for mixed models, if \code{TRUE} (default), random-effect standard deviations and correlations (and the residual standard deviation, for linear mixed models) are displayed below the fixed effects.}
@@ -204,7 +207,9 @@ format model parameters in APA style
 \details{
 For \code{aov} models (including repeated-measures models with an \code{Error()} term) and \code{afex} models, \code{apa_parameters()} returns the ANOVA table from \code{\link[=apa_anova]{apa_anova()}}. \code{predictor_parameters} and \code{t_with_df} are ignored, and other arguments in \code{...} (e.g., \code{effect_size}, \code{type}) are passed to \code{\link[=apa_anova]{apa_anova()}}. To display regression coefficients instead, refit the model with \code{\link[stats:lm]{stats::lm()}}.
 
-For structural equation models and confirmatory factor analyses fit with \code{lavaan}, estimates come from \code{\link[lavaan:standardizedSolution]{lavaan::standardizedSolution()}} (\code{standardize = TRUE}, default) or \code{\link[lavaan:parameterEstimates]{lavaan::parameterEstimates()}} (\code{standardize = FALSE}). Each kind of parameter is introduced by a heading row: "Factor loadings" (e.g., Visual \eqn{\rightarrow}{->} x1), "Regressions" (e.g., Speed \eqn{\leftarrow}{<-} Visual), "Correlations" (or "Covariances", if unstandardized; e.g., Visual \eqn{\leftrightarrow}{<->} Textual), and "Defined parameters" (e.g., indirect effects defined with \verb{:=}), followed, if requested, by variances, intercepts, and thresholds. The default columns are the estimate, its standard error, and its \emph{p}-value; \code{"z"}, \code{"CI"}, and (with \code{standardize = TRUE}) \code{"Coefficient"} for unstandardized estimates can be added to \code{predictor_parameters}. Unstandardized parameters fixed to set the scale of a factor (e.g., marker loadings fixed at 1) are not tested. Variable names are shown as written in the model, with the first letter capitalized and underscores replaced by spaces. Multiple-group models are not yet supported.
+For structural equation models and confirmatory factor analyses fit with \code{lavaan}, estimates come from \code{\link[lavaan:standardizedSolution]{lavaan::standardizedSolution()}} (\code{standardize = TRUE}, default) or \code{\link[lavaan:parameterEstimates]{lavaan::parameterEstimates()}} (\code{standardize = FALSE}). Each kind of parameter is introduced by a heading row: "Factor loadings" (e.g., Visual \eqn{\rightarrow}{->} x1), "Regressions" (e.g., Speed \eqn{\leftarrow}{<-} Visual), "Correlations" (or "Covariances", if unstandardized; e.g., Visual \eqn{\leftrightarrow}{<->} Textual), and "Defined parameters" (e.g., indirect effects defined with \verb{:=}), followed, if requested, by variances, intercepts, and thresholds. The default columns are the estimate, its standard error, and its \emph{p}-value; \code{"z"}, \code{"CI"}, and (with \code{standardize = TRUE}) \code{"Coefficient"} for unstandardized estimates can be added to \code{predictor_parameters}. Unstandardized parameters fixed to set the scale of a factor (e.g., marker loadings fixed at 1) are not tested. Variable names are shown as written in the model, with the first letter capitalized and underscores replaced by spaces.
+
+For multiple-group models (e.g., \code{group = "school"}), the groups are shown side by side by default, with one row for each parameter and a column spanner for each group, so that the groups can be compared row by row. With \code{groups = "rows"}, each group has a heading row, with the kinds of parameters indented below it. A defined parameter that uses the labels of one group is shown with that group. One that combines groups (e.g., the difference between two groups' paths) is shown in the first group's columns, or under an "Across groups" heading. \code{\link[=apa_note]{apa_note()}} gives the size of each group and names the parameters constrained to be equal across groups (\code{group.equal}), and any exceptions (\code{group.partial}). Standardized estimates of equal parameters can still differ across groups, because standardization uses each group's variances.
 
 For \code{glm} objects (including \code{MASS::glm.nb}), the test statistic is \emph{z} for families with a fixed dispersion parameter (binomial, Poisson, negative binomial) and \emph{t} for families with an estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi families). Whichever statistic applies is displayed. The exponentiated coefficient column (\code{Exp_Coefficient}) is labeled \emph{OR} for logit links, \emph{IRR} for log links in count models (Poisson, quasi-Poisson, negative binomial), \emph{RR} for log links in binomial models, and Exp(\emph{B}) otherwise.
 
@@ -224,6 +229,15 @@ if (requireNamespace("lavaan", quietly = TRUE)) {
             speed =~ x7 + x8 + x9
             speed ~ visual + textual"
   lavaan::sem(model, data = lavaan::HolzingerSwineford1939) |>
+    apa_parameters()
+
+  # Multiple groups, side by side
+  lavaan::cfa(
+    "visual =~ x1 + x2 + x3",
+    data = lavaan::HolzingerSwineford1939,
+    group = "school",
+    group.equal = "loadings"
+  ) |>
     apa_parameters()
 }
 }
