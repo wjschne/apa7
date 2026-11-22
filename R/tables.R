@@ -2712,6 +2712,8 @@ has_fixed_dispersion <- function(fit) {
 #' Nested models are compared with *F* tests ([performance::test_wald()]) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests ([performance::test_likelihoodratio()]) are used. For GLMs, `R2` is the pseudo-*R*^2^ that [performance::r2()] selects for the model family, and the header names it (e.g., *R*^2^~Tjur~).
 #'
 #' Mixed models (`lme4::lmer` and `lme4::glmer`) are compared with likelihood ratio tests. `R2` is the marginal *R*^2^ (variance explained by the fixed effects), and by default the conditional *R*^2^ (fixed and random effects) and its change (`R2_conditional`, `deltaR2_conditional`) are shown too, because adding random effects changes the conditional but not the marginal *R*^2^.
+#'
+#' Nested `lavaan` models (e.g., the configural, metric, and scalar models of a measurement invariance analysis) are compared each with the one before it, so they should be listed from the least to the most constrained. Each row shows the fit of the model (any of the metrics of [apa_performance.lavaan()]), followed, under a "Change from previous model" spanner, by the chi-square difference test from [lavaan::lavTestLRT()] (`"deltaChi2"`, `"deltaChi2_df"`, `"p_deltaChi2"`) and the changes in fit indices (`"deltaCFI"`, `"deltaTLI"`, `"deltaRMSEA"`, `"deltaSRMR"`), shown with three decimals. The default metrics are `"Chi2"`, `"Chi2_df"`, `"CFI"`, `"RMSEA"`, `"RMSEA_CI"`, `"SRMR"`, `"deltaChi2"`, `"deltaChi2_df"`, `"p_deltaChi2"`, `"deltaCFI"`, and `"deltaRMSEA"`. With a robust estimator (e.g., MLR or WLSMV), the difference test is scaled (e.g., the Satorra-Bentler scaled difference test), and the changes in fit indices are computed from their robust versions. [apa_note()] names the difference test. `starred` is ignored for `lavaan` models.
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
 #' @return tibble
@@ -2722,6 +2724,23 @@ has_fixed_dispersion <- function(fit) {
 #' m2 <- lm(mpg ~ cyl + wt, data = mtcars)
 #' apa_performance_comparison(list(`Model 1` =m1, `Model 3` =m2)) |>
 #'    apa_flextable()
+#'
+#' # Measurement invariance across schools
+#' \donttest{
+#' if (requireNamespace("lavaan", quietly = TRUE)) {
+#'   model <- "visual =~ x1 + x2 + x3
+#'             textual =~ x4 + x5 + x6
+#'             speed =~ x7 + x8 + x9"
+#'   hs <- lavaan::HolzingerSwineford1939
+#'   apa_performance_comparison(
+#'     Configural = lavaan::cfa(model, data = hs, group = "school"),
+#'     Metric = lavaan::cfa(model, data = hs, group = "school",
+#'                          group.equal = "loadings"),
+#'     Scalar = lavaan::cfa(model, data = hs, group = "school",
+#'                          group.equal = c("loadings", "intercepts"))
+#'   )
+#' }
+#' }
 apa_performance_comparison <- function(
   ...,
   metrics = NULL,
@@ -2740,6 +2759,9 @@ apa_performance_comparison <- function(
   models <- .dots
   if (length(.dots) == 1 && is.list(.dots[[1]]) && !is.object(.dots[[1]])) {
     models <- .dots[[1]]
+  }
+  if (length(models) > 0 && all(purrr::map_lgl(models, \(m) inherits(m, "lavaan")))) {
+    return(lavaan_performance_comparison(models, metrics, column_formats))
   }
   use_lrt <- all(purrr::map_lgl(models, has_fixed_dispersion))
   # Mixed models have marginal and conditional R2

@@ -30,10 +30,29 @@ format model comparison metrics in APA style
 Nested models are compared with \emph{F} tests (\code{\link[performance:test_wald]{performance::test_wald()}}) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests (\code{\link[performance:test_likelihoodratio]{performance::test_likelihoodratio()}}) are used. For GLMs, \code{R2} is the pseudo-\emph{R}^2^ that \code{\link[performance:r2]{performance::r2()}} selects for the model family, and the header names it (e.g., \emph{R}^2^~Tjur~).
 
 Mixed models (\code{lme4::lmer} and \code{lme4::glmer}) are compared with likelihood ratio tests. \code{R2} is the marginal \emph{R}^2^ (variance explained by the fixed effects), and by default the conditional \emph{R}^2^ (fixed and random effects) and its change (\code{R2_conditional}, \code{deltaR2_conditional}) are shown too, because adding random effects changes the conditional but not the marginal \emph{R}^2^.
+
+Nested \code{lavaan} models (e.g., the configural, metric, and scalar models of a measurement invariance analysis) are compared each with the one before it, so they should be listed from the least to the most constrained. Each row shows the fit of the model (any of the metrics of \code{\link[=apa_performance.lavaan]{apa_performance.lavaan()}}), followed, under a "Change from previous model" spanner, by the chi-square difference test from \code{\link[lavaan:lavTestLRT]{lavaan::lavTestLRT()}} (\code{"deltaChi2"}, \code{"deltaChi2_df"}, \code{"p_deltaChi2"}) and the changes in fit indices (\code{"deltaCFI"}, \code{"deltaTLI"}, \code{"deltaRMSEA"}, \code{"deltaSRMR"}), shown with three decimals. The default metrics are \code{"Chi2"}, \code{"Chi2_df"}, \code{"CFI"}, \code{"RMSEA"}, \code{"RMSEA_CI"}, \code{"SRMR"}, \code{"deltaChi2"}, \code{"deltaChi2_df"}, \code{"p_deltaChi2"}, \code{"deltaCFI"}, and \code{"deltaRMSEA"}. With a robust estimator (e.g., MLR or WLSMV), the difference test is scaled (e.g., the Satorra-Bentler scaled difference test), and the changes in fit indices are computed from their robust versions. \code{\link[=apa_note]{apa_note()}} names the difference test. \code{starred} is ignored for \code{lavaan} models.
 }
 \examples{
 m1 <- lm(mpg ~ cyl, data = mtcars)
 m2 <- lm(mpg ~ cyl + wt, data = mtcars)
 apa_performance_comparison(list(`Model 1` =m1, `Model 3` =m2)) |>
    apa_flextable()
+
+# Measurement invariance across schools
+\donttest{
+if (requireNamespace("lavaan", quietly = TRUE)) {
+  model <- "visual =~ x1 + x2 + x3
+            textual =~ x4 + x5 + x6
+            speed =~ x7 + x8 + x9"
+  hs <- lavaan::HolzingerSwineford1939
+  apa_performance_comparison(
+    Configural = lavaan::cfa(model, data = hs, group = "school"),
+    Metric = lavaan::cfa(model, data = hs, group = "school",
+                         group.equal = "loadings"),
+    Scalar = lavaan::cfa(model, data = hs, group = "school",
+                         group.equal = c("loadings", "intercepts"))
+  )
+}
+}
 }

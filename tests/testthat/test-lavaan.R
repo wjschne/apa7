@@ -267,3 +267,78 @@ test_that("higher-order factors are left out; groups are not yet supported", {
   )
   expect_error(apa_loadings(fit_g), "multiple-group")
 })
+
+invariance_fits <- function(...) {
+  d <- lavaan::HolzingerSwineford1939
+  list(
+    Configural = lavaan::cfa(hs_model, d, group = "school", ...),
+    Metric = lavaan::cfa(hs_model, d, group = "school", group.equal = "loadings", ...),
+    Scalar = lavaan::cfa(
+      hs_model, d,
+      group = "school",
+      group.equal = c("loadings", "intercepts"),
+      ...
+    )
+  )
+}
+
+test_that("apa_performance_comparison() compares each lavaan model with the previous one", {
+  skip_if_not_installed("lavaan")
+  fits <- invariance_fits()
+  result <- apa_performance_comparison(fits)
+  spanner <- "Change from previous model_"
+  expect_equal(
+    colnames(result),
+    c(
+      "Model", "*&chi;*^2^", "*df*", "CFI", "RMSEA", "90% CI", "SRMR",
+      paste0(spanner, c("&Delta;*&chi;*^2^", "&Delta;*df*", "*p*", "&Delta;CFI", "&Delta;RMSEA"))
+    )
+  )
+  expect_equal(result$Model, c("Configural", "Metric", "Scalar"))
+  # The first model has nothing to be compared with
+  expect_true(all(trimws(unlist(result[1, -(1:7)])) == ""))
+
+  lrt <- lavaan::lavTestLRT(fits$Metric, fits$Scalar)
+  expect_equal(
+    as_num(result[[paste0(spanner, "&Delta;*&chi;*^2^")]][3]),
+    round(lrt$`Chisq diff`[2], 2)
+  )
+  expect_equal(trimws(result[[paste0(spanner, "&Delta;*df*")]][3]), "6")
+  cfi <- purrr::map_dbl(fits, \(f) lavaan::fitMeasures(f, "cfi"))
+  expect_equal(
+    as_num(result[[paste0(spanner, "&Delta;CFI")]][3]),
+    round(cfi[[3]] - cfi[[2]], 3)
+  )
+  note <- apa_note(result)
+  expect_match(note, "&Delta; = change from the previous model.", fixed = TRUE)
+  expect_match(note, "is a likelihood ratio (*&chi;*^2^ difference) test.", fixed = TRUE)
+  expect_equal(apa_flextable(result)$body$dataset$Model, result$Model)
+})
+
+test_that("robust lavaan comparisons name the scaled difference test", {
+  skip_if_not_installed("lavaan")
+  fits <- invariance_fits(estimator = "MLR")
+  result <- apa_performance_comparison(
+    fits[1:2],
+    metrics = c("CFI", "deltaChi2", "deltaChi2_df", "p_deltaChi2", "deltaSRMR")
+  )
+  expect_equal(ncol(result), 6)
+  lrt <- lavaan::lavTestLRT(fits$Configural, fits$Metric)
+  expect_equal(
+    as_num(result$`Change from previous model_&Delta;*&chi;*^2^`[2]),
+    round(lrt$`Chisq diff`[2], 2)
+  )
+  expect_match(
+    apa_note(result),
+    "Satorra–Bentler (2001) scaled *&chi;*^2^ difference test",
+    fixed = TRUE
+  )
+  # Changes in fit indices alone have no difference test
+  only_delta <- apa_performance_comparison(fits[1:2], metrics = "deltaCFI")
+  expect_equal(colnames(only_delta), c("Model", "Change from previous model_&Delta;CFI"))
+  expect_no_match(apa_note(only_delta), "difference test", fixed = TRUE)
+
+  expect_error(apa_performance_comparison(fits[1:2], metrics = "GFI"), "Choose from")
+  expect_error(apa_performance_comparison(fits[1]), "at least two")
+  expect_equal(ncol(apa_performance_comparison(fits, metrics = "all")), 18)
+})

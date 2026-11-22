@@ -316,7 +316,23 @@ fit_note_sentences <- function(record) {
     )
   }
 
-  c(sentences, abbreviation_sentence(record$abbreviations))
+  sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
+
+  # Comparisons of nested models
+  if (isTRUE(record$change)) {
+    sentences <- c(sentences, "&Delta; = change from the previous model.")
+  }
+  if (length(record$difference_test) > 0) {
+    sentences <- c(
+      sentences,
+      paste0(
+        "&Delta;*&chi;*^2^ is ",
+        or_list(lavaan_lrt_description(record$difference_test)),
+        "."
+      )
+    )
+  }
+  sentences
 }
 
 #' "A", "A and B", "A, B, and C"
@@ -681,4 +697,142 @@ lavaan_fa_parts <- function(fit) {
     missing = options$missing,
     structural = structural
   )
+}
+
+#' Change metrics available for lists of lavaan models
+#' @keywords internal
+#' @noRd
+lavaan_change_metrics <- c(
+  "deltaChi2", "deltaChi2_df", "p_deltaChi2",
+  "deltaCFI", "deltaTLI", "deltaRMSEA", "deltaSRMR"
+)
+
+#' Compare nested lavaan models, each with the one before it
+#'
+#' @param models named list of lavaan models, from least to most constrained
+#' @keywords internal
+#' @noRd
+lavaan_performance_comparison <- function(models, metrics = NULL, column_formats = NULL) {
+  if (!requireNamespace("lavaan", quietly = TRUE)) {
+    stop("lavaan models require the lavaan package. Install it with install.packages(\"lavaan\").") # nocov
+  }
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+  if (length(models) < 2) {
+    cli::cli_abort("Comparing lavaan models needs at least two models.")
+  }
+  if (is.null(metrics)) {
+    metrics <- c(
+      "Chi2", "Chi2_df", "CFI", "RMSEA", "RMSEA_CI", "SRMR",
+      "deltaChi2", "deltaChi2_df", "p_deltaChi2", "deltaCFI", "deltaRMSEA"
+    )
+  }
+  names(metrics) <- NULL
+  if (any(metrics == "all")) {
+    metrics <- c(lavaan_fit_metrics, lavaan_change_metrics)
+  }
+  unknown <- setdiff(metrics, c(lavaan_fit_metrics, lavaan_change_metrics))
+  if (length(unknown) > 0) {
+    cli::cli_abort(c(
+      "Unknown metric{?s} for comparing lavaan models: {.val {unknown}}.",
+      i = "Choose from {.val {c(lavaan_fit_metrics, lavaan_change_metrics)}}."
+    ))
+  }
+  fit_metrics <- intersect(metrics, lavaan_fit_metrics)
+  change_metrics <- intersect(metrics, lavaan_change_metrics)
+  names(models) <- model_names(models)
+
+  # Fit of each model
+  if (length(fit_metrics) > 0) {
+    d <- apa_performance(models, metrics = fit_metrics, column_formats = column_formats)
+    record <- attr(d, "apa_note", exact = TRUE)
+  } else {
+    d <- apa_performance(models, metrics = "CFI", column_formats = column_formats)
+    record <- attr(d, "apa_note", exact = TRUE)
+    record$abbreviations <- character(0)
+    d <- d["Model"]
+  }
+  d <- tibble::as_tibble(d)
+
+  # Each model compared with the one before it
+  k <- length(models)
+  info <- purrr::map(models, \(m) lavaan_fit_info(m)$values)
+  lrt <- purrr::map(seq_len(k - 1), \(i) {
+    lavaan::lavTestLRT(models[[i]], models[[i + 1]])
+  })
+  lrt_value <- function(column) {
+    c(NA, purrr::map_dbl(lrt, \(x) x[[column]][2]))
+  }
+  change <- function(index) {
+    v <- purrr::map_dbl(info, \(x) x[[index]])
+    c(NA, diff(v))
+  }
+  values <- list(
+    deltaChi2 = lrt_value("Chisq diff"),
+    deltaChi2_df = lrt_value("Df diff"),
+    p_deltaChi2 = lrt_value("Pr(>Chisq)"),
+    deltaCFI = change("CFI"),
+    deltaTLI = change("TLI"),
+    deltaRMSEA = change("RMSEA"),
+    deltaSRMR = change("SRMR")
+  )
+  headers <- c(
+    deltaChi2 = "&Delta;*&chi;*^2^",
+    deltaChi2_df = "&Delta;*df*",
+    p_deltaChi2 = "*p*",
+    deltaCFI = "&Delta;CFI",
+    deltaTLI = "&Delta;TLI",
+    deltaRMSEA = "&Delta;RMSEA",
+    deltaSRMR = "&Delta;SRMR"
+  )
+  spanner <- "Change from previous model"
+  for (m in change_metrics) {
+    v <- values[[m]]
+    out <- switch(
+      m,
+      deltaChi2 = column_formats$Chi2@formatter(v),
+      deltaChi2_df = column_formats$Chi2_df@formatter(v),
+      p_deltaChi2 = column_formats$p_Chi2@formatter(v),
+      align_chr(v, accuracy = .001, trim_leading_zeros = TRUE)
+    )
+    out[is.na(v)] <- ""
+    d[[paste0(spanner, "_", headers[[m]])]] <- out
+  }
+
+  methods <- unique(purrr::map_chr(lrt, lavaan_lrt_method))
+  record$change <- length(change_metrics) > 0
+  record$difference_test <- if (any(c("deltaChi2", "p_deltaChi2") %in% change_metrics)) methods
+  attr(d, "apa_note") <- record
+  attr(d, "no_format_columns") <- "Model"
+  as_apa7_tbl(d)
+}
+
+#' The chi-square difference method lavTestLRT() used
+#' @keywords internal
+#' @noRd
+lavaan_lrt_method <- function(x) {
+  heading <- paste(attr(x, "heading"), collapse = " ")
+  # The method name may be in straight or curly quotes
+  m <- regmatches(heading, regexpr("method = .[a-z0-9.]+", heading))
+  if (length(m) == 0) {
+    return("standard")
+  }
+  sub("method = .", "", m)
+}
+
+#' Describe chi-square difference tests in words
+#' @keywords internal
+#' @noRd
+lavaan_lrt_description <- function(method) {
+  sb <- paste0("Satorra", intToUtf8(8211), "Bentler")
+  labels <- c(
+    standard = "a likelihood ratio (*&chi;*^2^ difference) test",
+    satorra.bentler.2001 = paste0("the ", sb, " (2001) scaled *&chi;*^2^ difference test"),
+    satorra.bentler.2010 = paste0("the ", sb, " (2010) strictly positive scaled *&chi;*^2^ difference test"),
+    satorra.2000 = "the Satorra (2000) scaled and shifted *&chi;*^2^ difference test"
+  )
+  out <- labels[method]
+  out[is.na(out)] <- "a scaled *&chi;*^2^ difference test"
+  unname(out)
 }

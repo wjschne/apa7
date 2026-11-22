@@ -34,6 +34,7 @@ Confirmatory factor analyses (CFA) and structural equation models (SEM) fit with
 | Model fit | `apa_performance` | *&chi;*^2^ test, CFI, TLI, RMSEA with its 90% confidence interval, and SRMR |
 | Parameter estimates | `apa_parameters` | Standardized loadings, regressions, correlations, and defined parameters (e.g., indirect effects), under headings |
 | Loading matrix | `apa_loadings`, `apa_factor_cor` | Standardized CFA loadings with indicators as rows and factors as columns, and the correlations among the factors |
+| Model comparison | `apa_performance_comparison` | Fit of nested models (e.g., measurement invariance), each compared with the previous model |
 
 The path diagrams in this article are drawn with the [ggdiagram](https://wjschne.github.io/ggdiagram/) package, using the standardized estimates from `lavaan::standardizedSolution`. The code for each diagram can be shown by clicking "Code".
 
@@ -216,9 +217,45 @@ fit_mlr <- cfa(
   estimator = "MLR",
   missing = "fiml"
 )
-apa_performance(fit_mlr) |> 
+apa_performance(fit_mlr) |>
   apa_flextable(note = TRUE)
 ```
+
+## Comparing nested models: measurement invariance
+
+Do the tests measure the same abilities in the same way at both schools in the study (Pasteur and Grant-White)? A measurement invariance analysis fits a sequence of multiple-group models, each more constrained than the one before it:
+
+1. **Configural**: the same factor structure in both groups
+2. **Metric**: loadings equal across groups (`group.equal = "loadings"`)
+3. **Scalar**: loadings and intercepts equal across groups
+
+```{r}
+#| label: hs-invariance-fit
+d_mi <- d_cfa |>
+  mutate(school = HolzingerSwineford1939$school)
+
+fit_configural <- cfa(model_3, data = d_mi, group = "school")
+fit_metric <- cfa(model_3, data = d_mi, group = "school",
+                  group.equal = "loadings")
+fit_scalar <- cfa(model_3, data = d_mi, group = "school",
+                  group.equal = c("loadings", "intercepts"))
+```
+
+`apa_performance_comparison` shows the fit of each model, and compares each model with the one before it. The comparison has the *&chi;*^2^ difference test from `lavaan::lavTestLRT` and the changes in CFI and RMSEA, which are often used alongside it because the *&chi;*^2^ test is sensitive to sample size. The models should be listed from the least to the most constrained.
+
+```{r}
+#| label: hs-invariance
+apa_performance_comparison(
+  Configural = fit_configural,
+  Metric = fit_metric,
+  Scalar = fit_scalar
+) |>
+  apa_flextable(note = TRUE)
+```
+
+Constraining the loadings to be equal did not worsen the fit much, so metric invariance is plausible. Constraining the intercepts worsened the fit considerably (e.g., a drop in CFI larger than the .01 suggested by Cheung & Rensvold, 2002), so scalar invariance does not hold: at least some tests have different intercepts at the two schools.
+
+With a robust estimator (e.g., `estimator = "MLR"`), the difference test is scaled (e.g., the Satorra–Bentler scaled difference test), and the note names it. Other metrics, such as `"deltaTLI"` and `"deltaSRMR"`, can be chosen with `metrics`, and `metrics = "all"` shows all of them.
 
 # Structural Equation Models
 
@@ -431,10 +468,11 @@ Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the note below the tab
 # What Is Not Yet Supported
 
 - Multiple-group models (e.g., `group = "school"`) in `apa_parameters`
-- Tables comparing nested models (e.g., with `lavaan::lavTestLRT`) and tests of measurement invariance
 
 # References
 
 Bollen, K. A. (2026). *Elements of structural equation models (SEMs)*. Cambridge University Press. <https://doi.org/10.1017/9781009312806>
+
+Cheung, G. W., & Rensvold, R. B. (2002). Evaluating goodness-of-fit indexes for testing measurement invariance. *Structural Equation Modeling, 9*(2), 233–255. <https://doi.org/10.1207/S15328007SEM0902_5>
 
 Holzinger, K. J., & Swineford, F. A. (1939). *A study in factor analysis: The stability of a bi-factor solution* (Supplementary Educational Monographs, No. 48). University of Chicago Press.
