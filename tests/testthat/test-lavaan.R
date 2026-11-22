@@ -195,3 +195,75 @@ test_that("RMSEA intervals keep decimals at 0; bootstrap CIs are named percentil
   )))
   expect_match(note, "confidence intervals are bootstrap percentile intervals", fixed = TRUE)
 })
+
+cross_model <- "visual =~ x1 + x2 + x3 + x9
+                textual =~ x4 + x5 + x6
+                speed =~ x7 + x8 + x9"
+
+test_that("apa_loadings() shows standardized CFA loadings in model order", {
+  skip_if_not_installed("lavaan")
+  fit <- lavaan::cfa(cross_model, data = lavaan::HolzingerSwineford1939)
+  result <- apa_loadings(fit, communality = TRUE)
+  expect_equal(colnames(result), c("Variable", "Visual", "Textual", "Speed", "*h*^2^"))
+  expect_equal(result$Variable, paste0("X", c(1, 2, 3, 9, 4:8)))
+  std <- lavaan::lavInspect(fit, "std")
+  expect_equal(as_num(result$Visual[1]), round(std$lambda["x1", "visual"], 2))
+  # The cross-loading is shown; loadings fixed at 0 are blank
+  expect_equal(as_num(result$Speed[4]), round(std$lambda["x9", "speed"], 2))
+  expect_equal(trimws(result$Textual[1]), "")
+  expect_equal(
+    as_num(result$`*h*^2^`[1]),
+    round(1 - diag(std$theta)[["x1"]], 2)
+  )
+  note <- apa_note(result)
+  expect_match(note, "*N* = 301. Estimation used maximum likelihood (ML).", fixed = TRUE)
+  expect_match(note, "fully standardized estimates from a confirmatory factor analysis", fixed = TRUE)
+  expect_match(note, "Blank cells are loadings fixed at 0.", fixed = TRUE)
+  expect_no_match(note, "omitted", fixed = TRUE)
+  expect_no_match(note, "pattern coefficients", fixed = TRUE)
+  expect_equal(apa_flextable(result)$body$dataset[[1]], result$Variable)
+
+  # Sorting, cutoffs, and names can still be chosen
+  sorted <- apa_loadings(
+    fit,
+    sort_loading = TRUE,
+    min_loading = .5,
+    factor_names = c(speed = "Processing speed")
+  )
+  expect_equal(colnames(sorted)[4], "Processing speed")
+  expect_equal(trimws(sorted$Visual[sorted$Variable == "X9"]), "")
+  expect_match(apa_note(sorted), "smaller than .50", fixed = TRUE)
+})
+
+test_that("apa_factor_cor() shows latent correlations for lavaan models", {
+  skip_if_not_installed("lavaan")
+  fit <- lavaan::cfa(hs_model, data = lavaan::HolzingerSwineford1939)
+  result <- apa_factor_cor(fit)
+  expect_equal(result$Factor, c("1. Visual", "2. Textual", "3. Speed"))
+  cor_lv <- lavaan::lavInspect(fit, "cor.lv")
+  expect_equal(as_num(result$`1`[2]), round(cor_lv["textual", "visual"], 2))
+  expect_match(apa_note(result), "from the fully standardized solution.", fixed = TRUE)
+  expect_no_match(apa_note(result), "implied", fixed = TRUE)
+
+  fit_sem <- lavaan::sem(sem_model, data = lavaan::HolzingerSwineford1939)
+  expect_match(apa_note(apa_factor_cor(fit_sem)), "implied by the model", fixed = TRUE)
+
+  fit_1 <- lavaan::cfa("visual =~ x1 + x2 + x3", data = lavaan::HolzingerSwineford1939)
+  expect_error(apa_factor_cor(fit_1), "one-factor")
+  expect_no_match(apa_note(apa_loadings(fit_1)), "Blank cells", fixed = TRUE)
+})
+
+test_that("higher-order factors are left out; groups are not yet supported", {
+  skip_if_not_installed("lavaan")
+  fit <- lavaan::cfa(
+    paste(sep = "\n", hs_model, "g =~ visual + textual + speed"),
+    data = lavaan::HolzingerSwineford1939
+  )
+  expect_equal(colnames(apa_loadings(fit))[-1], c("Visual", "Textual", "Speed"))
+  fit_g <- lavaan::cfa(
+    "visual =~ x1 + x2 + x3",
+    data = lavaan::HolzingerSwineford1939,
+    group = "school"
+  )
+  expect_error(apa_loadings(fit_g), "multiple-group")
+})

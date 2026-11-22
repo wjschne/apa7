@@ -23,8 +23,13 @@
 #' * that the cumulative proportion of variance is approximate when the
 #'   factors are correlated.
 #'
+#' For confirmatory factor analyses fit with `lavaan`, the note instead gives
+#' the sample size and estimator, says that the loadings are standardized, and
+#' says that blank cells are loadings fixed at 0.
+#'
 #' For [apa_factor_cor()] tables, the note says how the factors were
-#' extracted and rotated.
+#' extracted and rotated (for `lavaan` models, the sample size, the
+#' estimator, and that the correlations are standardized).
 #'
 #' For [apa_htest()] tables, the note can say
 #'
@@ -135,7 +140,7 @@ apa_note <- function(x, collapse = " ") {
     record$table,
     anova = anova_note_sentences(record),
     loadings = loadings_note_sentences(record),
-    factor_cor = fa_method_sentence(record),
+    factor_cor = factor_cor_note_sentences(record),
     parameters = parameters_note_sentences(record),
     htest = htest_note_sentences(record),
     fit = fit_note_sentences(record),
@@ -437,10 +442,21 @@ fa_rotation_labels <- list(
 #' @keywords internal
 #' @noRd
 loadings_note_sentences <- function(record) {
-  sentences <- fa_method_sentence(record)
+  is_cfa <- identical(record$method, "lavaan")
   is_pca <- identical(record$method, "pca")
+  if (is_cfa) {
+    sentences <- c(
+      cfa_intro_sentences(record),
+      "Loadings are fully standardized estimates from a confirmatory factor analysis."
+    )
+    if (isTRUE(record$fixed_zero)) {
+      sentences <- c(sentences, "Blank cells are loadings fixed at 0.")
+    }
+  } else {
+    sentences <- fa_method_sentence(record)
+  }
 
-  if (isTRUE(record$oblique)) {
+  if (isTRUE(record$oblique) && !is_cfa) {
     sentences <- c(sentences, "Loadings are pattern coefficients.")
   }
 
@@ -472,6 +488,41 @@ loadings_note_sentences <- function(record) {
     )
   }
 
+  sentences
+}
+
+#' @keywords internal
+#' @noRd
+factor_cor_note_sentences <- function(record) {
+  if (!identical(record$method, "lavaan")) {
+    return(fa_method_sentence(record))
+  }
+  c(
+    cfa_intro_sentences(record),
+    "Correlations among the latent variables are from the fully standardized solution.",
+    if (isTRUE(record$structural)) {
+      "Correlations between latent variables linked by regression paths are implied by the model."
+    }
+  )
+}
+
+#' Sample size, estimator, and missing-data sentences for lavaan models
+#' @keywords internal
+#' @noRd
+cfa_intro_sentences <- function(record) {
+  sentences <- character(0)
+  if (length(record$n) == 1 && !is.na(record$n)) {
+    sentences <- paste0("*N* = ", format(record$n, big.mark = ","), ".")
+  }
+  if (length(record$estimator) > 0) {
+    sentences <- c(sentences, paste0("Estimation used ", record$estimator, "."))
+  }
+  if (any(record$missing %in% c("ml", "ml.x", "fiml", "direct"))) {
+    sentences <- c(
+      sentences,
+      "Missing data were handled with full information maximum likelihood."
+    )
+  }
   sentences
 }
 

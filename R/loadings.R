@@ -1,7 +1,8 @@
 #' Factor loadings table
 #'
 #' Makes an APA-style table of factor loadings from an exploratory factor
-#' analysis or a principal components analysis.
+#' analysis, a principal components analysis, or a confirmatory factor
+#' analysis fit with `lavaan`.
 #'
 #' `fit` can be a [psych::fa()] or [psych::principal()] object, or the output
 #' of [parameters::factor_analysis()] or [parameters::principal_components()].
@@ -11,6 +12,18 @@
 #' output wraps a [stats::prcomp()] model. Its loadings are the correlations
 #' between the variables and the components when the variables are
 #' standardized (the default, `standardize = TRUE`).
+#'
+#' For a [lavaan::cfa()] or [lavaan::sem()] model, the loadings are the fully
+#' standardized estimates (as in [lavaan::standardizedSolution()]), and loadings
+#' fixed at 0 are left blank. The rows keep the order of the model syntax, and
+#' every estimated loading is shown, unless `sort_loading` or `min_loading` is
+#' set. The communality is the proportion of an indicator's variance explained
+#' by the factors (\eqn{R^2}{R^2}), and the uniqueness is its standardized
+#' residual variance. Variable and factor names are shown as written in the
+#' model, with the first letter capitalized and underscores replaced by
+#' spaces. Loadings of higher-order factors (regressions among latent
+#' variables) are not part of this table; see [apa_parameters()]. Multiple-group
+#' models are not yet supported.
 #'
 #' Loadings smaller in absolute value than `min_loading` are left blank. With
 #' `bold_max = TRUE`, the largest displayed loading in each row is bolded.
@@ -28,9 +41,9 @@
 #' `Variable` column as it is, so item text is never changed again when the
 #' table is rendered.
 #'
-#' @param fit a `psych::fa`, `psych::principal`, `parameters::factor_analysis`, or `parameters::principal_components` object
-#' @param sort_loading sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in [psych::fa.sort()])
-#' @param min_loading minimum absolute loading to display. Use `NA` or 0 to show all loadings.
+#' @param fit a `psych::fa`, `psych::principal`, `parameters::factor_analysis`, `parameters::principal_components`, or `lavaan` object
+#' @param sort_loading sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in [psych::fa.sort()]). `TRUE` by default, except for `lavaan` models.
+#' @param min_loading minimum absolute loading to display. Use `NA` or 0 to show all loadings. Defaults to .2, except for `lavaan` models, whose estimated loadings are all shown.
 #' @param factor_names names for the factors. Either an unnamed character vector in the order the factors appear in the table (psych orders factors by variance explained), or a named vector that maps the original names to new names (e.g., `c(PA1 = "Verbal")`). The unnamed form is safer: after an oblimin rotation, the labels psych assigns (PA1, PA2, ...) can change from one run to the next, but the order of the factors does not.
 #' @param variance add rows for the variance explained by each factor
 #' @param communality add a communality (*h*^2^) column
@@ -59,6 +72,16 @@
 #' # parameters output
 #' parameters::principal_components(mtcars[, 1:7], n = 2) |>
 #'   apa_loadings()
+#'
+#' # Confirmatory factor analysis
+#' if (requireNamespace("lavaan", quietly = TRUE)) {
+#'   hs_model <- "visual =~ x1 + x2 + x3
+#'                textual =~ x4 + x5 + x6
+#'                speed =~ x7 + x8 + x9"
+#'   fit_cfa <- lavaan::cfa(hs_model, data = lavaan::HolzingerSwineford1939)
+#'   apa_loadings(fit_cfa, communality = TRUE)
+#'   apa_factor_cor(fit_cfa)
+#' }
 apa_loadings <- function(
   fit,
   sort_loading = TRUE,
@@ -73,9 +96,16 @@ apa_loadings <- function(
   digits = 2
 ) {
   parts <- fa_parts(fit)
+  is_cfa <- identical(parts$method, "lavaan")
+  if (is_cfa) {
+    # A confirmatory model keeps the order in which it was written, and every
+    # estimated loading is shown
+    if (missing(sort_loading)) sort_loading <- FALSE
+    if (missing(min_loading)) min_loading <- NA
+  }
   L <- parts$loadings
   factor_columns <- colnames(L)
-  new_names <- fa_factor_names(factor_columns, factor_names)
+  new_names <- fa_factor_names(factor_columns, factor_names, is_cfa)
 
   ord <- seq_len(nrow(L))
   if (sort_loading) {
@@ -87,6 +117,10 @@ apa_loadings <- function(
   show <- matrix(TRUE, nrow(L), ncol(L))
   if (!is.na(min_loading) && min_loading > 0) {
     show <- abs(L) >= min_loading
+  }
+  if (is_cfa) {
+    # Loadings fixed at 0 are not part of the model
+    show <- show & parts$estimated[ord, , drop = FALSE]
   }
 
   loadings_chr <- vapply(
@@ -109,7 +143,11 @@ apa_loadings <- function(
 
   variable <- rownames(L)
   if (format_variable_names) {
-    variable <- the$column_formats$Variable@formatter(variable)
+    variable <- if (is_cfa) {
+      lavaan_label(variable)
+    } else {
+      the$column_formats$Variable@formatter(variable)
+    }
   }
 
   d <- tibble::tibble(Variable = variable) |>
@@ -170,7 +208,11 @@ apa_loadings <- function(
     uniqueness = uniqueness,
     complexity = complexity,
     abbreviations = column_abbreviations(extra_columns, cf),
-    variance = variance && length(factor_columns) > 1
+    variance = variance && length(factor_columns) > 1,
+    n = parts$n,
+    estimator = parts$estimator,
+    missing = parts$missing,
+    fixed_zero = is_cfa && any(!parts$estimated)
   )
   as_apa7_tbl(d)
 }
@@ -181,6 +223,9 @@ apa_loadings <- function(
 #' components) from an obliquely rotated solution: a [psych::fa()] or
 #' [psych::principal()] object, or the output of
 #' [parameters::factor_analysis()] or [parameters::principal_components()].
+#' For a `lavaan` model, the table shows the correlations among the latent
+#' variables in the fully standardized solution. When latent variables are
+#' linked by regression paths, these correlations are implied by the model.
 #'
 #' The factors are numbered in the first column, and the numbers are used as
 #' column headers. Only the lower triangle is shown. The factors are in the
@@ -217,7 +262,11 @@ apa_factor_cor <- function(
     ))
   }
 
-  new_names <- fa_factor_names(factor_columns, factor_names)
+  new_names <- fa_factor_names(
+    factor_columns,
+    factor_names,
+    identical(parts$method, "lavaan")
+  )
   Phi <- Phi[factor_columns, factor_columns, drop = FALSE]
 
   R <- matrix(
@@ -236,7 +285,11 @@ apa_factor_cor <- function(
     table = "factor_cor",
     method = parts$method,
     nfactors = k,
-    rotation = parts$rotation
+    rotation = parts$rotation,
+    n = parts$n,
+    estimator = parts$estimator,
+    missing = parts$missing,
+    structural = isTRUE(parts$structural)
   )
   as_apa7_tbl(d)
 }
@@ -250,6 +303,9 @@ apa_factor_cor <- function(
 #' @keywords internal
 #' @noRd
 fa_parts <- function(fit) {
+  if (inherits(fit, "lavaan")) {
+    return(lavaan_fa_parts(fit))
+  }
   if (inherits(fit, c("parameters_efa", "parameters_pca"))) {
     model <- attr(fit, "model")
     if (inherits(model, "psych")) {
@@ -278,7 +334,7 @@ fa_parts <- function(fit) {
 
   if (!(inherits(fit, "psych") && inherits(fit, c("fa", "principal")))) {
     cli::cli_abort(
-      "{.arg fit} must be a {.fn psych::fa}, {.fn psych::principal}, {.fn parameters::factor_analysis}, or {.fn parameters::principal_components} object, not {.obj_type_friendly {fit}}."
+      "{.arg fit} must be a {.fn psych::fa}, {.fn psych::principal}, {.fn parameters::factor_analysis}, {.fn parameters::principal_components}, or {.pkg lavaan} object, not {.obj_type_friendly {fit}}."
     )
   }
 
@@ -333,9 +389,10 @@ bold_padded <- function(x) {
 
 #' @keywords internal
 #' @noRd
-fa_factor_names <- function(factor_columns, factor_names = NULL) {
+fa_factor_names <- function(factor_columns, factor_names = NULL, lavaan = FALSE) {
+  defaults <- if (lavaan) lavaan_label(factor_columns) else factor_columns
   if (is.null(factor_names)) {
-    return(factor_columns)
+    return(defaults)
   }
 
   if (is.null(names(factor_names))) {
@@ -355,7 +412,7 @@ fa_factor_names <- function(factor_columns, factor_names = NULL) {
     ))
   }
 
-  new_names <- factor_columns
+  new_names <- defaults
   new_names[match(names(factor_names), factor_columns)] <- factor_names
   new_names
 }

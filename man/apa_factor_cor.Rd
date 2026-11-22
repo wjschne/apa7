@@ -7,7 +7,7 @@
 apa_factor_cor(fit, factor_names = NULL, digits = 2)
 }
 \arguments{
-\item{fit}{a \code{psych::fa}, \code{psych::principal}, \code{parameters::factor_analysis}, or \code{parameters::principal_components} object}
+\item{fit}{a \code{psych::fa}, \code{psych::principal}, \code{parameters::factor_analysis}, \code{parameters::principal_components}, or \code{lavaan} object}
 
 \item{factor_names}{names for the factors. Either an unnamed character vector in the order the factors appear in the table (psych orders factors by variance explained), or a named vector that maps the original names to new names (e.g., \code{c(PA1 = "Verbal")}). The unnamed form is safer: after an oblimin rotation, the labels psych assigns (PA1, PA2, ...) can change from one run to the next, but the order of the factors does not.}
 
@@ -21,6 +21,9 @@ Makes an APA-style table of the correlations among factors (or
 components) from an obliquely rotated solution: a \code{\link[psych:fa]{psych::fa()}} or
 \code{\link[psych:principal]{psych::principal()}} object, or the output of
 \code{\link[parameters:factor_analysis]{parameters::factor_analysis()}} or \code{\link[parameters:principal_components]{parameters::principal_components()}}.
+For a \code{lavaan} model, the table shows the correlations among the latent
+variables in the fully standardized solution. When latent variables are
+linked by regression paths, these correlations are implied by the model.
 }
 \details{
 The factors are numbered in the first column, and the numbers are used as

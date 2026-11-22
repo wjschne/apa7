@@ -19,11 +19,11 @@ apa_loadings(
 )
 }
 \arguments{
-\item{fit}{a \code{psych::fa}, \code{psych::principal}, \code{parameters::factor_analysis}, or \code{parameters::principal_components} object}
+\item{fit}{a \code{psych::fa}, \code{psych::principal}, \code{parameters::factor_analysis}, \code{parameters::principal_components}, or \code{lavaan} object}
 
-\item{sort_loading}{sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in \code{\link[psych:fa.sort]{psych::fa.sort()}})}
+\item{sort_loading}{sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in \code{\link[psych:fa.sort]{psych::fa.sort()}}). \code{TRUE} by default, except for \code{lavaan} models.}
 
-\item{min_loading}{minimum absolute loading to display. Use \code{NA} or 0 to show all loadings.}
+\item{min_loading}{minimum absolute loading to display. Use \code{NA} or 0 to show all loadings. Defaults to .2, except for \code{lavaan} models, whose estimated loadings are all shown.}
 
 \item{factor_names}{names for the factors. Either an unnamed character vector in the order the factors appear in the table (psych orders factors by variance explained), or a named vector that maps the original names to new names (e.g., \code{c(PA1 = "Verbal")}). The unnamed form is safer: after an oblimin rotation, the labels psych assigns (PA1, PA2, ...) can change from one run to the next, but the order of the factors does not.}
 
@@ -46,7 +46,8 @@ apa_loadings(
 }
 \description{
 Makes an APA-style table of factor loadings from an exploratory factor
-analysis or a principal components analysis.
+analysis, a principal components analysis, or a confirmatory factor
+analysis fit with \code{lavaan}.
 }
 \details{
 \code{fit} can be a \code{\link[psych:fa]{psych::fa()}} or \code{\link[psych:principal]{psych::principal()}} object, or the output
@@ -57,6 +58,18 @@ and \code{min_loading} instead. Unrotated \code{\link[parameters:principal_compo
 output wraps a \code{\link[stats:prcomp]{stats::prcomp()}} model. Its loadings are the correlations
 between the variables and the components when the variables are
 standardized (the default, \code{standardize = TRUE}).
+
+For a \code{\link[lavaan:cfa]{lavaan::cfa()}} or \code{\link[lavaan:sem]{lavaan::sem()}} model, the loadings are the fully
+standardized estimates (as in \code{\link[lavaan:standardizedSolution]{lavaan::standardizedSolution()}}), and loadings
+fixed at 0 are left blank. The rows keep the order of the model syntax, and
+every estimated loading is shown, unless \code{sort_loading} or \code{min_loading} is
+set. The communality is the proportion of an indicator's variance explained
+by the factors (\eqn{R^2}{R^2}), and the uniqueness is its standardized
+residual variance. Variable and factor names are shown as written in the
+model, with the first letter capitalized and underscores replaced by
+spaces. Loadings of higher-order factors (regressions among latent
+variables) are not part of this table; see \code{\link[=apa_parameters]{apa_parameters()}}. Multiple-group
+models are not yet supported.
 
 Loadings smaller in absolute value than \code{min_loading} are left blank. With
 \code{bold_max = TRUE}, the largest displayed loading in each row is bolded.
@@ -91,4 +104,14 @@ psych::principal(Harman74.cor$cov, 4) |>
 # parameters output
 parameters::principal_components(mtcars[, 1:7], n = 2) |>
   apa_loadings()
+
+# Confirmatory factor analysis
+if (requireNamespace("lavaan", quietly = TRUE)) {
+  hs_model <- "visual =~ x1 + x2 + x3
+               textual =~ x4 + x5 + x6
+               speed =~ x7 + x8 + x9"
+  fit_cfa <- lavaan::cfa(hs_model, data = lavaan::HolzingerSwineford1939)
+  apa_loadings(fit_cfa, communality = TRUE)
+  apa_factor_cor(fit_cfa)
+}
 }

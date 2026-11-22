@@ -33,6 +33,7 @@ Confirmatory factor analyses (CFA) and structural equation models (SEM) fit with
 |---|---|---|
 | Model fit | `apa_performance` | *&chi;*^2^ test, CFI, TLI, RMSEA with its 90% confidence interval, and SRMR |
 | Parameter estimates | `apa_parameters` | Standardized loadings, regressions, correlations, and defined parameters (e.g., indirect effects), under headings |
+| Loading matrix | `apa_loadings`, `apa_factor_cor` | Standardized CFA loadings with indicators as rows and factors as columns, and the correlations among the factors |
 
 The path diagrams in this article are drawn with the [ggdiagram](https://wjschne.github.io/ggdiagram/) package, using the standardized estimates from `lavaan::standardizedSolution`. The code for each diagram can be shown by clicking "Code".
 
@@ -42,18 +43,31 @@ In the `HolzingerSwineford1939` data set from the lavaan package, 301 seventh- a
 
 ```{r}
 #| label: hs-fit
+
+d_cfa <- HolzingerSwineford1939 |> 
+  rename(V1 = x1,
+         V2 = x2,
+         V3 = x3,
+         T1 = x4,
+         T2 = x5,
+         T3 = x6,
+         S1 = x7,
+         S2 = x8,
+         S3 = x9) |> 
+  select(-id:-grade)
+
 model_3 <- "
-  visual  =~ x1 + x2 + x3
-  textual =~ x4 + x5 + x6
-  speed   =~ x7 + x8 + x9
+  Visual  =~ V1 + V2 + V3
+  Textual =~ T1 + T2 + T3
+  Speed   =~ S1 + S2 + S3
 "
-fit_3 <- cfa(model_3, data = HolzingerSwineford1939)
+fit_3 <- cfa(model_3, data = d_cfa)
 ```
 
 ```{r}
 #| label: fig-hs
 #| fig-cap: Three-Factor Model of the Holzinger and Swineford (1939) Tests
-#| fig-width: 9
+#| fig-width: 8
 #| fig-height: 5
 #| code-fold: true
 #| code-summary: Code
@@ -62,44 +76,50 @@ std <- standardizedSolution(fit_3)
 lbl <- function(x) signs::signs(x, accuracy = .01, trim_leading_zeros = TRUE)
 loadings <- std |> filter(op == "=~")
 correlations <- std |> filter(op == "~~", lhs != rhs)
-residuals <- std |> filter(op == "~~", lhs == rhs, lhs %in% paste0("x", 1:9))
+residuals <- std |> filter(op == "~~", lhs == rhs, lhs %in% colnames(d_cfa))
 
 my_fills <- viridis::viridis(n = 3, begin = .25, end = .65) |> 
   class_color(brightness = .75, saturation = .4)
 
-
-# Nine tests in a row, with the three abilities above them
-tests <- ob_ellipse(a = .5, m1 = 16) |>
-  ob_array(k = 9, sep = 0.35, label = ob_label(paste0("*x*~", 1:9, "~"), color = "white", fill = NA, size = 16), 
-           color = NA, fill = rep(my_fills, each = 3))
-abilities <- ob_circle(
-  center = tests[c(2, 5, 8)]@center + ob_point(0, 3),
-  radius = 0.8,
-  label = ob_label(c("Visual", "Textual", "Speed"), color = "white", fill = NA, size = 16),
-  fill = my_fills,
-  color = NA
-)
-
 my_cov <- redefault(connect, arrow_fins = arrowhead(), arc_bend = -.75, resect = 2)
 
-ggdiagram(font_family = "Roboto Condensed", font_size = 16) +
-  tests +
-  abilities +
+
+
+ggdiagram(font_family = "Roboto Condensed", font_size = 18) +
+  {tests <- ob_ellipse(a = .5, m1 = 16) |>
+  ob_array(k = 9, sep = 0.35, label = ob_label(paste0(rep(c("V", "T", "S"), each = 3), "~", rep(1:3, 3), "~"), color = "white", fill = NA, nudge_y = -.05), 
+           color = NA, fill = rep(my_fills, each = 3))} +
+  {abilities <- ob_circle(
+  center = tests[c(2, 5, 8)]@center + ob_point(0, 3),
+  radius = 0.8,
+  label = ob_label(c("Visual", "Textual", "Speed"), color = "white", fill = NA),
+  fill = my_fills,
+  color = NA
+)} +
   connect(
     abilities[rep(1:3, each = 3)],
     tests,
     resect = 2,
     linewidth = .35,
-    position = .47,
     label_sloped = FALSE,
-    label = ob_label(lbl(loadings$est.std), size = 11, color = tests@fill)
+    label = ob_label(lbl(loadings$est.std), 
+                     size = 13, 
+                     color = tests@fill, 
+                     position = .48,
+                     label.padding = ggplot2::margin(t = 1.5))
   )@set_label_y() +
   my_cov(
     abilities[c(1, 2, 1)],
     abilities[c(2, 3, 3)],
     resect = 2,
     linewidth = .35,
-    label = ob_label(lbl(correlations$est.std), size = 11, color = "gray40")
+    label = ob_label(
+      lbl(correlations$est.std),
+      size = 13,
+      color = purrr::map2_chr(abilities[c(2, 3, 3)]@fill, 
+                              abilities[c(2, 3, 3)]@fill, 
+                              \(x, y) mean_color(c(x, y)))
+    )
   ) +
   ob_variance(
     tests,
@@ -120,21 +140,17 @@ ggdiagram(font_family = "Roboto Condensed", font_size = 16) +
 
 ```{r}
 #| label: hs-performance
-model_1 <- "g =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9"
-fit_1 <- cfa(model_1, data = HolzingerSwineford1939)
+model_1 <- "g =~ V1 + V2 + V3 + T1 + T2 + T3 + S1 + S2 + S3"
+fit_1 <- cfa(model_1, data = d_cfa)
 
-tbl_fit <- apa_performance(
+apa_performance(
   list(`One factor` = fit_1, `Three factors` = fit_3)
-)
-tbl_fit
+) |> 
+  apa_flextable(note = TRUE)
+
 ```
 
 The three-factor model fits much better than the one-factor model, though by conventional standards (e.g., CFI &ge; .95, RMSEA &le; .06) its fit is only fair. The values come from `lavaan::fitMeasures`. The table note gives the sample size and the estimator and defines the abbreviations:
-
-```{r}
-#| label: hs-performance-note
-apa_note(tbl_fit)
-```
 
 Other metrics can be chosen with `metrics` (e.g., `metrics = c("Chi2", "Chi2_df", "p_Chi2", "CFI", "AIC", "BIC")`), and `metrics = "all"` shows all of them.
 
@@ -144,23 +160,49 @@ Other metrics can be chosen with `metrics` (e.g., `metrics = c("Chi2", "Chi2_df"
 
 ```{r}
 #| label: hs-parameters
-apa_parameters(fit_3)
+apa_parameters(fit_3) |> 
+  apa_flextable(note = TRUE)
 ```
 
 Unstandardized estimates (*B*) are shown with `standardize = FALSE`. Here, the first loading of each factor was fixed at 1 to give the factor a scale, so it has no standard error or test, and the note says so. Other columns, such as *&beta;* next to *B*, *z*, and confidence intervals, can be added with `predictor_parameters`:
 
 ```{r}
 #| label: hs-unstandardized
-tbl_b <- apa_parameters(
+apa_parameters(
   fit_3,
   standardize = FALSE,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "z", "p")
-)
-tbl_b
-apa_note(tbl_b)
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "z", "p"), note = TRUE
+) |> 
+  apa_flextable(note = TRUE)
+
 ```
 
 Variances (labeled "residual" for indicators and outcomes), intercepts, and thresholds can be added with `variances = TRUE`, `intercepts = TRUE`, and `thresholds = TRUE`.
+
+## Loading matrix
+
+A CFA can also be reported in the matrix form used for exploratory factor analysis, with a row for each indicator and a column for each factor. `apa_loadings` shows the standardized loadings in the order of the model syntax, and leaves blank the loadings fixed at 0. Suppose that *S*~3~ (counting dots and capital letters) loads on Visual as well as on Speed:
+
+```{r}
+#| label: hs-loadings
+model_3x <- "
+  Visual  =~ V1 + V2 + V3 + S3
+  Textual =~ T1 + T2 + T3
+  Speed   =~ S1 + S2 + S3
+"
+fit_3x <- cfa(model_3x, data = d_cfa)
+
+apa_loadings(fit_3x, communality = TRUE) |>
+  apa_flextable(note = TRUE)
+```
+
+The communality (*h*^2^) is the proportion of variance in each indicator explained by the factors (*R*^2^). Rows for the variance explained by each factor can be added with `variance = TRUE`, and `apa_factor_cor` shows the correlations among the factors:
+
+```{r}
+#| label: hs-factor-cor
+apa_factor_cor(fit_3x) |>
+  apa_flextable(note = TRUE)
+```
 
 ## Robust estimation and missing data
 
@@ -170,13 +212,12 @@ When the model is fit with a robust estimator (e.g., `estimator = "MLR"`, or `"W
 #| label: hs-mlr
 fit_mlr <- cfa(
   model_3,
-  data = HolzingerSwineford1939,
+  data = d_cfa,
   estimator = "MLR",
   missing = "fiml"
 )
-tbl_mlr <- apa_performance(fit_mlr)
-tbl_mlr
-apa_note(tbl_mlr)
+apa_performance(fit_mlr) |> 
+  apa_flextable(note = TRUE)
 ```
 
 # Structural Equation Models
@@ -220,28 +261,109 @@ fit_pd <- sem(model_pd, data = PoliticalDemocracy)
 #| code-summary: Code
 std_pd <- standardizedSolution(fit_pd)
 path <- function(lhs, rhs) {
-  std_pd |> filter(op == "~", lhs == !!lhs, rhs == !!rhs) |> pull(est.std) |> lbl()
+  std_pd |> 
+    filter(op == "~", lhs == !!lhs, rhs == !!rhs) |> 
+    pull(est.std) |> 
+    lbl()
 }
 disturbance <- function(x) {
-  std_pd |> filter(op == "~~", lhs == x, rhs == x) |> pull(est.std) |> lbl()
+  std_pd |> 
+    filter(op == "~~", lhs == x, rhs == x) |> 
+    pull(est.std) |> 
+    lbl()
 }
 
-ind60 <- ob_circle(ob_point(0, 0), radius = 1.15, label = ob_label("Industrialization<br>1960", nudge_y = -.1))
-dem60 <- ob_circle(ob_point(4, 2.6), radius = 1.15, label = ob_label("Democracy<br>1960", nudge_y = -.1))
-dem65 <- ob_circle(ob_point(8, 0), radius = 1.15, label = ob_label("Democracy<br>1965", nudge_y = -.1))
+lb <- redefault(
+  ob_label,
+  nudge_y = -.1,
+  fill = NA,
+  color = "white",
+  size = 14,
+  lineheight = .95
+)
+lat <- redefault(ob_circle, radius = 1.5, color = NA)
+
+plb <- redefault(ob_label, size = 11, position = .47)
 
 ggdiagram(font_family = "Roboto Condensed", font_size = 16) +
-  ind60 + dem60 + dem65 +
-  connect(ind60, dem60, resect = 2, label_sloped = TRUE,
-          label = ob_label(paste0("*a* = ", path("dem60", "ind60")), size = 11, position = .48)) +
-  connect(dem60, dem65, resect = 2, label_sloped = TRUE,
-          label = ob_label(paste0("*b* = ", path("dem65", "dem60")), size = 11, position = .48)) +
-  connect(ind60, dem65, resect = 2, label_sloped = TRUE,
-          label = ob_label(paste0("*c*&prime; = ", path("dem65", "ind60")), size = 11)) +
-  ob_variance(dem60, where = "north", resect = 2, looseness = 1.1,
-              label = ob_label(disturbance("dem60"), size = 11)) +
-  ob_variance(dem65, where = "east", resect = 2, looseness = 1.1,
-              label = ob_label(disturbance("dem65"), size = 11))
+  {
+    ind60 <- lat(
+      fill = my_fills[1],
+      label = lb("Industrialization<br>1960"))
+  } +
+  {
+    dem60 <- lat(
+      fill = my_fills[2], 
+      label = lb("Democracy<br>1960")
+    ) |>
+      place(ind60, degree(30), sep = 2.5)
+  } +
+  {
+    dem65 <- lat(
+      fill = my_fills[3],
+      label = lb(
+        "Democracy<br>1965",
+        nudge_y = -.1,
+        fill = NA,
+        color = "white",
+        size = 15
+      )
+    ) |>
+      place(dem60, degree(-30), sep = 2.5)
+  } +
+  connect(
+    ind60,
+    dem60,
+    resect = 2,
+    label_sloped = TRUE,
+    label = plb(
+      paste0("*a* = ", path("dem60", "ind60")), 
+      color = mean_color(c(ind60@fill, dem60@fill))
+      )
+  ) +
+  connect(
+    dem60,
+    dem65,
+    resect = 2,
+    label_sloped = TRUE,
+    label = plb(
+      paste0("*b* = ", path("dem65", "dem60")),
+      color = mean_color(c(dem60@fill, dem65@fill))
+      )
+  ) +
+  connect(
+    ind60,
+    dem65,
+    resect = 2,
+    label_sloped = TRUE,
+    label = plb(
+      paste0("*c*&prime; = ", path("dem65", "ind60")),
+      position = .5,
+      color = mean_color(c(ind60@fill, dem65@fill))
+    )
+  ) +
+  ob_variance(
+    dem60,
+    where = "north",
+    resect = 2,
+    looseness = 1.1,
+    color = dem60@fill,
+    label = ob_label(
+      disturbance("dem60"), 
+      color = dem60@fill, 
+      size = 11)
+  ) +
+  ob_variance(
+    dem65,
+    where = "east",
+    resect = 2,
+    looseness = 1.1,
+    color = dem65@fill,
+    label = ob_label(
+      disturbance("dem65"), 
+      color = dem65@fill, 
+      size = 11)
+  )
 ```
 
 For clarity, the diagram shows only the structural model. The disturbances (the two-headed arrows on the democracy factors) are the proportions of variance not explained by the paths into them.
@@ -281,20 +403,16 @@ fit_pd_boot <- sem(
   se = "bootstrap",
   bootstrap = 500
 )
-tbl_boot <- apa_parameters(
+apa_parameters(
   fit_pd_boot,
   standardize = FALSE,
   predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "Std_Coefficient")
-)
-tbl_boot
+) |> 
+  apa_flextable(note = TRUE)
+
 ```
 
 The interval for the indirect effect excludes 0. The note gives the number of bootstrap samples that lavaan used and says that the intervals are percentile intervals:
-
-```{r}
-#| label: pd-bootstrap-note
-apa_note(tbl_boot)
-```
 
 # Table Notes
 
@@ -313,7 +431,6 @@ Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the note below the tab
 # What Is Not Yet Supported
 
 - Multiple-group models (e.g., `group = "school"`) in `apa_parameters`
-- A loading-matrix table for CFA, like the one `apa_loadings` makes for exploratory factor analysis
 - Tables comparing nested models (e.g., with `lavaan::lavTestLRT`) and tests of measurement invariance
 
 # References

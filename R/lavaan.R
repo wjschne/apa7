@@ -621,3 +621,64 @@ sem_note_sentences <- function(record) {
   sentences <- c(sentences, abbreviation_sentence(record$abbreviations))
   c(sentences, probability_note_sentences(record$starred, record$bolded))
 }
+
+#' What apa_loadings() and apa_factor_cor() need from a lavaan model
+#'
+#' Loadings, residual variances, and latent correlations come from the fully
+#' standardized solution. Loadings that are fixed at 0 (not part of the model)
+#' are marked in `estimated` so that they are left blank.
+#' @keywords internal
+#' @noRd
+lavaan_fa_parts <- function(fit) {
+  if (lavaan::lavInspect(fit, "ngroups") > 1) {
+    cli::cli_abort(
+      "{.fn apa_loadings} and {.fn apa_factor_cor} do not yet support multiple-group lavaan models."
+    )
+  }
+  std <- lavaan::lavInspect(fit, "std")
+  if (is.null(std$lambda) || ncol(std$lambda) == 0) {
+    cli::cli_abort("{.arg fit} has no latent variables with indicators.")
+  }
+  est <- lavaan::lavInspect(fit, "est")$lambda
+  free <- lavaan::lavInspect(fit, "free")$lambda
+  L <- unclass(std$lambda)
+  estimated <- unclass(free) != 0 | unclass(est) != 0
+  # Higher-order factors have no indicators in lambda (their loadings are
+  # regressions among latent variables), so they have no column here
+  keep_factors <- colSums(estimated) > 0
+  keep_items <- rowSums(estimated) > 0
+  L <- L[keep_items, keep_factors, drop = FALSE]
+  estimated <- estimated[keep_items, keep_factors, drop = FALSE]
+  attr(L, "class") <- NULL
+
+  uniqueness <- diag(unclass(std$theta))[rownames(L)]
+  Phi <- NULL
+  if (ncol(L) > 1) {
+    Phi <- unclass(lavaan::lavInspect(fit, "cor.lv"))[colnames(L), colnames(L), drop = FALSE]
+    attr(Phi, "class") <- NULL
+  }
+  beta <- std$beta
+  structural <- !is.null(beta) && any(unclass(beta) != 0)
+
+  ss <- colSums(L^2)
+  options <- lavaan::lavInspect(fit, "options")
+  tests <- setdiff(
+    options$test,
+    c("standard", "none", "browne.residual.nt", "browne.residual.adf",
+      "browne.residual.nt.model", "browne.residual.adf.model")
+  )
+  list(
+    loadings = L,
+    estimated = estimated,
+    uniqueness = uniqueness,
+    ss = ss,
+    prop = ss / nrow(L),
+    Phi = Phi,
+    rotation = "none",
+    method = "lavaan",
+    n = sum(lavaan::lavInspect(fit, "nobs")),
+    estimator = lavaan_estimator_name(options, tests),
+    missing = options$missing,
+    structural = structural
+  )
+}

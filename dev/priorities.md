@@ -80,7 +80,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
   - [x] Fit indices with `apa_performance()` (*χ*², CFI, TLI, RMSEA [90% CI], SRMR; scaled tests and robust indices for MLR/WLSMV; note with *N*, estimator, FIML)
   - [x] Parameter estimates with `apa_parameters()` (loadings, regressions, correlations, defined parameters under headings; standardized by default)
   - [ ] Multiple-group models in `apa_parameters()`
-  - [ ] CFA loading matrix with `apa_loadings()`
+  - [x] CFA loading matrix with `apa_loadings()` (and latent correlations with `apa_factor_cor()`)
   - [ ] Nested-model and measurement-invariance comparisons with `apa_performance_comparison()`
 - [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR`
 - [ ] Consider moving `apa_cor()` to the easystats `correlation` package
