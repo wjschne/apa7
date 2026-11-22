@@ -38,7 +38,7 @@ The `apa_htest` function runs common hypothesis tests on the variables in a data
 | Correlation test | `"cor"` | `y ~ x` | The correlation itself |
 | Chi-square test of independence | `"chisq"` | `y ~ group` | Cramér's *V* |
 
-Several outcomes on the left side of the formula, joined with `+`, give one row each. In the console, `apa_htest` returns an ordinary tibble. In Quarto and R Markdown documents, the tibble is displayed as an APA-style table automatically, and `apa_flextable` customizes it further.
+Several outcomes on the left side of the formula, joined with `+`, give one row each. Test results that were already computed (e.g., by `t.test`) can also be formatted (see [Test Results Already Computed](#test-results-already-computed)). In the console, `apa_htest` returns an ordinary tibble. In Quarto and R Markdown documents, the tibble is displayed as an APA-style table automatically, and `apa_flextable` customizes it further.
 
 # Comparing Two Groups
 
@@ -355,9 +355,42 @@ Variable names are converted to title case (e.g., `len` becomes Len). For better
 
 Each test uses the rows in which the outcome and the grouping (or predictor) variable are observed, so rows can have different sample sizes. Paired tests use the rows in which both variables of the pair are observed.
 
-# Why Not Format `htest` Objects?
+# Test Results Already Computed
 
-Functions like `t.test` return `htest` objects, which have the test statistic and *p*-value but not the data. Effect sizes need the data: Cohen's *d* from Welch's test, for example, cannot be computed exactly from *t* alone. `apa_htest` runs the tests itself, so its effect sizes are computed from the data rather than approximated from the test statistic.
+Functions like `t.test` return `htest` objects, which have the test statistic and *p*-value but not the data. `apa_htest` also accepts these objects, or a list of objects of the same kind, with one row per test. The names of the list label the rows:
+
+```{r}
+#| label: htest-objects
+car_tests <- list(
+  Weight = cor.test(mtcars$mpg, mtcars$wt),
+  Displacement = cor.test(mtcars$mpg, mtcars$disp),
+  Horsepower = cor.test(mtcars$mpg, mtcars$hp)
+)
+apa_htest(car_tests) |>
+  apa_flextable(note = TRUE)
+```
+
+Effect sizes, however, are computed from what the objects keep, and that is not always enough:
+
+| Test | Effect size from the object |
+|---|---|
+| One-sample *t* test | Cohen's *d* = *t*/&radic;*n*, exactly |
+| Paired *t* test | *d*~z~ = *t*/&radic;*n*, exactly (not *d*~av~, which needs the data) |
+| Welch's or Student's *t* test | Cohen's *d* &asymp; 2*t*/&radic;*df*, which assumes groups of equal size |
+| Correlation test | The correlation itself |
+| Chi-square test of independence | Cramér's *V* (or *&phi;*, or Cohen's *w*), exactly, from the observed table |
+| Wilcoxon tests | None, because the group sizes are not kept |
+
+For two groups, the approximation can be noticeably off when the groups differ in size or variance, and the note says that it is an approximation:
+
+```{r}
+#| label: htest-object-welch
+t.test(mpg ~ am, data = mtcars) |>
+  apa_htest() |>
+  apa_flextable(note = TRUE)
+```
+
+When the data are at hand, giving them to `apa_htest` is better: the effect sizes are then computed from the data rather than approximated from the test statistic, and the table has descriptive statistics.
 
 # References
 

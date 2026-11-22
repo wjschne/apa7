@@ -22,7 +22,10 @@ apa_htest(
 )
 }
 \arguments{
-\item{data}{data frame}
+\item{data}{data frame, or test results already computed: an \code{htest}
+object from \code{\link[stats:t.test]{stats::t.test()}}, \code{\link[stats:wilcox.test]{stats::wilcox.test()}}, \code{\link[stats:cor.test]{stats::cor.test()}},
+or \code{\link[stats:chisq.test]{stats::chisq.test()}}, or a list of such objects of the same kind
+(named lists label the rows). See \strong{Test results}.}
 
 \item{formula}{two-sided formula with outcome variables on the left and a
 grouping or predictor variable on the right. Several outcomes are joined
@@ -122,6 +125,32 @@ approximated from \emph{t}.
 Use \code{\link[=apa_note]{apa_note()}} to write a table note that says which tests were done, how
 the effect size was computed, and what the abbreviations stand for.
 }
+\section{Test results}{
+
+\code{htest} objects keep the test statistic, its degrees of freedom, and the
+\emph{p}-value, but not the data, so \code{formula} and the arguments that control
+the tests are not used, and effect sizes are computed from what the
+objects keep:
+\itemize{
+\item One-sample and paired \emph{t} tests: Cohen's \emph{d} (\emph{d}~z~ for paired tests)
+is exactly \eqn{t/\sqrt{n}}{t / sqrt(n)}, with an exact interval from the
+noncentral \emph{t} distribution.
+\item Two-sample \emph{t} tests: Cohen's \emph{d} is approximated as
+\eqn{2t/\sqrt{df}}{2t / sqrt(df)} (\code{\link[effectsize:t_to_d]{effectsize::t_to_d()}}), which assumes
+groups of equal size, and the note says so. For exact values, give
+\code{apa_htest()} the data instead.
+\item Correlation tests: the correlation and, for Pearson's \emph{r}, its interval
+and the sample size.
+\item Chi-square tests of independence: Cramér's \emph{V}, \eqn{\phi}{phi}, or
+Cohen's \emph{w}, computed from the observed table that the object keeps.
+\item Wilcoxon tests and chi-square goodness-of-fit tests: no effect size,
+because the objects do not keep the sample sizes.
+}
+
+The rows are labeled by the list's names or, if unnamed, by the objects'
+data names (e.g., "mpg by am"). The table has no descriptive statistics.
+}
+
 \examples{
 # Welch's t tests with Cohen's d
 d <- mtcars
@@ -150,4 +179,11 @@ d$vs <- factor(d$vs, labels = c("V-shaped", "Straight"))
 tbl <- apa_htest(d, cyl + vs ~ am, test = "chisq")
 tbl
 apa_note(tbl)
+
+# Test results already computed
+apa_htest(t.test(mpg ~ am, data = d))
+apa_htest(list(
+  Weight = cor.test(d$mpg, d$wt),
+  Displacement = cor.test(d$mpg, d$disp)
+))
 }

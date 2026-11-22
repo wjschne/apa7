@@ -52,7 +52,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 - [x] Table note via `apa_note()`
 - [x] Tests (`tests/testthat/test-htest.R`)
 - [x] Paired *t* tests and Wilcoxon signed-rank tests of paired variables, with `Pair(pre, post) ~ 1` (*d*~av~ by default; *d*~z~, *d*~rm~, and *g* versions)
-- [ ] Accept a plain `htest` object, with effect sizes computed from the test statistic (and the note saying so)
+- [x] Accept a plain `htest` object (or a list of them), with effect sizes computed from what the object keeps (and the note saying so)
 - [ ] Stack different kinds of tests in one table (list method)
 - [x] Vignette article (`vignettes/articles/htest.qmd`)
 
@@ -83,7 +83,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
   - [x] CFA loading matrix with `apa_loadings()` (and latent correlations with `apa_factor_cor()`)
   - [x] Nested-model and measurement-invariance comparisons with `apa_performance_comparison()` (each model against the previous one)
 - [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR`
-- [ ] Consider moving `apa_cor()` to the easystats `correlation` package
+- [ ] Let `apa_cor()` accept output from `correlation::correlation()`
 
 ## Table notes
 

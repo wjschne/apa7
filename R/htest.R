@@ -8,7 +8,10 @@
 #' effect sizes are computed from the data with the effectsize package (e.g.,
 #' [effectsize::cohens_d()]).
 #'
-#' @param data data frame
+#' @param data data frame, or test results already computed: an `htest`
+#'   object from [stats::t.test()], [stats::wilcox.test()], [stats::cor.test()],
+#'   or [stats::chisq.test()], or a list of such objects of the same kind
+#'   (named lists label the rows). See **Test results**.
 #' @param formula two-sided formula with outcome variables on the left and a
 #'   grouping or predictor variable on the right. Several outcomes are joined
 #'   with `+` (e.g., `mpg + hp ~ am`), and each gets its own row. For one-sample
@@ -82,6 +85,29 @@
 #' Use [apa_note()] to write a table note that says which tests were done, how
 #' the effect size was computed, and what the abbreviations stand for.
 #'
+#' @section Test results:
+#' `htest` objects keep the test statistic, its degrees of freedom, and the
+#' *p*-value, but not the data, so `formula` and the arguments that control
+#' the tests are not used, and effect sizes are computed from what the
+#' objects keep:
+#'
+#' * One-sample and paired *t* tests: Cohen's *d* (*d*~z~ for paired tests)
+#'   is exactly \eqn{t/\sqrt{n}}{t / sqrt(n)}, with an exact interval from the
+#'   noncentral *t* distribution.
+#' * Two-sample *t* tests: Cohen's *d* is approximated as
+#'   \eqn{2t/\sqrt{df}}{2t / sqrt(df)} ([effectsize::t_to_d()]), which assumes
+#'   groups of equal size, and the note says so. For exact values, give
+#'   `apa_htest()` the data instead.
+#' * Correlation tests: the correlation and, for Pearson's *r*, its interval
+#'   and the sample size.
+#' * Chi-square tests of independence: Cramér's *V*, \eqn{\phi}{phi}, or
+#'   Cohen's *w*, computed from the observed table that the object keeps.
+#' * Wilcoxon tests and chi-square goodness-of-fit tests: no effect size,
+#'   because the objects do not keep the sample sizes.
+#'
+#' The rows are labeled by the list's names or, if unnamed, by the objects'
+#' data names (e.g., "mpg by am"). The table has no descriptive statistics.
+#'
 #' @return `apa7_tbl` (tibble)
 #' @export
 #'
@@ -113,6 +139,13 @@
 #' tbl <- apa_htest(d, cyl + vs ~ am, test = "chisq")
 #' tbl
 #' apa_note(tbl)
+#'
+#' # Test results already computed
+#' apa_htest(t.test(mpg ~ am, data = d))
+#' apa_htest(list(
+#'   Weight = cor.test(d$mpg, d$wt),
+#'   Displacement = cor.test(d$mpg, d$disp)
+#' ))
 apa_htest <- function(
   data,
   formula,
@@ -129,6 +162,17 @@ apa_htest <- function(
   column_formats = NULL,
   ...
 ) {
+  # Test results that were already computed
+  if (inherits(data, "htest") || is_htest_list(data)) {
+    return(htest_from_objects(
+      data,
+      effect_size = effect_size,
+      ci = ci,
+      starred = starred,
+      bolded = bolded,
+      column_formats = column_formats
+    ))
+  }
   test <- match.arg(test)
   method <- match.arg(method)
 
@@ -221,6 +265,60 @@ apa_htest <- function(
   d <- dplyr::bind_rows(rows)
   d <- dplyr::relocate(d, "Parameter")
 
+  formatted <- htest_format(
+    d,
+    test = test,
+    ci = ci,
+    descriptives = descriptives,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    groups = groups
+  )
+  d_new <- formatted$data
+  es_col <- formatted$es_col
+  cf <- formatted$cf
+
+  record <- attr(d_new, "apa_note", exact = TRUE)
+  attr(d_new, "apa_note") <- htest_note_record(
+    test = test,
+    n_tests = nrow(d),
+    one_sample = one_sample,
+    paired = paired,
+    var_equal = var_equal,
+    mu = mu,
+    method = method,
+    method_names = method_names,
+    alternative = alternative,
+    effect_size = es_col,
+    effect_size_header = formatted$es_header,
+    predictor = if (one_sample || paired) NULL else name_formatter(predictor),
+    pair = if (paired && length(outcomes) == 1) name_formatter(outcomes[[1]]) else NULL,
+    abbreviations = record$abbreviations,
+    starred = record$starred,
+    bolded = record$bolded
+  )
+  as_apa7_tbl(labels_formatted(d_new))
+}
+
+#' Formats and columns of a hypothesis test table
+#'
+#' @param d one row per test, with `Parameter` first
+#' @returns list with the formatted table (`data`), the column formats
+#'   (`cf`), the effect size column (`es_col`, or NULL), and its header
+#'   (`es_header`, or NULL)
+#' @keywords internal
+#' @noRd
+htest_format <- function(
+  d,
+  test,
+  ci,
+  descriptives,
+  starred,
+  bolded,
+  column_formats,
+  groups = NULL
+) {
   # Columns and their formats
   es_col <- intersect(colnames(d), htest_es_columns)[1]
   cf <- column_formats
@@ -280,26 +378,12 @@ apa_htest <- function(
     t_with_df = TRUE
   )
 
-  record <- attr(d_new, "apa_note", exact = TRUE)
-  attr(d_new, "apa_note") <- htest_note_record(
-    test = test,
-    n_tests = nrow(d),
-    one_sample = one_sample,
-    paired = paired,
-    var_equal = var_equal,
-    mu = mu,
-    method = method,
-    method_names = method_names,
-    alternative = alternative,
-    effect_size = if (is.na(es_col)) NULL else es_col,
-    effect_size_header = if (is.na(es_col) || is.null(cf[[es_col]])) NULL else cf[[es_col]]@header,
-    predictor = if (one_sample || paired) NULL else name_formatter(predictor),
-    pair = if (paired && length(outcomes) == 1) name_formatter(outcomes[[1]]) else NULL,
-    abbreviations = record$abbreviations,
-    starred = record$starred,
-    bolded = record$bolded
+  list(
+    data = d_new,
+    cf = cf,
+    es_col = if (is.na(es_col)) NULL else es_col,
+    es_header = if (is.na(es_col) || is.null(cf[[es_col]])) NULL else cf[[es_col]]@header
   )
-  as_apa7_tbl(labels_formatted(d_new))
 }
 
 #' Effect sizes between -1 and 1
@@ -726,10 +810,16 @@ htest_note_record <- function(
   pair = NULL,
   abbreviations = character(0),
   starred = FALSE,
-  bolded = FALSE
+  bolded = FALSE,
+  from_object = FALSE,
+  kind = NULL,
+  null_values = NULL
 ) {
   list(
     table = "htest",
+    from_object = from_object,
+    kind = kind,
+    null_values = null_values,
     test = test,
     n_tests = n_tests,
     one_sample = one_sample,
@@ -752,6 +842,9 @@ htest_note_record <- function(
 #' @keywords internal
 #' @noRd
 htest_note_sentences <- function(record) {
+  if (isTRUE(record$from_object)) {
+    return(htest_object_sentences(record))
+  }
   sentences <- character(0)
   mu <- sub("-", "\u2212", format(record$mu, trim = TRUE), fixed = TRUE)
 
