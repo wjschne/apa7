@@ -183,9 +183,9 @@ apa_parameters(
 
 \item{standardize}{for \code{lavaan} models, if \code{TRUE} (default), fully standardized estimates (\eqn{\beta}{beta}) are displayed with their standard errors and \emph{p}-values. If \code{FALSE}, unstandardized estimates (\emph{B}) are displayed.}
 
-\item{variances, intercepts, thresholds}{for \code{lavaan} models, if \code{TRUE}, sections for (residual) variances, intercepts, or thresholds are added. All are \code{FALSE} by default.}
+\item{variances, intercepts}{for \code{lavaan} models, if \code{TRUE}, sections for (residual) variances or intercepts are added. Both are \code{FALSE} by default.}
 
-\item{thresholds}{for ordinal models, if \code{TRUE} (default), threshold (cutpoint) rows are displayed below the predictors.}
+\item{thresholds}{for ordinal models, if \code{TRUE} (default), threshold (cutpoint) rows are displayed below the predictors. For \code{lavaan} models, if \code{TRUE}, a section for the thresholds of ordinal indicators is added (\code{FALSE} by default).}
 
 \item{ci}{for \code{lavaan} models, confidence level of intervals shown when \code{predictor_parameters} includes \code{"CI"}}
 

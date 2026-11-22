@@ -334,7 +334,7 @@ and_list <- function(x) {
 }
 
 #' @param standardize for `lavaan` models, if `TRUE` (default), fully standardized estimates (\eqn{\beta}{beta}) are displayed with their standard errors and *p*-values. If `FALSE`, unstandardized estimates (*B*) are displayed.
-#' @param variances,intercepts,thresholds for `lavaan` models, if `TRUE`, sections for (residual) variances, intercepts, or thresholds are added. All are `FALSE` by default.
+#' @param variances,intercepts for `lavaan` models, if `TRUE`, sections for (residual) variances or intercepts are added. Both are `FALSE` by default.
 #' @param ci for `lavaan` models, confidence level of intervals shown when `predictor_parameters` includes `"CI"`
 #' @details
 #' For structural equation models and confirmatory factor analyses fit with `lavaan`, estimates come from [lavaan::standardizedSolution()] (`standardize = TRUE`, default) or [lavaan::parameterEstimates()] (`standardize = FALSE`). Each kind of parameter is introduced by a heading row: "Factor loadings" (e.g., Visual \eqn{\rightarrow}{->} x1), "Regressions" (e.g., Speed \eqn{\leftarrow}{<-} Visual), "Correlations" (or "Covariances", if unstandardized; e.g., Visual \eqn{\leftrightarrow}{<->} Textual), and "Defined parameters" (e.g., indirect effects defined with `:=`), followed, if requested, by variances, intercepts, and thresholds. The default columns are the estimate, its standard error, and its *p*-value; `"z"`, `"CI"`, and (with `standardize = TRUE`) `"Coefficient"` for unstandardized estimates can be added to `predictor_parameters`. Unstandardized parameters fixed to set the scale of a factor (e.g., marker loadings fixed at 1) are not tested. Variable names are shown as written in the model, with the first letter capitalized and underscores replaced by spaces. Multiple-group models are not yet supported.
@@ -452,9 +452,9 @@ apa_parameters.lavaan <- function(
     }
     rows$Parameter <- switch(
       section,
-      loadings = paste0(name(rows$lhs), " → ", name(rows$rhs)),
-      regressions = paste0(name(rows$lhs), " ← ", name(rows$rhs)),
-      correlations = paste0(name(rows$lhs), " ↔ ", name(rows$rhs)),
+      loadings = paste0(name(rows$lhs), " \u2192 ", name(rows$rhs)),
+      regressions = paste0(name(rows$lhs), " \u2190 ", name(rows$rhs)),
+      correlations = paste0(name(rows$lhs), " \u2194 ", name(rows$rhs)),
       defined = name(rows$lhs),
       variances = paste0(
         name(rows$lhs),
@@ -463,7 +463,7 @@ apa_parameters.lavaan <- function(
       intercepts = name(rows$lhs),
       thresholds = paste0(name(rows$lhs), " | ", rows$rhs)
     )
-    rows$Parameter <- paste0(" ", rows$Parameter)
+    rows$Parameter <- paste0("\u2003", rows$Parameter)
     pieces[[section]] <- dplyr::bind_rows(
       tibble::tibble(Parameter = headings[[section]]),
       rows
@@ -509,7 +509,7 @@ apa_parameters.lavaan <- function(
       "CI" %in% predictor_parameters,
     missing = options$missing,
     fixed = if (!standardize && nrow(fixed_loadings) > 0) {
-      paste0(name(fixed_loadings$lhs), " → ", name(fixed_loadings$rhs))
+      paste0(name(fixed_loadings$lhs), " \u2192 ", name(fixed_loadings$rhs))
     },
     abbreviations = attr(d_new, "apa_note", exact = TRUE)$abbreviations,
     starred = anova_marked(starred, predictor_parameters),
