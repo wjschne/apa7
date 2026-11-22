@@ -165,3 +165,33 @@ test_that("robust and bootstrap standard errors are named; groups are not yet su
   )
   expect_error(apa_parameters(fit_g), "multiple-group")
 })
+
+test_that("RMSEA intervals keep decimals at 0; bootstrap CIs are named percentile", {
+  skip_if_not_installed("lavaan")
+  pd_model <- "ind60 =~ x1 + x2 + x3
+               dem60 =~ y1 + y2 + y3 + y4
+               dem65 =~ y5 + y6 + y7 + y8
+               dem60 ~ ind60
+               dem65 ~ ind60 + dem60
+               y1 ~~ y5
+               y2 ~~ y4 + y6
+               y3 ~~ y7
+               y4 ~~ y8
+               y6 ~~ y8"
+  fit <- lavaan::sem(pd_model, data = lavaan::PoliticalDemocracy)
+  expect_equal(apa_performance(fit)$`90% CI`, "[.00, .09]")
+
+  set.seed(1)
+  fit_b <- suppressWarnings(lavaan::cfa(
+    "visual =~ x1 + x2 + x3",
+    data = lavaan::HolzingerSwineford1939,
+    se = "bootstrap",
+    bootstrap = 20
+  ))
+  note <- suppressWarnings(apa_note(apa_parameters(
+    fit_b,
+    standardize = FALSE,
+    predictor_parameters = c("Parameter", "Coefficient", "SE", "CI")
+  )))
+  expect_match(note, "confidence intervals are bootstrap percentile intervals", fixed = TRUE)
+})

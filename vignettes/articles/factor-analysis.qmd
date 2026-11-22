@@ -30,7 +30,7 @@ Two functions make APA-style tables from exploratory factor analyses and princip
 * `apa_loadings` makes a table of factor loadings, with optional columns for communalities, uniquenesses, and complexity, and optional rows for variance explained.
 * `apa_factor_cor` makes a table of the correlations among factors after an oblique rotation.
 
-Both accept models from `psych::fa` and `psych::principal` and from the easystats functions `parameters::factor_analysis` and `parameters::principal_components`.
+Both accept models from `psych::fa` and `psych::principal` and from the easystats functions `parameters::factor_analysis` and `parameters::principal_components`. For confirmatory factor analyses fit with lavaan, see the [structural equation model article](lavaan.html).
 
 The workflow is the same as for the other apa7 tables:
 

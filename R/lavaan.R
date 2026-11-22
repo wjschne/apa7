@@ -59,8 +59,8 @@ apa_performance.lavaan <- function(
   out <- list()
   for (m in metrics) {
     if (m == "RMSEA_CI") {
-      low <- column_formats$RMSEA@formatter(d$RMSEA_CI_low)
-      high <- column_formats$RMSEA@formatter(d$RMSEA_CI_high)
+      low <- column_formats$RMSEA@formatter(d$RMSEA_CI_low, format_integers = TRUE)
+      high <- column_formats$RMSEA@formatter(d$RMSEA_CI_high, format_integers = TRUE)
       out[[m]] <- ci_md(low, high, missing = is.na(d$RMSEA_CI_low))
     } else if (!is.null(column_formats[[m]])) {
       out[[m]] <- column_formats[[m]]@formatter(d[[m]])
@@ -504,7 +504,9 @@ apa_parameters.lavaan <- function(
     n = sum(lavaan::lavInspect(fit, "nobs")),
     estimator = lavaan_estimator_name(options, tests),
     se = options$se,
-    bootstrap = if (identical(options$se, "bootstrap")) options$bootstrap,
+    bootstrap = if (identical(options$se, "bootstrap")) lavaan_boot_count(fit, options),
+    percentile_ci = identical(options$se, "bootstrap") && !standardize &&
+      "CI" %in% predictor_parameters,
     missing = options$missing,
     fixed = if (!standardize && nrow(fixed_loadings) > 0) {
       paste0(name(fixed_loadings$lhs), " → ", name(fixed_loadings$rhs))
@@ -514,6 +516,17 @@ apa_parameters.lavaan <- function(
     bolded = anova_marked(bolded, predictor_parameters)
   )
   as_apa7_tbl(labels_formatted(d_new))
+}
+
+#' Number of bootstrap draws lavaan used (failed draws are dropped)
+#' @keywords internal
+#' @noRd
+lavaan_boot_count <- function(fit, options) {
+  draws <- tryCatch(lavaan::lavInspect(fit, "boot"), error = function(e) NULL)
+  if (is.null(draws) || length(dim(draws)) != 2) {
+    return(options$bootstrap) # nocov
+  }
+  sum(stats::complete.cases(draws))
 }
 
 #' Light formatting of lavaan variable names: underscores to spaces, first
@@ -536,12 +549,14 @@ sem_note_record <- function(
   bootstrap = NULL,
   missing = NULL,
   fixed = NULL,
+  percentile_ci = FALSE,
   abbreviations = character(0),
   starred = FALSE,
   bolded = FALSE
 ) {
   list(
     table = "sem",
+    percentile_ci = percentile_ci,
     standardize = standardize,
     n = n,
     estimator = estimator,
@@ -577,7 +592,9 @@ sem_note_sentences <- function(record) {
       paste0(
         "Standard errors are based on ",
         format(record$bootstrap, big.mark = ","),
-        " bootstrap samples."
+        " bootstrap samples",
+        if (isTRUE(record$percentile_ci)) ", and confidence intervals are bootstrap percentile intervals",
+        "."
       )
     )
   } else if (isTRUE(record$se %in% c("robust.huber.white", "robust.sem", "robust.mlr"))) {
