@@ -29,6 +29,22 @@
   [`effectsize::repeated_measures_d()`](https://easystats.github.io/effectsize/reference/repeated_measures_d.html).
   New `pair_labels` argument sets the headings above each pair’s
   descriptive statistics.
+- [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)
+  makes *F* tables of the fixed effects of linear mixed models from
+  [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) or
+  [`lmerTest::lmer()`](https://rdrr.io/pkg/lmerTest/man/lmer.html), and
+  formats ANOVA tables from lmerTest’s
+  [`anova()`](https://rdrr.io/r/stats/anova.html). Tests come from
+  lmerTest, with Kenward-Roger (default, as in
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md))
+  or Satterthwaite (`ddf = "Satterthwaite"`) denominator degrees of
+  freedom, and are Type III by default. The table shows *df*_(effect),
+  *df*_(error), *F*, and *p*. Partial effect sizes, computed from *F*
+  and its degrees of freedom, are shown only when requested (e.g.,
+  `effect_size = "eta"`).
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  gives the type of tests, the degrees-of-freedom method, and how the
+  effect size was computed.
 - Table notes are now single-spaced, even when the table is
   double-spaced. This applies to `apa_flextable(note = TRUE)`,
   [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),

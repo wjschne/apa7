@@ -94,6 +94,23 @@ apa_anova(
   ...
 )
 
+# S3 method for class 'merMod'
+apa_anova(
+  fit,
+  anova_parameters = mixed_anova_parameters,
+  effect_size = NULL,
+  partial = TRUE,
+  generalized = FALSE,
+  type = NULL,
+  ci = 0.95,
+  residual_label = "Error",
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  ddf = c("Kenward-Roger", "Satterthwaite"),
+  ...
+)
+
 # Default S3 method
 apa_anova(fit, ...)
 ```
@@ -104,9 +121,13 @@ apa_anova(fit, ...)
 
   an `aov` or `lm` model, a repeated-measures `aov` model with an
   `Error()` term (class `aovlist`), an `afex` model (class `afex_aov`),
-  or an ANOVA table from
-  [`stats::anova()`](https://rdrr.io/r/stats/anova.html) or
-  [`car::Anova()`](https://rdrr.io/pkg/car/man/Anova.html).
+  a linear mixed model from
+  [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) or
+  [`lmerTest::lmer()`](https://rdrr.io/pkg/lmerTest/man/lmer.html), or
+  an ANOVA table from
+  [`stats::anova()`](https://rdrr.io/r/stats/anova.html),
+  [`car::Anova()`](https://rdrr.io/pkg/car/man/Anova.html), or
+  lmerTest's [`anova()`](https://rdrr.io/r/stats/anova.html).
 
 - anova_parameters:
 
@@ -141,8 +162,9 @@ apa_anova(fit, ...)
   Types 2 and 3 are computed with
   [`car::Anova()`](https://rdrr.io/pkg/car/man/Anova.html). Type 3 tests
   are interpretable only when factors have sum-to-zero contrasts (e.g.,
-  `contr.sum`) and covariates are centered. Ignored for ANOVA tables,
-  which already have a type.
+  `contr.sum`) and covariates are centered. For linear mixed models, the
+  type of hypothesis tests: `3` (default, as in lmerTest), `2`, or `1`.
+  Ignored for ANOVA tables, which already have a type.
 
 - ci:
 
@@ -175,6 +197,11 @@ apa_anova(fit, ...)
   further arguments passed to
   [`parameters::model_parameters()`](https://easystats.github.io/parameters/reference/model_parameters.html)
 
+- ddf:
+
+  for linear mixed models, method of approximating the denominator
+  degrees of freedom: `"Kenward-Roger"` (default) or `"Satterthwaite"`
+
 ## Value
 
 `apa7_tbl` (tibble)
@@ -200,6 +227,31 @@ of freedom (*df*~effect~, *df*~error~), mean squared error (*MSE*), *F*,
 freedom and *p*-values reflect the sphericity correction set in `afex`
 (Greenhouse-Geisser by default), and generalized \\\eta^2\\ is the
 default effect size, as in `afex`.
+
+For linear mixed models fit with
+[`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) or
+[`lmerTest::lmer()`](https://rdrr.io/pkg/lmerTest/man/lmer.html), *F*
+tests of the fixed effects come from the lmerTest package, which
+approximates the denominator degrees of freedom with Kenward-Roger's
+method (default, as in
+[`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md),
+which requires the pbkrtest package) or Satterthwaite's method
+(`ddf = "Satterthwaite"`). Tests are Type III by default, as in
+lmerTest, whose Type III tests do not depend on how factors are coded.
+The table shows each effect's degrees of freedom (*df*~effect~,
+*df*~error~), *F*, and *p*. Sums of squares and effect sizes have no
+agreed-upon definition in mixed models, so they are not shown by
+default. With `effect_size = "eta"` (or `"omega"` or `"epsilon"`),
+partial effect sizes are computed from *F* and its degrees of freedom
+(e.g.,
+[`effectsize::F_to_eta2()`](https://easystats.github.io/effectsize/reference/F_to_eta2.html)),
+which only approximates them. ANOVA tables made by lmerTest's
+[`anova()`](https://rdrr.io/r/stats/anova.html) are displayed the same
+way. Generalized linear mixed models
+([`lme4::glmer()`](https://rdrr.io/pkg/lme4/man/glmer.html)) have no *F*
+tests; use
+[`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+for them.
 
 ## Examples
 
@@ -264,4 +316,16 @@ if (requireNamespace("afex", quietly = TRUE)) {
 #> 1 Treatment     2.00           13.00         6.41     2.91  .09  .27            
 #> 2 Phase         1.74           22.64         0.81    19.29 <.001 .21            
 #> 3 Treatment × … 3.48           22.64         0.81     5.43  .004 .13            
+if (requireNamespace("lmerTest", quietly = TRUE) &&
+  requireNamespace("pbkrtest", quietly = TRUE)) {
+  fit_lmer <- lme4::lmer(
+    Reaction ~ Days + (Days | Subject),
+    data = lme4::sleepstudy
+  )
+  apa_anova(fit_lmer)
+}
+#> # A tibble: 1 × 5
+#>   Effect `*df*~effect~` `*df*~error~` `*F*` `*p*`
+#>   <chr>  <chr>          <chr>         <chr> <chr>
+#> 1 Days   1              17.00         45.85 <.001
 ```

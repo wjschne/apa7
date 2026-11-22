@@ -135,6 +135,23 @@
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'merMod'</span></span>
+<span><span class="fu">apa_anova</span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  anova_parameters <span class="op">=</span> <span class="va">mixed_anova_parameters</span>,</span>
+<span>  effect_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  partial <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  generalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ci <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  residual_label <span class="op">=</span> <span class="st">"Error"</span>,</span>
+<span>  starred <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  bolded <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  column_formats <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ddf <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Kenward-Roger"</span>, <span class="st">"Satterthwaite"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Default S3 method</span></span>
 <span><span class="fu">apa_anova</span><span class="op">(</span><span class="va">fit</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -144,7 +161,7 @@
 
 
 <dl><dt id="arg-fit">fit<a class="anchor" aria-label="anchor" href="#arg-fit"></a></dt>
-<dd><p>an <code>aov</code> or <code>lm</code> model, a repeated-measures <code>aov</code> model with an <code>Error()</code> term (class <code>aovlist</code>), an <code>afex</code> model (class <code>afex_aov</code>), or an ANOVA table from <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">stats::anova()</a></code> or <code><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">car::Anova()</a></code>.</p></dd>
+<dd><p>an <code>aov</code> or <code>lm</code> model, a repeated-measures <code>aov</code> model with an <code>Error()</code> term (class <code>aovlist</code>), an <code>afex</code> model (class <code>afex_aov</code>), a linear mixed model from <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code> or <code><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmerTest::lmer()</a></code>, or an ANOVA table from <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">stats::anova()</a></code>, <code><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">car::Anova()</a></code>, or lmerTest's <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code>.</p></dd>
 
 
 <dt id="arg-anova-parameters">anova_parameters<a class="anchor" aria-label="anchor" href="#arg-anova-parameters"></a></dt>
@@ -164,7 +181,7 @@
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>type of sums of squares for <code>aov</code> and <code>lm</code> models: <code>1</code> (sequential, default, as in <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">stats::anova()</a></code>), <code>2</code>, or <code>3</code>. Types 2 and 3 are computed with <code><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">car::Anova()</a></code>. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., <code>contr.sum</code>) and covariates are centered. Ignored for ANOVA tables, which already have a type.</p></dd>
+<dd><p>type of sums of squares for <code>aov</code> and <code>lm</code> models: <code>1</code> (sequential, default, as in <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">stats::anova()</a></code>), <code>2</code>, or <code>3</code>. Types 2 and 3 are computed with <code><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">car::Anova()</a></code>. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., <code>contr.sum</code>) and covariates are centered. For linear mixed models, the type of hypothesis tests: <code>3</code> (default, as in lmerTest), <code>2</code>, or <code>1</code>. Ignored for ANOVA tables, which already have a type.</p></dd>
 
 
 <dt id="arg-ci">ci<a class="anchor" aria-label="anchor" href="#arg-ci"></a></dt>
@@ -190,6 +207,10 @@
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>further arguments passed to <code><a href="https://easystats.github.io/parameters/reference/model_parameters.html" class="external-link">parameters::model_parameters()</a></code></p></dd>
 
+
+<dt id="arg-ddf">ddf<a class="anchor" aria-label="anchor" href="#arg-ddf"></a></dt>
+<dd><p>for linear mixed models, method of approximating the denominator degrees of freedom: <code>"Kenward-Roger"</code> (default) or <code>"Satterthwaite"</code></p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -200,6 +221,7 @@
     <p>For repeated-measures models fit with <code>aov(y ~ a * b + Error(id / b))</code>, each error stratum is introduced by a heading row ("Between subjects" or "Within subjects"), and each stratum's error term follows its effects.</p>
 <p>Model comparisons (e.g., <code>anova(m1, m2)</code>) are not ANOVA source tables. Use <code><a href="apa_performance_comparison.html">apa_performance_comparison()</a></code> for them.</p>
 <p>For <code>afex</code> models (<code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_car()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_ez()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_4()</a></code>), each effect has its own error term, so the table shows each effect's degrees of freedom (<em>df</em>~effect~, <em>df</em>~error~), mean squared error (<em>MSE</em>), <em>F</em>, <em>p</em>, and effect size, as in <code>afex</code>'s own <code>nice()</code> tables. Degrees of freedom and <em>p</em>-values reflect the sphericity correction set in <code>afex</code> (Greenhouse-Geisser by default), and generalized \(\eta^2\) is the default effect size, as in <code>afex</code>.</p>
+<p>For linear mixed models fit with <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code> or <code><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmerTest::lmer()</a></code>, <em>F</em> tests of the fixed effects come from the lmerTest package, which approximates the denominator degrees of freedom with Kenward-Roger's method (default, as in <code><a href="apa_parameters.html">apa_parameters()</a></code>, which requires the pbkrtest package) or Satterthwaite's method (<code>ddf = "Satterthwaite"</code>). Tests are Type III by default, as in lmerTest, whose Type III tests do not depend on how factors are coded. The table shows each effect's degrees of freedom (<em>df</em>~effect~, <em>df</em>~error~), <em>F</em>, and <em>p</em>. Sums of squares and effect sizes have no agreed-upon definition in mixed models, so they are not shown by default. With <code>effect_size = "eta"</code> (or <code>"omega"</code> or <code>"epsilon"</code>), partial effect sizes are computed from <em>F</em> and its degrees of freedom (e.g., <code><a href="https://easystats.github.io/effectsize/reference/F_to_eta2.html" class="external-link">effectsize::F_to_eta2()</a></code>), which only approximates them. ANOVA tables made by lmerTest's <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> are displayed the same way. Generalized linear mixed models (<code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer()</a></code>) have no <em>F</em> tests; use <code><a href="apa_parameters.html">apa_parameters()</a></code> for them.</p>
     </div>
 
     <div class="section level2">
@@ -264,6 +286,18 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Treatment     2.00           13.00         6.41     2.91  .09  .27            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Phase         1.74           22.64         0.81    19.29 &lt;.001 .21            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Treatment × … 3.48           22.64         0.81     5.43  .004 .13            </span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"lmerTest"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"pbkrtest"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">fit_lmer</span> <span class="op">&lt;-</span> <span class="fu">lme4</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">+</span> <span class="op">(</span><span class="va">Days</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="fu">lme4</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/lme4/man/sleepstudy.html" class="external-link">sleepstudy</a></span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">apa_anova</span><span class="op">(</span><span class="va">fit_lmer</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Effect `*df*~effect~` `*df*~error~` `*F*` `*p*`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Days   1              17.00         45.85 &lt;.001</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
