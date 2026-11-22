@@ -1,9 +1,12 @@
 ---
 title: "Structural Equation Model Tables"
 format: html
+execute: 
+  cache: true
 knitr:
   opts_chunk:
     fig-cap-location: top
+    dev: "ragg_png"
 filters:
   - quarto
   - apanote
@@ -61,38 +64,53 @@ loadings <- std |> filter(op == "=~")
 correlations <- std |> filter(op == "~~", lhs != rhs)
 residuals <- std |> filter(op == "~~", lhs == rhs, lhs %in% paste0("x", 1:9))
 
+my_fills <- viridis::viridis(n = 3, begin = .25, end = .65) |> 
+  class_color(brightness = .75, saturation = .4)
+
+
 # Nine tests in a row, with the three abilities above them
-tests <- ob_rectangle(width = 1, height = 1) |>
-  ob_array(k = 9, sep = 0.35, label = paste0("*x*~", 1:9, "~"))
+tests <- ob_ellipse(a = .5, m1 = 16) |>
+  ob_array(k = 9, sep = 0.35, label = ob_label(paste0("*x*~", 1:9, "~"), color = "white", fill = NA, size = 16), 
+           color = NA, fill = rep(my_fills, each = 3))
 abilities <- ob_circle(
   center = tests[c(2, 5, 8)]@center + ob_point(0, 3),
   radius = 0.8,
-  label = c("Visual", "Textual", "Speed")
+  label = ob_label(c("Visual", "Textual", "Speed"), color = "white", fill = NA, size = 16),
+  fill = my_fills,
+  color = NA
 )
 
-ggdiagram(font_family = "sans", font_size = 14) +
+my_cov <- redefault(connect, arrow_fins = arrowhead(), arc_bend = -.75, resect = 2)
+
+ggdiagram(font_family = "Roboto Condensed", font_size = 16) +
   tests +
   abilities +
   connect(
     abilities[rep(1:3, each = 3)],
     tests,
-    resect = 1,
+    resect = 2,
+    linewidth = .35,
+    position = .47,
     label_sloped = FALSE,
-    label = ob_label(lbl(loadings$est.std), size = 11)
-  ) +
-  ob_covariance(
+    label = ob_label(lbl(loadings$est.std), size = 11, color = tests@fill)
+  )@set_label_y() +
+  my_cov(
     abilities[c(1, 2, 1)],
     abilities[c(2, 3, 3)],
-    resect = 1,
-    label = ob_label(lbl(correlations$est.std), size = 11)
+    resect = 2,
+    linewidth = .35,
+    label = ob_label(lbl(correlations$est.std), size = 11, color = "gray40")
   ) +
   ob_variance(
     tests,
     where = "south",
     resect = 1,
     theta = 60,
-    looseness = 2,
-    label = ob_label(lbl(residuals$est.std), size = 11)
+    looseness = 1.5,
+    bend = -15,
+    linewidth = .35,
+    label = ob_label(lbl(residuals$est.std), size = 11, color = tests@fill),
+    color = tests@fill
   )
 ```
 
@@ -208,21 +226,21 @@ disturbance <- function(x) {
   std_pd |> filter(op == "~~", lhs == x, rhs == x) |> pull(est.std) |> lbl()
 }
 
-ind60 <- ob_circle(ob_point(0, 0), radius = 1.15, label = "Industrialization<br>1960")
-dem60 <- ob_circle(ob_point(4, 2.6), radius = 1.15, label = "Democracy<br>1960")
-dem65 <- ob_circle(ob_point(8, 0), radius = 1.15, label = "Democracy<br>1965")
+ind60 <- ob_circle(ob_point(0, 0), radius = 1.15, label = ob_label("Industrialization<br>1960", nudge_y = -.1))
+dem60 <- ob_circle(ob_point(4, 2.6), radius = 1.15, label = ob_label("Democracy<br>1960", nudge_y = -.1))
+dem65 <- ob_circle(ob_point(8, 0), radius = 1.15, label = ob_label("Democracy<br>1965", nudge_y = -.1))
 
-ggdiagram(font_family = "sans", font_size = 13) +
+ggdiagram(font_family = "Roboto Condensed", font_size = 16) +
   ind60 + dem60 + dem65 +
-  connect(ind60, dem60, resect = 1, label_sloped = FALSE,
-          label = ob_label(paste0("*a* = ", path("dem60", "ind60")), size = 11)) +
-  connect(dem60, dem65, resect = 1, label_sloped = FALSE,
-          label = ob_label(paste0("*b* = ", path("dem65", "dem60")), size = 11)) +
-  connect(ind60, dem65, resect = 1, label_sloped = FALSE,
+  connect(ind60, dem60, resect = 2, label_sloped = TRUE,
+          label = ob_label(paste0("*a* = ", path("dem60", "ind60")), size = 11, position = .48)) +
+  connect(dem60, dem65, resect = 2, label_sloped = TRUE,
+          label = ob_label(paste0("*b* = ", path("dem65", "dem60")), size = 11, position = .48)) +
+  connect(ind60, dem65, resect = 2, label_sloped = TRUE,
           label = ob_label(paste0("*c*&prime; = ", path("dem65", "ind60")), size = 11)) +
-  ob_variance(dem60, where = "north", resect = 1, looseness = 1.5,
+  ob_variance(dem60, where = "north", resect = 2, looseness = 1.1,
               label = ob_label(disturbance("dem60"), size = 11)) +
-  ob_variance(dem65, where = "east", resect = 1, looseness = 1.5,
+  ob_variance(dem65, where = "east", resect = 2, looseness = 1.1,
               label = ob_label(disturbance("dem65"), size = 11))
 ```
 
@@ -300,6 +318,6 @@ Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the note below the tab
 
 # References
 
-Bollen, K. A. (1989). *Structural equations with latent variables*. Wiley. <https://doi.org/10.1002/9781118619179>
+Bollen, K. A. (2026). *Elements of structural equation models (SEMs)*. Cambridge University Press. <https://doi.org/10.1017/9781009312806>
 
 Holzinger, K. J., & Swineford, F. A. (1939). *A study in factor analysis: The stability of a bi-factor solution* (Supplementary Educational Monographs, No. 48). University of Chicago Press.
