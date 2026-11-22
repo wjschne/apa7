@@ -283,6 +283,11 @@ apa_parameters(glm_qpois)
 | Wt       | 0.00 | 0.09 | 1.00 | 0.05  |  .96   |
 | Hp       | 0.01 | 0.00 | 1.01 | 4.92  | \<.001 |
 
+For nested counts, or counts with many zeros, negative binomial and
+zero-inflated mixed models fit with glmmTMB are described in the
+[multilevel
+article](https://wjschne.github.io/apa7/articles/multilevel.html#count-outcomes-with-glmmtmb).
+
 ## Table Notes
 
 A regression table often needs a note that defines its symbols and

@@ -72,6 +72,13 @@
 <span>  column_formats <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'glmmTMB'</span></span>
+<span><span class="fu">apa_performance</span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R2_marginal"</span>, <span class="st">"R2_conditional"</span>, <span class="st">"ICC"</span><span class="op">)</span>,</span>
+<span>  column_formats <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'list'</span></span>
 <span><span class="fu">apa_performance</span><span class="op">(</span><span class="va">fit</span>, metrics <span class="op">=</span> <span class="cn">NULL</span>, column_formats <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -99,7 +106,7 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For <code>glm</code> objects, <code>R2</code> is the pseudo-<em>R</em>^2^ that <code><a href="https://easystats.github.io/performance/reference/r2.html" class="external-link">performance::r2()</a></code> selects for the model family (e.g., Tjur's <em>R</em>^2^ for logistic regression and Nagelkerke's <em>R</em>^2^ for count models). The header names the pseudo-<em>R</em>^2^ that was used. Because the residual standard deviation is not meaningful for most GLMs, the default metrics are <code>R2</code> and <code>AIC</code>.</p>
-<p>For mixed models (<code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer</a></code> and <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer</a></code>), the default metrics are the marginal <em>R</em>^2^ (variance explained by the fixed effects), the conditional <em>R</em>^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by <code><a href="https://easystats.github.io/performance/reference/model_performance.html" class="external-link">performance::model_performance()</a></code>.</p>
+<p>For mixed models (<code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer</a></code>, <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer</a></code>, and <code><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB::glmmTMB</a></code>), the default metrics are the marginal <em>R</em>^2^ (variance explained by the fixed effects), the conditional <em>R</em>^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by <code><a href="https://easystats.github.io/performance/reference/model_performance.html" class="external-link">performance::model_performance()</a></code>.</p>
 <p>For a list of models, each model's metrics are displayed in a row, labeled in a <code>Model</code> column by the list's names (or "Model 1", "Model 2", ... for unnamed elements). If <code>metrics</code> is <code>NULL</code> (default), each model's default metrics are used.</p>
     </div>
 

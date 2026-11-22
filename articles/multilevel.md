@@ -15,10 +15,11 @@ of items), ordinary regression treats correlated observations as
 independent and understates uncertainty. Multilevel (mixed-effects)
 models account for the nesting with random effects. `apa_parameters`
 accepts models fit with
-[`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html) and
-[`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html) and displays
-the fixed effects as in an ordinary regression table, followed by the
-random-effect standard deviations and correlations.
+[`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html),
+[`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html), and
+[`glmmTMB::glmmTMB`](https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html) and
+displays the fixed effects as in an ordinary regression table, followed
+by the random-effect standard deviations and correlations.
 
 ## Linear Mixed Models
 
@@ -86,12 +87,12 @@ apa_parameters(
 )
 ```
 
-| Variable                  | B      | SE    | 95% CI             | t     | df     | p      |
-|---------------------------|--------|-------|--------------------|-------|--------|--------|
-| Constant                  | 267.97 | 10.87 | \[245.43, 290.50\] | 24.65 |  22.15 | \<.001 |
-| Days                      |  11.44 |  1.10 | \[  9.26,  13.61\] | 10.41 | 125.00 | \<.001 |
-| Participant:SD (Constant) |  41.80 |       |                    |       |        |        |
-| Residual SD               |  30.22 |       |                    |       |        |        |
+| Variable                   | B      | SE    | 95% CI             | t     | df     | p      |
+|----------------------------|--------|-------|--------------------|-------|--------|--------|
+| Constant                   | 267.97 | 10.87 | \[245.43, 290.50\] | 24.65 |  22.15 | \<.001 |
+| Days                       |  11.44 |  1.10 | \[  9.26,  13.61\] | 10.41 | 125.00 | \<.001 |
+| Participant: SD (Constant) |  41.80 |       |                    |       |        |        |
+| Residual SD                |  30.22 |       |                    |       |        |        |
 
 The table has two parts. The fixed effects are read like ordinary
 regression coefficients: at baseline, the average reaction time is about
@@ -128,14 +129,14 @@ apa_parameters(
 )
 ```
 
-| Variable                      | B      | SE   | 95% CI             | t(17) | p      |
-|-------------------------------|--------|------|--------------------|-------|--------|
-| Constant                      | 267.97 | 8.27 | \[250.53, 285.41\] | 32.42 | \<.001 |
-| Days                          |  11.44 | 1.85 | \[  7.54,  15.33\] |  6.20 | \<.001 |
-| Participant:SD (Constant)     |  30.96 |      |                    |       |        |
-| Participant:SD (Days)         |   6.77 |      |                    |       |        |
-| Participant:r (Constant Days) |    .18 |      |                    |       |        |
-| Residual SD                   |  25.53 |      |                    |       |        |
+| Variable                        | B      | SE   | 95% CI             | t(17) | p      |
+|---------------------------------|--------|------|--------------------|-------|--------|
+| Constant                        | 267.97 | 8.27 | \[250.53, 285.41\] | 32.42 | \<.001 |
+| Days                            |  11.44 | 1.85 | \[  7.54,  15.33\] |  6.20 | \<.001 |
+| Participant: SD (Constant)      |  30.96 |      |                    |       |        |
+| Participant: SD (Days)          |   6.77 |      |                    |       |        |
+| Participant: r (Constant, Days) |    .18 |      |                    |       |        |
+| Residual SD                     |  25.53 |      |                    |       |        |
 
 The average slope is unchanged, but its standard error is larger,
 because the model now recognizes that participants’ slopes vary: the
@@ -202,19 +203,19 @@ apa_parameters(list(sleep0, sleep1, sleep2)) |>
 |  |  |  |  |  |  |  | R2 | ΔR2 |  | R2 | ΔR2 |
 | Model 1 |  |  |  |  |  |  | .00 |  |  | .49 |  |
 |  | Constant | 307.99 | 10.17 | 30.29 |  17.00 | \<.001 |  |  |  |  |  |
-|  | Participant:SD (Constant) |  40.62 |  |  |  |  |  |  |  |  |  |
+|  | Participant: SD (Constant) |  40.62 |  |  |  |  |  |  |  |  |  |
 |  | Residual SD |  41.11 |  |  |  |  |  |  |  |  |  |
 | Model 2 |  |  |  |  |  |  | .21 | .21\*\*\* |  | .73 | .23 |
 |  | Constant | 267.97 | 10.87 | 24.65 |  22.15 | \<.001 |  |  |  |  |  |
 |  | Days |  11.44 |  1.10 | 10.41 | 125.00 | \<.001 |  |  |  |  |  |
-|  | Participant:SD (Constant) |  41.80 |  |  |  |  |  |  |  |  |  |
+|  | Participant: SD (Constant) |  41.80 |  |  |  |  |  |  |  |  |  |
 |  | Residual SD |  30.22 |  |  |  |  |  |  |  |  |  |
 | Model 3 |  |  |  |  |  |  | .21 | .00\*\*\* |  | .81 | .08 |
 |  | Constant | 267.97 |  8.27 | 32.42 |  17.00 | \<.001 |  |  |  |  |  |
 |  | Days |  11.44 |  1.85 |  6.20 |  17.00 | \<.001 |  |  |  |  |  |
-|  | Participant:SD (Constant) |  30.96 |  |  |  |  |  |  |  |  |  |
-|  | Participant:SD (Days) |   6.77 |  |  |  |  |  |  |  |  |  |
-|  | Participant:r (Constant Days) |    .18 |  |  |  |  |  |  |  |  |  |
+|  | Participant: SD (Constant) |  30.96 |  |  |  |  |  |  |  |  |  |
+|  | Participant: SD (Days) |   6.77 |  |  |  |  |  |  |  |  |  |
+|  | Participant: r (Constant, Days) |    .18 |  |  |  |  |  |  |  |  |  |
 |  | Residual SD |  25.53 |  |  |  |  |  |  |  |  |  |
 
 The random slope does not change the marginal *R*², because the fixed
@@ -278,17 +279,17 @@ glmer_va <- glmer(
 apa_parameters(glmer_va)
 ```
 
-| Variable             | B     | SE   | OR   | z      | p      |
-|----------------------|-------|------|------|--------|--------|
-| Constant             |  0.55 | 0.39 | 1.74 |   1.43 |  .15   |
-| Anger                |  0.06 | 0.02 | 1.06 |   3.41 | \<.001 |
-| Gender–Male          |  0.32 | 0.19 | 1.38 |   1.67 |  .10   |
-| Behavior–Scold       | −1.06 | 0.18 | 0.35 |  −5.73 | \<.001 |
-| Behavior–Shout       | −2.10 | 0.19 | 0.12 | −11.20 | \<.001 |
-| Mode–Do              | −0.71 | 0.15 | 0.49 |  −4.67 | \<.001 |
-| Situation–Self       | −1.05 | 0.15 | 0.35 |  −6.94 | \<.001 |
-| Person:SD (Constant) |  1.34 |      |      |        |        |
-| Item:SD (Constant)   |  0.34 |      |      |        |        |
+| Variable              | B     | SE   | OR   | z      | p      |
+|-----------------------|-------|------|------|--------|--------|
+| Constant              |  0.55 | 0.39 | 1.74 |   1.43 |  .15   |
+| Anger                 |  0.06 | 0.02 | 1.06 |   3.41 | \<.001 |
+| Gender–Male           |  0.32 | 0.19 | 1.38 |   1.67 |  .09   |
+| Behavior–Scold        | −1.06 | 0.18 | 0.35 |  −5.73 | \<.001 |
+| Behavior–Shout        | −2.10 | 0.19 | 0.12 | −11.20 | \<.001 |
+| Mode–Do               | −0.71 | 0.15 | 0.49 |  −4.67 | \<.001 |
+| Situation–Self        | −1.05 | 0.15 | 0.35 |  −6.94 | \<.001 |
+| Person: SD (Constant) |  1.34 |      |      |        |        |
+| Item: SD (Constant)   |  0.34 |      |      |        |        |
 
 Each point of trait anger multiplies the odds of endorsing an item by
 about 1.06. Scolding and shouting are endorsed less often than cursing,
@@ -297,3 +298,194 @@ when someone else is, and people are less likely to say they would *do*
 something than that they would *want* to. The random-effect *SD*s are on
 the log-odds scale and show that people differ much more than items do,
 after the item characteristics are taken into account.
+
+## Count Outcomes with glmmTMB
+
+Counts often vary more than a Poisson model allows (overdispersion) or
+have more zeros than it predicts. The
+[glmmTMB](https://glmmtmb.github.io/glmmTMB/) package fits mixed models
+for such data, including negative binomial models and models with a
+separate zero-inflation part. `apa_parameters` displays them like
+`glmer` models.
+
+The `Salamanders` data set from the glmmTMB package has 644 counts of
+salamanders at 23 stream sites, some of which were affected by
+mountaintop removal coal mining. Each site was surveyed for seven
+species (or life stages). Do mined sites have fewer salamanders?
+
+``` r
+
+data(Salamanders, package = "glmmTMB")
+d_sal <- Salamanders |>
+  mutate(
+    Mined = factor(mined, levels = c("no", "yes"), labels = c("No", "Yes"))
+  ) |>
+  rename(Count = count, Site = site, Species = spp)
+```
+
+The counts have a mean of 1.32 but a variance of 6.95, and 60% of them
+are zeros, far more variability than a Poisson model allows.
+
+### Negative binomial models
+
+A negative binomial model adds a dispersion parameter that lets the
+variance grow faster than the mean. Sites are a random effect, because
+each site was surveyed for every species.
+
+``` r
+
+tmb_nb <- glmmTMB::glmmTMB(
+  Count ~ Mined + Species + (1 | Site),
+  family = glmmTMB::nbinom2,
+  data = d_sal
+)
+apa_parameters(tmb_nb)
+```
+
+| Variable            | B     | SE   | IRR  | z     | p      |
+|---------------------|-------|------|------|-------|--------|
+| Constant            |  0.58 | 0.23 | 1.79 |  2.57 |  .01   |
+| Mined–Yes           | −2.26 | 0.28 | 0.10 | −7.97 | \<.001 |
+| Species–PR          | −1.32 | 0.29 | 0.27 | −4.59 | \<.001 |
+| Species–DM          |  0.37 | 0.22 | 1.45 |  1.65 |  .10   |
+| Species–EC-A        | −0.71 | 0.25 | 0.49 | −2.81 |  .005  |
+| Species–EC-L        |  0.57 | 0.22 | 1.77 |  2.61 |  .009  |
+| Species–DES-L       |  0.79 | 0.22 | 2.21 |  3.66 | \<.001 |
+| Species–DF          |  0.31 | 0.23 | 1.37 |  1.34 |  .18   |
+| Site: SD (Constant) |  0.54 |      |      |       |        |
+
+As with `glmer`, coefficients are tested with *z* tests, and
+coefficients of models with a log link are exponentiated. For count
+models, the exponentiated coefficients are incidence rate ratios
+(*IRR*): mined sites have about one tenth as many salamanders as unmined
+sites of the same species. The site *SD* is on the log scale. The
+dispersion parameter itself is not displayed, because it is not tested.
+
+### Zero-inflated models
+
+Another account of the many zeros is that some surveys could not have
+found any salamanders (e.g., because the stream was buried by mining),
+while the others produced counts as usual. A zero-inflated model has two
+parts: a conditional model of the counts, and a logistic model of
+whether a zero is one of these excess zeros. Here a zero-inflated
+Poisson model lets the probability of an excess zero differ between
+mined and unmined sites:
+
+``` r
+
+tmb_zip <- glmmTMB::glmmTMB(
+  Count ~ Mined + Species + (1 | Site),
+  ziformula = ~ Mined,
+  family = poisson,
+  data = d_sal
+)
+tbl_zip <- apa_parameters(tmb_zip)
+tbl_zip
+```
+
+| Variable             | B     | SE   | IRR  | z     | p      |
+|----------------------|-------|------|------|-------|--------|
+| Conditional model    |       |      |      |       |        |
+|  Constant            |  0.91 | 0.14 | 2.49 |  6.40 | \<.001 |
+|  Mined–Yes           | −1.27 | 0.27 | 0.28 | −4.72 | \<.001 |
+|  Species–PR          | −1.27 | 0.24 | 0.28 | −5.27 | \<.001 |
+|  Species–DM          |  0.27 | 0.14 | 1.31 |  1.95 |  .05   |
+|  Species–EC-A        | −0.57 | 0.21 | 0.57 | −2.75 |  .006  |
+|  Species–EC-L        |  0.67 | 0.13 | 1.95 |  5.20 | \<.001 |
+|  Species–DES-L       |  0.63 | 0.13 | 1.87 |  4.96 | \<.001 |
+|  Species–DF          |  0.12 | 0.15 | 1.12 |  0.78 |  .43   |
+|  Site: SD (Constant) |  0.33 |      |      |       |        |
+| Zero-inflation model |       |      |      |       |        |
+|  Constant            | −1.05 | 0.16 |      | −6.39 | \<.001 |
+|  Mined–Yes           |  1.84 | 0.31 |      |  5.87 | \<.001 |
+
+Each part of the model has its own heading. Only the conditional model’s
+coefficients are exponentiated, because the zero-inflation coefficients
+are log odds: the probability of an excess zero is about .26 at unmined
+sites (the inverse logit of −1.05) and .69 at mined sites (the inverse
+logit of −1.05 + 1.84). Mined sites have both more excess zeros and
+fewer salamanders otherwise. The table note says what the zero-inflation
+coefficients are:
+
+``` r
+
+apa_note(tbl_zip)
+```
+
+    [1] "Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the conditional model). *IRR* = incidence rate ratio."
+
+The two models explain the zeros differently, and their *AIC*s can be
+compared with `apa_performance`. Here the negative binomial model fits
+better:
+
+``` r
+
+apa_performance(
+  list(`Negative binomial` = tmb_nb, `Zero-inflated Poisson` = tmb_zip),
+  metrics = c("AIC", "BIC")
+)
+```
+
+| Model                 | AIC      | BIC      |
+|-----------------------|----------|----------|
+| Negative binomial     | 1,672.40 | 1,717.08 |
+| Zero-inflated Poisson | 1,795.53 | 1,844.67 |
+
+### Dispersion models
+
+With `dispformula`, the dispersion parameter itself is modeled, and the
+table has a “Dispersion model” part. For negative binomial models, a
+larger dispersion parameter means less overdispersion, so the negative
+coefficient here means that counts at mined sites are more
+overdispersed. As the note says, dispersion coefficients are on the log
+scale.
+
+``` r
+
+glmmTMB::glmmTMB(
+  Count ~ Mined + Species + (1 | Site),
+  dispformula = ~ Mined,
+  family = glmmTMB::nbinom2,
+  data = d_sal
+) |>
+  apa_parameters()
+```
+
+| Variable             | B     | SE   | IRR  | z     | p      |
+|----------------------|-------|------|------|-------|--------|
+| Conditional model    |       |      |      |       |        |
+|  Constant            |  0.64 | 0.21 | 1.89 |  3.07 |  .002  |
+|  Mined–Yes           | −2.19 | 0.27 | 0.11 | −8.12 | \<.001 |
+|  Species–PR          | −1.39 | 0.29 | 0.25 | −4.88 | \<.001 |
+|  Species–DM          |  0.29 | 0.22 | 1.33 |  1.27 |  .20   |
+|  Species–EC-A        | −0.76 | 0.25 | 0.47 | −3.02 |  .003  |
+|  Species–EC-L        |  0.56 | 0.22 | 1.75 |  2.55 |  .01   |
+|  Species–DES-L       |  0.72 | 0.22 | 2.06 |  3.31 | \<.001 |
+|  Species–DF          |  0.16 | 0.24 | 1.18 |  0.69 |  .49   |
+|  Site: SD (Constant) |  0.45 |      |      |       |        |
+| Dispersion model     |       |      |      |       |        |
+|  Constant            |  0.08 | 0.14 |      |  0.56 |  .57   |
+|  Mined–Yes           | −1.20 | 0.38 |      | −3.18 |  .002  |
+
+### Fit and comparisons
+
+`apa_performance` reports the marginal and conditional *R*² and the ICC
+of glmmTMB models, and nested models are compared with likelihood ratio
+tests, as for lme4 models:
+
+``` r
+
+tmb_nb0 <- glmmTMB::glmmTMB(
+  Count ~ Mined + (1 | Site),
+  family = glmmTMB::nbinom2,
+  data = d_sal
+)
+apa_performance_comparison(
+  list(`Mining` = tmb_nb0, `Mining and species` = tmb_nb)
+)
+```
+
+| Model | R2marginal | ΔR2marginal | R2conditional | ΔR2conditional | χ2 | df | p |
+|----|----|----|----|----|----|----|----|
+| Mining | .47 | .47 | .58 | .58 |  |  |  |
+| Mining and species | .59 | .11 | .68 | .11 | 85.93 | 6 | \<.001 |

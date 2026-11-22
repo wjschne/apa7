@@ -26,6 +26,13 @@ apa_performance(
   column_formats = NULL
 )
 
+# S3 method for class 'glmmTMB'
+apa_performance(
+  fit,
+  metrics = c("R2_marginal", "R2_conditional", "ICC"),
+  column_formats = NULL
+)
+
 # S3 method for class 'list'
 apa_performance(fit, metrics = NULL, column_formats = NULL)
 ```
@@ -58,8 +65,10 @@ regression and Nagelkerke's *R*^2^ for count models). The header names
 the pseudo-*R*^2^ that was used. Because the residual standard deviation
 is not meaningful for most GLMs, the default metrics are `R2` and `AIC`.
 
-For mixed models ([`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html)
-and [`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html)), the
+For mixed models
+([`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html),
+[`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html), and
+[`glmmTMB::glmmTMB`](https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html)), the
 default metrics are the marginal *R*^2^ (variance explained by the fixed
 effects), the conditional *R*^2^ (fixed and random effects), and the
 intraclass correlation (ICC), as computed by

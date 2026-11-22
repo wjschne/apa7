@@ -100,10 +100,12 @@ compared with or the variables were correlated with,</p></li>
 <li><p>what the effect size and its confidence interval stand for, and</p></li>
 <li><p>what stars or bold values mean.</p></li>
 </ul><p>For <code><a href="apa_parameters.html">apa_parameters()</a></code> tables of regression models (<code>lm</code>, <code>glm</code>, <code>polr</code>,
-<code>clm</code>, and <code>lme4</code> models, or a list of models), the note can say</p><ul><li><p>which robust standard errors were used (e.g., <code>vcov = "HC3"</code>),</p></li>
+<code>clm</code>, <code>lme4</code>, and <code>glmmTMB</code> models, or a list of models), the note can say</p><ul><li><p>which robust standard errors were used (e.g., <code>vcov = "HC3"</code>),</p></li>
 <li><p>how the degrees of freedom of mixed-model <em>t</em> tests were approximated
 (Kenward-Roger or Satterthwaite),</p></li>
 <li><p>that ordinal-model thresholds are not tested,</p></li>
+<li><p>the scale of the zero-inflation and dispersion coefficients of <code>glmmTMB</code>
+models,</p></li>
 <li><p>what the standardized coefficient (\(\beta\)), exponentiated coefficient
 (e.g., <em>OR</em>), confidence interval, and model-comparison (e.g.,
 \(\Delta R^2\)) columns stand for, and</p></li>

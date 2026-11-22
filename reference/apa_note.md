@@ -83,8 +83,8 @@ tables, the note can say
 
 For
 [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
-tables of regression models (`lm`, `glm`, `polr`, `clm`, and `lme4`
-models, or a list of models), the note can say
+tables of regression models (`lm`, `glm`, `polr`, `clm`, `lme4`, and
+`glmmTMB` models, or a list of models), the note can say
 
 - which robust standard errors were used (e.g., `vcov = "HC3"`),
 
@@ -92,6 +92,9 @@ models, or a list of models), the note can say
   (Kenward-Roger or Satterthwaite),
 
 - that ordinal-model thresholds are not tested,
+
+- the scale of the zero-inflation and dispersion coefficients of
+  `glmmTMB` models,
 
 - what the standardized coefficient (\\\beta\\), exponentiated
   coefficient (e.g., *OR*), confidence interval, and model-comparison

@@ -113,6 +113,20 @@ apa_parameters(
   ...
 )
 
+# S3 method for class 'glmmTMB'
+apa_parameters(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "t", "z",
+    "df_error", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  random = TRUE,
+  ...
+)
+
 # S3 method for class 'list'
 apa_parameters(
   fit,
@@ -246,6 +260,18 @@ differ across fixed effects, they are shown in a *df* column rather than
 in the *t* column header. Random-effect rows show only the estimated
 standard deviation (*SD*) or correlation (*r*), labeled by grouping
 factor.
+
+For mixed models fit with
+[`glmmTMB::glmmTMB()`](https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html),
+fixed effects are tested with *z* tests, and random effects are
+displayed as for `lme4` models. Coefficients of log and logit links are
+exponentiated by default (e.g., *IRR* for Poisson and negative binomial
+models). When the model has a zero-inflation part (`ziformula`) or a
+dispersion part (`dispformula`), each part is introduced by a heading
+row ("Conditional model", "Zero-inflation model", or "Dispersion
+model"), and only the conditional model's coefficients are
+exponentiated. A dispersion parameter that is not modeled (i.e., without
+a `dispformula`) is not displayed.
 
 ## Examples
 

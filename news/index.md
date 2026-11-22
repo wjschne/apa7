@@ -45,6 +45,26 @@
   [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
   gives the type of tests, the degrees-of-freedom method, and how the
   effect size was computed.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  and
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  support mixed models fit with
+  [`glmmTMB::glmmTMB()`](https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html).
+  Fixed effects are tested with *z* tests, coefficients of log and logit
+  links are exponentiated by default (e.g., *IRR* for negative binomial
+  models), and random effects are shown as for `lme4` models.
+  Zero-inflation and dispersion parts appear under their own headings
+  (“Zero-inflation model”, “Dispersion model”), and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  gives their scale. glmmTMB models also work in lists of models and in
+  [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md).
+- [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  no longer re-formats row labels that
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  (for `lme4` and `glmmTMB` models) and
+  [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
+  have already formatted. Before, random-effect labels such as “Subject:
+  *r* (Constant, Days)” lost their spacing and commas in flextables.
 - Table notes are now single-spaced, even when the table is
   double-spaced. This applies to `apa_flextable(note = TRUE)`,
   [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
