@@ -51,6 +51,7 @@ Suggests:
     lme4,
     lmerTest,
     MASS,
+    nlme,
     ordinal,
     pbkrtest,
     quarto,

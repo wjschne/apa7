@@ -19,7 +19,7 @@ library(parameters)
 <<setup>>
 ```
 
-When observations are nested (trials within participants, students within classrooms) or crossed (participants responding to the same set of items), ordinary regression treats correlated observations as independent and understates uncertainty. Multilevel (mixed-effects) models account for the nesting with random effects. `apa_parameters` accepts models fit with `lme4::lmer`, `lme4::glmer`, and `glmmTMB::glmmTMB` and displays the fixed effects as in an ordinary regression table, followed by the random-effect standard deviations and correlations.
+When observations are nested (trials within participants, students within classrooms) or crossed (participants responding to the same set of items), ordinary regression treats correlated observations as independent and understates uncertainty. Multilevel (mixed-effects) models account for the nesting with random effects. `apa_parameters` accepts models fit with `lme4::lmer`, `lme4::glmer`, `nlme::lme`, and `glmmTMB::glmmTMB` and displays the fixed effects as in an ordinary regression table, followed by the random-effect standard deviations and correlations.
 
 # Linear Mixed Models
 
@@ -139,9 +139,49 @@ The comparison can also be displayed on its own with `apa_performance_comparison
 ```{r}
 #| label: sleep-compare
 #| message: false
-apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>  
+apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>
   apa_flextable()
 ```
+
+## Correlated residuals with nlme
+
+lme4 assumes that, after the random effects are taken into account, a participant's residuals are independent. In daily measurements, though, a participant who is unusually slow on one day is often unusually slow the next day too. The nlme package can model such residual correlation. Here the random-slope model is refit with `nlme::lme` and a first-order autoregressive (AR(1)) correlation among each participant's residuals:
+
+```{r}
+#| label: sleep-lme
+sleep_lme <- nlme::lme(
+  Reaction ~ Days,
+  random = ~ Days | Participant,
+  correlation = nlme::corAR1(),
+  data = d_sleep
+)
+tbl_sleep_lme <- apa_parameters(sleep_lme)
+tbl_sleep_lme
+```
+
+The fixed effects are tested with *t* tests whose degrees of freedom are computed by nlme from the grouping levels at which each effect varies, rather than with Kenward–Roger degrees of freedom. The parameters of the residual structure are shown below the residual *SD*: residuals on adjacent days correlate about .45. The table note names the structure:
+
+```{r}
+#| label: sleep-lme-note
+apa_note(tbl_sleep_lme)
+```
+
+Because the AR(1) structure and the random slopes both describe how a participant's reaction times hang together over days, they compete with each other: with correlated residuals, the intercept *SD* is smaller and the correlation between intercepts and slopes is nearly 1, a sign that these data cannot fully separate the two. A likelihood ratio test compares the model with and without correlated residuals:
+
+```{r}
+#| label: sleep-lme-compare
+#| message: false
+sleep_lme0 <- nlme::lme(
+  Reaction ~ Days,
+  random = ~ Days | Participant,
+  data = d_sleep
+)
+apa_performance_comparison(
+  list(`Independent residuals` = sleep_lme0, `AR(1) residuals` = sleep_lme)
+)
+```
+
+Variance functions (the `weights` argument, e.g., `nlme::varIdent(form = ~ 1 | Group)` for a separate residual *SD* in each group) are displayed the same way, with a row for each parameter and a sentence in the note.
 
 # Generalized Linear Mixed Models
 

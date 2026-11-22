@@ -71,8 +71,8 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 ### 4. More mixed-model classes
 
 - [x] `glmmTMB` methods for `apa_parameters()` and `apa_performance()` (zero-inflation and dispersion parts under their own headings; only the conditional model exponentiated)
-- [ ] `nlme::lme` methods
-- [ ] Tests
+- [x] `nlme::lme` methods (nlme's df; residual correlation and variance structures as rows, named in the note)
+- [x] Tests (`test-glmmtmb.R`, `test-nlme.R`)
 
 ### 5. After CRAN
 

@@ -55,13 +55,15 @@ compared with or the variables were correlated with,
 }
 
 For \code{\link[=apa_parameters]{apa_parameters()}} tables of regression models (\code{lm}, \code{glm}, \code{polr},
-\code{clm}, \code{lme4}, and \code{glmmTMB} models, or a list of models), the note can say
+\code{clm}, \code{lme4}, \code{glmmTMB}, and \code{nlme} models, or a list of models), the note can say
 \itemize{
 \item which robust standard errors were used (e.g., \code{vcov = "HC3"}),
 \item how the degrees of freedom of mixed-model \emph{t} tests were approximated
 (Kenward-Roger or Satterthwaite),
 \item that ordinal-model thresholds are not tested,
 \item the scale of the zero-inflation and dispersion coefficients of \code{glmmTMB}
+models,
+\item the residual correlation structure and variance function of \code{nlme::lme}
 models,
 \item what the standardized coefficient (\eqn{\beta}{beta}), exponentiated coefficient
 (e.g., \emph{OR}), confidence interval, and model-comparison (e.g.,

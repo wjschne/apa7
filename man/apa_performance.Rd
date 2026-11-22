@@ -8,6 +8,7 @@
 \alias{apa_performance.clm}
 \alias{apa_performance.merMod}
 \alias{apa_performance.glmmTMB}
+\alias{apa_performance.lme}
 \alias{apa_performance.list}
 \title{format model performance metrics in APA style}
 \usage{
@@ -33,6 +34,12 @@ apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
   column_formats = NULL
 )
 
+\method{apa_performance}{lme}(
+  fit,
+  metrics = c("R2_marginal", "R2_conditional", "ICC"),
+  column_formats = NULL
+)
+
 \method{apa_performance}{list}(fit, metrics = NULL, column_formats = NULL)
 }
 \arguments{
@@ -51,7 +58,7 @@ format model performance metrics in APA style
 \details{
 For \code{glm} objects, \code{R2} is the pseudo-\emph{R}^2^ that \code{\link[performance:r2]{performance::r2()}} selects for the model family (e.g., Tjur's \emph{R}^2^ for logistic regression and Nagelkerke's \emph{R}^2^ for count models). The header names the pseudo-\emph{R}^2^ that was used. Because the residual standard deviation is not meaningful for most GLMs, the default metrics are \code{R2} and \code{AIC}.
 
-For mixed models (\code{lme4::lmer}, \code{lme4::glmer}, and \code{glmmTMB::glmmTMB}), the default metrics are the marginal \emph{R}^2^ (variance explained by the fixed effects), the conditional \emph{R}^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by \code{\link[performance:model_performance]{performance::model_performance()}}.
+For mixed models (\code{lme4::lmer}, \code{lme4::glmer}, \code{glmmTMB::glmmTMB}, and \code{nlme::lme}), the default metrics are the marginal \emph{R}^2^ (variance explained by the fixed effects), the conditional \emph{R}^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by \code{\link[performance:model_performance]{performance::model_performance()}}.
 
 For a list of models, each model's metrics are displayed in a row, labeled in a \code{Model} column by the list's names (or "Model 1", "Model 2", ... for unnamed elements). If \code{metrics} is \code{NULL} (default), each model's default metrics are used.
 }

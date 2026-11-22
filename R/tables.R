@@ -1880,6 +1880,209 @@ labels_formatted <- function(d) {
   d
 }
 
+#' @details
+#' For linear mixed models fit with `nlme::lme()`, fixed effects are tested with *t* tests whose degrees of freedom are computed by nlme from the grouping levels at which each effect varies, and random effects are displayed as for `lme4` models. Parameters of residual correlation structures (`correlation`, e.g., `nlme::corAR1()`) and variance functions (`weights`, e.g., `nlme::varIdent()`) are displayed below the residual *SD*, and [apa_note()] names the structures.
+#' @export
+#' @rdname apa_parameters
+#' @examples
+#' \donttest{
+#' if (requireNamespace("nlme", quietly = TRUE)) {
+#'   nlme::lme(
+#'     distance ~ age + Sex,
+#'     random = ~ 1 | Subject,
+#'     correlation = nlme::corAR1(),
+#'     data = nlme::Orthodont
+#'   ) |>
+#'     apa_parameters()
+#' }
+#' }
+apa_parameters.lme <- function(
+  fit,
+  predictor_parameters = c(
+    "Parameter",
+    "Coefficient",
+    "SE",
+    "t",
+    "df_error",
+    "p"
+  ),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  random = TRUE,
+  ...
+) {
+  if (inherits(fit, "glmmPQL")) {
+    stop(
+      "apa_parameters() does not support glmmPQL models. ",
+      "Fit generalized linear mixed models with lme4::glmer() or glmmTMB::glmmTMB()."
+    )
+  }
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+  names(predictor_parameters) <- NULL
+
+  d_b <- parameters::model_parameters(fit, effects = "fixed", ...) |>
+    tibble::as_tibble()
+
+  # Format variable names here, because random-effect labels are built below
+  name_formatter <- column_formats$Parameter@formatter
+  d_b$Parameter <- name_formatter(parameters::format_parameters(fit))
+
+  residual <- lme_residual_structures(fit, name_formatter, column_formats@accuracy)
+
+  if (random) {
+    d_r <- parameters::model_parameters(fit, effects = "random", ci = NULL) |>
+      tibble::as_tibble()
+    d_b$Coefficient <- signs::signs(d_b$Coefficient, accuracy = column_formats@accuracy)
+    d_b <- dplyr::bind_rows(
+      d_b,
+      tibble::tibble(
+        Parameter = random_effect_labels(d_r$Parameter, d_r$Group, name_formatter),
+        Coefficient = random_effect_coefficients(d_r, column_formats@accuracy)
+      ),
+      residual$rows
+    )
+  }
+
+  # Names were formatted above
+  column_formats$Parameter@formatter <- \(x, ...) x
+
+  format_apa_parameters(
+    d_b,
+    predictor_parameters = predictor_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = t_with_df,
+    note = list(df_method = "nlme", residual = residual$note)
+  ) |>
+    labels_formatted()
+}
+
+#' Rows and note sentences for the residual structures of an lme model
+#'
+#' @returns list with `rows` (a tibble of Parameter and formatted Coefficient)
+#'   and `note` (character vector of sentences)
+#' @keywords internal
+#' @noRd
+lme_residual_structures <- function(fit, formatter, accuracy) {
+  rows <- tibble::tibble(Parameter = character(0), Coefficient = character(0))
+  note <- character(0)
+  groups_text <- function(struct) {
+    g <- nlme::getGroupsFormula(struct)
+    if (is.null(g)) NULL else formatter(all.vars(g))
+  }
+  covariate_text <- function(struct) {
+    v <- all.vars(nlme::getCovariateFormula(struct))
+    if (length(v) == 0) "the fitted values" else paste(formatter(v), collapse = " and ")
+  }
+
+  # Correlation structure
+  cs <- fit$modelStruct$corStruct
+  if (!is.null(cs)) {
+    cls <- class(cs)[1]
+    values <- stats::coef(cs, unconstrained = FALSE)
+    labels <- switch(
+      cls,
+      corAR1 = ,
+      corCAR1 = "Residual autocorrelation (*\u03C6*)",
+      corCompSymm = "Residual correlation (*\u03C1*)",
+      paste0("Residual correlation: ", names(values))
+    )
+    rows <- dplyr::bind_rows(
+      rows,
+      tibble::tibble(
+        Parameter = labels,
+        Coefficient = signs::signs(values, accuracy = accuracy, trim_leading_zeros = TRUE)
+      )
+    )
+    structure_name <- switch(
+      cls,
+      corAR1 = "a first-order autoregressive (AR(1))",
+      corCAR1 = "a continuous-time first-order autoregressive (CAR(1))",
+      corARMA = "an autoregressive moving-average (ARMA)",
+      corCompSymm = "a compound-symmetric",
+      corSymm = "an unstructured",
+      corExp = "an exponential spatial",
+      corGaus = "a Gaussian spatial",
+      corLin = "a linear spatial",
+      corRatio = "a rational quadratic spatial",
+      corSpher = "a spherical spatial",
+      paste0("a ", cls)
+    )
+    groups <- groups_text(cs)
+    note <- c(
+      note,
+      paste0(
+        "Residuals",
+        if (length(groups) > 0) paste0(" within ", paste(groups, collapse = " and ")),
+        " have ",
+        structure_name,
+        " correlation structure."
+      )
+    )
+  }
+
+  # Variance function
+  vs <- fit$modelStruct$varStruct
+  if (!is.null(vs)) {
+    cls <- class(vs)[1]
+    values <- stats::coef(vs, unconstrained = FALSE)
+    if (cls == "varIdent") {
+      all_values <- stats::coef(vs, unconstrained = FALSE, allCoef = TRUE)
+      reference <- names(all_values)[!(names(all_values) %in% names(values))][1]
+      rows <- dplyr::bind_rows(
+        rows,
+        tibble::tibble(
+          Parameter = paste0("Residual *SD* ratio: ", names(values)),
+          Coefficient = signs::signs(values, accuracy = accuracy)
+        )
+      )
+      groups <- groups_text(vs)
+      note <- c(
+        note,
+        paste0(
+          "Each level of ",
+          paste(groups, collapse = " and "),
+          " has its own residual *SD*. The residual *SD* is that of ",
+          reference,
+          ", and the others are shown as ratios to it."
+        )
+      )
+    } else if (length(values) > 0) {
+      labels <- switch(
+        cls,
+        varPower = "Residual *SD* power (*\u03B4*)",
+        varExp = "Residual *SD* exponent (*\u03B4*)",
+        paste0("Residual variance: ", names(values))
+      )
+      rows <- dplyr::bind_rows(
+        rows,
+        tibble::tibble(
+          Parameter = labels,
+          Coefficient = signs::signs(values, accuracy = accuracy)
+        )
+      )
+    }
+    note <- c(
+      note,
+      switch(
+        cls,
+        varIdent = NULL,
+        varPower = paste0("Residual *SD*s are proportional to a power (*\u03B4*) of ", covariate_text(vs), "."),
+        varExp = paste0("Residual *SD*s are an exponential function of ", covariate_text(vs), "."),
+        varConstPower = paste0("Residual *SD*s are a constant plus a power of ", covariate_text(vs), "."),
+        varFixed = paste0("Residual variances are proportional to ", covariate_text(vs), "."),
+        paste0("Residual variances follow a ", cls, " variance function.")
+      )
+    )
+  }
+  list(rows = rows, note = note)
+}
+
 #' Random-effect SDs formatted like coefficients and correlations without a
 #' leading zero
 #' @keywords internal
@@ -2191,7 +2394,7 @@ apa_parameters.list <- function(
   # Mixed models also show the conditional R2 and its change by default
   if (
     missing(performance_parameters) &&
-      all(purrr::map_lgl(fit, \(m) inherits(m, c("merMod", "glmmTMB"))))
+      all(purrr::map_lgl(fit, \(m) inherits(m, c("merMod", "glmmTMB", "lme"))))
   ) {
     performance_parameters <- c(
       "R2",
@@ -2367,7 +2570,7 @@ apa_performance.polr <- apa_performance.glm
 apa_performance.clm <- apa_performance.glm
 
 #' @details
-#' For mixed models (`lme4::lmer`, `lme4::glmer`, and `glmmTMB::glmmTMB`), the default metrics are the marginal *R*^2^ (variance explained by the fixed effects), the conditional *R*^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by [performance::model_performance()].
+#' For mixed models (`lme4::lmer`, `lme4::glmer`, `glmmTMB::glmmTMB`, and `nlme::lme`), the default metrics are the marginal *R*^2^ (variance explained by the fixed effects), the conditional *R*^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by [performance::model_performance()].
 #' @export
 #' @rdname apa_performance
 apa_performance.merMod <- function(
@@ -2381,6 +2584,10 @@ apa_performance.merMod <- function(
 #' @export
 #' @rdname apa_performance
 apa_performance.glmmTMB <- apa_performance.merMod
+
+#' @export
+#' @rdname apa_performance
+apa_performance.lme <- apa_performance.merMod
 
 #' @details
 #' For a list of models, each model's metrics are displayed in a row, labeled in a `Model` column by the list's names (or "Model 1", "Model 2", ... for unnamed elements). If `metrics` is `NULL` (default), each model's default metrics are used.
@@ -2474,7 +2681,7 @@ use_pseudo_r2 <- function(data, column_formats) {
 #' @noRd
 has_fixed_dispersion <- function(fit) {
   # Nested mixed models are also compared with likelihood ratio tests
-  if (inherits(fit, c("polr", "clm", "merMod", "glmmTMB"))) {
+  if (inherits(fit, c("polr", "clm", "merMod", "glmmTMB", "lme"))) {
     return(TRUE)
   }
   if (!inherits(fit, "glm")) {
@@ -2525,7 +2732,7 @@ apa_performance_comparison <- function(
   }
   use_lrt <- all(purrr::map_lgl(models, has_fixed_dispersion))
   # Mixed models have marginal and conditional R2
-  is_mixed <- all(purrr::map_lgl(models, \(m) inherits(m, c("merMod", "glmmTMB"))))
+  is_mixed <- all(purrr::map_lgl(models, \(m) inherits(m, c("merMod", "glmmTMB", "lme"))))
   conditional_r2 <- if (is_mixed) c("R2_conditional", "deltaR2_conditional")
 
   if (is.null(metrics)) {

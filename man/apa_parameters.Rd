@@ -11,6 +11,7 @@
 \alias{apa_parameters.clm}
 \alias{apa_parameters.merMod}
 \alias{apa_parameters.glmmTMB}
+\alias{apa_parameters.lme}
 \alias{apa_parameters.list}
 \title{format model parameters in APA style}
 \usage{
@@ -127,6 +128,17 @@ apa_parameters(
   ...
 )
 
+\method{apa_parameters}{lme}(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "t", "df_error", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  random = TRUE,
+  ...
+)
+
 \method{apa_parameters}{list}(
   fit,
   predictor_parameters = NULL,
@@ -177,6 +189,8 @@ For ordinal regression models (\code{MASS::polr} and \code{ordinal::clm}), coeff
 For mixed models fit with \code{lme4} (\code{lmer} and \code{glmer}), fixed effects are displayed as for \code{lm} and \code{glm} models. For linear mixed models, \emph{t} tests and confidence intervals use Kenward-Roger degrees of freedom by default (\code{ci_method = "kenward"}, which requires the pbkrtest package); pass another \code{ci_method} (e.g., \code{"satterthwaite"}, which requires lmerTest, or \code{"wald"}) to change this. When the degrees of freedom differ across fixed effects, they are shown in a \emph{df} column rather than in the \emph{t} column header. Random-effect rows show only the estimated standard deviation (\emph{SD}) or correlation (\emph{r}), labeled by grouping factor.
 
 For mixed models fit with \code{glmmTMB::glmmTMB()}, fixed effects are tested with \emph{z} tests, and random effects are displayed as for \code{lme4} models. Coefficients of log and logit links are exponentiated by default (e.g., \emph{IRR} for Poisson and negative binomial models). When the model has a zero-inflation part (\code{ziformula}) or a dispersion part (\code{dispformula}), each part is introduced by a heading row ("Conditional model", "Zero-inflation model", or "Dispersion model"), and only the conditional model's coefficients are exponentiated. A dispersion parameter that is not modeled (i.e., without a \code{dispformula}) is not displayed.
+
+For linear mixed models fit with \code{nlme::lme()}, fixed effects are tested with \emph{t} tests whose degrees of freedom are computed by nlme from the grouping levels at which each effect varies, and random effects are displayed as for \code{lme4} models. Parameters of residual correlation structures (\code{correlation}, e.g., \code{nlme::corAR1()}) and variance functions (\code{weights}, e.g., \code{nlme::varIdent()}) are displayed below the residual \emph{SD}, and \code{\link[=apa_note]{apa_note()}} names the structures.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>
@@ -217,6 +231,17 @@ if (requireNamespace("glmmTMB", quietly = TRUE)) {
     ziformula = ~ mined,
     family = poisson,
     data = Salamanders
+  ) |>
+    apa_parameters()
+}
+}
+\donttest{
+if (requireNamespace("nlme", quietly = TRUE)) {
+  nlme::lme(
+    distance ~ age + Sex,
+    random = ~ 1 | Subject,
+    correlation = nlme::corAR1(),
+    data = nlme::Orthodont
   ) |>
     apa_parameters()
 }
