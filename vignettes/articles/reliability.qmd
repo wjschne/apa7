@@ -1,0 +1,117 @@
+---
+title: "Reliability and Item Analysis Tables"
+format: html
+knitr:
+  opts_chunk:
+    fig-cap-location: top
+filters:
+  - quarto
+  - apanote
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(apa7)
+library(psych)
+```
+
+```{r}
+#| label: setup2
+#| eval: false
+<<setup>>
+```
+
+`apa_reliability` makes one table with the most often reported aspects of a reliability analysis. For each item, it shows:
+
+* the mean (*M*) and standard deviation (*SD*), which reveal ceiling and floor effects
+* the corrected item–total correlation (*r*~it~), the item's correlation with the sum of the *other* items in its scale. Items with low values (often, below .30) discriminate poorly.
+* Cronbach's α if the item were deleted. A value above the scale's α means that the item lowers reliability.
+
+Below each scale's items are its scale-level statistics: the mean and *SD* of the scale scores, Cronbach's α with a confidence interval, McDonald's *ω*~total~, and the mean inter-item correlation. Cronbach's α assumes that all items are equally good measures of what the scale measures, while *ω*~total~ allows them to differ, so many journals now ask for both. The mean inter-item correlation shows whether a high α comes from strongly related items or merely from many items.
+
+The statistics come from the [psych](https://personality-project.org/r/psych/) package: `psych::alpha` for α and the item statistics, and a one-factor model (`psych::fa`) for *ω*~total~. The confidence interval of α is Feldt's.
+
+# Several Scales
+
+The `bfi` data set in the psych package has 25 personality items from 2,800 people, answered on a 6-point scale. Give `apa_reliability` a named list of scales, each a vector of item names. Items worded in the opposite direction (e.g., A1, "Am indifferent to the feelings of others") are reverse-scored with `reverse`. `item_range` gives the lowest and highest possible responses, which are used to reverse the items:
+
+```{r}
+#| label: bfi-reliability
+bfi_scales <- list(
+  Agreeableness = paste0("A", 1:5),
+  Conscientiousness = paste0("C", 1:5)
+)
+bfi_reverse <- c("A1", "C4", "C5")
+
+apa_reliability(
+  bfi,
+  scales = bfi_scales,
+  reverse = bfi_reverse,
+  item_range = c(1, 6)
+) |>
+  apa_flextable(note = TRUE)
+```
+
+Each scale has a heading, with its items and statistics indented below it. Reverse-scored items are marked (R). Each scale uses the respondents who answered all of its items, and the note gives their number.
+
+A1 has the weakest item–total correlation of the agreeableness items, and deleting it would raise α slightly, from .70 to .72. With `flag = TRUE`, item–total correlations below .30 (or another cutoff, with `min_item_total`) and values of α if deleted that exceed the scale's α are bolded:
+
+```{r}
+#| label: bfi-flag
+apa_reliability(
+  bfi,
+  scales = bfi_scales,
+  reverse = bfi_reverse,
+  item_range = c(1, 6),
+  flag = TRUE
+) |>
+  apa_flextable(note = TRUE)
+```
+
+# One Row per Scale
+
+When the items have been examined and the paper reports only the scales, `level = "scales"` gives one row per scale. This table pairs naturally with a correlation table of the scale scores (see `apa_cor`).
+
+```{r}
+#| label: bfi-scales
+apa_reliability(
+  bfi,
+  scales = list(
+    Agreeableness = paste0("A", 1:5),
+    Conscientiousness = paste0("C", 1:5),
+    Extraversion = paste0("E", 1:5),
+    Neuroticism = paste0("N", 1:5),
+    Openness = paste0("O", 1:5)
+  ),
+  reverse = c("A1", "C4", "C5", "E1", "E2", "O2", "O5"),
+  item_range = c(1, 6),
+  level = "scales"
+) |>
+  apa_flextable(note = TRUE)
+```
+
+# Test Items Scored 0 or 1
+
+For tests whose items are scored correct (1) or incorrect (0), *M* is the item's difficulty (the proportion of correct answers), *r*~it~ is the corrected point-biserial correlation, and α equals the Kuder–Richardson formula 20 (KR-20). `apa_reliability` detects such items and says so in the table and the note. Here, 300 simulated students answered 6 items of increasing difficulty:
+
+```{r}
+#| label: binary
+set.seed(1)
+ability <- rnorm(300)
+difficulty <- seq(-1, 1, length.out = 6)
+test_items <- sapply(difficulty, \(b) rbinom(300, 1, plogis(ability - b)))
+colnames(test_items) <- paste0("Item", 1:6)
+
+apa_reliability(as.data.frame(test_items)) |>
+  apa_flextable(note = TRUE)
+```
+
+With a single scale, there is no scale heading. Six items of modest discrimination give a low KR-20; longer tests are usually needed for dependable scores.
+
+# Options
+
+* `omega = FALSE` leaves out *ω*~total~.
+* `score = "sum"` reports the mean and *SD* of the scale sums instead of the scale means.
+* `ci` sets the confidence level of the interval of α (e.g., `ci = .90`).
+* `format_variable_names = FALSE` keeps item and scale names exactly as they are.

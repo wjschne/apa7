@@ -45,6 +45,10 @@ For confirmatory factor analyses fit with \code{lavaan}, the note instead gives
 the sample size and estimator, says that the loadings are standardized, and
 says that blank cells are loadings fixed at 0.
 
+For \code{\link[=apa_reliability]{apa_reliability()}} tables, the note gives the number of respondents,
+says which items were reverse-scored and how scale scores were computed,
+and defines the statistics.
+
 For \code{\link[=apa_factor_cor]{apa_factor_cor()}} tables, the note says how the factors were
 extracted and rotated (for \code{lavaan} models, the sample size, the
 estimator, and that the correlations are standardized).

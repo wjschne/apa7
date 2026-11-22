@@ -16,6 +16,7 @@ reference:
       - apa_parameters
       - apa_performance
       - apa_performance_comparison
+      - apa_reliability
   - title: Style flextables
     desc: "Alter the look of a flextable previously created"
     contents:

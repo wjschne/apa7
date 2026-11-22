@@ -2,7 +2,7 @@
 
 Working checklist for apa7 development. Check items off (`- [x]`) as they are finished, and add new items under the right section. Keep finished items in place until the next release, then move them to the **Done** section (and to NEWS.md).
 
-Last reviewed: 2026-11-20
+Last reviewed: 2026-11-22
 
 ## Before CRAN submission
 
@@ -82,8 +82,27 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
   - [x] Multiple-group models in `apa_parameters()` (groups side by side by default; stacked with `groups = "rows"`)
   - [x] CFA loading matrix with `apa_loadings()` (and latent correlations with `apa_factor_cor()`)
   - [x] Nested-model and measurement-invariance comparisons with `apa_performance_comparison()` (each model against the previous one)
-- [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR`
 - [x] Let `apa_cor()` accept output from `correlation::correlation()` (not yet: grouped, two-set, or Bayesian correlations)
+
+### 6. Other analyses reported by easystats
+
+Roughly in order of how often they appear in APA-style papers. `apa_parameters()` and `apa_performance()` have no default method, so other model classes give errors until they are supported. Bayesian models wait until the rest are more or less complete.
+
+- [ ] Descriptive and sample tables ("Table 1"): *M*, *SD*, range, and *n* (%) by group, from `report::report_sample()` or `datawizard::describe_distribution()`
+- [ ] Estimated marginal means, contrasts, and simple slopes (post hoc tests, moderation) from `modelbased::estimate_means()`, `estimate_contrasts()`, and `estimate_slopes()`: means with CIs and pairwise differences with adjusted *p*-values
+- [x] Reliability and item analysis with `apa_reliability()`: item *M*, *SD*, *r*~it~, and α if deleted; scale mean, α [CI], *ω*~total~, and mean inter-item *r*. Computed with `psych`, which covers what `performance`'s `cronbachs_alpha()`, `item_reliability()`, `item_difficulty()`, `item_discrimination()`, `item_intercor()`, and `item_omega()` report and adds the CI of α.
+- [ ] Other regression families via `parameters`
+  - [ ] Multinomial logistic regression (`nnet::multinom`): one block of coefficients per outcome category
+  - [ ] Zero-inflated and hurdle count models outside mixed models (`pscl`): count and zero parts under headings, as for `glmmTMB`
+  - [ ] Survival models (`survival::coxph`, `survreg`): hazard ratios
+  - [ ] Robust and quantile regression (`MASS::rlm`, `robustbase`, `quantreg`)
+  - [ ] Beta regression, GEE, panel and fixed-effects, and instrumental-variable models (`betareg`, `geepack`, `fixest`, `ivreg`), possibly through one generic method
+- [ ] Generalized additive models (`mgcv::gam`): parametric terms, and smooth terms with *edf* and *F*
+- [ ] Collinearity diagnostics from `performance::check_collinearity()`: VIF and tolerance for each predictor
+- [ ] Mediation (`mediation::mediate`): ACME, ADE, and total effect with CIs (beyond `lavaan`'s defined parameters)
+- [ ] Factor retention (`parameters::n_factors()`) and cluster analysis (`parameters::cluster_analysis()`)
+- [ ] Meta-analyses (e.g., `metafor::rma()`) via `parameters`: study-level effect sizes with weights, the pooled estimate, heterogeneity (*Q*, *I*², *τ*²), and moderators for meta-regressions
+- [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR` (on hold until the other major easystats analyses are supported)
 
 ## Table notes
 

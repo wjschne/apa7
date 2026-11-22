@@ -20,7 +20,7 @@
 }
 \description{
 The tibbles returned by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_factor_cor]{apa_factor_cor()}}, \code{\link[=apa_htest]{apa_htest()}}, \code{\link[=apa_loadings]{apa_loadings()}}, \code{\link[=apa_parameters]{apa_parameters()}},
-\code{\link[=apa_performance]{apa_performance()}}, and \code{\link[=apa_performance_comparison]{apa_performance_comparison()}} have class
+\code{\link[=apa_performance]{apa_performance()}}, \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}, and \code{\link[=apa_reliability]{apa_reliability()}} have class
 \code{apa7_tbl}. They are ordinary
 tibbles for post-processing with dplyr, but in knitr and Quarto documents
 they are rendered as an \code{\link[=apa_flextable]{apa_flextable()}} automatically. In the console they
