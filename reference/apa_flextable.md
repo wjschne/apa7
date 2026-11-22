@@ -123,7 +123,8 @@ apa_flextable(
 
 - line_spacing:
 
-  spacing between lines
+  spacing between lines of the header and body. Table notes are
+  single-spaced.
 
 - horizontal_padding:
 
@@ -189,8 +190,8 @@ apa_flextable(
 
 - note:
 
-  table note placed below the table, after "*Note*.". If `TRUE`, the
-  note is written by
+  table note placed below the table, after "*Note*.". The note is
+  single-spaced. If `TRUE`, the note is written by
   [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
   from what a table function such as
   [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md),

@@ -11,6 +11,7 @@
 - [Correlations](https://wjschne.github.io/apa7/articles/correlations.md):
 - [Factor Analysis
   Tables](https://wjschne.github.io/apa7/articles/factor-analysis.md):
+- [Hypothesis Tests](https://wjschne.github.io/apa7/articles/htest.md):
 - [Multilevel Model
   Tables](https://wjschne.github.io/apa7/articles/multilevel.md):
 - [Regression Analysis

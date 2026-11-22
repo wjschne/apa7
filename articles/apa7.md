@@ -348,9 +348,13 @@ my_formats@get_tibble |>
 | Coefficient | \*B\* | \$B\$ |
 | cohens_d | Cohen's \*d\* | Cohen's \$d\$ |
 | Cohens_d | Cohen's \*d\* | Cohen's \$d\$ |
+| Cohens_w | Cohen's \*w\* | Cohen's \$w\$ |
 | Complexity | Complexity | Complexity |
 | Cramers_v | Cramér's \*V\* | Cramér's \$V\$ |
 | cronbach | Cronbach's &alpha; | Cronbach's \$\alpha\$ |
+| d_av | \*d\*~av~ | \$d\_{\text{av}}\$ |
+| d_rm | \*d\*~rm~ | \$d\_{\text{rm}}\$ |
+| d_z | \*d\*~z~ | \$d\_{\text{z}}\$ |
 | deltaAIC | &Delta;\*AIC\* | \$\Delta AIC\$ |
 | deltaBIC | &Delta;\*BIC\* | \$\Delta BIC\$ |
 | deltachi2 | &Delta;&chi;^2^ | \$\Delta \chi^2\$ |
@@ -368,10 +372,15 @@ my_formats@get_tibble |>
 | Exp_CI | {round(ci \* 100)}% CI for Exp(\*B\*) | {round(ci \* 100)}\\ CI for Exp(\$B\$) |
 | Exp_Coefficient | Exp(\*B\*) | Exp(\$B\$) |
 | F | \*F\* | \$F\$ |
+| g_av | \*g\*~av~ | \$g\_{\text{av}}\$ |
+| g_rm | \*g\*~rm~ | \$g\_{\text{rm}}\$ |
+| g_z | \*g\*~z~ | \$g\_{\text{z}}\$ |
 | h2 | \*h\*^2^ | \$h^2\$ |
+| Hedges_g | Hedges' \*g\* | Hedges' \$g\$ |
 | ICC | ICC | ICC |
 | m | \*m\* | \$m\$ |
 | M | \*M\* | \$M\$ |
+| Mdn | \*Mdn\* | \$Mdn\$ |
 | Mean | \*Mean\* | \$Mean\$ |
 | Mean_Square | \*MS\* | \$MS\$ |
 | n | \*n\* | \$n\$ |
@@ -387,10 +396,12 @@ my_formats@get_tibble |>
 | Phi | &Phi; | \$\Phi\$ |
 | Predictor | Variable | Variable |
 | r | \*r\* | \$r\$ |
+| r_rank_biserial | \*r\*~rb~ | \$r\_{\text{rb}}\$ |
 | R2 | \*R\*^2^ | \$R^2\$ |
 | R2_adjusted | adj\*R\*^2^ | \$\text{adj}R^2\$ |
 | R2_conditional | \*R\*^2^~conditional~ | \$R^2\_{\text{conditional}}\$ |
 | R2_marginal | \*R\*^2^~marginal~ | \$R^2\_{\text{marginal}}\$ |
+| rho | &rho; | \$\rho\$ |
 | RMSE | \*RMSE\* | \$RMSE\$ |
 | RMSEA | RMSEA | RMSEA |
 | s | \*s\* | \$s\$ |
@@ -404,7 +415,9 @@ my_formats@get_tibble |>
 | t_df | \*t\*({df}) | \$t\$({df}) |
 | tau | &tau; | \$\tau\$ |
 | u2 | \*u\*^2^ | \$u^2\$ |
+| V | \*V\* | \$V\$ |
 | Variable | Variable | Variable |
+| W | \*W\* | \$W\$ |
 | z | \*z\* | \$z\$ |
 
 The `apa_flextable` function performs a number of formatting operations

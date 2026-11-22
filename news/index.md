@@ -1,6 +1,45 @@
 # Changelog
 
+## apa7 (development version)
+
+- New
+  [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
+  runs *t* tests (Welch’s or Student’s, two-group or one-sample),
+  Wilcoxon rank-sum and signed-rank tests, correlation tests (Pearson,
+  Spearman, or Kendall), and chi-square tests of independence on the
+  variables in a data frame, and makes a table with one row per outcome
+  (e.g., `apa_htest(d, mpg + hp ~ am)`). It shows group means and
+  standard deviations (or medians) under group spanners, the test
+  statistic, *df*, *p*, and an effect size with a two-sided confidence
+  interval: Cohen’s *d* or Hedges’ *g*, the rank-biserial correlation,
+  or Cramér’s *V*, *φ*, or Cohen’s *w*. Effect sizes are computed from
+  the data, so they do not depend on where the function is called, and
+  Cohen’s *d* for Welch’s test is exact rather than approximated from
+  *t*.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  says which tests were done, how *d* was standardized, and what the
+  abbreviations stand for.
+- [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
+  runs paired *t* tests and Wilcoxon signed-rank tests of paired
+  variables with [`Pair()`](https://rdrr.io/r/stats/Pair.html) in the
+  formula (e.g., `apa_htest(d, Pair(pre, post) ~ 1)`, or several pairs
+  joined with `+`). Paired *t* tests show *d*_(av) by default, which is
+  comparable to *d* for independent groups; *d*_(z), *d*_(rm), and
+  Hedges’ *g* versions come from
+  [`effectsize::repeated_measures_d()`](https://easystats.github.io/effectsize/reference/repeated_measures_d.html).
+  New `pair_labels` argument sets the headings above each pair’s
+  descriptive statistics.
+- Table notes are now single-spaced, even when the table is
+  double-spaced. This applies to `apa_flextable(note = TRUE)`,
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md),
+  and footers styled by
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md).
+  `line_spacing` now sets only the spacing of the header and body.
+
 ## apa7 0.2.0 *2026-10-18*
+
+CRAN release: 2026-11-21
 
 - New
   [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)

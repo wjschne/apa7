@@ -11,7 +11,7 @@ edit it or add to it as needed."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">apa7</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,7 @@ edit it or add to it as needed."></head><body>
     <li><a class="dropdown-item" href="../articles/chisquare.html">Contingency Tables</a></li>
     <li><a class="dropdown-item" href="../articles/correlations.html">Correlations</a></li>
     <li><a class="dropdown-item" href="../articles/factor-analysis.html">Factor Analysis Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/htest.html">Hypothesis Tests</a></li>
     <li><a class="dropdown-item" href="../articles/multilevel.html">Multilevel Model Tables</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression Analysis Tables</a></li>
     <li><a class="dropdown-item" href="../articles/summarize.html">Summarize Data</a></li>
@@ -44,7 +45,7 @@ edit it or add to it as needed."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Write a table note</h1>
-      <small class="dont-index">Source: <a href="https://github.com/wjschne/apa7/blob/0.2.0/R/notes.R" class="external-link"><code>R/notes.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/wjschne/apa7/blob/main/R/notes.R" class="external-link"><code>R/notes.R</code></a></small>
       <div class="d-none name"><code>apa_note.Rd</code></div>
     </div>
 
@@ -64,7 +65,7 @@ edit it or add to it as needed.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>a table made by <code><a href="apa_anova.html">apa_anova()</a></code>, <code><a href="apa_parameters.html">apa_parameters()</a></code>, <code><a href="apa_loadings.html">apa_loadings()</a></code>, or <code><a href="apa_factor_cor.html">apa_factor_cor()</a></code></p></dd>
+<dd><p>a table made by <code><a href="apa_anova.html">apa_anova()</a></code>, <code><a href="apa_htest.html">apa_htest()</a></code>, <code><a href="apa_parameters.html">apa_parameters()</a></code>, <code><a href="apa_loadings.html">apa_loadings()</a></code>, or <code><a href="apa_factor_cor.html">apa_factor_cor()</a></code></p></dd>
 
 
 <dt id="arg-collapse">collapse<a class="anchor" aria-label="anchor" href="#arg-collapse"></a></dt>
@@ -92,7 +93,13 @@ rotation are pattern coefficients,</p></li>
 factors are correlated.</p></li>
 </ul><p>For <code><a href="apa_factor_cor.html">apa_factor_cor()</a></code> tables, the note says how the factors were
 extracted and rotated.</p>
-<p>For <code><a href="apa_parameters.html">apa_parameters()</a></code> tables of regression models (<code>lm</code>, <code>glm</code>, <code>polr</code>,
+<p>For <code><a href="apa_htest.html">apa_htest()</a></code> tables, the note can say</p><ul><li><p>which tests were done (e.g., Welch's <em>t</em> tests) and what the groups were
+compared with or the variables were correlated with,</p></li>
+<li><p>that <em>p</em>-values are one-sided, if they are,</p></li>
+<li><p>how Cohen's <em>d</em> (or Hedges' <em>g</em>) was standardized,</p></li>
+<li><p>what the effect size and its confidence interval stand for, and</p></li>
+<li><p>what stars or bold values mean.</p></li>
+</ul><p>For <code><a href="apa_parameters.html">apa_parameters()</a></code> tables of regression models (<code>lm</code>, <code>glm</code>, <code>polr</code>,
 <code>clm</code>, and <code>lme4</code> models, or a list of models), the note can say</p><ul><li><p>which robust standard errors were used (e.g., <code>vcov = "HC3"</code>),</p></li>
 <li><p>how the degrees of freedom of mixed-model <em>t</em> tests were approximated
 (Kenward-Roger or Satterthwaite),</p></li>

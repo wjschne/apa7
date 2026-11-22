@@ -28,6 +28,7 @@ character vector
 ``` r
 apa_p_star_note()
 #> [1] "^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001"
-apa_p_star_note(x = c(.10, .05, .01, .001), first_alpha_marginal = TRUE)
+apa_p_star_note(x = c(0.10, 0.05, 0.01, 0.001),
+                first_alpha_marginal = TRUE)
 #> [1] "^† ^*p* < .1. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001"
 ```

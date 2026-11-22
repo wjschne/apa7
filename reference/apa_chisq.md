@@ -112,7 +112,8 @@ apa_chisq(
 
 - line_spacing:
 
-  spacing between lines
+  spacing between lines of the header and body. Table notes are
+  single-spaced.
 
 - horizontal_padding:
 

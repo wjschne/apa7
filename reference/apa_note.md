@@ -16,6 +16,7 @@ apa_note(x, collapse = " ")
 
   a table made by
   [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md),
+  [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),
   [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md),
   [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md),
   or
@@ -64,6 +65,21 @@ tables, the note can say
 For
 [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
 tables, the note says how the factors were extracted and rotated.
+
+For
+[`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
+tables, the note can say
+
+- which tests were done (e.g., Welch's *t* tests) and what the groups
+  were compared with or the variables were correlated with,
+
+- that *p*-values are one-sided, if they are,
+
+- how Cohen's *d* (or Hedges' *g*) was standardized,
+
+- what the effect size and its confidence interval stand for, and
+
+- what stars or bold values mean.
 
 For
 [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)

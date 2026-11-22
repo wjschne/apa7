@@ -14,6 +14,8 @@ Convert objects to flextables
   APA-formatted correlation table
 - [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
   : Factor correlation table
+- [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
+  : Format hypothesis tests in APA style
 - [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
   : Factor loadings table
 - [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)

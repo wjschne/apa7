@@ -2,7 +2,7 @@
 
 Create American Psychological Association Style, Seventh Edition
 documents. Format numbers and text consistent with APA style. Create
-tables that comply with APA style by extending flextable functions.
+tables that comply with APA style by extending 'flextable' functions.
 
 ## See also
 

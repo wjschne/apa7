@@ -3,6 +3,7 @@
 The tibbles returned by
 [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md),
 [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md),
+[`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),
 [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md),
 [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md),
 [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md),
