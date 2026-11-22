@@ -27,6 +27,9 @@
 #' the sample size and estimator, says that the loadings are standardized, and
 #' says that blank cells are loadings fixed at 0.
 #'
+#' For [apa_descriptives()] tables, the note says which statistics are
+#' shown, lists missing values, and names the tests of group differences.
+#'
 #' For [apa_reliability()] tables, the note gives the number of respondents,
 #' says which items were reverse-scored and how scale scores were computed,
 #' and defines the statistics.
@@ -135,7 +138,7 @@ apa_note <- function(x, collapse = " ") {
   if (is.null(record)) {
     cli::cli_abort(c(
       "{.arg x} has no table note information.",
-      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, and {.fn apa_performance} (for lavaan models).",
+      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, {.fn apa_descriptives}, and {.fn apa_performance} (for lavaan models).",
       i = "The information is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop. Call {.fn apa_note} on the table before changing it."
     ))
   }
@@ -146,6 +149,7 @@ apa_note <- function(x, collapse = " ") {
     loadings = loadings_note_sentences(record),
     factor_cor = factor_cor_note_sentences(record),
     reliability = reliability_note_sentences(record),
+    descriptives = descriptives_note_sentences(record),
     parameters = parameters_note_sentences(record),
     htest = htest_note_sentences(record),
     fit = fit_note_sentences(record),
@@ -755,7 +759,7 @@ note_text <- function(data, note) {
   if (isTRUE(note)) {
     if (is.null(attr(data, "apa_note", exact = TRUE))) {
       cli::cli_abort(c(
-        "{.code note = TRUE} needs a table made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, or {.fn apa_reliability}.",
+        "{.code note = TRUE} needs a table made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, or {.fn apa_descriptives}.",
         i = "The information for the note is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop.",
         i = "To write your own note, pass it as text (e.g., {.code note = \"Data are from ...\"})."
       ))

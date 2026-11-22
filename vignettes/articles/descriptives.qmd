@@ -1,0 +1,105 @@
+---
+title: "Descriptive Statistics Tables"
+format: html
+knitr:
+  opts_chunk:
+    fig-cap-location: top
+filters:
+  - quarto
+  - apanote
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(apa7)
+library(dplyr)
+library(forcats)
+```
+
+```{r}
+#| label: setup2
+#| eval: false
+<<setup>>
+```
+
+The first table of most empirical papers describes the sample. `apa_descriptives` makes this table: for each continuous variable, its mean and standard deviation, *M* (*SD*), and for each categorical variable, the number and percentage of respondents at each level, *n* (%). Numeric variables are treated as continuous, and factors, character vectors, and logical vectors as categorical. Each categorical variable has a heading row, with its levels indented below it.
+
+# The Whole Sample
+
+The `survey` data set in the MASS package has the answers of 237 statistics students to a short questionnaire. Without groups, there is one column for the whole sample:
+
+```{r}
+#| label: survey
+d_survey <- MASS::survey |> 
+  mutate(Exer = fct_recode(Exer, Frequently = "Freq") |> fct_relevel("Frequently", after = Inf),
+         Smoke = fct_recode(Smoke, Occasionally = "Occas", Regularly = "Regul") |> fct_relevel("Heavy", after = Inf))
+
+
+
+apa_descriptives(
+  d_survey,
+  variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
+  labels = c(
+    Height = "Height (cm)",
+    Pulse = "Pulse (beats per minute)",
+    Smoke = "Smoking",
+    Exer = "Exercise"
+  )
+) |>
+  apa_flextable(note = TRUE)
+```
+
+Variables are named by their formatted names unless `labels` gives better ones. Percentages are of the non-missing responses, and the note lists the number of missing values of each variable that has any.
+
+# Groups
+
+With `by`, each group gets a column, with its size in the header, followed by a column for the whole sample (`total = FALSE` leaves it out). Rows whose group is missing are left out, and the note says how many.
+
+```{r}
+#| label: survey-by-sex
+apa_descriptives(
+  d_survey,
+  variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
+  by = "Sex",
+  labels = c(
+    Height = "Height (cm)",
+    Pulse = "Pulse (beats per minute)",
+    Smoke = "Smoking",
+    Exer = "Exercise"
+  )
+) |>
+  apa_flextable(note = TRUE)
+```
+
+# Skewed Variables and Group Differences
+
+Age is strongly skewed in this sample (most students are about 20, a few much older), so its median and interquartile range, *Mdn* (*IQR*), describe it better. `continuous` sets the description of particular variables.
+
+With `test = TRUE`, a *p* column tests the group differences: Welch's *t* test (two groups) or Welch's one-way ANOVA (more groups) for variables described by their mean, the Kruskal–Wallis test for variables described by their median, and the chi-square test of independence for categorical variables. Tests are not shown by default, because many journals discourage testing baseline differences in randomized trials, where any difference is due to chance.
+
+```{r}
+#| label: survey-tests
+apa_descriptives(
+  d_survey,
+  variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
+  by = "Sex",
+  continuous = c(Age = "median_iqr"),
+  test = TRUE,
+  labels = c(
+    Height = "Height (cm)",
+    Pulse = "Pulse (beats per minute)",
+    Smoke = "Smoking",
+    Exer = "Exercise"
+  )
+) |>
+  apa_flextable(note = TRUE)
+```
+
+# Options
+
+* `categorical` treats numeric codes (e.g., 1 = yes, 0 = no) as categories.
+* `digits` and `percent_digits` set the decimal places of the statistics and the percentages.
+* `format_variable_names = FALSE` keeps unlabeled variable names exactly as they are.
+
+For tables with other layouts, see the [article on summarizing data](summarize.html), which builds a table step by step with flextable.

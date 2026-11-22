@@ -88,7 +88,8 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 
 Roughly in order of how often they appear in APA-style papers. `apa_parameters()` and `apa_performance()` have no default method, so other model classes give errors until they are supported. Bayesian models wait until the rest are more or less complete.
 
-- [ ] Descriptive and sample tables ("Table 1"): *M*, *SD*, range, and *n* (%) by group, from `report::report_sample()` or `datawizard::describe_distribution()`
+- [x] Descriptive and sample tables ("Table 1") with `apa_descriptives()`: *M* (*SD*) or *Mdn* (*IQR*) and *n* (%), a column for each group and the total, and optional tests of group differences (computed in apa7 rather than with `report::report_sample()`, so the layout and notes match the other tables)
+  - [ ] Possible additions: ranges (min–max), a missing-values row or column, and Fisher's exact test for sparse tables
 - [ ] Estimated marginal means, contrasts, and simple slopes (post hoc tests, moderation) from `modelbased::estimate_means()`, `estimate_contrasts()`, and `estimate_slopes()`: means with CIs and pairwise differences with adjusted *p*-values
 - [x] Reliability and item analysis with `apa_reliability()`: item *M*, *SD*, *r*~it~, and α if deleted; scale mean, α [CI], *ω*~total~, and mean inter-item *r*. Computed with `psych`, which covers what `performance`'s `cronbachs_alpha()`, `item_reliability()`, `item_difficulty()`, `item_discrimination()`, `item_intercor()`, and `item_omega()` report and adds the CI of α.
 - [ ] Other regression families via `parameters`

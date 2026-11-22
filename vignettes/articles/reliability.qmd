@@ -22,7 +22,7 @@ library(psych)
 <<setup>>
 ```
 
-`apa_reliability` makes one table with the most often reported aspects of a reliability analysis. For each item, it shows:
+`apa_reliability` reports useful aspects of a reliability analysis. For each item, it shows:
 
 * the mean (*M*) and standard deviation (*SD*), which reveal ceiling and floor effects
 * the corrected item–total correlation (*r*~it~), the item's correlation with the sum of the *other* items in its scale. Items with low values (often, below .30) discriminate poorly.
