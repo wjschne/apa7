@@ -6,19 +6,6 @@ d_htest$am <- factor(d_htest$am, labels = c("Automatic", "Manual"))
 d_htest$cyl <- factor(d_htest$cyl)
 d_htest$vs <- factor(d_htest$vs, labels = c("V-shaped", "Straight"))
 
-# Formatted numbers back to numbers (minus signs, padding, leading zeros)
-as_num <- function(x) {
-  x <- gsub(intToUtf8(8722), "-", x, fixed = TRUE)
-  x <- gsub("[^0-9.-]", "", x)
-  as.numeric(x)
-}
-
-ci_bounds <- function(x) {
-  x <- gsub(intToUtf8(8722), "-", x, fixed = TRUE)
-  parts <- strsplit(gsub("[^0-9.,-]", "", x), ",", fixed = TRUE)
-  t(vapply(parts, as.numeric, numeric(2)))
-}
-
 test_that("apa_htest makes Welch's t tests with exact Cohen's d", {
   result <- apa_htest(d_htest, mpg + hp ~ am)
   expect_s3_class(result, "apa7_tbl")

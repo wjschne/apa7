@@ -48,6 +48,7 @@ Suggests:
     fresh,
     ggplot2,
     lme4,
+    lmerTest,
     MASS,
     ordinal,
     pbkrtest,

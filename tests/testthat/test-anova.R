@@ -341,3 +341,80 @@ test_that("apa_note survives dplyr verbs and errors without a record", {
   expect_error(apa_note(mtcars), "no table note information")
   expect_equal(apa_note(apa_parameters(fit)), apa_note(tbl))
 })
+
+# Linear mixed models (lmerTest) ----
+lmer_data <- function() {
+  d <- lme4::sleepstudy
+  d$Group <- factor(rep(c("A", "B"), length.out = 18))[as.integer(d$Subject)]
+  d
+}
+
+test_that("apa_anova() gives F tests of lmer fixed effects with Kenward-Roger df", {
+  skip_if_not_installed("lmerTest")
+  skip_if_not_installed("pbkrtest")
+  fit <- lme4::lmer(Reaction ~ Days * Group + (Days | Subject), data = lmer_data())
+  result <- apa_anova(fit)
+  expect_equal(
+    colnames(result),
+    c("Effect", "*df*~effect~", "*df*~error~", "*F*", "*p*")
+  )
+  expect_equal(result$Effect, c("Days", "Group", "Days × Group"))
+  tab <- anova(lmerTest::as_lmerModLmerTest(fit), ddf = "Kenward-Roger")
+  expect_equal(as_num(result$`*F*`), round(tab$`F value`, 2))
+  expect_equal(as_num(result$`*df*~error~`), round(tab$DenDF, 2))
+  note <- apa_note(result)
+  expect_match(note, "*F* tests of fixed effects are Type III.", fixed = TRUE)
+  expect_match(note, "Kenward–Roger approximations", fixed = TRUE)
+  # No effect size unless asked for
+  expect_no_match(note, "eta", fixed = TRUE)
+})
+
+test_that("apa_anova() offers Satterthwaite df, other types, and effect sizes from F", {
+  skip_if_not_installed("lmerTest")
+  fit <- lmerTest::lmer(Reaction ~ Days * Group + (Days | Subject), data = lmer_data())
+  result <- apa_anova(
+    fit,
+    ddf = "Satterthwaite",
+    type = 2,
+    effect_size = "eta",
+    anova_parameters = c("Parameter", "df", "df_error", "F", "p", "Effect_Size", "CI")
+  )
+  tab <- anova(fit, ddf = "Satterthwaite", type = 2)
+  es <- effectsize::F_to_eta2(
+    tab$`F value`, tab$NumDF, tab$DenDF, alternative = "two.sided"
+  )
+  expect_true("*&eta;*^2^~p~" %in% colnames(result))
+  expect_equal(
+    as_num(result$`*&eta;*^2^~p~`),
+    round(es$Eta2_partial, 2)
+  )
+  expect_true("95% CI" %in% colnames(result))
+  note <- apa_note(result)
+  expect_match(note, "Type II.", fixed = TRUE)
+  expect_match(note, "Satterthwaite approximations", fixed = TRUE)
+  expect_match(note, "computed from *F* and its degrees of freedom", fixed = TRUE)
+
+  expect_error(apa_anova(fit, effect_size = "eta", generalized = TRUE), "Generalized")
+  expect_error(apa_anova(fit, effect_size = "eta", partial = FALSE), "partial")
+})
+
+test_that("apa_anova() formats lmerTest ANOVA tables", {
+  skip_if_not_installed("lmerTest")
+  fit <- lmerTest::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
+  result <- apa_anova(anova(fit))
+  expect_equal(
+    colnames(result),
+    c("Effect", "*df*~effect~", "*df*~error~", "*F*", "*p*")
+  )
+  expect_match(apa_note(result), "Satterthwaite approximations", fixed = TRUE)
+})
+
+test_that("apa_anova() rejects generalized linear mixed models", {
+  skip_if_not_installed("lmerTest")
+  fit <- lme4::glmer(
+    cbind(incidence, size - incidence) ~ period + (1 | herd),
+    data = lme4::cbpp,
+    family = binomial
+  )
+  expect_error(apa_anova(fit), "apa_parameters")
+})

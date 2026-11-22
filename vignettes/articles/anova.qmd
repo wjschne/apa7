@@ -26,7 +26,7 @@ library(car)
 
 The `apa_anova` function makes APA-style analysis of variance (ANOVA) source tables. Like `apa_parameters`, it relies on the [easystats](https://easystats.github.io/easystats/) packages to do the computing: `parameters::model_parameters` gets the sums of squares, *F* tests, and *p*-values, and the effectsize package computes effect sizes and their confidence intervals. The workflow is the same as for regression tables:
 
-1. Fit a model with `aov`, `lm`, or one of the `afex` functions (`aov_car`, `aov_ez`, or `aov_4`).
+1. Fit a model with `aov`, `lm`, one of the `afex` functions (`aov_car`, `aov_ez`, or `aov_4`), or `lme4::lmer`.
 2. `apa_anova` converts the fit object into a tibble.
 3. In Quarto and R Markdown documents, the tibble is displayed as an APA-style table automatically. Pass it to `apa_flextable` to customize the table or save it.
 
@@ -37,7 +37,8 @@ The `apa_anova` function makes APA-style analysis of variance (ANOVA) source tab
 | Between-subjects models | `aov(y ~ a * b, data)`, `lm(y ~ a * b, data)` |
 | Repeated-measures models with error strata | `aov(y ~ a * b + Error(id / b), data)` |
 | `afex` models | `afex::aov_ez("id", "y", data, between = "a", within = "b")` |
-| ANOVA tables | `anova(fit)`, `car::Anova(fit, type = 2)` |
+| Linear mixed models | `lme4::lmer(y ~ a * b + (1 | id), data)`, `lmerTest::lmer(...)` |
+| ANOVA tables | `anova(fit)`, `car::Anova(fit, type = 2)`, `anova(lmerTest_fit)` |
 
 # Between-Subjects Designs
 
@@ -265,6 +266,49 @@ apa_anova(
 
 The sphericity correction is set when the model is fit or printed in afex (e.g., `afex_options(correction_aov = "none")`).
 
+## Linear mixed models
+
+Repeated-measures ANOVAs need complete data from every participant, and they average over repeated measurements within each cell. Linear mixed models fit with `lme4::lmer` have neither requirement. Here the same O'Brien and Kaiser data are analyzed without averaging the five measurements within each phase, with a random intercept for each participant:
+
+```{r}
+#| label: obk-lmer
+d_obk_trials <- obk.long |>
+  mutate(phase = factor(phase, levels = c("pre", "post", "fup"))) |>
+  rename(Treatment = treatment, Phase = phase)
+
+fit_obk_lmer <- lme4::lmer(
+  value ~ Treatment * Phase + (1 | id),
+  data = d_obk_trials
+)
+apa_anova(fit_obk_lmer)
+```
+
+The *F* tests come from the [lmerTest](https://cran.r-project.org/package=lmerTest) package, which must be installed. Models fit with `lme4::lmer` are converted for lmerTest automatically, and models fit with `lmerTest::lmer` are used as they are. Mixed models have no simple error terms, so each test's denominator degrees of freedom (*df*~error~) are approximated. By default, the approximation is Kenward–Roger's (which requires the pbkrtest package), as in `apa_parameters`, so tables of the same model's *F* tests and coefficients use the same approximation. Satterthwaite's approximation, lmerTest's default, is faster for large data sets:
+
+```{r}
+#| label: obk-lmer-satterthwaite
+tbl_obk_lmer <- apa_anova(fit_obk_lmer, ddf = "Satterthwaite")
+apa_note(tbl_obk_lmer)
+```
+
+Tests are Type 3 by default, as in lmerTest. lmerTest's Type 3 tests do not depend on how factors are coded, so sum-to-zero contrasts are not needed. Use `type = 2` or `type = 1` for other types.
+
+Sums of squares and effect sizes have no agreed-upon definitions in mixed models, so they are not shown by default. When a partial effect size is requested, it is computed from *F* and its degrees of freedom (e.g., `effectsize::F_to_eta2`), and the note says that it only approximates the effect size:
+
+```{r}
+#| label: obk-lmer-eta
+apa_anova(
+  fit_obk_lmer,
+  effect_size = "eta",
+  anova_parameters = c(
+    "Parameter", "df", "df_error", "F", "p", "Effect_Size", "CI"
+  )
+) |>
+  apa_flextable(note = TRUE)
+```
+
+ANOVA tables made by lmerTest's `anova` function are displayed the same way, with the type of tests and the degrees-of-freedom method read from the table (e.g., `apa_anova(anova(lmerTest_fit, type = 2))`). Generalized linear mixed models (`lme4::glmer`) have no *F* tests. Use `apa_parameters` for them, as described in the [multilevel article](multilevel.html).
+
 # Customizing ANOVA Tables
 
 ## Notes
@@ -323,7 +367,7 @@ apa_anova(fit_tooth) |>
 
 ## Using `apa_parameters`
 
-`apa_parameters` returns the same table for `aov` and afex models, so `apa_parameters(fit)` and `apa_anova(fit)` are interchangeable for these models. To display the regression coefficients of an ANOVA model, fit it with `lm` and use `apa_parameters`.
+`apa_parameters` returns the same table for `aov` and afex models, so `apa_parameters(fit)` and `apa_anova(fit)` are interchangeable for these models. To display the regression coefficients of an ANOVA model, fit it with `lm` and use `apa_parameters`. For linear mixed models, the two functions show different things: `apa_anova` tests each effect as a whole, and `apa_parameters` shows the fixed-effect coefficients and the random effects.
 
 # References
 

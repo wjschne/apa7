@@ -162,13 +162,19 @@ anova_note_record <- function(
   starred = FALSE,
   bolded = FALSE,
   correction = NULL,
-  corrected_factors = character(0)
+  corrected_factors = character(0),
+  mixed = FALSE,
+  df_method = NA,
+  effect_size_header = NULL
 ) {
   list(
     table = "anova",
     ss_type = ss_type,
     correction = correction,
     corrected_factors = corrected_factors,
+    mixed = mixed,
+    df_method = df_method,
+    effect_size_header = effect_size_header,
     abbreviations = abbreviations,
     starred = starred,
     bolded = bolded
@@ -235,8 +241,17 @@ abbreviation_sentence <- function(abbreviations) {
 anova_note_sentences <- function(record) {
   sentences <- character(0)
 
-  # Sums of squares
-  if (!is.null(record$ss_type) && !is.na(record$ss_type)) {
+  # Sums of squares (mixed models: type of tests)
+  if (isTRUE(record$mixed) && !is.null(record$ss_type) && !is.na(record$ss_type)) {
+    sentences <- c(
+      sentences,
+      paste0(
+        "*F* tests of fixed effects are Type ",
+        c("I", "II", "III")[record$ss_type],
+        "."
+      )
+    )
+  } else if (!is.null(record$ss_type) && !is.na(record$ss_type)) {
     sentences <- c(
       sentences,
       switch(
@@ -244,6 +259,31 @@ anova_note_sentences <- function(record) {
         `1` = "Sums of squares are sequential (Type I).",
         `2` = "Type II sums of squares.",
         `3` = "Type III sums of squares."
+      )
+    )
+  }
+
+  # Denominator degrees of freedom of mixed models
+  if (isTRUE(record$mixed) && isTRUE(record$df_method %in% c("kenward", "satterthwaite"))) {
+    sentences <- c(
+      sentences,
+      paste0(
+        "Denominator degrees of freedom are ",
+        switch(
+          record$df_method,
+          kenward = paste0("Kenward", intToUtf8(8211), "Roger"),
+          satterthwaite = "Satterthwaite"
+        ),
+        " approximations."
+      )
+    )
+  }
+  if (isTRUE(record$mixed) && !is.null(record$effect_size_header)) {
+    sentences <- c(
+      sentences,
+      paste0(
+        record$effect_size_header,
+        " is computed from *F* and its degrees of freedom, which only approximates it in mixed models."
       )
     )
   }

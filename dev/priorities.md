@@ -37,7 +37,7 @@ Last reviewed: 2026-11-20
 - [x] `anova(m1, m2)` model comparison objects: give an error pointing to `apa_performance_comparison()`
 - [x] Tests (`tests/testthat/test-anova.R`)
 - [x] Vignette article (`vignettes/articles/anova.qmd`)
-- [ ] `lmerTest` ANOVA tables for mixed models (F tests with Satterthwaite/Kenward-Roger df)
+- [x] `lmerTest` ANOVA tables for mixed models (F tests with Kenward-Roger (default) or Satterthwaite df; Type III by default; partial effect sizes from *F* only on request)
 - [x] Table note helper: type of SS and sphericity correction (e.g., "Greenhouse–Geisser corrected"). See **Table notes** below.
 - [ ] Revisit generalized η² CIs if `effectsize` fixes them (they can now exclude the point estimate, so they're hidden)
 

@@ -2,12 +2,12 @@
 #'
 #' Makes an analysis of variance source table with sums of squares, degrees of freedom, mean squares, *F* tests, *p*-values, and effect sizes. Values come from [parameters::model_parameters()], and effect sizes come from the `effectsize` package (e.g., [effectsize::eta_squared()]).
 #'
-#' @param fit an `aov` or `lm` model, a repeated-measures `aov` model with an `Error()` term (class `aovlist`), an `afex` model (class `afex_aov`), or an ANOVA table from [stats::anova()] or `car::Anova()`.
+#' @param fit an `aov` or `lm` model, a repeated-measures `aov` model with an `Error()` term (class `aovlist`), an `afex` model (class `afex_aov`), a linear mixed model from `lme4::lmer()` or `lmerTest::lmer()`, or an ANOVA table from [stats::anova()], `car::Anova()`, or lmerTest's `anova()`.
 #' @param anova_parameters columns to display. `"Effect_Size"` stands for whichever effect size `effect_size`, `partial`, and `generalized` select, and `"CI"` adds its confidence interval as \[*LL*, *UL*\]. Columns not in the ANOVA table are silently dropped.
 #' @param effect_size effect size to display: `"eta"` (\eqn{\eta^2}{eta^2}, default), `"omega"` (\eqn{\omega^2}{omega^2}), or `"epsilon"` (\eqn{\epsilon^2}{epsilon^2}). If `NULL`, no effect size is computed.
 #' @param partial if `TRUE` (default), partial effect sizes (e.g., \eqn{\eta^2_p}{eta^2_p}) are displayed. For one-way designs, partial and non-partial effect sizes are the same.
 #' @param generalized if `TRUE`, generalized \eqn{\eta^2}{eta^2} (\eqn{\eta^2_G}{eta^2_G}) is displayed instead, which is comparable across between- and within-subjects designs. Only for `effect_size = "eta"`.
-#' @param type type of sums of squares for `aov` and `lm` models: `1` (sequential, default, as in [stats::anova()]), `2`, or `3`. Types 2 and 3 are computed with `car::Anova()`. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., `contr.sum`) and covariates are centered. Ignored for ANOVA tables, which already have a type.
+#' @param type type of sums of squares for `aov` and `lm` models: `1` (sequential, default, as in [stats::anova()]), `2`, or `3`. Types 2 and 3 are computed with `car::Anova()`. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., `contr.sum`) and covariates are centered. For linear mixed models, the type of hypothesis tests: `3` (default, as in lmerTest), `2`, or `1`. Ignored for ANOVA tables, which already have a type.
 #' @param ci confidence level for the effect size interval, shown if `anova_parameters` includes `"CI"`. Intervals are two-sided, so a 90% interval excludes 0 when the *F* test is significant at \eqn{\alpha}{alpha} = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized \eqn{\eta^2}{eta^2}, because those computed by `effectsize` can exclude the point estimate.
 #' @param residual_label label for residual (error) rows
 #' @param starred columns to star with significant *p*-values (e.g., `"F"`)
@@ -215,6 +215,28 @@ apa_anova.anova <- function(
   if (!is.null(type)) {
     warning("`type` is ignored for ANOVA tables, which already have a type of sums of squares.")
   }
+  # lmerTest tables of linear mixed models
+  if (all(c("NumDF", "DenDF") %in% colnames(fit))) {
+    if (missing(anova_parameters)) {
+      anova_parameters <- mixed_anova_parameters
+    }
+    if (missing(effect_size)) {
+      effect_size <- NULL
+    }
+    return(apa_anova_mixed(
+      fit,
+      anova_parameters = anova_parameters,
+      effect_size = effect_size,
+      partial = partial,
+      generalized = generalized,
+      ci = ci,
+      starred = starred,
+      bolded = bolded,
+      column_formats = column_formats,
+      ss_type = anova_heading_type(fit),
+      df_method = mixed_df_method(fit)
+    ))
+  }
   apa_anova_table(
     fit,
     anova_parameters = anova_parameters,
@@ -402,6 +424,210 @@ afex_corrected_factors <- function(fit, formatter) {
   formatter(factors)
 }
 
+#' @details
+#' For linear mixed models fit with `lme4::lmer()` or `lmerTest::lmer()`, *F* tests of the fixed effects come from the lmerTest package, which approximates the denominator degrees of freedom with Kenward-Roger's method (default, as in [apa_parameters()], which requires the pbkrtest package) or Satterthwaite's method (`ddf = "Satterthwaite"`). Tests are Type III by default, as in lmerTest, whose Type III tests do not depend on how factors are coded. The table shows each effect's degrees of freedom (*df*~effect~, *df*~error~), *F*, and *p*. Sums of squares and effect sizes have no agreed-upon definition in mixed models, so they are not shown by default. With `effect_size = "eta"` (or `"omega"` or `"epsilon"`), partial effect sizes are computed from *F* and its degrees of freedom (e.g., [effectsize::F_to_eta2()]), which only approximates them. ANOVA tables made by lmerTest's `anova()` are displayed the same way. Generalized linear mixed models (`lme4::glmer()`) have no *F* tests; use [apa_parameters()] for them.
+#' @param ddf for linear mixed models, method of approximating the denominator degrees of freedom: `"Kenward-Roger"` (default) or `"Satterthwaite"`
+#' @export
+#' @rdname apa_anova
+#' @examples
+#' if (requireNamespace("lmerTest", quietly = TRUE) &&
+#'   requireNamespace("pbkrtest", quietly = TRUE)) {
+#'   fit_lmer <- lme4::lmer(
+#'     Reaction ~ Days + (Days | Subject),
+#'     data = lme4::sleepstudy
+#'   )
+#'   apa_anova(fit_lmer)
+#' }
+apa_anova.merMod <- function(
+  fit,
+  anova_parameters = mixed_anova_parameters,
+  effect_size = NULL,
+  partial = TRUE,
+  generalized = FALSE,
+  type = NULL,
+  ci = 0.95,
+  residual_label = "Error",
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  ddf = c("Kenward-Roger", "Satterthwaite"),
+  ...
+) {
+  if (inherits(fit, "glmerMod")) {
+    stop(
+      "apa_anova() makes tables of F tests for linear mixed models. ",
+      "For generalized linear mixed models, use apa_parameters()."
+    )
+  }
+  if (!requireNamespace("lmerTest", quietly = TRUE)) {
+    stop("F tests for mixed models require the lmerTest package. Install it with install.packages(\"lmerTest\").") # nocov
+  }
+  ddf <- match.arg(ddf)
+  if (ddf == "Kenward-Roger" && !requireNamespace("pbkrtest", quietly = TRUE)) {
+    stop("Kenward-Roger degrees of freedom require the pbkrtest package. Install it with install.packages(\"pbkrtest\"), or use ddf = \"Satterthwaite\".") # nocov
+  }
+  type <- if (is.null(type)) 3L else anova_ss_type(type)
+  if (!inherits(fit, "lmerModLmerTest")) {
+    fit <- lmerTest::as_lmerModLmerTest(fit)
+  }
+  tab <- stats::anova(fit, type = type, ddf = ddf)
+
+  apa_anova_mixed(
+    tab,
+    anova_parameters = anova_parameters,
+    effect_size = effect_size,
+    partial = partial,
+    generalized = generalized,
+    ci = ci,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    ss_type = type,
+    df_method = mixed_df_method(tab)
+  )
+}
+
+#' Columns of mixed-model ANOVA tables
+#' @keywords internal
+#' @noRd
+mixed_anova_parameters <- c(
+  "Parameter",
+  "df",
+  "df_error",
+  "F",
+  "p",
+  "Effect_Size"
+)
+
+#' Denominator df method named in the heading of an lmerTest ANOVA table
+#' @keywords internal
+#' @noRd
+mixed_df_method <- function(tab) {
+  heading <- paste(attr(tab, "heading", exact = TRUE), collapse = " ")
+  if (grepl("Kenward", heading, fixed = TRUE)) {
+    return("kenward")
+  }
+  if (grepl("Satterthwaite", heading, fixed = TRUE)) {
+    return("satterthwaite")
+  }
+  NA_character_
+}
+
+#' ANOVA table of a linear mixed model from an lmerTest ANOVA table
+#' @keywords internal
+#' @noRd
+apa_anova_mixed <- function(
+  tab,
+  anova_parameters,
+  effect_size,
+  partial,
+  generalized,
+  ci,
+  starred,
+  bolded,
+  column_formats,
+  ss_type = NA,
+  df_method = NA
+) {
+  if (is.null(column_formats)) {
+    column_formats <- the$column_formats
+  }
+  names(anova_parameters) <- NULL
+
+  if (!is.null(effect_size)) {
+    effect_size <- match.arg(effect_size, c("eta", "omega", "epsilon"))
+    if (isTRUE(generalized)) {
+      stop("Generalized effect sizes are not available for mixed models.")
+    }
+    if (!isTRUE(partial)) {
+      stop("Only partial effect sizes are available for mixed models.")
+    }
+  }
+  column_formats <- es_ci_format(column_formats)
+  show_ci <- "CI" %in% anova_parameters && !is.null(effect_size)
+
+  d <- tibble::tibble(
+    Parameter = rownames(tab),
+    Sum_Squares = tab[["Sum Sq"]],
+    Mean_Square = tab[["Mean Sq"]],
+    df = tab[["NumDF"]],
+    df_error = tab[["DenDF"]],
+    F = tab[["F value"]],
+    p = tab[["Pr(>F)"]]
+  )
+
+  # Partial effect sizes from F and its degrees of freedom
+  es_col <- NA_character_
+  if (!is.null(effect_size)) {
+    es_fun <- switch(
+      effect_size,
+      eta = effectsize::F_to_eta2,
+      omega = effectsize::F_to_omega2,
+      epsilon = effectsize::F_to_epsilon2
+    )
+    d_es <- es_fun(
+      d$F,
+      d$df,
+      d$df_error,
+      ci = if (show_ci) ci else NULL,
+      alternative = "two.sided"
+    ) |>
+      tibble::as_tibble()
+    es_col <- intersect(colnames(d_es), anova_es_columns)[1]
+    d[[es_col]] <- d_es[[es_col]]
+    if (show_ci && all(c("CI_low", "CI_high") %in% colnames(d_es))) {
+      d$CI_low <- d_es$CI_low
+      d$CI_high <- d_es$CI_high
+      d$CI <- ci
+    }
+  }
+  if (is.na(es_col)) {
+    anova_parameters <- setdiff(anova_parameters, c("Effect_Size", "CI"))
+  } else {
+    anova_parameters[anova_parameters == "Effect_Size"] <- es_col
+    if (!("CI_low" %in% colnames(d))) {
+      anova_parameters <- setdiff(anova_parameters, "CI")
+    }
+  }
+
+  d$Parameter <- gsub(":", " \u00D7 ", d$Parameter, fixed = TRUE)
+
+  # Each effect has its own denominator degrees of freedom
+  if (column_formats$Parameter@header == "Variable") {
+    column_formats$Parameter@header <- "Effect"
+    column_formats$Parameter@latex <- "Effect"
+  }
+  if (!is.null(column_formats$df)) {
+    column_formats$df@header <- "*df*~effect~"
+    column_formats$df@latex <- "$df_{\\text{effect}}$"
+  }
+  if (!is.null(column_formats$df_error)) {
+    column_formats$df_error@header <- "*df*~error~"
+    column_formats$df_error@latex <- "$df_{\\text{error}}$"
+  }
+
+  d_new <- format_apa_parameters(
+    d,
+    predictor_parameters = anova_parameters,
+    starred = starred,
+    bolded = bolded,
+    column_formats = column_formats,
+    t_with_df = FALSE
+  )
+
+  attr(d_new, "apa_note") <- anova_note_record(
+    ss_type = ss_type,
+    abbreviations = attr(d_new, "apa_note", exact = TRUE)$abbreviations,
+    starred = anova_marked(starred, anova_parameters),
+    bolded = anova_marked(bolded, anova_parameters),
+    mixed = TRUE,
+    df_method = df_method,
+    effect_size_header = if (is.na(es_col)) NULL else column_formats[[es_col]]@header
+  )
+
+  as_apa7_tbl(d_new)
+}
+
 #' @export
 #' @rdname apa_anova
 apa_anova.default <- function(fit, ...) {
@@ -409,7 +635,8 @@ apa_anova.default <- function(fit, ...) {
     "apa_anova() does not support objects of class ",
     paste0("\"", class(fit), "\"", collapse = ", "),
     ". Supported objects are aov and lm models, repeated-measures aov models, ",
-    "afex models, and ANOVA tables from stats::anova() or car::Anova()."
+    "afex models, linear mixed models (lme4 and lmerTest), and ANOVA tables ",
+    "from stats::anova(), car::Anova(), or lmerTest."
   )
 }
 

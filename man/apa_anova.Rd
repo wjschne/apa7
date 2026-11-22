@@ -6,6 +6,7 @@
 \alias{apa_anova.aovlist}
 \alias{apa_anova.anova}
 \alias{apa_anova.afex_aov}
+\alias{apa_anova.merMod}
 \alias{apa_anova.default}
 \title{Format ANOVA tables in APA style}
 \usage{
@@ -89,10 +90,26 @@ apa_anova(
   ...
 )
 
+\method{apa_anova}{merMod}(
+  fit,
+  anova_parameters = mixed_anova_parameters,
+  effect_size = NULL,
+  partial = TRUE,
+  generalized = FALSE,
+  type = NULL,
+  ci = 0.95,
+  residual_label = "Error",
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  ddf = c("Kenward-Roger", "Satterthwaite"),
+  ...
+)
+
 \method{apa_anova}{default}(fit, ...)
 }
 \arguments{
-\item{fit}{an \code{aov} or \code{lm} model, a repeated-measures \code{aov} model with an \code{Error()} term (class \code{aovlist}), an \code{afex} model (class \code{afex_aov}), or an ANOVA table from \code{\link[stats:anova]{stats::anova()}} or \code{car::Anova()}.}
+\item{fit}{an \code{aov} or \code{lm} model, a repeated-measures \code{aov} model with an \code{Error()} term (class \code{aovlist}), an \code{afex} model (class \code{afex_aov}), a linear mixed model from \code{lme4::lmer()} or \code{lmerTest::lmer()}, or an ANOVA table from \code{\link[stats:anova]{stats::anova()}}, \code{car::Anova()}, or lmerTest's \code{anova()}.}
 
 \item{anova_parameters}{columns to display. \code{"Effect_Size"} stands for whichever effect size \code{effect_size}, \code{partial}, and \code{generalized} select, and \code{"CI"} adds its confidence interval as [\emph{LL}, \emph{UL}]. Columns not in the ANOVA table are silently dropped.}
 
@@ -102,7 +119,7 @@ apa_anova(
 
 \item{generalized}{if \code{TRUE}, generalized \eqn{\eta^2}{eta^2} (\eqn{\eta^2_G}{eta^2_G}) is displayed instead, which is comparable across between- and within-subjects designs. Only for \code{effect_size = "eta"}.}
 
-\item{type}{type of sums of squares for \code{aov} and \code{lm} models: \code{1} (sequential, default, as in \code{\link[stats:anova]{stats::anova()}}), \code{2}, or \code{3}. Types 2 and 3 are computed with \code{car::Anova()}. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., \code{contr.sum}) and covariates are centered. Ignored for ANOVA tables, which already have a type.}
+\item{type}{type of sums of squares for \code{aov} and \code{lm} models: \code{1} (sequential, default, as in \code{\link[stats:anova]{stats::anova()}}), \code{2}, or \code{3}. Types 2 and 3 are computed with \code{car::Anova()}. Type 3 tests are interpretable only when factors have sum-to-zero contrasts (e.g., \code{contr.sum}) and covariates are centered. For linear mixed models, the type of hypothesis tests: \code{3} (default, as in lmerTest), \code{2}, or \code{1}. Ignored for ANOVA tables, which already have a type.}
 
 \item{ci}{confidence level for the effect size interval, shown if \code{anova_parameters} includes \code{"CI"}. Intervals are two-sided, so a 90\% interval excludes 0 when the \emph{F} test is significant at \eqn{\alpha}{alpha} = .05, and its lower bound is 0 otherwise. Intervals are not shown for generalized \eqn{\eta^2}{eta^2}, because those computed by \code{effectsize} can exclude the point estimate.}
 
@@ -115,6 +132,8 @@ apa_anova(
 \item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 
 \item{...}{further arguments passed to \code{\link[parameters:model_parameters]{parameters::model_parameters()}}}
+
+\item{ddf}{for linear mixed models, method of approximating the denominator degrees of freedom: \code{"Kenward-Roger"} (default) or \code{"Satterthwaite"}}
 }
 \value{
 \code{apa7_tbl} (tibble)
@@ -128,6 +147,8 @@ For repeated-measures models fit with \code{aov(y ~ a * b + Error(id / b))}, eac
 Model comparisons (e.g., \code{anova(m1, m2)}) are not ANOVA source tables. Use \code{\link[=apa_performance_comparison]{apa_performance_comparison()}} for them.
 
 For \code{afex} models (\code{afex::aov_car()}, \code{afex::aov_ez()}, \code{afex::aov_4()}), each effect has its own error term, so the table shows each effect's degrees of freedom (\emph{df}~effect~, \emph{df}~error~), mean squared error (\emph{MSE}), \emph{F}, \emph{p}, and effect size, as in \code{afex}'s own \code{nice()} tables. Degrees of freedom and \emph{p}-values reflect the sphericity correction set in \code{afex} (Greenhouse-Geisser by default), and generalized \eqn{\eta^2}{eta^2} is the default effect size, as in \code{afex}.
+
+For linear mixed models fit with \code{lme4::lmer()} or \code{lmerTest::lmer()}, \emph{F} tests of the fixed effects come from the lmerTest package, which approximates the denominator degrees of freedom with Kenward-Roger's method (default, as in \code{\link[=apa_parameters]{apa_parameters()}}, which requires the pbkrtest package) or Satterthwaite's method (\code{ddf = "Satterthwaite"}). Tests are Type III by default, as in lmerTest, whose Type III tests do not depend on how factors are coded. The table shows each effect's degrees of freedom (\emph{df}~effect~, \emph{df}~error~), \emph{F}, and \emph{p}. Sums of squares and effect sizes have no agreed-upon definition in mixed models, so they are not shown by default. With \code{effect_size = "eta"} (or \code{"omega"} or \code{"epsilon"}), partial effect sizes are computed from \emph{F} and its degrees of freedom (e.g., \code{\link[effectsize:F_to_eta2]{effectsize::F_to_eta2()}}), which only approximates them. ANOVA tables made by lmerTest's \code{anova()} are displayed the same way. Generalized linear mixed models (\code{lme4::glmer()}) have no \emph{F} tests; use \code{\link[=apa_parameters]{apa_parameters()}} for them.
 }
 \examples{
 d <- mtcars
@@ -158,5 +179,13 @@ if (requireNamespace("afex", quietly = TRUE)) {
     between = "treatment", within = "phase", fun_aggregate = mean
   )
   apa_anova(fit_afex)
+}
+if (requireNamespace("lmerTest", quietly = TRUE) &&
+  requireNamespace("pbkrtest", quietly = TRUE)) {
+  fit_lmer <- lme4::lmer(
+    Reaction ~ Days + (Days | Subject),
+    data = lme4::sleepstudy
+  )
+  apa_anova(fit_lmer)
 }
 }
