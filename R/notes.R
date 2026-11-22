@@ -126,7 +126,7 @@ apa_note <- function(x, collapse = " ") {
   if (is.null(record)) {
     cli::cli_abort(c(
       "{.arg x} has no table note information.",
-      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, and {.fn apa_factor_cor}.",
+      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, and {.fn apa_performance} (for lavaan models).",
       i = "The information is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop. Call {.fn apa_note} on the table before changing it."
     ))
   }
@@ -138,6 +138,8 @@ apa_note <- function(x, collapse = " ") {
     factor_cor = fa_method_sentence(record),
     parameters = parameters_note_sentences(record),
     htest = htest_note_sentences(record),
+    fit = fit_note_sentences(record),
+    sem = sem_note_sentences(record),
     cli::cli_abort("Unknown table type {.val {record$table}}.") # nocov
   )
 

@@ -1588,6 +1588,20 @@ the$columns <- list(
     formatter = the$trim_leading_zero,
     abbreviation = "root mean square error of approximation"
   ),
+  SRMR = column_format(
+    name = "SRMR",
+    header = "SRMR",
+    latex = "SRMR",
+    formatter = the$trim_leading_zero,
+    abbreviation = "standardized root mean square residual"
+  ),
+  TLI = column_format(
+    name = "TLI",
+    header = "TLI",
+    latex = "TLI",
+    formatter = the$trim_leading_zero,
+    abbreviation = "Tucker\u2013Lewis index"
+  ),
   s = column_format(
     name = "s",
     header = "*s*",

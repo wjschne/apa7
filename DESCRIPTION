@@ -48,6 +48,7 @@ Suggests:
     fresh,
     ggplot2,
     glmmTMB,
+    lavaan,
     lme4,
     lmerTest,
     MASS,

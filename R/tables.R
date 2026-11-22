@@ -2606,26 +2606,37 @@ apa_performance.list <- function(
 ) {
   Model <- NULL
   names(fit) <- model_names(fit)
-  d <- purrr::map_df(
+  tables <- purrr::map(
     fit,
     \(f1) {
       args <- list(f1, column_formats = column_formats)
       if (!is.null(metrics)) {
         args$metrics <- metrics
       }
-      tibble::as_tibble(do.call(apa_performance, args))
-    },
-    .id = "Model"
+      do.call(apa_performance, args)
+    }
   )
+  records <- purrr::map(tables, \(x) attr(x, "apa_note", exact = TRUE))
+  d <- purrr::map(tables, tibble::as_tibble) |>
+    dplyr::bind_rows(.id = "Model")
+
   # Each model was aligned separately; re-align values across models
-  d |>
+  value_columns <- setdiff(colnames(d), "Model")
+  ci_columns <- value_columns[purrr::map_lgl(d[value_columns], is_ci_md)]
+  d <- d |>
     dplyr::mutate(
+      dplyr::across(dplyr::all_of(ci_columns), realign_ci),
       dplyr::across(
-        !dplyr::all_of("Model") & dplyr::where(is.character),
+        dplyr::all_of(setdiff(value_columns, ci_columns)) & dplyr::where(is.character),
         align_chr
       )
-    ) |>
-    as_apa7_tbl()
+    )
+
+  # Fit-index tables of lavaan models keep their note
+  if (length(records) > 0 && all(purrr::map_lgl(records, \(r) identical(r$table, "fit")))) {
+    attr(d, "apa_note") <- merge_fit_note_records(records)
+  }
+  as_apa7_tbl(d)
 }
 
 #' Use a pseudo-R2 as the R2 column
