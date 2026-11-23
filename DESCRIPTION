@@ -54,6 +54,8 @@ Suggests:
     lme4,
     lmerTest,
     marginaleffects,
+    metadat,
+    metafor,
     MASS,
     modelbased,
     nlme,

@@ -88,6 +88,7 @@ models,
 models,
 \item the reference category of multinomial models (\code{nnet::multinom}),
 \item the count distribution and the meaning of the zero model of zero-inflated and hurdle models (\code{pscl}),
+\item the effect-size measure and model of meta-analyses (\code{metafor::rma}) and, for tables of studies, the test of the pooled estimate, its prediction interval, and the test of heterogeneity,
 \item what the standardized coefficient (\eqn{\beta}{beta}), exponentiated coefficient
 (e.g., \emph{OR}), confidence interval, and model-comparison (e.g.,
 \eqn{\Delta R^2}{Delta R^2}) columns stand for, and

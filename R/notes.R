@@ -69,6 +69,7 @@
 #'   models,
 #' * the reference category of multinomial models (`nnet::multinom`),
 #' * the count distribution and the meaning of the zero model of zero-inflated and hurdle models (`pscl`),
+#' * the effect-size measure and model of meta-analyses (`metafor::rma`) and, for tables of studies, the test of the pooled estimate, its prediction interval, and the test of heterogeneity,
 #' * what the standardized coefficient (\eqn{\beta}{beta}), exponentiated coefficient
 #'   (e.g., *OR*), confidence interval, and model-comparison (e.g.,
 #'   \eqn{\Delta R^2}{Delta R^2}) columns stand for, and
@@ -161,6 +162,8 @@ apa_note <- function(x, collapse = " ") {
     factor_cor = factor_cor_note_sentences(record),
     reliability = reliability_note_sentences(record),
     collinearity = collinearity_note_sentences(record),
+    meta = meta_note_sentences(record),
+    meta_fit = meta_fit_note_sentences(record),
     descriptives = descriptives_note_sentences(record),
     modelbased = modelbased_note_sentences(record),
     parameters = parameters_note_sentences(record),
@@ -605,6 +608,7 @@ parameters_note_record <- function(
     residual = note$residual,
     multinomial = note$multinomial,
     count_zero = note$count_zero,
+    meta = note$meta,
     starred = isTRUE(starred),
     bolded = isTRUE(bolded),
     performance = NULL,
@@ -671,6 +675,7 @@ merge_parameters_note_records <- function(
     residual = pick("residual"),
     multinomial = purrr::compact(purrr::map(records, "multinomial"))[1][[1]],
     count_zero = merge_count_zero_records(purrr::compact(purrr::map(records, "count_zero"))),
+    meta = purrr::compact(purrr::map(records, "meta"))[1][[1]],
     starred = any(purrr::map_lgl(records, "starred")),
     bolded = any(purrr::map_lgl(records, "bolded")),
     performance = performance_headers,
@@ -741,6 +746,9 @@ parameters_note_sentences <- function(record) {
 
   # Count and zero models of zero-inflated and hurdle models (pscl)
   sentences <- c(sentences, count_zero_note_sentences(record$count_zero))
+
+  # Measure and model of meta-regressions (metafor)
+  sentences <- c(sentences, meta_note_sentences(record$meta))
 
   # Zero-inflation and dispersion parts of glmmTMB models
   if ("zero_inflated" %in% record$components) {

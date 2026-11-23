@@ -1,0 +1,111 @@
+---
+title: "Meta-Analysis Tables"
+format: html
+knitr:
+  opts_chunk:
+    fig-cap-location: top
+filters:
+  - quarto
+  - apanote
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(apa7)
+library(metafor)
+```
+
+```{r}
+#| label: setup2
+#| eval: false
+<<setup>>
+```
+
+`apa_parameters` and `apa_performance` make APA-style tables of meta-analyses fit with `metafor::rma`:
+
+| Table | Function | Contents |
+|---|---|---|
+| Studies and pooled estimate | `apa_parameters` | Each study's effect size, confidence interval, and weight, followed by the pooled estimate |
+| Meta-regression | `apa_parameters` | Coefficients of the moderators, as for other regression models |
+| Heterogeneity | `apa_performance` | *k*, *Q*, *&tau;*^2^, *I*^2^, and, for meta-regressions, the test of the moderators and *R*^2^ |
+
+# Studies and the Pooled Estimate
+
+The `dat.molloy2014` data set in the metadat package (installed with metafor) has the correlations between conscientiousness and medication adherence in 16 studies. Correlations are meta-analyzed as Fisher's *z* values (`measure = "ZCOR"` in `escalc`), and `slab` gives the study labels:
+
+```{r}
+#| label: molloy
+d_adherence <- escalc(
+  measure = "ZCOR",
+  ri = ri,
+  ni = ni,
+  data = metadat::dat.molloy2014,
+  slab = paste(authors, year)
+)
+
+fit_adherence <- rma(yi, vi, data = d_adherence)
+
+apa_parameters(fit_adherence) |>
+  apa_flextable(note = TRUE)
+```
+
+Each study's correlation and confidence interval, and the pooled estimate below the rule, are converted back from Fisher's *z* to *r*. The weights are each study's percentage of the total weight in the random-effects model. The note names the measure and the model, and it gives the test of the pooled estimate, its 95% prediction interval (the range in which the true effect of a new study is expected to fall), and the test of heterogeneity.
+
+The column of effect sizes is named by the measure given to `escalc`: for example, *g* for standardized mean differences (`"SMD"`), *r* for correlations (`"COR"` or `"ZCOR"`), and *OR*, *RR*, or *IRR* for odds ratios, risk ratios, and incidence rate ratios. Ratios are analyzed on the log scale and exponentiated for the table. With `transform = FALSE`, estimates stay on the scale on which they were analyzed (e.g., log risk ratios). With `weights = FALSE`, the weights are left out.
+
+# Heterogeneity
+
+`apa_performance` gives the heterogeneity statistics:
+
+```{r}
+#| label: molloy-heterogeneity
+apa_performance(fit_adherence) |>
+  apa_flextable(note = TRUE)
+```
+
+With `metrics = "all"`, the table adds *&tau;*, *H*^2^, and confidence intervals of *&tau;*^2^ and *I*^2^.
+
+# Ratio Measures
+
+In the `dat.bcg` data set, 13 trials compared the risk of tuberculosis in people who were and were not vaccinated with BCG. The effect sizes are risk ratios, which are analyzed on the log scale and exponentiated for the table:
+
+```{r}
+#| label: bcg
+d_bcg <- escalc(
+  measure = "RR",
+  ai = tpos, bi = tneg, ci = cpos, di = cneg,
+  data = metadat::dat.bcg,
+  slab = paste(author, year)
+)
+d_bcg$latitude <- d_bcg$ablat
+
+fit_bcg <- rma(yi, vi, data = d_bcg)
+
+apa_parameters(fit_bcg) |>
+  apa_flextable(note = TRUE)
+```
+
+# Meta-Regression
+
+Moderators are added with `mods`. The vaccine appeared to work better in trials farther from the equator, so here the absolute latitude of each trial is a moderator:
+
+```{r}
+#| label: bcg-metareg
+fit_latitude <- rma(yi, vi, mods = ~ latitude, data = d_bcg)
+
+apa_parameters(fit_latitude) |>
+  apa_flextable(note = TRUE)
+
+apa_performance(fit_latitude) |>
+  apa_flextable(note = TRUE)
+```
+
+For a meta-regression, `apa_parameters` shows the intercept and moderators, as for other regression models. Coefficients (*B*) are on the scale on which the effect sizes were analyzed (here, log risk ratios), and for ratio measures, the exponentiated coefficients are added (here, *RR*): each degree of latitude multiplies the risk ratio by about 0.97. `apa_performance` adds the omnibus test of the moderators (*Q*~M~) and the percentage of heterogeneity they explain (*R*^2^), and *Q*~E~ is the test of the heterogeneity that remains.
+
+# Options
+
+* `method = "EE"` in `rma` fits an equal-effects model; the table labels the pooled estimate accordingly, and there is no prediction interval or *&tau;*^2^.
+* `test = "knha"` in `rma` uses the Knapp–Hartung adjustment; the pooled estimate is tested with *t*, and the note says so.
+* `studies = FALSE` shows only the pooled estimate, with its test, instead of the study rows.
+* Multivariate and multilevel models (`rma.mv`) are not yet supported.

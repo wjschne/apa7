@@ -9,6 +9,7 @@ apaquarto
 ascorbic
 asis
 autofit
+BCG
 Belenky
 Bentler
 bfi
@@ -67,6 +68,7 @@ Gnagy
 Gohel
 Greiner
 gtsummary
+Hartung
 heteroskedasticity
 Hoeffding's
 Hofmann
@@ -90,6 +92,8 @@ lmerTest
 lmerTest's
 Lupas
 Mdn
+metadat
+metafor
 midcorrelation
 MLR
 modelbased
@@ -164,6 +168,7 @@ yaml
 ε
 η
 θ
+τ
 φ
 χ
 ω
