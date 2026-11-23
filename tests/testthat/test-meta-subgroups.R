@@ -31,7 +31,7 @@ test_that("separate tau2: each subgroup's estimate, then the overall estimate, a
   fits <- lapply(split(seq_len(nrow(d)), d$alloc), \(i) metafor::rma(d$yi[i], d$vi[i]))
   between <- metafor::rma(sapply(fits, \(f) f$b[1]), sei = sapply(fits, \(f) f$se), method = "EE")
   note <- apa_note(result)
-  expect_match(note, paste0("Test of subgroup differences: *Q*~between~(2) = ", sprintf("%.2f", between$QE)), fixed = TRUE)
+  expect_match(note, paste0("Test of subgroup differences (Borenstein et al., 2009): *Q*~between~(2) = ", sprintf("%.2f", between$QE)), fixed = TRUE)
   expect_match(note, "Each subgroup of Alloc was pooled with its own random-effects model", fixed = TRUE)
   expect_match(note, "Effect sizes are risk ratios, analyzed on the log scale and exponentiated", fixed = TRUE)
 
@@ -71,4 +71,11 @@ test_that("subgroup vectors, missing subgroups, and errors", {
   expect_error(apa_subgroups(fit, c("a", "b")), "one value for each")
   expect_error(apa_subgroups(metafor::rma(yi, vi, mods = ~ablat, data = d), alloc), "without moderators")
   expect_error(apa_subgroups(metafor::rma(yi, vi, data = d, method = "EE"), alloc), "random-effects")
+})
+
+test_that("the subgroup note cites Borenstein et al. (2009)", {
+  d <- bcg()
+  result <- apa_subgroups(metafor::rma(yi, vi, data = d), alloc)
+  expect_match(apa_note(result, citations = "keys"), "Test of subgroup differences [@borensteinIntroductionMetaanalysis2009]: ", fixed = TRUE)
+  expect_equal(apa7:::citation_text("borensteinIntroductionMetaanalysis2009"), "Borenstein et al., 2009")
 })

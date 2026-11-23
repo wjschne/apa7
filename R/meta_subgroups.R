@@ -233,7 +233,7 @@ meta_subgroups_note_sentences <- function(record) {
   sentences <- c(
     sentences,
     paste0(
-      "Test of subgroup differences: ", stat, " = ",
+      "Test of subgroup differences ", cite("borensteinIntroductionMetaanalysis2009"), ": ", stat, " = ",
       trimws(align_chr(q$stat, accuracy = the$accuracy)), ", ", meta_p_text(q$p), "."
     )
   )
