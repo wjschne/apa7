@@ -100,7 +100,7 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
   - [ ] Robust and quantile regression (`MASS::rlm`, `robustbase`, `quantreg`)
   - [ ] Beta regression, GEE, panel and fixed-effects, and instrumental-variable models (`betareg`, `geepack`, `fixest`, `ivreg`), possibly through one generic method
 - [ ] Generalized additive models (`mgcv::gam`): parametric terms, and smooth terms with *edf* and *F*
-- [ ] Collinearity diagnostics from `performance::check_collinearity()`: VIF and tolerance for each predictor
+- [x] Collinearity diagnostics with `apa_collinearity()`, from `performance::check_collinearity()`: *VIF* [CI] and tolerance for each predictor, generalized *VIF*s, headings for model parts, bolded large *VIF*s
 - [ ] Mediation (`mediation::mediate`): ACME, ADE, and total effect with CIs (beyond `lavaan`'s defined parameters)
 - [ ] Factor retention (`parameters::n_factors()`) and cluster analysis (`parameters::cluster_analysis()`)
 - [ ] Meta-analyses (e.g., `metafor::rma()`) via `parameters`: study-level effect sizes with weights, the pooled estimate, heterogeneity (*Q*, *I*², *τ*²), and moderators for meta-regressions

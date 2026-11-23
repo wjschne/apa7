@@ -236,6 +236,35 @@ pscl::hurdle(
 
 For nested counts, or counts with many zeros, negative binomial and zero-inflated mixed models fit with glmmTMB are described in the [multilevel article](multilevel.html#count-outcomes-with-glmmtmb).
 
+# Collinearity
+
+`apa_collinearity` reports the variance inflation factor (*VIF*) and tolerance of each predictor, as computed by `performance::check_collinearity`. In the third ACT model above, the two SAT scores are correlated, but not enough to inflate their standard errors much:
+
+```{r}
+#| label: collinearity
+apa_collinearity(lm3) |>
+  apa_flextable(note = TRUE)
+```
+
+Education has more than 1 degree of freedom, so its *VIF* is the generalized *VIF*, and the note says so. Add `"SE_factor"` to `columns` for *VIF*^1/(2*df*)^, which can be compared across terms with different degrees of freedom. To bold large *VIF*s, set `flag` to your cutoff (e.g., `flag = 5` or `flag = 10`). In models with interactions, the *VIF*s of the interaction and its components are high in part because product terms are correlated with their components, and the note explains that this does not affect the test of the interaction.
+
+```{r}
+#| label: collinearity-interaction
+lm(ACT ~ SATV * SATQ, data = d) |>
+  apa_collinearity(flag = 10) |>
+  apa_flextable(note = TRUE)
+```
+
+
+With centered predictors, these *VIF*s are small, and the note leaves this out.
+
+```{r}
+#| label: collinearity-interaction-centered
+lm(ACT ~ SATV * SATQ, data = datawizard::center(d)) |>
+  apa_collinearity(flag = 10) |>
+  apa_flextable(note = TRUE)
+```
+
 # Table Notes
 
 A regression table often needs a note that defines its symbols and explains its stars. `apa_parameters` records how each table was made, and `apa_note` turns that record into note text. For the hierarchical regression above, the note defines the standardized coefficient and the change in *R*^2^ and explains the stars on the change in *R*^2^:

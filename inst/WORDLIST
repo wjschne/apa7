@@ -40,6 +40,8 @@ Cov
 Cramér's
 Cran
 Cronbach's
+cyl
+Cyl
 de
 deckered
 Deckered
@@ -91,6 +93,7 @@ Mdn
 midcorrelation
 MLR
 modelbased
+Monette
 Nagelkerke's
 nlme
 nlme's
@@ -148,6 +151,8 @@ unrotated
 Unrotated
 varimax
 versicolor
+VIF
+VIFs
 vmatrix
 Vmatrix
 Welch's

@@ -53,6 +53,10 @@ says what the values are, how the other predictors were held constant, on
 which scale the estimates are, which level was subtracted from which, and
 how \emph{p}-values were adjusted for multiple comparisons.
 
+For \code{\link[=apa_collinearity]{apa_collinearity()}} tables, the note names terms with generalized
+\emph{VIF}s, explains the \emph{VIF}s of interaction terms, defines tolerance, and
+says which \emph{VIF}s are bolded.
+
 For \code{\link[=apa_reliability]{apa_reliability()}} tables, the note gives the number of respondents,
 says which items were reverse-scored and how scale scores were computed,
 and defines the statistics.
