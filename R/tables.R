@@ -3002,7 +3002,7 @@ use_pseudo_r2 <- function(data, column_formats) {
 #' @noRd
 has_fixed_dispersion <- function(fit) {
   # Nested mixed models are also compared with likelihood ratio tests
-  if (inherits(fit, c("polr", "clm", "multinom", "merMod", "glmmTMB", "lme"))) {
+  if (inherits(fit, c("polr", "clm", "multinom", "zeroinfl", "hurdle", "merMod", "glmmTMB", "lme"))) {
     return(TRUE)
   }
   if (!inherits(fit, "glm")) {

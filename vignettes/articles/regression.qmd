@@ -195,6 +195,45 @@ glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
 
+## Zero-inflated and hurdle models
+
+Counts often have more zeros than a Poisson or negative binomial model expects. A zero-inflated model (`pscl::zeroinfl`) adds a logistic model of *excess* zeros, which come from cases that could only be zero (e.g., scientists who were not publishing at all). A hurdle model (`pscl::hurdle`) instead has a logistic model of whether the count is zero or positive, and a zero-truncated count model of the positive counts. Either way, `apa_parameters` puts each part under its own heading. Only the count model's coefficients are exponentiated (*IRR*), because the zero model's coefficients are log odds. The `bioChemists` data set in the pscl package has the number of articles 915 biochemistry graduate students published in the last 3 years of their PhD programs, which depends here on their mentors' numbers of articles (`mentor_articles`) and their number of young children (`young_children`). The zero-inflation part has only the mentor's articles:
+
+```{r}
+#| label: zeroinfl
+data("bioChemists", package = "pscl")
+d_articles <- bioChemists |>
+  rename(
+    articles = art,
+    mentor_articles = ment,
+    young_children = kid5
+  )
+
+zinb <- pscl::zeroinfl(
+  articles ~ mentor_articles + young_children | mentor_articles,
+  data = d_articles,
+  dist = "negbin"
+)
+
+apa_parameters(zinb) |>
+  apa_flextable(note = TRUE)
+```
+
+Students with productive mentors published more, and they were less likely to be among those who did not publish at all. The note names the count distribution, gives the negative binomial dispersion parameter (*&theta;*), and explains the zero model. For a hurdle model, the zero model's heading is "Zero hurdle model", and its coefficients are the log odds of a count greater than zero:
+
+```{r}
+#| label: hurdle
+pscl::hurdle(
+  articles ~ mentor_articles + young_children | mentor_articles,
+  data = d_articles,
+  dist = "negbin"
+) |>
+  apa_parameters() |>
+  apa_note()
+```
+
+`apa_performance_comparison` compares nested zero-inflated or hurdle models with likelihood ratio tests.
+
 For nested counts, or counts with many zeros, negative binomial and zero-inflated mixed models fit with glmmTMB are described in the [multilevel article](multilevel.html#count-outcomes-with-glmmtmb).
 
 # Table Notes

@@ -2,7 +2,7 @@
 
 Working checklist for apa7 development. Check items off (`- [x]`) as they are finished, and add new items under the right section. Keep finished items in place until the next release, then move them to the **Done** section (and to NEWS.md).
 
-Last reviewed: 2026-11-22
+Last reviewed: 2026-11-23
 
 ## Before CRAN submission
 
@@ -95,7 +95,7 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
 - [x] Reliability and item analysis with `apa_reliability()`: item *M*, *SD*, *r*~it~, and α if deleted; scale mean, α [CI], *ω*~total~, and mean inter-item *r*. Computed with `psych`, which covers what `performance`'s `cronbachs_alpha()`, `item_reliability()`, `item_difficulty()`, `item_discrimination()`, `item_intercor()`, and `item_omega()` report and adds the CI of α.
 - [ ] Other regression families via `parameters`
   - [x] Multinomial logistic regression (`nnet::multinom`): one block of coefficients per outcome category, with McFadden's *R*^2^ and likelihood ratio tests for comparisons
-  - [ ] Zero-inflated and hurdle count models outside mixed models (`pscl`): count and zero parts under headings, as for `glmmTMB`
+  - [x] Zero-inflated and hurdle count models outside mixed models (`pscl::zeroinfl`, `pscl::hurdle`): count and zero models under headings, only the count model exponentiated, LR tests for comparisons
   - [ ] Survival models (`survival::coxph`, `survreg`): hazard ratios
   - [ ] Robust and quantile regression (`MASS::rlm`, `robustbase`, `quantreg`)
   - [ ] Beta regression, GEE, panel and fixed-effects, and instrumental-variable models (`betareg`, `geepack`, `fixest`, `ivreg`), possibly through one generic method

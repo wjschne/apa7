@@ -53,7 +53,7 @@
 #' * what stars or bold values mean.
 #'
 #' For [apa_parameters()] tables of regression models (`lm`, `glm`, `polr`,
-#' `clm`, `multinom`, `lme4`, `glmmTMB`, and `nlme` models, or a list of models), the note can say
+#' `clm`, `multinom`, `zeroinfl`, `hurdle`, `lme4`, `glmmTMB`, and `nlme` models, or a list of models), the note can say
 #'
 #' * which robust standard errors were used (e.g., `vcov = "HC3"`),
 #' * how the degrees of freedom of mixed-model *t* tests were approximated
@@ -64,6 +64,7 @@
 #' * the residual correlation structure and variance function of `nlme::lme`
 #'   models,
 #' * the reference category of multinomial models (`nnet::multinom`),
+#' * the count distribution and the meaning of the zero model of zero-inflated and hurdle models (`pscl`),
 #' * what the standardized coefficient (\eqn{\beta}{beta}), exponentiated coefficient
 #'   (e.g., *OR*), confidence interval, and model-comparison (e.g.,
 #'   \eqn{\Delta R^2}{Delta R^2}) columns stand for, and
@@ -598,6 +599,7 @@ parameters_note_record <- function(
     components = note$components,
     residual = note$residual,
     multinomial = note$multinomial,
+    count_zero = note$count_zero,
     starred = isTRUE(starred),
     bolded = isTRUE(bolded),
     performance = NULL,
@@ -663,6 +665,7 @@ merge_parameters_note_records <- function(
     components = pick("components"),
     residual = pick("residual"),
     multinomial = purrr::compact(purrr::map(records, "multinomial"))[1][[1]],
+    count_zero = merge_count_zero_records(purrr::compact(purrr::map(records, "count_zero"))),
     starred = any(purrr::map_lgl(records, "starred")),
     bolded = any(purrr::map_lgl(records, "bolded")),
     performance = performance_headers,
@@ -730,6 +733,9 @@ parameters_note_sentences <- function(record) {
 
   # Reference category of multinomial models
   sentences <- c(sentences, multinomial_note_sentence(record$multinomial))
+
+  # Count and zero models of zero-inflated and hurdle models (pscl)
+  sentences <- c(sentences, count_zero_note_sentences(record$count_zero))
 
   # Zero-inflation and dispersion parts of glmmTMB models
   if ("zero_inflated" %in% record$components) {

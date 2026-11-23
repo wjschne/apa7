@@ -58,6 +58,7 @@ Suggests:
     modelbased,
     nlme,
     nnet,
+    pscl,
     ordinal,
     pbkrtest,
     quarto,
