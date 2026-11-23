@@ -92,7 +92,8 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
   - [ ] Possible additions: ranges (min–max), a missing-values row or column, and Fisher's exact test for sparse tables
 - [x] Estimated marginal means, contrasts, and simple slopes (post hoc tests, moderation) with `apa_means()`, `apa_contrasts()`, and `apa_slopes()`, from `modelbased::estimate_means()`, `estimate_contrasts()`, and `estimate_slopes()`: means with CIs, differences with adjusted *p*-values, heading rows for other `by` variables
   - [x] Cohen's *d* [CI] for contrasts (residual *SD* of `lm`/`aov` models, or `sd` for mixed models)
-  - [ ] Possible additions: joint and omnibus tests, and Johnson–Neyman intervals
+  - [x] Johnson–Neyman intervals in the `apa_slopes()` note (exact boundaries for a two-way interaction with a continuous moderator; identity-link models)
+  - [ ] Possible additions: joint and omnibus tests; Johnson–Neyman intervals for link-function models (on the link scale)
 - [x] Reliability and item analysis with `apa_reliability()`: item *M*, *SD*, *r*~it~, and α if deleted; scale mean, α [CI], *ω*~total~, and mean inter-item *r*. Computed with `psych`, which covers what `performance`'s `cronbachs_alpha()`, `item_reliability()`, `item_difficulty()`, `item_discrimination()`, `item_intercor()`, and `item_omega()` report and adds the CI of α.
 - [ ] Other regression families via `parameters`
   - [x] Multinomial logistic regression (`nnet::multinom`): one block of coefficients per outcome category, with McFadden's *R*^2^ and likelihood ratio tests for comparisons

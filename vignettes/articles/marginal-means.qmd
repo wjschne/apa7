@@ -119,6 +119,9 @@ apa_contrasts(fit_mixed, contrast = condition, sd = 12.5)
 
 # Simple Slopes
 
+
+
+
 A moderation analysis asks whether the effect of one predictor depends on another. In the `mtcars` data, the effect of a car's weight on its fuel efficiency (miles per gallon) may depend on its horsepower:
 
 ```{r}
@@ -140,6 +143,14 @@ apa_parameters(fit_mod) |>
   apa_flextable(note = TRUE)
 ```
 
+Without `by`, `apa_slopes` gives the average slope of the predictor:
+
+```{r}
+#| label: slope-average
+apa_slopes(fit_mod, trend = Weight) |>
+  apa_flextable(note = TRUE)
+```
+
 Simple slopes show the effect of weight at chosen values of horsepower (here, 100, 150, and 200):
 
 ```{r}
@@ -151,6 +162,8 @@ apa_slopes(fit_mod,
 ```
 
 Weight lowers fuel efficiency less in more powerful cars.
+
+The notes of the simple-slopes tables above also give the Johnson–Neyman intervals: the values of horsepower, within its observed range, at which the slope of weight is significant. Rather than testing the slope at a few chosen values of the moderator, the Johnson–Neyman technique finds the values at which the slope's test becomes significant, so readers can see where the effect holds. apa7 computes the boundaries exactly from the model's coefficients and adds the intervals to the note whenever the slope depends on a single continuous moderator through a two-way interaction. Use `johnson_neyman = FALSE` to leave them out.
 
 modelbased has shortcuts for common moderator values, and `apa_slopes` names the values they give. A numeric moderator named without values (`by = "hp"`) is set to its mean and 1 standard deviation above and below it, as with `by = "hp=[sd]"`:
 
@@ -176,14 +189,6 @@ Other named shortcuts are `"[quartiles]"`, `"[minmax]"`, and `"[mad]"` (the medi
 fit_am <- lm(MPG ~ Transmission * Horsepower, data = d_mtcars)
 
 apa_contrasts(fit_am, contrast = Transmission, by = Horsepower) |>
-  apa_flextable(note = TRUE)
-```
-
-Without `by`, `apa_slopes` gives the average slope of the predictor:
-
-```{r}
-#| label: slope-average
-apa_slopes(fit_mod, trend = Weight) |>
   apa_flextable(note = TRUE)
 ```
 
@@ -213,6 +218,16 @@ apa_contrasts(fit_logistic, contrast = race, p_adjust = "holm") |>
 ```
 
 With `predict = "link"`, modelbased gives estimates on the link scale (here, log odds) instead, and the note says so.
+
+```{r}
+#| label: logistic-link
+apa_contrasts(fit_logistic, 
+              contrast = race, 
+              p_adjust = "holm", 
+              predict = "link") |>
+  apa_flextable(note = TRUE)
+```
+
 
 # Options
 

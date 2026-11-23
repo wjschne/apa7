@@ -34,6 +34,7 @@ apa_slopes(
   trend = NULL,
   by = NULL,
   ...,
+  johnson_neyman = NULL,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
@@ -86,6 +87,11 @@ residual standard deviation is used (not for mixed models).}
 
 \item{trend}{predictor whose slopes are estimated (e.g., \code{trend = wt}),
 quoted or unquoted. Passed to \code{\link[modelbased:estimate_slopes]{modelbased::estimate_slopes()}}.}
+
+\item{johnson_neyman}{in \code{apa_slopes()}, whether the note gives the
+Johnson-Neyman intervals. If \code{NULL} (default), they are given when they
+can be computed (see Details). If \code{TRUE}, an error is given when they
+cannot be computed.}
 }
 \value{
 \code{apa7_tbl} (tibble)
@@ -140,6 +146,18 @@ standard deviation to divide by, so \emph{d} is shown only when it is given with
 square root of the sum of the variance components and the residual
 variance). \emph{d} is not computed for logistic and other generalized linear
 models.
+
+In \code{apa_slopes()}, when the slope of \code{trend} depends on a single
+continuous moderator in \code{by} through a two-way interaction (e.g.,
+\code{lm(y ~ x * m)}), the note gives the Johnson-Neyman intervals (Johnson &
+Neyman, 1936): the values of the moderator, within its observed range, at
+which the slope is significant. The boundaries are computed exactly from
+the coefficients and their covariance matrix (the values of the moderator
+at which the slope's test statistic equals its critical value), with \emph{t}
+and the residual degrees of freedom for \code{lm()} models and the normal
+distribution for other models (e.g., mixed models). They are not computed
+for models with a link function (e.g., logistic regression), or when the
+slope also depends on other variables (e.g., a three-way interaction).
 
 Bayesian models are not yet supported.
 }

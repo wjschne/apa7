@@ -49,6 +49,18 @@
 #' variance). *d* is not computed for logistic and other generalized linear
 #' models.
 #'
+#' In `apa_slopes()`, when the slope of `trend` depends on a single
+#' continuous moderator in `by` through a two-way interaction (e.g.,
+#' `lm(y ~ x * m)`), the note gives the Johnson-Neyman intervals (Johnson &
+#' Neyman, 1936): the values of the moderator, within its observed range, at
+#' which the slope is significant. The boundaries are computed exactly from
+#' the coefficients and their covariance matrix (the values of the moderator
+#' at which the slope's test statistic equals its critical value), with *t*
+#' and the residual degrees of freedom for `lm()` models and the normal
+#' distribution for other models (e.g., mixed models). They are not computed
+#' for models with a link function (e.g., logistic regression), or when the
+#' slope also depends on other variables (e.g., a three-way interaction).
+#'
 #' Bayesian models are not yet supported.
 #'
 #' @param x a model, or output of [modelbased::estimate_means()] (for
@@ -75,6 +87,10 @@
 #' @param bolded columns that are bolded when *p* \eqn{\le}{<=} .05
 #' @param column_formats [column_formats()] object. If `NULL` (default), the
 #'   defaults are used. The estimate column is named `"Estimate"`.
+#' @param johnson_neyman in `apa_slopes()`, whether the note gives the
+#'   Johnson-Neyman intervals. If `NULL` (default), they are given when they
+#'   can be computed (see Details). If `TRUE`, an error is given when they
+#'   cannot be computed.
 #' @param effect_size in `apa_contrasts()`, whether to add Cohen's *d* and its
 #'   confidence interval. If `NULL` (default), *d* is added when it can be
 #'   computed (models of continuous outcomes with an identity link, such as
@@ -168,11 +184,15 @@ apa_slopes <- function(
   trend = NULL,
   by = NULL,
   ...,
+  johnson_neyman = NULL,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
+  if (!is.null(johnson_neyman) && !(isTRUE(johnson_neyman) || isFALSE(johnson_neyman))) {
+    cli::cli_abort("{.arg johnson_neyman} must be {.code NULL}, {.code TRUE}, or {.code FALSE}.")
+  }
   x <- modelbased_call(x, "estimate_slopes", list(trend = rlang::enquo(trend), by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
@@ -180,7 +200,8 @@ apa_slopes <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
-    format_variable_names = format_variable_names
+    format_variable_names = format_variable_names,
+    johnson_neyman = johnson_neyman
   )
 }
 
@@ -481,7 +502,8 @@ modelbased_table <- function(
   column_formats = NULL,
   format_variable_names = TRUE,
   effect_size = FALSE,
-  sd = NULL
+  sd = NULL,
+  johnson_neyman = FALSE
 ) {
   d <- as.data.frame(x)
   a <- attributes(x)
@@ -671,6 +693,28 @@ modelbased_table <- function(
     record$headers <- c(record$headers, stats::setNames(c(d_header, d_ci_header), c("d", "d_CI")))
   }
 
+  # Johnson-Neyman regions of significance for a single numeric moderator
+  jn <- NULL
+  if (kind == "slopes" && !isFALSE(johnson_neyman)) {
+    moderator <- setdiff(focal, trend)
+    if (length(moderator) == 1 && is.numeric(d[[moderator]])) {
+      jn <- johnson_neyman(
+        a$model,
+        trend,
+        moderator,
+        ci = ci,
+        required = isTRUE(johnson_neyman),
+        call = rlang::caller_env()
+      )
+      if (!is.null(jn)) {
+        jn$trend <- label(trend)
+        jn$moderator <- label(moderator)
+      }
+    } else if (isTRUE(johnson_neyman)) {
+      cli::cli_abort("Johnson-Neyman intervals need exactly one numeric moderator in {.arg by}.", call = rlang::caller_env())
+    }
+  }
+
   # Heading rows for the other variables in by
   if (length(heading_vars) > 0) {
     keys <- purrr::map(heading_vars, \(v) {
@@ -746,6 +790,7 @@ modelbased_table <- function(
   record$moderators <- if (kind == "slopes") label(setdiff(focal, trend)) else NULL
   record$contrast_vars <- if (kind == "contrasts") label(contrast_names) else NULL
   record$contrast_values <- contrast_values
+  record$johnson_neyman <- jn
   record$effect_size <- if (!is.null(es)) list(sd = attr(es, "sd"), source = attr(es, "source"), ci = ci)
 
   attr(tbl, "apa_note") <- record
@@ -865,6 +910,9 @@ modelbased_note_sentences <- function(record) {
       )
     }
   }
+
+  # Johnson-Neyman regions of significance
+  sentences <- c(sentences, johnson_neyman_sentence(record$johnson_neyman))
 
   # Standardized differences
   es <- record$effect_size
