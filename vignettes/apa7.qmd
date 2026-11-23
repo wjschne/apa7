@@ -181,6 +181,7 @@ Each of these settings is also an R option
 |:--------------------|:-------------------------|:------------------|
 | accuracy            | apa7.accuracy            | .01               |
 | font_family         | apa7.font_family         | "Times New Roman" |
+| font_size           | apa7.font_size           | 2                 |
 | intercept_text      | apa7.intercept_text      | "Constant"        |
 | width_aware_padding | apa7.width_aware_padding | TRUE              |
 | page_width          | apa7.page_width          | 6.5               |

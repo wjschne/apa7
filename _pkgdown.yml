@@ -20,6 +20,7 @@ reference:
       - apa_performance
       - apa_performance_comparison
       - apa_publication_bias
+      - apa_subgroups
       - apa_reliability
       - apa_collinearity
       - apa_slopes

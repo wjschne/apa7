@@ -171,6 +171,7 @@ apa_note <- function(x, collapse = " ", citations = NULL) {
     meta = meta_note_sentences(record),
     meta_fit = meta_fit_note_sentences(record),
     publication_bias = publication_bias_note_sentences(record),
+    meta_subgroups = meta_subgroups_note_sentences(record),
     descriptives = descriptives_note_sentences(record),
     modelbased = modelbased_note_sentences(record),
     parameters = parameters_note_sentences(record),

@@ -29,6 +29,7 @@ library(metafor)
 | Studies and pooled estimate | `apa_parameters` | Each study's effect size, confidence interval, and weight, followed by the pooled estimate |
 | Meta-regression | `apa_parameters` | Coefficients of the moderators, as for other regression models |
 | Heterogeneity | `apa_performance` | *k*, *Q*, *&tau;*^2^, *I*^2^, and, for meta-regressions, the test of the moderators and *R*^2^ |
+| Subgroups | `apa_subgroups` | Each subgroup's pooled estimate and the test of subgroup differences |
 | Publication bias | `apa_publication_bias` | Egger's regression test, the rank correlation test, and trim and fill, with adjusted estimates |
 
 # Studies and the Pooled Estimate
@@ -78,8 +79,11 @@ d_bcg <- escalc(
   ai = tpos, bi = tneg, ci = cpos, di = cneg,
   data = metadat::dat.bcg,
   slab = paste(author, year)
-)
-d_bcg$latitude <- d_bcg$ablat
+) |> 
+  rename(Latitude = ablat,
+         Allocation = alloc) |> 
+  mutate(Allocation = factor(stringr::str_to_title(Allocation)))
+
 
 fit_bcg <- rma(yi, vi, data = d_bcg)
 
@@ -93,7 +97,7 @@ Moderators are added with `mods`. The vaccine appeared to work better in trials 
 
 ```{r}
 #| label: bcg-metareg
-fit_latitude <- rma(yi, vi, mods = ~ latitude, data = d_bcg)
+fit_latitude <- rma(yi, vi, mods = ~ Latitude, data = d_bcg)
 
 apa_parameters(fit_latitude) |>
   apa_flextable(note = TRUE)
@@ -103,6 +107,18 @@ apa_performance(fit_latitude) |>
 ```
 
 For a meta-regression, `apa_parameters` shows the intercept and moderators, as for other regression models. Coefficients (*B*) are on the scale on which the effect sizes were analyzed (here, log risk ratios), and for ratio measures, the exponentiated coefficients are added (here, *RR*): each degree of latitude multiplies the risk ratio by about 0.97. `apa_performance` adds the omnibus test of the moderators (*Q*~M~) and the percentage of heterogeneity they explain (*R*^2^), and *Q*~E~ is the test of the heterogeneity that remains.
+
+# Subgroup Analysis
+
+A subgroup analysis compares the pooled estimates of groups of studies. In the BCG trials, participants were assigned to the vaccine at random, alternately, or systematically. `apa_subgroups` pools each group of trials and compares them:
+
+```{r}
+#| label: subgroups
+apa_subgroups(fit_bcg, Allocation) |>
+  apa_flextable(note = TRUE)
+```
+
+By default, each subgroup has its own *&tau;*^2^, and the subgroups are compared with *Q*~between~, the heterogeneity of the subgroup estimates. With `tau2 = "common"`, the subgroups share one *&tau;*^2^, which is estimated more precisely when subgroups have few studies: the estimates come from a meta-regression with the subgroup as a categorical moderator, and the subgroups are compared with its omnibus test (*Q*~M~). The subgroup variable can be a column of the data (quoted or unquoted) or a vector (e.g., `d_bcg$Latititude > 30`).
 
 # Publication Bias
 

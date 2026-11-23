@@ -107,7 +107,8 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
 - [ ] Factor retention (`parameters::n_factors()`) and cluster analysis (`parameters::cluster_analysis()`)
 - [x] Meta-analyses (`metafor::rma()`): study-level effect sizes with weights and the pooled estimate, heterogeneity (*Q*, *I*², *τ*²) with `apa_performance()`, and meta-regressions (computed from the metafor object rather than `parameters`, which gives equal-effects inverse-variance weights rather than percentages and exponentiates only the pooled estimate)
   - [x] Multilevel models (`rma.mv` with nested random intercepts): variance components and multilevel *I*^2^ for each level
-  - [ ] Possible additions: `rma.mv` with `~ inner | outer` structures (multivariate models), `rma.mh`/`rma.peto`, and subgroup tables
+  - [ ] Possible additions: `rma.mv` with `~ inner | outer` structures (multivariate models) and `rma.mh`/`rma.peto`
+  - [x] Subgroup analyses with `apa_subgroups()`: estimate per subgroup and the test of subgroup differences (separate or common *&tau;*^2^)
   - [x] Publication bias with `apa_publication_bias()`: Egger's test (with limit estimate), rank correlation test, trim and fill, and fail-safe *N* (`rma` models only)
 - [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR` (on hold until the other major easystats analyses are supported)
 
