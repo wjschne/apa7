@@ -119,9 +119,6 @@ apa_contrasts(fit_mixed, contrast = condition, sd = 12.5)
 
 # Simple Slopes
 
-
-
-
 A moderation analysis asks whether the effect of one predictor depends on another. In the `mtcars` data, the effect of a car's weight on its fuel efficiency (miles per gallon) may depend on its horsepower:
 
 ```{r}

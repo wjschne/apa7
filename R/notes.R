@@ -627,6 +627,7 @@ parameters_note_record <- function(
     multinomial = note$multinomial,
     count_zero = note$count_zero,
     meta = note$meta,
+    gam = note$gam,
     starred = isTRUE(starred),
     bolded = isTRUE(bolded),
     performance = NULL,
@@ -694,6 +695,7 @@ merge_parameters_note_records <- function(
     multinomial = purrr::compact(purrr::map(records, "multinomial"))[1][[1]],
     count_zero = merge_count_zero_records(purrr::compact(purrr::map(records, "count_zero"))),
     meta = purrr::compact(purrr::map(records, "meta"))[1][[1]],
+    gam = purrr::compact(purrr::map(records, "gam"))[1][[1]],
     starred = any(purrr::map_lgl(records, "starred")),
     bolded = any(purrr::map_lgl(records, "bolded")),
     performance = performance_headers,
@@ -766,6 +768,9 @@ parameters_note_sentences <- function(record) {
 
   # Count and zero models of zero-inflated and hurdle models (pscl)
   sentences <- c(sentences, count_zero_note_sentences(record$count_zero))
+
+  # Smoothing parameters and smooth-term tests of GAMs (mgcv)
+  sentences <- c(sentences, gam_note_sentences(record$gam))
 
   # Measure and model of meta-regressions (metafor)
   sentences <- c(sentences, meta_note_sentences(record$meta))

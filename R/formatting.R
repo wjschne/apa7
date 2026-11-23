@@ -1330,6 +1330,13 @@ the$columns <- list(
     latex = "$df$",
     formatter = the$number_formatter
   ),
+  edf = column_format(
+    name = "edf",
+    header = "*edf*",
+    latex = "$edf$",
+    formatter = the$number_formatter,
+    abbreviation = "effective degrees of freedom"
+  ),
   df_diff = column_format(
     name = "df_diff",
     header = "&Delta;*df*",

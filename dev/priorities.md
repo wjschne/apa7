@@ -101,7 +101,7 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
   - [ ] Survival models (`survival::coxph`, `survreg`): hazard ratios
   - [ ] Robust and quantile regression (`MASS::rlm`, `robustbase`, `quantreg`)
   - [ ] Beta regression, GEE, panel and fixed-effects, and instrumental-variable models (`betareg`, `geepack`, `fixest`, `ivreg`), possibly through one generic method
-- [ ] Generalized additive models (`mgcv::gam`): parametric terms, and smooth terms with *edf* and *F*
+- [x] Generalized additive models (`mgcv::gam`, `mgcv::bam`): parametric and smooth terms under headings (*edf*, approximate *F* or *&chi;*^2^), adjusted *R*^2^ and deviance explained; lists compared by *R*^2^ and *AIC*
 - [x] Collinearity diagnostics with `apa_collinearity()`, from `performance::check_collinearity()`: *VIF* [CI] and tolerance for each predictor, generalized *VIF*s, headings for model parts, bolded large *VIF*s
 - [ ] Mediation (`mediation::mediate`): ACME, ADE, and total effect with CIs (beyond `lavaan`'s defined parameters). On hold (2026-11-23): undecided whether apa7 should support the mediation package
 - [ ] Factor retention (`parameters::n_factors()`) and cluster analysis (`parameters::cluster_analysis()`)

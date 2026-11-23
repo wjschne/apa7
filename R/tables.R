@@ -2771,6 +2771,17 @@ apa_parameters.list <- function(
     )
   }
 
+  # GAMs: nested tests are not well defined for penalized smooths, so models
+  # are compared by R2 and AIC, without p-values or stars
+  if (all(purrr::map_lgl(fit, \(m) inherits(m, "gam")))) {
+    if (missing(performance_parameters)) {
+      performance_parameters <- c("R2", "deltaR2", "AIC")
+    }
+    if (missing(starred)) {
+      starred <- NA
+    }
+  }
+
   # List names label the models ("Model 1", ... if unnamed)
   names(fit) <- model_names(fit)
   model_tables <- purrr::map(
@@ -3158,10 +3169,15 @@ apa_performance_comparison <- function(
     return(lavaan_performance_comparison(models, metrics, column_formats))
   }
   use_lrt <- all(purrr::map_lgl(models, has_fixed_dispersion))
+  # Nested tests are not well defined for GAMs with penalized smooths
+  is_gam <- length(models) > 0 && all(purrr::map_lgl(models, \(m) inherits(m, "gam")))
   # Mixed models have marginal and conditional R2
   is_mixed <- all(purrr::map_lgl(models, \(m) inherits(m, c("merMod", "glmmTMB", "lme"))))
   conditional_r2 <- if (is_mixed) c("R2_conditional", "deltaR2_conditional")
 
+  if (is.null(metrics) && is_gam) {
+    metrics <- c("R2", "deltaR2", "AIC")
+  }
   if (is.null(metrics)) {
     metrics <- if (use_lrt) {
       c("R2", "deltaR2", conditional_r2, "Chi2", "df", "p")
@@ -3202,7 +3218,10 @@ apa_performance_comparison <- function(
     column_formats <- pr2$column_formats
 
     # Likelihood ratio tests for fixed-dispersion GLMs, F tests otherwise
-    t_nested <- if (use_lrt) {
+    # (none for GAMs, whose nested tests are not well defined)
+    t_nested <- if (is_gam) {
+      tibble::tibble(Name = cp$Name, Model = cp$Model)
+    } else if (use_lrt) {
       performance::test_likelihoodratio(...)
     } else {
       performance::test_wald(...)

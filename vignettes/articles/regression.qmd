@@ -236,6 +236,33 @@ pscl::hurdle(
 
 For nested counts, or counts with many zeros, negative binomial and zero-inflated mixed models fit with glmmTMB are described in the [multilevel article](multilevel.html#count-outcomes-with-glmmtmb).
 
+# Generalized Additive Models
+
+Generalized additive models (GAMs), fit with `mgcv::gam`, let a predictor's effect be a smooth curve instead of a straight line. Here, ozone concentration in New York (from the `airquality` data set) depends on smooth functions of temperature and wind speed:
+
+```{r}
+#| label: gam
+fit_gam <- mgcv::gam(
+  Ozone ~ s(Temp) + s(Wind),
+  data = airquality,
+  method = "REML"
+)
+
+apa_parameters(fit_gam) |>
+  apa_flextable(note = TRUE)
+```
+
+The parametric terms (here, only the constant) have coefficients and *t* tests, as in other regression models. Each smooth term has its effective degrees of freedom (*edf*: 1 for a straight line, more for a curvier shape) and an approximate *F* test of whether the smooth differs from zero. For non-Gaussian families (e.g., `family = binomial`), the parametric terms are tested with *z*, the smooth terms with *&chi;*^2^, and exponentiated coefficients (e.g., *OR*) are added. Use `terms = "parametric"` or `terms = "smooth"` to show only one kind of term. Smooths of a factor-`by` variable (e.g., `s(Temp, by = Month)`) get a row for each level.
+
+`apa_performance` gives the adjusted *R*^2^ and the percentage of the deviance explained:
+
+```{r}
+#| label: gam-performance
+apa_performance(fit_gam)
+```
+
+The smooth terms are shrunk toward simpler shapes, so nested GAMs cannot be compared with the usual *F* or likelihood ratio tests. Lists of GAMs are compared by *R*^2^ and *AIC* instead.
+
 # Collinearity
 
 `apa_collinearity` reports the variance inflation factor (*VIF*) and tolerance of each predictor, as computed by `performance::check_collinearity`. In the third ACT model above, the two SAT scores are correlated, but not enough to inflate their standard errors much:
