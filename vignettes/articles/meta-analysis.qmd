@@ -103,9 +103,30 @@ apa_performance(fit_latitude) |>
 
 For a meta-regression, `apa_parameters` shows the intercept and moderators, as for other regression models. Coefficients (*B*) are on the scale on which the effect sizes were analyzed (here, log risk ratios), and for ratio measures, the exponentiated coefficients are added (here, *RR*): each degree of latitude multiplies the risk ratio by about 0.97. `apa_performance` adds the omnibus test of the moderators (*Q*~M~) and the percentage of heterogeneity they explain (*R*^2^), and *Q*~E~ is the test of the heterogeneity that remains.
 
+# Multilevel Meta-Analysis
+
+When studies report several effect sizes, the effect sizes are not independent, and a multilevel (three-level) model with `rma.mv` has a random intercept for each level. In the `dat.konstantopoulos2011` data set, 56 schools in 11 school districts compared the achievement of students on modified and traditional school calendars (standardized mean differences). The table of a multilevel model has a row for each effect size, so this example shows only the pooled estimate (`studies = FALSE`):
+
+```{r}
+#| label: multilevel
+fit_schools <- rma.mv(
+  yi, vi,
+  random = ~ 1 | district / school,
+  data = metadat::dat.konstantopoulos2011
+)
+
+apa_parameters(fit_schools, studies = FALSE) |>
+  apa_flextable(note = TRUE)
+
+apa_performance(fit_schools) |>
+  apa_flextable(note = TRUE)
+```
+
+`apa_performance` gives the variance of the true effects at each level (*&sigma;*^2^, with the level as a subscript) and the multilevel *I*^2^ (Cheung, 2014), the percentage of the total variability due to heterogeneity at all levels. With `metrics = "all"`, the table adds *&sigma;* and confidence intervals of *&sigma;*^2^ for each level, and *I*^2^ for each level. Meta-regressions of multilevel models work as for `rma`. Random effects with an `~ inner | outer` structure (e.g., correlated outcomes within studies) are not yet supported.
+
 # Options
 
 * `method = "EE"` in `rma` fits an equal-effects model; the table labels the pooled estimate accordingly, and there is no prediction interval or *&tau;*^2^.
 * `test = "knha"` in `rma` uses the Knapp–Hartung adjustment; the pooled estimate is tested with *t*, and the note says so.
 * `studies = FALSE` shows only the pooled estimate, with its test, instead of the study rows.
-* Multivariate and multilevel models (`rma.mv`) are not yet supported.
+* Multilevel models with random intercepts (`rma.mv` with `random = ~ 1 | study / effect`) are supported; random effects with an `~ inner | outer` structure are not yet supported.

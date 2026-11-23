@@ -26,8 +26,17 @@
 #' estimate, its prediction interval, and the test of heterogeneity. The
 #' table of a meta-regression has the intercept and moderators, as for other
 #' regression models. [apa_performance()] gives the heterogeneity statistics.
-#' Multivariate and multilevel models (`metafor::rma.mv()`) are not yet
-#' supported.
+#'
+#' Multilevel meta-analyses fit with `metafor::rma.mv()` (e.g., several effect
+#' sizes nested in studies, with `random = ~ 1 | study / effect`) get the
+#' same tables, with a row for each effect size. [apa_note()] names the
+#' levels and their numbers of units, and gives each level's variance
+#' component (\eqn{\sigma^2}{sigma^2}) and the multilevel \eqn{I^2}{I^2}
+#' (Cheung, 2014). Random effects with an `~ inner | outer` structure (e.g.,
+#' correlated outcomes within studies) are not yet supported.
+#' @references Cheung, M. W.-L. (2014). Modeling dependent effect sizes with
+#'   three-level meta-analyses: A structural equation modeling approach.
+#'   *Psychological Methods, 19*(2), 211--229. \doi{10.1037/a0032968}
 #' @export
 #' @rdname apa_parameters
 #' @examples
@@ -162,6 +171,15 @@ apa_parameters.rma <- function(
 #' `"k"`, `"QE"`, `"p_QE"`, `"tau2"`, and `"I2"`, plus `"QM"`, `"p_QM"`, and
 #' `"R2"` for meta-regressions. Equal-effects models have no
 #' \eqn{\tau^2}{tau^2}.
+#'
+#' For multilevel meta-analyses (`metafor::rma.mv()`), `"k"` is the number of
+#' effect sizes, and the variance components are reported for each level:
+#' \eqn{\sigma^2}{sigma^2} (`"sigma2"`), \eqn{\sigma}{sigma} (`"sigma"`), and
+#' their confidence intervals (`"sigma2_CI"`), with the level as a subscript.
+#' `"I2"` is the multilevel \eqn{I^2}{I^2} for all levels together, and
+#' `"I2_levels"` gives it for each level (Cheung, 2014). The defaults are
+#' `"k"`, `"QE"`, `"p_QE"`, `"sigma2"`, and `"I2"`, plus `"QM"` and `"p_QM"`
+#' for meta-regressions.
 #' @export
 #' @rdname apa_performance
 apa_performance.rma <- function(
@@ -171,30 +189,37 @@ apa_performance.rma <- function(
 ) {
   meta_check_class(fit)
   int_only <- isTRUE(fit$int.only)
-  random <- !(fit$method %in% c("EE", "FE", "CE"))
+  multilevel <- meta_multilevel(fit)
+  is_mv <- inherits(fit, "rma.mv")
+  random <- if (is_mv) !is.null(multilevel) else !(fit$method %in% c("EE", "FE", "CE"))
   if (is.null(metrics)) {
     metrics <- c(
       "k",
       "QE",
       "p_QE",
-      if (random) c("tau2", "I2"),
-      if (!int_only) c("QM", "p_QM", if (random) "R2")
+      if (random && is_mv) c("sigma2", "I2"),
+      if (random && !is_mv) c("tau2", "I2"),
+      if (!int_only) c("QM", "p_QM", if (random && !is_mv) "R2")
     )
   }
   if (any(metrics == "all")) {
     metrics <- c(
       "k", "QE", "p_QE",
-      if (random) c("tau2", "tau2_CI", "tau", "I2", "I2_CI", "H2"),
-      if (!int_only) c("QM", "p_QM", if (random) "R2")
+      if (random && is_mv) c("sigma2", "sigma2_CI", "sigma", "I2", "I2_levels"),
+      if (random && !is_mv) c("tau2", "tau2_CI", "tau", "I2", "I2_CI", "H2"),
+      if (!int_only) c("QM", "p_QM", if (random && !is_mv) "R2")
     )
   }
-  allowed <- c("k", "QE", "p_QE", "tau2", "tau2_CI", "tau", "I2", "I2_CI", "H2", "QM", "p_QM", "R2")
+  univariate <- c("tau2", "tau2_CI", "tau", "I2_CI", "H2", "R2")
+  multilevel_only <- c("sigma2", "sigma2_CI", "sigma", "I2_levels")
+  allowed <- c("k", "QE", "p_QE", univariate, multilevel_only, "I2", "QM", "p_QM")
   unknown <- setdiff(metrics, allowed)
   if (length(unknown) > 0) {
     cli::cli_abort("Unknown {cli::qty(unknown)} metric{?s} for meta-analyses: {.val {unknown}}. Use any of {.val {allowed}}.")
   }
+  metrics <- setdiff(metrics, if (is_mv) univariate else multilevel_only)
   if (!random) {
-    metrics <- setdiff(metrics, c("tau2", "tau2_CI", "tau", "I2", "I2_CI", "H2", "R2"))
+    metrics <- setdiff(metrics, c(univariate, multilevel_only, "I2"))
   }
   if (int_only) {
     metrics <- setdiff(metrics, c("QM", "p_QM", "R2"))
@@ -203,7 +228,18 @@ apa_performance.rma <- function(
   num <- function(v) align_chr(v, accuracy = the$accuracy)
   p_format <- function(v) align_chr(apa_p(v), center = ".")
   ci <- NULL
-  if (any(c("tau2_CI", "I2_CI") %in% metrics)) {
+  ci_mv <- NULL
+  if (is_mv && "sigma2_CI" %in% metrics) {
+    ci_mv <- tryCatch(
+      suppressWarnings(stats::confint(fit)),
+      error = function(e) NULL
+    )
+    # One component gives a single result rather than a list of them
+    if (!is.null(ci_mv) && !is.null(ci_mv$random)) {
+      ci_mv <- list(ci_mv)
+    }
+  }
+  if (!is_mv && any(c("tau2_CI", "I2_CI") %in% metrics)) {
     ci <- tryCatch(
       suppressWarnings(stats::confint(fit)$random),
       error = function(e) NULL
@@ -216,6 +252,23 @@ apa_performance.rma <- function(
 
   d <- tibble::tibble(.rows = 1)
   for (m in metrics) {
+    # One column for each level of a multilevel model
+    if (m %in% multilevel_only) {
+      for (i in seq_along(multilevel$labels)) {
+        sub <- meta_subscript(multilevel$labels[i])
+        switch(
+          m,
+          sigma2 = d[[paste0("*&sigma;*^2^", sub)]] <- num(multilevel$sigma2[i]),
+          sigma = d[[paste0("*&sigma;*", sub)]] <- num(sqrt(multilevel$sigma2[i])),
+          sigma2_CI = {
+            bounds <- if (is.null(ci_mv) || length(ci_mv) < i) NULL else ci_mv[[i]]$random[1, c("ci.lb", "ci.ub")]
+            d[[paste0(ci_header, " for *&sigma;*^2^", sub)]] <- if (is.null(bounds)) "" else ci_md(num(bounds[[1]]), num(bounds[[2]]))
+          },
+          I2_levels = d[[paste0("*I*^2^", sub, " (%)")]] <- align_chr(multilevel$I2_levels[i] %||% NA_real_, accuracy = 0.1)
+        )
+      }
+      next
+    }
     switch(
       m,
       k = d[["*k*"]] <- as.character(fit$k),
@@ -224,7 +277,7 @@ apa_performance.rma <- function(
       tau2 = d[["*&tau;*^2^"]] <- num(fit$tau2),
       tau2_CI = d[[paste0(ci_header, " for *&tau;*^2^")]] <- if (is.null(ci)) "" else ci_md(num(ci["tau^2", "ci.lb"]), num(ci["tau^2", "ci.ub"])),
       tau = d[["*&tau;*"]] <- num(sqrt(fit$tau2)),
-      I2 = d[["*I*^2^ (%)"]] <- align_chr(fit$I2, accuracy = 0.1),
+      I2 = d[["*I*^2^ (%)"]] <- align_chr(if (is_mv) multilevel$I2 %||% NA_real_ else fit$I2, accuracy = 0.1),
       I2_CI = d[[paste0(ci_header, " for *I*^2^")]] <- if (is.null(ci)) "" else ci_md(align_chr(ci["I^2(%)", "ci.lb"], accuracy = 0.1), align_chr(ci["I^2(%)", "ci.ub"], accuracy = 0.1)),
       H2 = d[["*H*^2^"]] <- num(fit$H2),
       QM = d[[paste0("*Q*~M~(", fit$QMdf[1], ")")]] <- num(fit$QM),
@@ -237,6 +290,7 @@ apa_performance.rma <- function(
     metrics = metrics,
     method = fit$method,
     int_only = int_only,
+    multilevel = !is.null(multilevel),
     ci = level
   )
   as_apa7_tbl(d)
@@ -245,13 +299,77 @@ apa_performance.rma <- function(
 #' Only univariate models are supported
 #' @keywords internal
 #' @noRd
-meta_check_class <- function(fit) {
+meta_check_class <- function(fit, call = rlang::caller_env()) {
+  if (inherits(fit, "rma.mv")) {
+    if (isTRUE(fit$withG) || isTRUE(fit$withH)) {
+      cli::cli_abort(c(
+        "Random effects with an {.code ~ inner | outer} structure (e.g., {.code ~ outcome | study}) are not yet supported.",
+        i = "apa7 supports {.fn metafor::rma.mv} models with random intercepts at one or more (nested) levels, such as {.code random = ~ 1 | study / effect}."
+      ), call = call)
+    }
+    return(invisible(TRUE))
+  }
   if (!inherits(fit, "rma.uni")) {
     cli::cli_abort(c(
-      "apa7 supports meta-analyses fit with {.fn metafor::rma} (or {.fn metafor::rma.uni}), not {.cls {class(fit)[1]}} models.",
-      i = "Multivariate and multilevel models ({.fn metafor::rma.mv}) and Mantel-Haenszel and Peto models are not yet supported."
-    ))
+      "apa7 supports meta-analyses fit with {.fn metafor::rma} and {.fn metafor::rma.mv}, not {.cls {class(fit)[1]}} models.",
+      i = "Mantel-Haenszel and Peto models are not yet supported."
+    ), call = call)
   }
+}
+
+#' Markdown subscript of a level label
+#'
+#' Subscripts cannot contain spaces, so spaces become non-breaking spaces
+#' (e.g., "~School in District~").
+#' @keywords internal
+#' @noRd
+meta_subscript <- function(label) {
+  paste0("~", gsub(" ", "\u00a0", label, fixed = TRUE), "~")
+}
+
+#' Levels of a multilevel meta-analysis
+#'
+#' For `rma.mv` models, the label, variance, and number of levels of each
+#' random intercept, and the multilevel I2 (total and for each level),
+#' computed as in Cheung (2014) with the typical sampling variance
+#' (k - p) / tr(P), where P = W - WX(X'WX)^-1 X'W.
+#' @returns NULL for univariate models
+#' @keywords internal
+#' @noRd
+meta_multilevel <- function(fit) {
+  if (!inherits(fit, "rma.mv") || !isTRUE(fit$withS)) {
+    return(NULL)
+  }
+  labels <- purrr::map_chr(fit$s.names, \(name) {
+    parts <- variable_name_formatter(strsplit(name, "/", fixed = TRUE)[[1]])
+    if (length(parts) == 1) {
+      return(parts)
+    }
+    paste0(parts[length(parts)], " in ", paste(rev(parts[-length(parts)]), collapse = " in "))
+  })
+  sigma2 <- fit$sigma2
+  I2 <- NULL
+  I2_levels <- NULL
+  typical <- tryCatch(
+    {
+      W <- solve(as.matrix(fit$V))
+      X <- as.matrix(fit$X)
+      P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+      (fit$k - fit$p) / sum(diag(P))
+    },
+    error = function(e) NULL
+  )
+  if (!is.null(typical)) {
+    I2 <- 100 * sum(sigma2) / (sum(sigma2) + typical)
+    I2_levels <- 100 * sigma2 / (sum(sigma2) + typical)
+  }
+  list(
+    labels = unname(labels),
+    sigma2 = sigma2,
+    nlevels = fit$s.nlevels,
+    I2 = I2,
+    I2_levels = I2_levels
+  )
 }
 
 #' Are the tests t tests (Knapp-Hartung or similar adjustments)?
@@ -392,7 +510,8 @@ meta_study_table <- function(fit, info, weights = TRUE, column_formats = NULL) {
 #' @noRd
 meta_record <- function(fit, info, studies, weights = FALSE) {
   pi <- NULL
-  random <- !(fit$method %in% c("EE", "FE", "CE"))
+  multilevel <- meta_multilevel(fit)
+  random <- if (inherits(fit, "rma.mv")) !is.null(multilevel) else !(fit$method %in% c("EE", "FE", "CE"))
   if (studies && random) {
     pr <- tryCatch(stats::predict(fit), error = function(e) NULL)
     if (!is.null(pr) && !is.null(pr$pi.lb)) {
@@ -414,6 +533,7 @@ meta_record <- function(fit, info, studies, weights = FALSE) {
     transformed = isTRUE(info$transformed),
     bounded = isTRUE(info$bounded),
     method = fit$method,
+    multilevel = if (!is.null(multilevel)) multilevel[c("labels", "nlevels")],
     t_test = meta_t_test(fit),
     int_only = isTRUE(fit$int.only),
     pooled = list(
@@ -426,8 +546,9 @@ meta_record <- function(fit, info, studies, weights = FALSE) {
       QE = fit$QE,
       df = fit$k - fit$p,
       p = fit$QEp,
-      tau2 = if (random) fit$tau2,
-      I2 = if (random) fit$I2
+      tau2 = if (random && is.null(multilevel)) fit$tau2,
+      sigma2 = if (!is.null(multilevel)) stats::setNames(multilevel$sigma2, multilevel$labels),
+      I2 = if (!is.null(multilevel)) multilevel$I2 else if (random) fit$I2
     ),
     ci = meta_level(fit)
   )
@@ -459,7 +580,20 @@ meta_estimator <- function(method) {
 #' @noRd
 meta_model_sentence <- function(record) {
   method <- record$method
-  model <- if (method %in% c("EE", "CE")) {
+  ml <- record$multilevel
+  model <- if (length(ml) > 0) {
+    levels <- paste0(
+      # Lowercase words in running text (e.g., "school in district")
+      gsub("\\b([A-Z])(?=[a-z])", "\\L\\1", ml$labels, perl = TRUE),
+      " (", ml$nlevels, " levels)"
+    )
+    paste0(
+      "a multilevel random-effects model with random intercepts for ",
+      and_list(levels),
+      ", with variance components estimated by ",
+      meta_estimator(method)
+    )
+  } else if (method %in% c("EE", "CE")) {
     "an equal-effects model"
   } else if (method == "FE") {
     "a fixed-effects model"
@@ -474,11 +608,12 @@ meta_model_sentence <- function(record) {
   } else {
     ""
   }
+  units <- if (length(ml) > 0) "effect sizes" else "studies"
   if (isTRUE(record$int_only)) {
-    paste0("The ", record$k, " studies were pooled with ", model, knha, ".")
+    paste0("The ", record$k, " ", units, " were pooled with ", model, knha, ".")
   } else {
     paste0(
-      "The meta-regression of ", record$k, " studies used ",
+      "The meta-regression of ", record$k, " ", units, " used ",
       sub("^an? ", "a ", sub("random-effects model", "mixed-effects model", model)),
       knha,
       "."
@@ -567,6 +702,15 @@ meta_note_sentences <- function(record) {
           ", *&tau;*^2^ = ", trimws(align_chr(het$tau2, accuracy = the$accuracy)),
           ", *I*^2^ = ", trimws(align_chr(het$I2, accuracy = 0.1)), "%"
         )
+      } else if (!is.null(het$sigma2)) {
+        paste0(
+          paste0(
+            ", *&sigma;*^2^", meta_subscript(names(het$sigma2)), " = ",
+            trimws(align_chr(unname(het$sigma2), accuracy = the$accuracy)),
+            collapse = ""
+          ),
+          if (!is.null(het$I2)) paste0(", *I*^2^ = ", trimws(align_chr(het$I2, accuracy = 0.1)), "%") else ""
+        )
       } else {
         ""
       },
@@ -600,23 +744,35 @@ meta_p_text <- function(p) {
 meta_fit_note_sentences <- function(record) {
   metrics <- record$metrics
   sentences <- character(0)
-  if (!(record$method %in% c("EE", "FE", "CE")) && any(c("tau2", "tau", "tau2_CI", "I2", "R2") %in% metrics)) {
+  if (isTRUE(record$multilevel) && any(c("sigma2", "sigma", "sigma2_CI", "I2", "I2_levels") %in% metrics)) {
+    sentences <- c(
+      sentences,
+      paste0("Variance components were estimated by ", meta_estimator(record$method), "."),
+      if (any(c("I2", "I2_levels") %in% metrics)) {
+        "*I*^2^ is the multilevel *I*^2^ (Cheung, 2014): the percentage of total variability due to heterogeneity at all levels, or at the level in the subscript."
+      }
+    )
+  } else if (!(record$method %in% c("EE", "FE", "CE")) && any(c("tau2", "tau", "tau2_CI", "I2", "R2") %in% metrics)) {
     sentences <- c(
       sentences,
       paste0("*&tau;*^2^ was estimated by ", meta_estimator(record$method), ".")
     )
   }
   abbreviations <- c(
-    `*k*` = if ("k" %in% metrics) "number of studies",
+    `*k*` = if ("k" %in% metrics) {
+      if (isTRUE(record$multilevel)) "number of effect sizes" else "number of studies"
+    },
     `*Q*` = if ("QE" %in% metrics && isTRUE(record$int_only)) "test of heterogeneity",
     `*Q*~E~` = if ("QE" %in% metrics && !isTRUE(record$int_only)) "test of residual heterogeneity",
     `*&tau;*^2^` = if (any(c("tau2", "tau2_CI") %in% metrics)) "variance of the true effects",
     `*&tau;*` = if ("tau" %in% metrics) "standard deviation of the true effects",
-    `*I*^2^` = if (any(c("I2", "I2_CI") %in% metrics)) "percentage of total variability due to heterogeneity",
+    `*&sigma;*^2^` = if (any(c("sigma2", "sigma2_CI") %in% metrics)) "variance of the true effects at the level in the subscript",
+    `*&sigma;*` = if ("sigma" %in% metrics) "standard deviation of the true effects at the level in the subscript",
+    `*I*^2^` = if (any(c("I2", "I2_CI") %in% metrics) && !isTRUE(record$multilevel)) "percentage of total variability due to heterogeneity",
     `*H*^2^` = if ("H2" %in% metrics) "ratio of total variability to sampling variability",
     `*Q*~M~` = if ("QM" %in% metrics) "omnibus test of the moderators",
     `*R*^2^` = if ("R2" %in% metrics) "percentage of heterogeneity explained by the moderators",
-    CI = if (any(c("tau2_CI", "I2_CI") %in% metrics)) "confidence interval"
+    CI = if (any(c("tau2_CI", "I2_CI", "sigma2_CI") %in% metrics)) "confidence interval"
   )
   c(sentences, abbreviation_sentence(unlist(abbreviations)))
 }

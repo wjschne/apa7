@@ -310,8 +310,14 @@ estimator of \eqn{\tau^2}{tau^2}), and gives the test of the pooled
 estimate, its prediction interval, and the test of heterogeneity. The
 table of a meta-regression has the intercept and moderators, as for other
 regression models. \code{\link[=apa_performance]{apa_performance()}} gives the heterogeneity statistics.
-Multivariate and multilevel models (\code{metafor::rma.mv()}) are not yet
-supported.
+
+Multilevel meta-analyses fit with \code{metafor::rma.mv()} (e.g., several effect
+sizes nested in studies, with \code{random = ~ 1 | study / effect}) get the
+same tables, with a row for each effect size. \code{\link[=apa_note]{apa_note()}} names the
+levels and their numbers of units, and gives each level's variance
+component (\eqn{\sigma^2}{sigma^2}) and the multilevel \eqn{I^2}{I^2}
+(Cheung, 2014). Random effects with an \code{~ inner | outer} structure (e.g.,
+correlated outcomes within studies) are not yet supported.
 
 For multinomial logistic regression models (\code{nnet::multinom}), each outcome
 category except the reference category (the first level of the response)
@@ -454,4 +460,9 @@ if (requireNamespace("nlme", quietly = TRUE)) {
     apa_parameters()
 }
 }
+}
+\references{
+Cheung, M. W.-L. (2014). Modeling dependent effect sizes with
+three-level meta-analyses: A structural equation modeling approach.
+\emph{Psychological Methods, 19}(2), 211--229. \doi{10.1037/a0032968}
 }

@@ -104,6 +104,15 @@ and the proportion of heterogeneity they explain (\code{"R2"}). The defaults are
 \code{"R2"} for meta-regressions. Equal-effects models have no
 \eqn{\tau^2}{tau^2}.
 
+For multilevel meta-analyses (\code{metafor::rma.mv()}), \code{"k"} is the number of
+effect sizes, and the variance components are reported for each level:
+\eqn{\sigma^2}{sigma^2} (\code{"sigma2"}), \eqn{\sigma}{sigma} (\code{"sigma"}), and
+their confidence intervals (\code{"sigma2_CI"}), with the level as a subscript.
+\code{"I2"} is the multilevel \eqn{I^2}{I^2} for all levels together, and
+\code{"I2_levels"} gives it for each level (Cheung, 2014). The defaults are
+\code{"k"}, \code{"QE"}, \code{"p_QE"}, \code{"sigma2"}, and \code{"I2"}, plus \code{"QM"} and \code{"p_QM"}
+for meta-regressions.
+
 For multinomial logistic regression models (\code{nnet::multinom}), \code{R2} is
 McFadden's pseudo-\emph{R}^2^, and the default metrics are \code{R2} and \code{AIC}.
 

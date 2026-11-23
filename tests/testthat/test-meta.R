@@ -123,8 +123,75 @@ test_that("apa_performance gives heterogeneity statistics", {
   expect_error(apa_performance(fit, metrics = "zz"), "Unknown metric")
 })
 
+test_that("multilevel meta-analyses (rma.mv) get effect-size rows and variance components", {
+  d <- metadat::dat.konstantopoulos2011
+  fit <- metafor::rma.mv(
+    yi, vi,
+    random = ~ 1 | district / school,
+    data = d,
+    slab = paste0("District ", district, ", School ", school)
+  )
+  result <- apa_parameters(fit)
+  expect_equal(nrow(result), 57)
+  expect_equal(colnames(result), c("Study", "*g*", "95% CI", "Weight (%)"))
+  expect_equal(result$Study[57], "Pooled estimate (random effects)")
+  expect_equal(unpad(result$`*g*`[57]), sprintf("%.2f", as.vector(fit$b)))
+  expect_equal(unpad(result$`Weight (%)`[5]), sprintf("%.1f", weights(fit)[5]))
+
+  # Multilevel I2 (Cheung, 2014; formula from the metafor FAQ)
+  W <- solve(fit$V)
+  X <- model.matrix(fit)
+  P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+  I2 <- 100 * sum(fit$sigma2) / (sum(fit$sigma2) + (fit$k - fit$p) / sum(diag(P)))
+
+  note <- apa_note(result)
+  expect_match(
+    note,
+    "The 56 effect sizes were pooled with a multilevel random-effects model with random intercepts for district (11 levels) and school in district (56 levels), with variance components estimated by restricted maximum likelihood.",
+    fixed = TRUE
+  )
+  expect_match(note, "*&sigma;*^2^~District~ = 0.07, *&sigma;*^2^~School\u00a0in\u00a0District~ = 0.03", fixed = TRUE)
+  expect_match(note, paste0("*I*^2^ = ", sprintf("%.1f", I2), "%"), fixed = TRUE)
+
+  perf <- apa_performance(fit)
+  expect_equal(
+    colnames(perf),
+    c("*k*", "*Q*(55)", "*p*", "*&sigma;*^2^~District~", "*&sigma;*^2^~School\u00a0in\u00a0District~", "*I*^2^ (%)")
+  )
+  expect_equal(unpad(perf$`*I*^2^ (%)`), sprintf("%.1f", I2))
+  perf_note <- apa_note(perf)
+  expect_match(perf_note, "*k* = number of effect sizes", fixed = TRUE)
+  expect_match(perf_note, "multilevel *I*^2^ (Cheung, 2014)", fixed = TRUE)
+
+  all <- apa_performance(fit, metrics = "all")
+  expect_true(all(c(
+    "95% CI for *&sigma;*^2^~District~",
+    "*&sigma;*~School\u00a0in\u00a0District~",
+    "*I*^2^~District~ (%)"
+  ) %in% colnames(all)))
+  ci <- confint(fit)
+  expect_equal(
+    unpad(all$`95% CI for *&sigma;*^2^~District~`),
+    paste0("[", sprintf("%.2f", ci[[1]]$random[1, "ci.lb"]), ",", sprintf("%.2f", ci[[1]]$random[1, "ci.ub"]), "]")
+  )
+
+  # Meta-regression
+  fit2 <- metafor::rma.mv(yi, vi, mods = ~ year, random = ~ 1 | district / school, data = d)
+  reg <- apa_parameters(fit2)
+  expect_equal(reg$Variable, c("Constant", "Year"))
+  expect_match(apa_note(reg), "The meta-regression of 56 effect sizes used a multilevel mixed-effects model", fixed = TRUE)
+  expect_equal(
+    colnames(apa_performance(fit2)),
+    c("*k*", "*Q*~E~(54)", "*p*~E~", "*&sigma;*^2^~District~", "*&sigma;*^2^~School\u00a0in\u00a0District~", "*I*^2^ (%)", "*Q*~M~(1)", "*p*~M~")
+  )
+
+  # Univariate metrics are not available for multilevel models
+  expect_false("*&tau;*^2^" %in% colnames(apa_performance(fit, metrics = c("k", "tau2"))))
+})
+
 test_that("unsupported metafor models give a clear error", {
   d <- metadat::dat.konstantopoulos2011
-  fit <- metafor::rma.mv(yi, vi, random = ~ 1 | district / school, data = d)
+  fit <- metafor::rma.mv(yi, vi, random = ~ factor(school) | district, data = d)
   expect_error(apa_parameters(fit), "not yet supported")
+  expect_error(apa_performance(fit), "not yet supported")
 })

@@ -102,10 +102,11 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
   - [ ] Beta regression, GEE, panel and fixed-effects, and instrumental-variable models (`betareg`, `geepack`, `fixest`, `ivreg`), possibly through one generic method
 - [ ] Generalized additive models (`mgcv::gam`): parametric terms, and smooth terms with *edf* and *F*
 - [x] Collinearity diagnostics with `apa_collinearity()`, from `performance::check_collinearity()`: *VIF* [CI] and tolerance for each predictor, generalized *VIF*s, headings for model parts, bolded large *VIF*s
-- [ ] Mediation (`mediation::mediate`): ACME, ADE, and total effect with CIs (beyond `lavaan`'s defined parameters)
+- [ ] Mediation (`mediation::mediate`): ACME, ADE, and total effect with CIs (beyond `lavaan`'s defined parameters). On hold (2026-11-23): undecided whether apa7 should support the mediation package
 - [ ] Factor retention (`parameters::n_factors()`) and cluster analysis (`parameters::cluster_analysis()`)
 - [x] Meta-analyses (`metafor::rma()`): study-level effect sizes with weights and the pooled estimate, heterogeneity (*Q*, *I*², *τ*²) with `apa_performance()`, and meta-regressions (computed from the metafor object rather than `parameters`, which gives equal-effects inverse-variance weights rather than percentages and exponentiates only the pooled estimate)
-  - [ ] Possible additions: `rma.mv` (multilevel and multivariate models), `rma.mh`/`rma.peto`, subgroup tables, and publication-bias tests (Egger's test, trim and fill)
+  - [x] Multilevel models (`rma.mv` with nested random intercepts): variance components and multilevel *I*^2^ for each level
+  - [ ] Possible additions: `rma.mv` with `~ inner | outer` structures (multivariate models), `rma.mh`/`rma.peto`, subgroup tables, and publication-bias tests (Egger's test, trim and fill)
 - [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR` (on hold until the other major easystats analyses are supported)
 
 ## Table notes
