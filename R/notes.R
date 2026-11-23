@@ -30,6 +30,11 @@
 #' For [apa_descriptives()] tables, the note says which statistics are
 #' shown, lists missing values, and names the tests of group differences.
 #'
+#' For [apa_means()], [apa_contrasts()], and [apa_slopes()] tables, the note
+#' says what the values are, how the other predictors were held constant, on
+#' which scale the estimates are, which level was subtracted from which, and
+#' how *p*-values were adjusted for multiple comparisons.
+#'
 #' For [apa_reliability()] tables, the note gives the number of respondents,
 #' says which items were reverse-scored and how scale scores were computed,
 #' and defines the statistics.
@@ -138,7 +143,7 @@ apa_note <- function(x, collapse = " ") {
   if (is.null(record)) {
     cli::cli_abort(c(
       "{.arg x} has no table note information.",
-      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, {.fn apa_descriptives}, and {.fn apa_performance} (for lavaan models).",
+      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, {.fn apa_descriptives}, {.fn apa_means}, {.fn apa_contrasts}, {.fn apa_slopes}, and {.fn apa_performance} (for lavaan models).",
       i = "The information is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop. Call {.fn apa_note} on the table before changing it."
     ))
   }
@@ -150,6 +155,7 @@ apa_note <- function(x, collapse = " ") {
     factor_cor = factor_cor_note_sentences(record),
     reliability = reliability_note_sentences(record),
     descriptives = descriptives_note_sentences(record),
+    modelbased = modelbased_note_sentences(record),
     parameters = parameters_note_sentences(record),
     htest = htest_note_sentences(record),
     fit = fit_note_sentences(record),
@@ -759,7 +765,7 @@ note_text <- function(data, note) {
   if (isTRUE(note)) {
     if (is.null(attr(data, "apa_note", exact = TRUE))) {
       cli::cli_abort(c(
-        "{.code note = TRUE} needs a table made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, or {.fn apa_descriptives}.",
+        "{.code note = TRUE} needs a table made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, {.fn apa_descriptives}, {.fn apa_means}, {.fn apa_contrasts}, or {.fn apa_slopes}.",
         i = "The information for the note is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop.",
         i = "To write your own note, pass it as text (e.g., {.code note = \"Data are from ...\"})."
       ))

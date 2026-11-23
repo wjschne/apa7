@@ -5,14 +5,6 @@ knitr:
     collapse: true
     comment: '#>'
     dev: "ragg_png"
-format: 
-  html:
-    toc: true
-    html-math-method: katex
-vignette: >
-  %\VignetteIndexEntry{summarize}
-  %\VignetteEngine{quarto::html}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r}
@@ -32,9 +24,11 @@ library(purrr)
 <<presetup>>
 ```
 
-The flextable and gt packages have many, many options and helper functions. The `tabulator`, `summarizor`, and `proc_freq` functions from the flextable package are particularly powerful ways of summarizing and describing data. Functions that automate your descriptive statistics tables for you (e.g., the amazing [gtsummary package](https://www.danieldsjoberg.com/gtsummary/index.html)) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. (For a standard table describing a sample, `apa_descriptives` makes one directly; see the [descriptive statistics article](descriptives.html).) After all that, the `apa_style` function will get a flextable or gt table close to APA style. You may need to do some additional styling with flextable or gt as well.
+The flextable package has many, many options and helper functions. The `tabulator`, `summarizor`, and `proc_freq` functions are particularly powerful ways of summarizing and describing data. 
 
-Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that flextable and gt can do most of the rest after that. 
+Functions that automate your descriptive statistics tables for you (e.g., the amazing [gtsummary package](https://www.danieldsjoberg.com/gtsummary/index.html)) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the `apa_style` function will get a flextable table close to APA style. You may need to do some additional styling with flextable as well.
+
+Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that apa7 and flextable can do most of the rest after that. 
 
 # Data Setup
 
@@ -54,42 +48,9 @@ d <- diamonds %>%
   pivot_wider(names_from = Variable) 
 ```
 
-# Flextable
-
-The flextable package has a `theme_apa` function that can get things very close to full APA style. With a little extra care, the formatting in @tbl-flextable is pretty much perfect. 
-
-```{r}
-#| label: tbl-flextable
-#| tbl-cap: Price, Carat, Depth, Table Using `flextable`
-flextable::flextable(d) |>
-  theme_apa() |>
-  flextable::separate_header() |>
-  colformat_double(j = 3:4,
-                   prefix = "$",
-                   digits = 2) |>
-  italic(j = -1, i = 2, part = "header") |>
-  italic(j = 2, i = 1, part = "header") |>
-  align(align = "center", part = "header") |>
-  align(j = 1) |>
-  surround(
-    i = 2,
-    part = "header",
-    border.top = flextable::fp_border_default(
-      color = "black",
-      width = 1)
-  ) 
-
-```
-
-
-
-## The `apa_flextable` function
+# The `apa_flextable` function
 
 The `apa_flextable` function handles most of the formatting automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
-
-```{r loadftextra, include=FALSE}
-library(ftExtra)
-```
 
 ```{r}
 #| label: tbl-apaflextable

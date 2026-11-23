@@ -9,15 +9,18 @@ reference:
       - apa_flextable
       - apa_anova
       - apa_chisq
+      - apa_contrasts
       - apa_cor
       - apa_descriptives
       - apa_factor_cor
       - apa_htest
       - apa_loadings
+      - apa_means
       - apa_parameters
       - apa_performance
       - apa_performance_comparison
       - apa_reliability
+      - apa_slopes
   - title: Style flextables
     desc: "Alter the look of a flextable previously created"
     contents:

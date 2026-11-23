@@ -1,0 +1,155 @@
+---
+title: "Estimated Marginal Means, Contrasts, and Simple Slopes"
+format: html
+knitr:
+  opts_chunk:
+    fig-cap-location: top
+filters:
+  - quarto
+  - apanote
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(apa7)
+library(modelbased)
+```
+
+```{r}
+#| label: setup2
+#| eval: false
+<<setup>>
+```
+
+After an ANOVA or a regression with an interaction, readers usually want to know more than whether an effect is significant. Which groups differ? How large is the effect of a predictor at different values of a moderator? The [modelbased](https://easystats.github.io/modelbased/) package answers these questions, and three apa7 functions put its answers in APA-style tables:
+
+| Function | Table | modelbased function |
+|---|---|---|
+| `apa_means` | Estimated marginal means with confidence intervals | `estimate_means` |
+| `apa_contrasts` | Differences between means (e.g., pairwise comparisons) | `estimate_contrasts` |
+| `apa_slopes` | Simple slopes of a predictor at values of a moderator | `estimate_slopes` |
+
+Each function takes either a model or the output of the modelbased function. With a model, the other arguments (e.g., `by`, `contrast`, `trend`, and `p_adjust`) go to the modelbased function, so these two calls make the same table:
+
+```{r}
+#| label: equivalent
+#| eval: false
+apa_contrasts(fit, contrast = "dose", p_adjust = "holm")
+
+estimate_contrasts(fit, contrast = "dose", p_adjust = "holm") |>
+  apa_contrasts()
+```
+
+# Estimated Marginal Means
+
+The `ToothGrowth` data set has the tooth length of 60 guinea pigs given one of three doses of vitamin C (0.5, 1, or 2 mg/day) by one of two delivery methods (orange juice or ascorbic acid). Here is a two-way ANOVA:
+
+```{r}
+#| label: fit
+d_tooth <- ToothGrowth
+names(d_tooth) <- c("length", "supplement", "dose")
+d_tooth$dose <- factor(d_tooth$dose)
+levels(d_tooth$supplement) <- c("Orange juice", "Ascorbic acid")
+fit <- lm(length ~ supplement * dose, data = d_tooth)
+
+apa_anova(fit) |>
+  apa_flextable(note = TRUE)
+```
+
+The means of each dose, averaged over the two delivery methods:
+
+```{r}
+#| label: means-dose
+apa_means(fit, by = "dose") |>
+  apa_flextable(note = TRUE)
+```
+
+With more than one variable in `by`, the last variable labels the rows, and each level of the other variables gets a heading row:
+
+```{r}
+#| label: means-both
+apa_means(fit, by = c("supplement", "dose")) |>
+  apa_flextable(note = TRUE)
+```
+
+# Contrasts
+
+Pairwise comparisons of the doses, with *p*-values adjusted by Holm's method:
+
+```{r}
+#| label: contrasts-dose
+apa_contrasts(fit, contrast = "dose", p_adjust = "holm") |>
+  apa_flextable(note = TRUE)
+```
+
+Each row is the first level minus the second (e.g., 1 − 0.5), and the note says so. To follow up the interaction, compare the doses separately for each delivery method with `by`:
+
+```{r}
+#| label: contrasts-by
+apa_contrasts(fit, contrast = "dose", by = "supplement", p_adjust = "holm") |>
+  apa_flextable(note = TRUE)
+```
+
+The `p_adjust` argument of `estimate_contrasts` offers several methods, including `"tukey"`, `"bonferroni"`, `"holm"`, and `"fdr"`. The note names the method, or says that the *p*-values are not adjusted.
+
+# Simple Slopes
+
+A moderation analysis asks whether the effect of one predictor depends on another. In the `mtcars` data, the effect of a car's weight on its fuel efficiency (miles per gallon) may depend on its horsepower:
+
+```{r}
+#| label: moderation
+fit_mod <- lm(mpg ~ wt * hp, data = mtcars)
+apa_parameters(fit_mod) |>
+  apa_flextable(note = TRUE)
+```
+
+Simple slopes show the effect of weight at chosen values of horsepower (here, 100, 150, and 200):
+
+```{r}
+#| label: slopes
+apa_slopes(fit_mod, trend = "wt", by = "hp=c(100, 150, 200)") |>
+  apa_flextable(note = TRUE)
+```
+
+Weight lowers fuel efficiency less in more powerful cars. modelbased has shortcuts for common moderator values, such as `by = "hp=[sd]"` for the mean and one standard deviation above and below it.
+
+Without `by`, `apa_slopes` gives the average slope of the predictor:
+
+```{r}
+#| label: slope-average
+apa_slopes(fit_mod, trend = "wt") |>
+  apa_flextable(note = TRUE)
+```
+
+# Logistic Regression
+
+For models with a link function, modelbased reports estimates on the response scale by default. For logistic regression, the estimates are probabilities, which have no leading zero in APA style, and the contrasts are differences in probabilities. The `birthwt` data set in the MASS package has the birth weights of 189 babies. Here, the probability of a low birth weight (under 2.5 kg) depends on the mother's race, holding her weight at its mean and averaging over whether she smoked during pregnancy:
+
+```{r}
+#| label: logistic
+d_birth <- MASS::birthwt
+d_birth$race <- factor(d_birth$race, labels = c("White", "Black", "Other"))
+d_birth$smoke <- factor(d_birth$smoke, labels = c("No", "Yes"))
+d_birth$low_birth_weight <- d_birth$low
+d_birth$mother_weight <- d_birth$lwt
+fit_logistic <- glm(
+  low_birth_weight ~ race + smoke + mother_weight,
+  data = d_birth,
+  family = binomial
+)
+
+apa_means(fit_logistic, by = "race") |>
+  apa_flextable(note = TRUE)
+
+apa_contrasts(fit_logistic, contrast = "race", p_adjust = "holm") |>
+  apa_flextable(note = TRUE)
+```
+
+With `predict = "link"`, modelbased gives estimates on the link scale (here, log odds) instead, and the note says so.
+
+# Options
+
+* `starred = "p"` adds significance stars, and `bolded = "p"` bolds significant values, as in `apa_parameters`.
+* `format_variable_names = FALSE` keeps variable names exactly as they are.
+* Bayesian models are not yet supported.

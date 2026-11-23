@@ -90,7 +90,8 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
 
 - [x] Descriptive and sample tables ("Table 1") with `apa_descriptives()`: *M* (*SD*) or *Mdn* (*IQR*) and *n* (%), a column for each group and the total, and optional tests of group differences (computed in apa7 rather than with `report::report_sample()`, so the layout and notes match the other tables)
   - [ ] Possible additions: ranges (min–max), a missing-values row or column, and Fisher's exact test for sparse tables
-- [ ] Estimated marginal means, contrasts, and simple slopes (post hoc tests, moderation) from `modelbased::estimate_means()`, `estimate_contrasts()`, and `estimate_slopes()`: means with CIs and pairwise differences with adjusted *p*-values
+- [x] Estimated marginal means, contrasts, and simple slopes (post hoc tests, moderation) with `apa_means()`, `apa_contrasts()`, and `apa_slopes()`, from `modelbased::estimate_means()`, `estimate_contrasts()`, and `estimate_slopes()`: means with CIs, differences with adjusted *p*-values, heading rows for other `by` variables
+  - [ ] Possible additions: standardized effect sizes for contrasts (e.g., Cohen's *d* via `effectsize`), joint and omnibus tests, and Johnson–Neyman intervals
 - [x] Reliability and item analysis with `apa_reliability()`: item *M*, *SD*, *r*~it~, and α if deleted; scale mean, α [CI], *ω*~total~, and mean inter-item *r*. Computed with `psych`, which covers what `performance`'s `cronbachs_alpha()`, `item_reliability()`, `item_difficulty()`, `item_discrimination()`, `item_intercor()`, and `item_omega()` report and adds the CI of α.
 - [ ] Other regression families via `parameters`
   - [ ] Multinomial logistic regression (`nnet::multinom`): one block of coefficients per outcome category
