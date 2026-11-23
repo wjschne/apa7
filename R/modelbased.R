@@ -7,8 +7,8 @@
 #'
 #' `x` is either a model or the output of [modelbased::estimate_means()],
 #' [modelbased::estimate_contrasts()], or [modelbased::estimate_slopes()].
-#' With a model, the arguments in `...` are passed to the modelbased function
-#' (e.g., `by`, `contrast`, `trend`, and `p_adjust`), so
+#' With a model, `by`, `contrast`, `trend`, and the arguments in `...` (e.g.,
+#' `p_adjust`) are passed to the modelbased function, so
 #' `apa_contrasts(fit, contrast = "group", p_adjust = "holm")` is the same as
 #' `apa_contrasts(modelbased::estimate_contrasts(fit, contrast = "group", p_adjust = "holm"))`.
 #'
@@ -43,7 +43,21 @@
 #'   `apa_means()`), [modelbased::estimate_contrasts()] (for
 #'   `apa_contrasts()`), or [modelbased::estimate_slopes()] (for
 #'   `apa_slopes()`)
-#' @param ... arguments passed to the modelbased function when `x` is a model
+#' @param by variables whose levels (or values) the estimates are computed at
+#'   (e.g., `by = Species`, `by = c(am, cyl)`, `by = "hp=[sd]"`, or
+#'   `by = list(hp = "[sd]")`). Variable
+#'   names can be quoted or unquoted, but values (e.g., `"hp=[fivenum]"`) must
+#'   be quoted. In `apa_means()` and `apa_slopes()`, the last variable labels
+#'   the rows and the others get heading rows; in `apa_contrasts()`, all of
+#'   them get heading rows. Passed to the modelbased function.
+#' @param contrast variable whose levels (or values) are compared (e.g.,
+#'   `contrast = cyl`), quoted or unquoted. Passed to
+#'   [modelbased::estimate_contrasts()].
+#' @param trend predictor whose slopes are estimated (e.g., `trend = wt`),
+#'   quoted or unquoted. Passed to [modelbased::estimate_slopes()].
+#' @param ... other arguments passed to the modelbased function when `x` is a
+#'   model (e.g., `p_adjust = "holm"`, `predict = "link"`, or
+#'   `estimate = "average"`)
 #' @param starred columns to which significance stars are added (e.g., `"p"`
 #'   or `"Estimate"`)
 #' @param bolded columns that are bolded when *p* \eqn{\le}{<=} .05
@@ -76,13 +90,14 @@
 #' }
 apa_means <- function(
   x,
+  by = NULL,
   ...,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
-  x <- modelbased_call(x, "estimate_means", ...)
+  x <- modelbased_call(x, "estimate_means", list(by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
     kind = "means",
@@ -97,13 +112,15 @@ apa_means <- function(
 #' @export
 apa_contrasts <- function(
   x,
+  contrast = NULL,
+  by = NULL,
   ...,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
-  x <- modelbased_call(x, "estimate_contrasts", ...)
+  x <- modelbased_call(x, "estimate_contrasts", list(contrast = rlang::enquo(contrast), by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
     kind = "contrasts",
@@ -118,13 +135,15 @@ apa_contrasts <- function(
 #' @export
 apa_slopes <- function(
   x,
+  trend = NULL,
+  by = NULL,
   ...,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
-  x <- modelbased_call(x, "estimate_slopes", ...)
+  x <- modelbased_call(x, "estimate_slopes", list(trend = rlang::enquo(trend), by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
     kind = "slopes",
@@ -140,15 +159,116 @@ apa_slopes <- function(
 #' and below it
 #' @keywords internal
 #' @noRd
-modelbased_call <- function(x, fun, ...) {
+modelbased_call <- function(x, fun, variable_args, ...) {
+  args <- rlang::enquos(...)
+  # Variable arguments that were given
+  variable_args <- Filter(\(q) !rlang::quo_is_null(q), variable_args)
   if (inherits(x, "data.frame")) {
-    return(modelbased_estimates(x, fun, ...))
+    # modelbased output: the arguments are not evaluated, because unquoted
+    # variable names cannot be found without the model's data
+    if ((length(args) > 0 || length(variable_args) > 0) && inherits(x, fun)) {
+      cli::cli_warn(
+        "Arguments in {.arg ...} are ignored because {.arg x} is already output of {.fn modelbased::{fun}}."
+      )
+    }
+    return(modelbased_estimates(x, fun))
   }
-  args <- list(...)
-  if (!is.null(args$by)) {
-    args$by <- modelbased_numeric_by(x, args$by)
+  data <- tryCatch(
+    insight::get_data(x, verbose = FALSE),
+    error = function(e) NULL
+  )
+  variables <- if (is.null(data)) character(0) else colnames(data)
+  # by, contrast, and trend take quoted or unquoted variable names
+  values <- lapply(variable_args, modelbased_variable_names, variables = variables)
+  values <- c(values, lapply(args, rlang::eval_tidy))
+  # Named lists (e.g., list(x = "[sd]")) become strings (e.g., "x=[sd]"),
+  # which modelbased handles in all of its functions
+  for (arg in intersect(c("by", "contrast"), names(values))) {
+    values[[arg]] <- modelbased_spec_strings(values[[arg]])
   }
-  do.call(modelbased_estimates, c(list(x, fun), args))
+  if (!is.null(values$by)) {
+    values$by <- modelbased_numeric_by(data, values$by)
+  }
+  do.call(modelbased_estimates, c(list(x, fun), values))
+}
+
+#' Specifications as strings
+#'
+#' Turns a named list or named vector (e.g., `list(x = "[sd]", g = NULL)` or
+#' `list(x = c(1, 2))`) into strings (e.g., `"x=[sd]"` or `"x=c(1, 2)"`).
+#' Unnamed elements are variable names. Other inputs are returned unchanged.
+#' @keywords internal
+#' @noRd
+modelbased_spec_strings <- function(x) {
+  if (!is.list(x) && is.null(names(x))) {
+    return(x)
+  }
+  if (is.list(x) && is.null(names(x))) {
+    return(unlist(x))
+  }
+  nms <- names(x)
+  out <- character(0)
+  for (i in seq_along(x)) {
+    value <- x[[i]]
+    name <- nms[i]
+    if (is.na(name) || !nzchar(name)) {
+      out <- c(out, as.character(value))
+    } else if (is.null(value)) {
+      out <- c(out, name)
+    } else if (is.character(value) && length(value) == 1 && grepl("^\\[.*\\]$", value)) {
+      out <- c(out, paste0(name, "=", value))
+    } else if (is.numeric(value)) {
+      out <- c(out, paste0(name, "=c(", paste(value, collapse = ", "), ")"))
+    } else {
+      out <- c(out, paste0(name, "=c(", paste0("'", as.character(value), "'", collapse = ", "), ")"))
+    }
+  }
+  out
+}
+
+#' Variable names from a quoted or unquoted argument
+#'
+#' A name (e.g., `hp`) or a `c()` of names and strings (e.g.,
+#' `c(am, "hp=[sd]")`) that are variables in the model's data become strings.
+#' Anything else is evaluated (e.g., `"hp"`, or an object holding names).
+#' @param q quosure of the argument
+#' @param variables names of the variables in the model's data
+#' @keywords internal
+#' @noRd
+modelbased_variable_names <- function(q, variables) {
+  expr <- rlang::quo_get_expr(q)
+  as_name <- function(e) {
+    if (is.symbol(e) && as.character(e) %in% variables) {
+      return(as.character(e))
+    }
+    if (is.character(e) && length(e) == 1) {
+      return(e)
+    }
+    NULL
+  }
+  name <- as_name(expr)
+  if (!is.null(name)) {
+    return(name)
+  }
+  if (is.call(expr) && identical(expr[[1]], quote(c))) {
+    parts <- lapply(as.list(expr)[-1], as_name)
+    if (length(parts) > 0 && !any(vapply(parts, is.null, logical(1)))) {
+      return(unlist(parts))
+    }
+  }
+  tryCatch(
+    rlang::eval_tidy(q),
+    error = function(e) {
+      unknown <- setdiff(all.vars(expr), variables)
+      if (length(unknown) > 0 && length(variables) > 0) {
+        cli::cli_abort(
+          "{.val {unknown}} {?is/are} not {?a variable/variables} in the model's data.",
+          call = NULL
+        )
+      }
+      rlang::cnd_signal(e)
+    }
+  )
 }
 
 #' modelbased output, computed from a model if needed
@@ -192,11 +312,7 @@ modelbased_estimates <- function(x, fun, ...) {
 #' mean and 1 SD above and below it ("x=[sd]")
 #' @keywords internal
 #' @noRd
-modelbased_numeric_by <- function(model, by) {
-  data <- tryCatch(
-    insight::get_data(model, verbose = FALSE),
-    error = function(e) NULL
-  )
+modelbased_numeric_by <- function(data, by) {
   if (is.null(data) || !is.character(by)) {
     return(by)
   }
@@ -244,11 +360,15 @@ modelbased_shortcut_labels <- function(v, var, by) {
 #' @keywords internal
 #' @noRd
 modelbased_shortcut <- function(var, specs) {
-  spec <- specs[startsWith(specs, paste0(var, "=["))]
-  if (length(spec) != 1) {
+  # Specifications are "x=[sd]", or "x = c('[sd]')" when by is a list (e.g.,
+  # list(x = "[sd]"))
+  specs <- gsub("\\s", "", as.character(specs))
+  pattern <- "^(.+)=(c\\()?['\"]?\\[([A-Za-z0-9]+)\\]['\"]?\\)?$"
+  matched <- grepl(pattern, specs) & sub(pattern, "\\1", specs) == var
+  if (sum(matched) != 1) {
     return(NULL)
   }
-  sub("^.*=\\[(.*)\\]$", "\\1", spec)
+  sub(pattern, "\\3", specs[matched])
 }
 
 #' Names of the values a shortcut gives, from lowest to highest
@@ -376,7 +496,7 @@ modelbased_table <- function(
     row_label <- level_labels(row_var)
     first_header <- label(row_var)
   } else if (kind == "contrasts") {
-    contrast_names <- sub("=.*$", "", contrast_vars)
+    contrast_names <- trimws(sub("=.*$", "", contrast_vars))
     heading_vars <- setdiff(focal, contrast_names)
     row_label <- paste0(d$Level1, " \u2212 ", d$Level2)
     first_header <- if (length(contrast_vars) == 1) label(contrast_names) else "Contrast"

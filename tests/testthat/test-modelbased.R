@@ -211,3 +211,65 @@ test_that("numeric by defaults to [sd] in means and contrasts; contrasted shortc
   expect_equal(grouped$Hp[1], "Am: Auto")
   expect_equal(grouped$Hp[2], paste0(em, "*M* ", minus, " ", minus, "1*SD*"))
 })
+
+test_that("by, contrast, and trend take unquoted variable names", {
+  d <- cars_data()
+  fit <- lm(mpg ~ cyl * am + hp * wt, data = d)
+  expect_equal(apa_means(fit, by = cyl), apa_means(fit, by = "cyl"))
+  expect_equal(apa_means(fit, by = c(am, cyl)), apa_means(fit, by = c("am", "cyl")))
+  expect_equal(
+    apa_contrasts(fit, contrast = cyl, by = am, p_adjust = "holm"),
+    apa_contrasts(fit, contrast = "cyl", by = "am", p_adjust = "holm")
+  )
+  expect_equal(apa_slopes(fit, trend = wt, by = hp), apa_slopes(fit, trend = "wt", by = "hp"))
+  # Unquoted names mix with quoted values
+  expect_equal(
+    apa_slopes(fit, trend = wt, by = c(am, "hp=[sd]")),
+    apa_slopes(fit, trend = "wt", by = c("am", "hp=[sd]"))
+  )
+  # Objects holding names and other arguments are evaluated
+  vars <- c("am", "cyl")
+  adjust <- "holm"
+  expect_equal(apa_means(fit, by = vars), apa_means(fit, by = c("am", "cyl")))
+  expect_match(apa_note(apa_contrasts(fit, contrast = cyl, p_adjust = adjust)), "Holm", fixed = TRUE)
+
+  expect_error(apa_means(fit, by = zzz), "not a variable in the model's data")
+  em_cyl <- modelbased::estimate_means(fit, by = "cyl")
+  expect_warning(apa_means(em_cyl, by = cyl), "ignored")
+})
+
+test_that("by, contrast, and trend are named arguments that can be given by position", {
+  expect_equal(names(formals(apa_means))[1:3], c("x", "by", "..."))
+  expect_equal(names(formals(apa_contrasts))[1:4], c("x", "contrast", "by", "..."))
+  expect_equal(names(formals(apa_slopes))[1:4], c("x", "trend", "by", "..."))
+  d <- cars_data()
+  fit <- lm(mpg ~ cyl * am + wt, data = d)
+  expect_equal(apa_means(fit, cyl), apa_means(fit, by = "cyl"))
+  expect_equal(apa_contrasts(fit, cyl, am), apa_contrasts(fit, contrast = "cyl", by = "am"))
+  expect_equal(apa_slopes(fit, wt, am), apa_slopes(fit, trend = "wt", by = "am"))
+  # Named arguments are also ignored (with a warning) for modelbased output
+  es <- modelbased::estimate_slopes(fit, trend = "wt", by = "am")
+  expect_warning(apa_slopes(es, trend = wt), "ignored")
+})
+
+test_that("by given as a named list gets shortcut labels", {
+  d <- cars_data()
+  fit <- lm(mpg ~ wt * hp, data = d)
+  five <- c("Min (52)", "*Q*~1~ (96)", "*Mdn* (123)", "*Q*~3~ (180)", "Max (335)")
+  expect_equal(apa_slopes(fit, trend = wt, by = list(hp = "[fivenum]"))$Hp, five)
+  expect_equal(apa_slopes(fit, trend = wt, by = list(hp = c(100, 150)))$Hp, c("100", "150"))
+  # modelbased output made with a list keeps the labels
+  es <- modelbased::estimate_slopes(fit, trend = "wt", by = list(hp = "[fivenum]"))
+  expect_equal(apa_slopes(es)$Hp, five)
+
+  # Contrasts with a list by (which modelbased cannot handle directly)
+  fit2 <- lm(mpg ~ am * hp, data = d)
+  m <- mean(d$hp)
+  contrasts <- apa_contrasts(fit2, contrast = am, by = list(hp = "[sd]"))
+  expect_equal(contrasts$Am[3], sprintf("Hp: *M* (%.2f)", m))
+
+  # Unnamed elements are variable names
+  fit3 <- lm(mpg ~ am * hp * wt, data = d)
+  mixed <- apa_slopes(fit3, trend = wt, by = list("am", hp = "[sd]"))
+  expect_equal(mixed, apa_slopes(fit3, trend = wt, by = c("am", "hp=[sd]")))
+})

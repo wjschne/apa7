@@ -8,6 +8,7 @@
 \usage{
 apa_means(
   x,
+  by = NULL,
   ...,
   starred = NA,
   bolded = NA,
@@ -17,6 +18,8 @@ apa_means(
 
 apa_contrasts(
   x,
+  contrast = NULL,
+  by = NULL,
   ...,
   starred = NA,
   bolded = NA,
@@ -26,6 +29,8 @@ apa_contrasts(
 
 apa_slopes(
   x,
+  trend = NULL,
+  by = NULL,
   ...,
   starred = NA,
   bolded = NA,
@@ -39,7 +44,17 @@ apa_slopes(
 \code{apa_contrasts()}), or \code{\link[modelbased:estimate_slopes]{modelbased::estimate_slopes()}} (for
 \code{apa_slopes()})}
 
-\item{...}{arguments passed to the modelbased function when \code{x} is a model}
+\item{by}{variables whose levels (or values) the estimates are computed at
+(e.g., \code{by = Species}, \code{by = c(am, cyl)}, \code{by = "hp=[sd]"}, or
+\code{by = list(hp = "[sd]")}). Variable
+names can be quoted or unquoted, but values (e.g., \code{"hp=[fivenum]"}) must
+be quoted. In \code{apa_means()} and \code{apa_slopes()}, the last variable labels
+the rows and the others get heading rows; in \code{apa_contrasts()}, all of
+them get heading rows. Passed to the modelbased function.}
+
+\item{...}{other arguments passed to the modelbased function when \code{x} is a
+model (e.g., \code{p_adjust = "holm"}, \code{predict = "link"}, or
+\code{estimate = "average"})}
 
 \item{starred}{columns to which significance stars are added (e.g., \code{"p"}
 or \code{"Estimate"})}
@@ -52,6 +67,13 @@ defaults are used. The estimate column is named \code{"Estimate"}.}
 \item{format_variable_names}{if \code{TRUE} (default), variable names are
 formatted (e.g., \code{"Sepal.Length"} becomes "Sepal Length"). Factor levels
 are shown as they are.}
+
+\item{contrast}{variable whose levels (or values) are compared (e.g.,
+\code{contrast = cyl}), quoted or unquoted. Passed to
+\code{\link[modelbased:estimate_contrasts]{modelbased::estimate_contrasts()}}.}
+
+\item{trend}{predictor whose slopes are estimated (e.g., \code{trend = wt}),
+quoted or unquoted. Passed to \code{\link[modelbased:estimate_slopes]{modelbased::estimate_slopes()}}.}
 }
 \value{
 \code{apa7_tbl} (tibble)
@@ -65,8 +87,8 @@ probe a moderation effect), computed with the
 \details{
 \code{x} is either a model or the output of \code{\link[modelbased:estimate_means]{modelbased::estimate_means()}},
 \code{\link[modelbased:estimate_contrasts]{modelbased::estimate_contrasts()}}, or \code{\link[modelbased:estimate_slopes]{modelbased::estimate_slopes()}}.
-With a model, the arguments in \code{...} are passed to the modelbased function
-(e.g., \code{by}, \code{contrast}, \code{trend}, and \code{p_adjust}), so
+With a model, \code{by}, \code{contrast}, \code{trend}, and the arguments in \code{...} (e.g.,
+\code{p_adjust}) are passed to the modelbased function, so
 \code{apa_contrasts(fit, contrast = "group", p_adjust = "holm")} is the same as
 \code{apa_contrasts(modelbased::estimate_contrasts(fit, contrast = "group", p_adjust = "holm"))}.
 
