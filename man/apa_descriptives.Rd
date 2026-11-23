@@ -13,6 +13,9 @@ apa_descriptives(
   categorical = NULL,
   labels = NULL,
   test = FALSE,
+  categorical_test = c("auto", "chisq", "fisher"),
+  missing = c("note", "row"),
+  range = FALSE,
   digits = 2,
   percent_digits = 1,
   format_variable_names = TRUE
@@ -41,8 +44,20 @@ names.}
 \item{test}{if \code{TRUE}, a column of \emph{p}-values tests the differences
 between groups (requires \code{by})}
 
+\item{categorical_test}{test of categorical variables when \code{test = TRUE}:
+\code{"auto"} (default) for Fisher's exact test when an expected count is
+below 5 and the chi-square test otherwise, \code{"chisq"} for the chi-square
+test, or \code{"fisher"} for Fisher's exact test}
+
+\item{missing}{where missing values are reported: \code{"note"} (default) in
+the note, or \code{"row"} in a "Missing" row below each variable that has
+missing values}
+
+\item{range}{if \code{TRUE}, a "Range" row with the minimum and maximum is
+added below each continuous variable}
+
 \item{digits}{number of decimal places of means, standard deviations,
-medians, and interquartile ranges}
+medians, interquartile ranges, and ranges}
 
 \item{percent_digits}{number of decimal places of percentages}
 
@@ -66,15 +81,23 @@ as categories). Each categorical variable is introduced by a heading row,
 with its levels indented below it, in factor level order (character
 vectors are sorted).
 
-Percentages are of the nonmissing responses, and \code{\link[=apa_note]{apa_note()}} lists the
-number of missing values of each variable that has any. Rows whose \code{by}
-value is missing are left out.
+Percentages are of the nonmissing responses. By default, \code{\link[=apa_note]{apa_note()}} lists
+the number of missing values of each variable that has any; with
+\code{missing = "row"}, each such variable gets a "Missing" row with the number
+of missing values in each column instead. Rows whose \code{by} value is missing
+are left out.
+
+With \code{range = TRUE}, each continuous variable gets a "Range" row with its
+minimum and maximum.
 
 With \code{test = TRUE}, a \emph{p} column tests group differences: Welch's \emph{t} test
 (two groups) or Welch's one-way ANOVA (\code{\link[stats:oneway.test]{stats::oneway.test()}}, more groups)
 for variables described by their mean, the Kruskal-Wallis test for
 variables described by their median, and the chi-square test of
 independence (without continuity correction) for categorical variables.
+When an expected count of a categorical variable's table is below 5, the
+chi-square approximation can be poor, so by default (\code{categorical_test = "auto"}) Fisher's exact test is used for that variable instead, and the
+note names the variables tested this way.
 Many journals discourage testing baseline differences in randomized
 trials, so tests are not shown by default.
 }
@@ -83,6 +106,11 @@ d <- mtcars
 d$am <- factor(d$am, labels = c("Automatic", "Manual"))
 d$cyl <- factor(d$cyl)
 apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am")
+
+# Ranges and rows of missing values
+d$hp[c(3, 8)] <- NA
+apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am",
+                 range = TRUE, missing = "row")
 
 # Medians for skewed variables, and tests of group differences
 apa_descriptives(

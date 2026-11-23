@@ -1,21 +1,9 @@
 ---
 title: "Correlations"
-crossref: 
-  title-delim: "."
 knitr:
   opts_chunk: 
-    collapse: true
-    comment: '#>'
     dev: "ragg_png"
-    cache: false
-format: 
-  html:
-    toc: true
-    html-math-method: katex
-vignette: >
-  %\VignetteIndexEntry{Correlations}
-  %\VignetteEngine{quarto::html}
-  %\VignetteEncoding{UTF-8}
+format: html
 ---
 
 ```{r setup, include = FALSE}

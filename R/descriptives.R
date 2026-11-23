@@ -12,15 +12,24 @@
 #' with its levels indented below it, in factor level order (character
 #' vectors are sorted).
 #'
-#' Percentages are of the nonmissing responses, and [apa_note()] lists the
-#' number of missing values of each variable that has any. Rows whose `by`
-#' value is missing are left out.
+#' Percentages are of the nonmissing responses. By default, [apa_note()] lists
+#' the number of missing values of each variable that has any; with
+#' `missing = "row"`, each such variable gets a "Missing" row with the number
+#' of missing values in each column instead. Rows whose `by` value is missing
+#' are left out.
+#'
+#' With `range = TRUE`, each continuous variable gets a "Range" row with its
+#' minimum and maximum.
 #'
 #' With `test = TRUE`, a *p* column tests group differences: Welch's *t* test
 #' (two groups) or Welch's one-way ANOVA ([stats::oneway.test()], more groups)
 #' for variables described by their mean, the Kruskal-Wallis test for
 #' variables described by their median, and the chi-square test of
 #' independence (without continuity correction) for categorical variables.
+#' When an expected count of a categorical variable's table is below 5, the
+#' chi-square approximation can be poor, so by default (`categorical_test =
+#' "auto"`) Fisher's exact test is used for that variable instead, and the
+#' note names the variables tested this way.
 #' Many journals discourage testing baseline differences in randomized
 #' trials, so tests are not shown by default.
 #'
@@ -40,8 +49,17 @@
 #'   names.
 #' @param test if `TRUE`, a column of *p*-values tests the differences
 #'   between groups (requires `by`)
+#' @param categorical_test test of categorical variables when `test = TRUE`:
+#'   `"auto"` (default) for Fisher's exact test when an expected count is
+#'   below 5 and the chi-square test otherwise, `"chisq"` for the chi-square
+#'   test, or `"fisher"` for Fisher's exact test
+#' @param missing where missing values are reported: `"note"` (default) in
+#'   the note, or `"row"` in a "Missing" row below each variable that has
+#'   missing values
+#' @param range if `TRUE`, a "Range" row with the minimum and maximum is
+#'   added below each continuous variable
 #' @param digits number of decimal places of means, standard deviations,
-#'   medians, and interquartile ranges
+#'   medians, interquartile ranges, and ranges
 #' @param percent_digits number of decimal places of percentages
 #' @param format_variable_names format variable names that have no label with
 #'   the `Variable` column format
@@ -53,6 +71,11 @@
 #' d$am <- factor(d$am, labels = c("Automatic", "Manual"))
 #' d$cyl <- factor(d$cyl)
 #' apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am")
+#'
+#' # Ranges and rows of missing values
+#' d$hp[c(3, 8)] <- NA
+#' apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am",
+#'                  range = TRUE, missing = "row")
 #'
 #' # Medians for skewed variables, and tests of group differences
 #' apa_descriptives(
@@ -71,10 +94,15 @@ apa_descriptives <- function(
   categorical = NULL,
   labels = NULL,
   test = FALSE,
+  categorical_test = c("auto", "chisq", "fisher"),
+  missing = c("note", "row"),
+  range = FALSE,
   digits = 2,
   percent_digits = 1,
   format_variable_names = TRUE
 ) {
+  categorical_test <- rlang::arg_match(categorical_test)
+  missing <- rlang::arg_match(missing)
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame, not {.obj_type_friendly {data}}.")
   }
@@ -135,6 +163,18 @@ apa_descriptives <- function(
 
   rows <- list()
   missing_counts <- integer(0)
+  fisher_variables <- character(0)
+  # Indented row of counts of missing values in each column
+  missing_row <- function(x, block) {
+    extra <- tibble::tibble(Variable = "\u2003Missing")
+    for (s in names(subsets)) {
+      extra[[s]] <- as.character(sum(is.na(x[subsets[[s]]])))
+    }
+    if (test) {
+      extra$p <- NA_real_
+    }
+    dplyr::bind_rows(block, extra)
+  }
   for (v in variables) {
     x <- data[[v]]
     is_categorical <- v %in% categorical || is.factor(x) || is.character(x) || is.logical(x)
@@ -155,7 +195,11 @@ apa_descriptives <- function(
         block[[s]] <- c(NA_character_, paste0(counts, " (", pct(percents), ")"))
       }
       if (test) {
-        block$p <- c(descriptives_test(xc, data[[by]], "categorical"), rep(NA_real_, length(levels_v)))
+        p_value <- descriptives_test(xc, data[[by]], "categorical", categorical_test)
+        if (identical(attr(p_value, "test"), "fisher")) {
+          fisher_variables <- c(fisher_variables, label_of(v))
+        }
+        block$p <- c(as.numeric(p_value), rep(NA_real_, length(levels_v)))
       }
     } else {
       method <- methods[[v]]
@@ -174,6 +218,20 @@ apa_descriptives <- function(
       if (test) {
         block$p <- descriptives_test(x, data[[by]], method)
       }
+      if (range) {
+        extra <- tibble::tibble(Variable = "\u2003Range")
+        for (s in names(subsets)) {
+          xs <- x[subsets[[s]] & !is.na(x)]
+          extra[[s]] <- if (length(xs) == 0) NA_character_ else paste0(num(min(xs)), "\u2013", num(max(xs)))
+        }
+        if (test) {
+          extra$p <- NA_real_
+        }
+        block <- dplyr::bind_rows(block, extra)
+      }
+    }
+    if (missing == "row" && any(is.na(x))) {
+      block <- missing_row(x, block)
     }
     rows[[v]] <- block
   }
@@ -206,7 +264,11 @@ apa_descriptives <- function(
       !purrr::map_lgl(data[variables], \(x) is.factor(x) || is.character(x) || is.logical(x))]])),
     any_categorical = any(variables %in% categorical) ||
       any(purrr::map_lgl(data[variables], \(x) is.factor(x) || is.character(x) || is.logical(x))),
-    missing = missing_counts,
+    missing = if (missing == "note") missing_counts,
+    missing_rows = missing == "row" && length(missing_counts) > 0,
+    range = isTRUE(range),
+    fisher = fisher_variables,
+    categorical_test = categorical_test,
     n_dropped = n_dropped,
     by = if (is.null(by)) NULL else label_of(by),
     test = isTRUE(test),
@@ -240,10 +302,29 @@ descriptives_methods <- function(continuous, variables) {
 #' p-value of a test of group differences
 #' @keywords internal
 #' @noRd
-descriptives_test <- function(x, g, method) {
+descriptives_test <- function(x, g, method, categorical_test = "auto") {
   ok <- !is.na(x) & !is.na(g)
   x <- x[ok]
   g <- droplevels(as.factor(g[ok]))
+  if (method == "categorical") {
+    tab <- table(x, g)
+    expected <- outer(rowSums(tab), colSums(tab)) / sum(tab)
+    use_fisher <- categorical_test == "fisher" ||
+      (categorical_test == "auto" && any(expected < 5))
+    if (use_fisher) {
+      p <- tryCatch(
+        stats::fisher.test(tab, workspace = 2e7)$p.value,
+        error = function(e) {
+          cli::cli_warn(c(
+            "Fisher's exact test could not be computed for a table with {nrow(tab)} rows and {ncol(tab)} columns, so its {.emph p}-value is missing.",
+            i = "Use {.code categorical_test = \"chisq\"} for the chi-square test."
+          ))
+          NA_real_
+        }
+      )
+      return(structure(p, test = "fisher"))
+    }
+  }
   result <- tryCatch(
     suppressWarnings(switch(
       method,
@@ -278,6 +359,12 @@ descriptives_note_sentences <- function(record) {
   if (isTRUE(record$any_categorical)) {
     sentences <- c(sentences, "Percentages are of nonmissing responses.")
   }
+  if (isTRUE(record$range)) {
+    sentences <- c(sentences, "Ranges are the minimum and maximum.")
+  }
+  if (isTRUE(record$missing_rows)) {
+    sentences <- c(sentences, "Missing rows give the number of missing values.")
+  }
   if (length(record$missing) > 0) {
     sentences <- c(
       sentences,
@@ -291,12 +378,10 @@ descriptives_note_sentences <- function(record) {
   if (isTRUE(record$n_dropped > 0)) {
     sentences <- c(
       sentences,
+      # A sentence should not begin with a numeral (APA style)
       paste0(
-        format(record$n_dropped, big.mark = ","),
-        if (record$n_dropped == 1) " respondent" else " respondents",
-        " with a missing value of ", record$by,
-        if (record$n_dropped == 1) " is" else " are",
-        " not included."
+        "Respondents with a missing value of ", record$by,
+        " (*n* = ", format(record$n_dropped, big.mark = ","), ") are not included."
       )
     )
   }
@@ -314,12 +399,29 @@ descriptives_note_sentences <- function(record) {
           if (length(described) > 1) "variables described by *Mdn* (*IQR*)" else "continuous variables", ")"
         )
       },
-      if (isTRUE(record$any_categorical)) "chi-square tests of independence (categorical variables)"
+      if (isTRUE(record$any_categorical)) {
+        if (identical(record$categorical_test, "fisher")) {
+          "Fisher's exact tests (categorical variables)"
+        } else {
+          "chi-square tests of independence (categorical variables)"
+        }
+      }
     )
     sentences <- c(
       sentences,
       paste0("*p*-values are from ", and_list(tests), " comparing the groups of ", record$by, ".")
     )
+    fisher <- record$fisher
+    if (!identical(record$categorical_test, "fisher") && length(fisher) > 0) {
+      sentences <- c(
+        sentences,
+        paste0(
+          "Fisher's exact test was used instead for ",
+          and_list(fisher),
+          ", which had expected counts below 5."
+        )
+      )
+    }
   }
   abbreviations <- c(
     if ("median_iqr" %in% record$methods) c("*Mdn*" = "median", "*IQR*" = "interquartile range")

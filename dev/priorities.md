@@ -89,7 +89,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 Roughly in order of how often they appear in APA-style papers. `apa_parameters()` and `apa_performance()` have no default method, so other model classes give errors until they are supported. Bayesian models wait until the rest are more or less complete.
 
 - [x] Descriptive and sample tables ("Table 1") with `apa_descriptives()`: *M* (*SD*) or *Mdn* (*IQR*) and *n* (%), a column for each group and the total, and optional tests of group differences (computed in apa7 rather than with `report::report_sample()`, so the layout and notes match the other tables)
-  - [ ] Possible additions: ranges (min–max), a missing-values row or column, and Fisher's exact test for sparse tables
+  - [x] Ranges (`range = TRUE`), missing-value rows (`missing = "row"`), and Fisher's exact test for sparse tables (`categorical_test = "auto"`)
 - [x] Estimated marginal means, contrasts, and simple slopes (post hoc tests, moderation) with `apa_means()`, `apa_contrasts()`, and `apa_slopes()`, from `modelbased::estimate_means()`, `estimate_contrasts()`, and `estimate_slopes()`: means with CIs, differences with adjusted *p*-values, heading rows for other `by` variables
   - [x] Cohen's *d* [CI] for contrasts (residual *SD* of `lm`/`aov` models, or `sd` for mixed models)
   - [x] Johnson–Neyman intervals in the `apa_slopes()` note (exact boundaries for a two-way interaction with a continuous moderator; identity-link models)

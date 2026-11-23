@@ -1,13 +1,6 @@
 ---
 title: "Contingency Tables"
-vignette: >
-  %\VignetteIndexEntry{Contingency Tables}
-  %\VignetteEngine{quarto::html}
-  %\VignetteEncoding{UTF-8}
-knitr:
-  opts_chunk:
-    collapse: true
-    comment: '#>'
+format: html
 ---
 
 ```{r}

@@ -29,11 +29,11 @@ library(stringr)
 
 # Summarizing by Hand
 
-The flextable package has many, many options and helper functions. The `tabulator`, `summarizor`, and `proc_freq` functions are particularly powerful ways of summarizing and describing data. 
+
 
 Functions that automate your descriptive statistics tables for you (e.g., the amazing [gtsummary package](https://www.danieldsjoberg.com/gtsummary/index.html)) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the `apa_flextable` function will get a flextable table close to APA style. You may need to do some additional styling with flextable as well.
 
-Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that apa7 and flextable can do most of the rest after that. 
+The flextable package helper functions for automating summary tables. The `tabulator`, `summarizor`, and `proc_freq` functions are particularly powerful ways of summarizing and describing data. However, I am going to compute my summaries with standard base R and tidyverse functions. Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that apa7 and flextable can do most of the rest after that. 
 
 ```{r dataprocessing}
 d <- ggplot2::diamonds %>% 
@@ -50,7 +50,6 @@ d <- ggplot2::diamonds %>%
   unite(Variable, Variable, name) %>%
   pivot_wider(names_from = Variable) 
 ```
-
 
 The `apa_flextable` function handles most of the formatting automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
 
@@ -119,7 +118,7 @@ apa_descriptives(
 
 Age is strongly skewed in this sample (most students are about 20, a few much older), so its median and interquartile range, *Mdn* (*IQR*), describe it better. `continuous` sets the description of particular variables.
 
-With `test = TRUE`, a *p* column tests the group differences: Welch's *t* test (two groups) or Welch's one-way ANOVA (more groups) for variables described by their mean, the Kruskal–Wallis test for variables described by their median, and the chi-square test of independence for categorical variables. Tests are not shown by default, because many journals discourage testing baseline differences in randomized trials, where any difference is due to chance.
+With `test = TRUE`, a *p* column tests the group differences: Welch's *t* test (two groups) or Welch's one-way ANOVA (more groups) for variables described by their mean, the Kruskal–Wallis test for variables described by their median, and the chi-square test of independence for categorical variables. When a categorical variable's table has an expected count below 5, where the chi-square approximation is poor, Fisher's exact test is used for that variable instead, and the note names it (`categorical_test = "chisq"` or `"fisher"` uses one test for all categorical variables). Tests are not shown by default, because many journals discourage testing baseline differences in randomized trials, where any difference is due to chance.
 
 ```{r}
 #| label: survey-tests
@@ -134,6 +133,27 @@ apa_descriptives(
     Pulse = "Pulse (beats per minute)",
     Smoke = "Smoking",
     Exer = "Exercise"
+  )
+) |>
+  apa_flextable(note = TRUE)
+```
+
+## Missing Values and Ranges
+
+By default, the note lists the missing values. With `missing = "row"`, each variable with missing values gets a "Missing" row with the number of missing values in each column instead. With `range = TRUE`, each continuous variable gets a "Range" row with its minimum and maximum:
+
+```{r}
+#| label: survey-missing-range
+apa_descriptives(
+  d_survey,
+  variables = c("Height", "Pulse", "Smoke"),
+  by = "Sex",
+  missing = "row",
+  range = TRUE,
+  labels = c(
+    Height = "Height (cm)",
+    Pulse = "Pulse (beats per minute)",
+    Smoke = "Smoking"
   )
 ) |>
   apa_flextable(note = TRUE)

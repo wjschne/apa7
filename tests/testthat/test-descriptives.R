@@ -92,7 +92,7 @@ test_that("more than two groups use Welch's ANOVA; no groups give one column", {
   d$am[1:2] <- NA
   dropped <- apa_descriptives(d, variables = "mpg", by = "am")
   expect_equal(colnames(dropped)[4], "Total (*N* = 30)")
-  expect_match(apa_note(dropped), "2 respondents with a missing value of Am are not included.", fixed = TRUE)
+  expect_match(apa_note(dropped), "Respondents with a missing value of Am (*n* = 2) are not included.", fixed = TRUE)
 })
 
 test_that("apa_descriptives() checks its arguments", {
@@ -107,4 +107,58 @@ test_that("apa_descriptives() checks its arguments", {
   expect_error(apa_descriptives(d, variables = "mpg", by = "one"), "at least 2 groups")
   d$when <- Sys.Date() + 1:32
   expect_error(apa_descriptives(d, variables = "when"), "cannot be described")
+})
+
+test_that("Fisher's exact test is used when expected counts are small", {
+  d <- desc_data()
+  d$gear <- factor(d$gear)
+  auto <- apa_descriptives(d, variables = c("cyl", "gear"), by = "am", test = TRUE)
+  p_cyl <- stats::fisher.test(table(d$cyl, d$am))$p.value
+  expect_equal(unpad(auto$`*p*`[1]), sub("^0", "", sprintf("%.2f", p_cyl)))
+  note <- apa_note(auto)
+  expect_match(note, "Fisher's exact test was used instead for Cyl and Gear, which had expected counts below 5.", fixed = TRUE)
+
+  chisq <- apa_descriptives(d, variables = "cyl", by = "am", test = TRUE, categorical_test = "chisq")
+  p_chisq <- suppressWarnings(stats::chisq.test(table(d$cyl, d$am), correct = FALSE)$p.value)
+  expect_equal(unpad(chisq$`*p*`[1]), sub("^0", "", sprintf("%.2f", p_chisq)))
+  expect_no_match(apa_note(chisq), "Fisher", fixed = TRUE)
+
+  fisher <- apa_descriptives(d, variables = "cyl", by = "am", test = TRUE, categorical_test = "fisher")
+  expect_match(apa_note(fisher), "Fisher's exact tests (categorical variables)", fixed = TRUE)
+
+  # Large expected counts keep the chi-square test
+  big <- data.frame(g = rep(c("a", "b"), each = 100), x = rep(c("u", "v"), 100))
+  expect_no_match(apa_note(apa_descriptives(big, variables = "x", by = "g", test = TRUE)), "Fisher", fixed = TRUE)
+  expect_error(apa_descriptives(d, variables = "cyl", by = "am", test = TRUE, categorical_test = "exact"), "categorical_test")
+})
+
+test_that("missing values can be shown in rows, and ranges added", {
+  d <- desc_data()
+  result <- apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am", missing = "row", range = TRUE)
+  expect_equal(
+    result$Variable,
+    c(
+      "Mpg, *M* (*SD*)", "\u2003Range",
+      "Hp, *M* (*SD*)", "\u2003Range", "\u2003Missing",
+      "Cyl, *n* (%)", "\u20034", "\u20036", "\u20038", "\u2003Missing"
+    )
+  )
+  totals <- result[[4]]
+  expect_equal(unpad(totals[2]), paste0(sprintf("%.2f", min(d$mpg)), "\u2013", sprintf("%.2f", max(d$mpg))))
+  expect_equal(totals[5], "2")
+  expect_equal(totals[10], "1")
+  expect_equal(result[[2]][5], as.character(sum(is.na(d$hp[d$am == "Automatic"]))))
+  note <- apa_note(result)
+  expect_match(note, "Ranges are the minimum and maximum.", fixed = TRUE)
+  expect_match(note, "Missing rows give the number of missing values.", fixed = TRUE)
+  expect_no_match(note, "Missing values:", fixed = TRUE)
+
+  # Variables without missing values get no missing row
+  complete <- apa_descriptives(d, variables = "mpg", missing = "row")
+  expect_equal(complete$Variable, "Mpg, *M* (*SD*)")
+  expect_no_match(apa_note(complete), "Missing", fixed = TRUE)
+
+  # Missing and range rows have no p-value
+  tested <- apa_descriptives(d, variables = "hp", by = "am", test = TRUE, missing = "row", range = TRUE)
+  expect_equal(tested$`*p*`[2:3], c("", ""))
 })
