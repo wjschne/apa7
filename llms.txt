@@ -81,8 +81,14 @@ Convert objects to flextables
   : Format ANOVA tables in APA style
 - [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
   : Make contingency table with chi-square test of independence
+- [`apa_means()`](https://wjschne.github.io/apa7/reference/apa_means.md)
+  [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md)
+  [`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md)
+  : Estimated marginal means, contrasts, and slopes tables
 - [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md) :
   APA-formatted correlation table
+- [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
+  : Descriptive statistics table ("Table 1")
 - [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
   : Factor correlation table
 - [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
@@ -92,9 +98,17 @@ Convert objects to flextables
 - [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
   : format model parameters in APA style
 - [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
-  : format model performance metrics in APA style
+  : Fit indices of lavaan models
 - [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md)
   : format model comparison metrics in APA style
+- [`apa_publication_bias()`](https://wjschne.github.io/apa7/reference/apa_publication_bias.md)
+  : Publication bias table for a meta-analysis
+- [`apa_subgroups()`](https://wjschne.github.io/apa7/reference/apa_subgroups.md)
+  : Subgroup analysis table for a meta-analysis
+- [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md)
+  : Reliability and item analysis table
+- [`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md)
+  : Collinearity diagnostics table
 
 ## Style flextables
 
@@ -187,6 +201,9 @@ Functions for creating apaquarto documents
   : Installs the apaquarto extension.
 - [`make_apaquarto()`](https://wjschne.github.io/apa7/reference/make_apaquarto.md)
   : Run shiny app to make a document in APA style via Quarto
+- [`apa7_write_bib()`](https://wjschne.github.io/apa7/reference/apa7_write_bib.md)
+  [`apa7_bib()`](https://wjschne.github.io/apa7/reference/apa7_write_bib.md)
+  : Citations in table notes
 
 ## Misc
 
@@ -228,12 +245,22 @@ Other Functions
 - [Contingency
   Tables](https://wjschne.github.io/apa7/articles/chisquare.md):
 - [Correlations](https://wjschne.github.io/apa7/articles/correlations.md):
+- [Descriptive Statistics
+  Tables](https://wjschne.github.io/apa7/articles/descriptives.md):
 - [Factor Analysis
   Tables](https://wjschne.github.io/apa7/articles/factor-analysis.md):
 - [Hypothesis Tests](https://wjschne.github.io/apa7/articles/htest.md):
+- [Structural Equation Model
+  Tables](https://wjschne.github.io/apa7/articles/lavaan.md):
+- [Estimated Marginal Means, Contrasts, and Simple
+  Slopes](https://wjschne.github.io/apa7/articles/marginal-means.md):
+- [Meta-Analysis
+  Tables](https://wjschne.github.io/apa7/articles/meta-analysis.md):
 - [Multilevel Model
   Tables](https://wjschne.github.io/apa7/articles/multilevel.md):
 - [Regression Analysis
   Tables](https://wjschne.github.io/apa7/articles/regression.md):
-- [Summarize
-  Data](https://wjschne.github.io/apa7/articles/summarize.md):
+- [Reliability and Item Analysis
+  Tables](https://wjschne.github.io/apa7/articles/reliability.md):
+- [Building Tables by
+  Hand](https://wjschne.github.io/apa7/articles/summarize.md):

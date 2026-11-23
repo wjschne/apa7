@@ -491,7 +491,7 @@ apa_note(tbl_obk_lmer)
 ```
 
 ```
-[1] "*F* tests of fixed effects are Type III. Denominator degrees of freedom are Satterthwaite approximations."
+[1] "*F* tests of fixed effects are Type III. Denominator degrees of freedom are Satterthwaite approximations (Satterthwaite, 1946)."
 ```
 
 Tests are Type 3 by default, as in lmerTest. lmerTest’s Type 3 tests do
@@ -522,7 +522,7 @@ apa_anova(
 | Treatment | 2 |  13.00 |  2.91 |  .09  | .31 | \[.00, .60\] |
 | Phase | 2 | 218.00 | 36.71 | \<.001 | .25 | \[.16, .34\] |
 | Treatment × Phase | 4 | 218.00 | 10.33 | \<.001 | .16 | \[.07, .24\] |
-| Note. F tests of fixed effects are Type III. Denominator degrees of freedom are Kenward–Roger approximations. η2p is computed from F and its degrees of freedom, which only approximates it in mixed models. η2p = partial eta squared; CI = confidence interval. |  |  |  |  |  |  |
+| Note. F tests of fixed effects are Type III. Denominator degrees of freedom are Kenward–Roger approximations (Kenward & Roger, 1997). η2p is computed from F and its degrees of freedom, which only approximates it in mixed models. η2p = partial eta squared; CI = confidence interval. |  |  |  |  |  |  |
 
 ANOVA tables made by lmerTest’s `anova` function are displayed the same
 way, with the type of tests and the degrees-of-freedom method read from
@@ -563,7 +563,7 @@ apa_note(tbl_obk)
 ```
 
 ```
-[1] "Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected. *MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+[1] "Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected (Greenhouse & Geisser, 1959). *MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared (Olejnik & Algina, 2003). ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
 ```
 
 When stars or bold values are used, the note explains them, after the
@@ -597,9 +597,10 @@ tbl_obk
 Table 2: Mixed ANOVA of Treatment and Phase
 
 *Note*. Type III sums of squares. Degrees of freedom and *p*-values for
-effects involving Phase are Greenhouse–Geisser corrected. *MSE* = mean
-square error; *η*²_(G) = generalized eta squared. ^(\* )*p* \< .05.
-^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
+effects involving Phase are Greenhouse–Geisser corrected (Greenhouse &
+Geisser, 1959). *MSE* = mean square error; *η*²_(G) = generalized eta
+squared (Olejnik & Algina, 2003). ^(\* )*p* \< .05. ^(\*\* )*p* \< .01.
+^(\*\*\* )*p* \< .001.
 
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the same note
 below the table (or pass your own text as `note`). Do not combine it

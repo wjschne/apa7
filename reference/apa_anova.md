@@ -316,7 +316,8 @@ if (requireNamespace("afex", quietly = TRUE)) {
 #> 1 Treatment     2.00           13.00         6.41     2.91  .09  .27            
 #> 2 Phase         1.74           22.64         0.81    19.29 <.001 .21            
 #> 3 Treatment × … 3.48           22.64         0.81     5.43  .004 .13            
-if (requireNamespace("lmerTest", quietly = TRUE) &&
+if (requireNamespace("lme4", quietly = TRUE) &&
+  requireNamespace("lmerTest", quietly = TRUE) &&
   requireNamespace("pbkrtest", quietly = TRUE)) {
   fit_lmer <- lme4::lmer(
     Reaction ~ Days + (Days | Subject),

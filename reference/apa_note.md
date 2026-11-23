@@ -7,7 +7,7 @@ edit it or add to it as needed.
 ## Usage
 
 ``` r
-apa_note(x, collapse = " ")
+apa_note(x, collapse = " ", citations = NULL)
 ```
 
 ## Arguments
@@ -26,6 +26,14 @@ apa_note(x, collapse = " ")
 
   string that joins the sentences. Use `NULL` to get a character vector
   with one sentence per element.
+
+- citations:
+
+  how articles cited in the note are written: `"auto"`, `"keys"` (Pandoc
+  citation keys, e.g., `[@duvalTrimFillSimple2000]`), or `"text"` (e.g.,
+  "(Duval & Tweedie, 2000)"). If `NULL` (default), the `apa7.citations`
+  option is used, which is `"auto"` unless set. See
+  [`apa7_write_bib()`](https://wjschne.github.io/apa7/reference/apa7_write_bib.md).
 
 ## Value
 
@@ -62,9 +70,42 @@ tables, the note can say
 - that the cumulative proportion of variance is approximate when the
   factors are correlated.
 
+For confirmatory factor analyses fit with `lavaan`, the note instead
+gives the sample size and estimator, says that the loadings are
+standardized, and says that blank cells are loadings fixed at 0.
+
+For
+[`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
+tables, the note says which statistics are shown, lists missing values,
+and names the tests of group differences.
+
+For
+[`apa_means()`](https://wjschne.github.io/apa7/reference/apa_means.md),
+[`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md),
+and
+[`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md)
+tables, the note says what the values are, how the other predictors were
+held constant, on which scale the estimates are, which level was
+subtracted from which, and how *p*-values were adjusted for multiple
+comparisons.
+
+For
+[`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md)
+tables, the note names terms with generalized *VIF*s, explains the
+*VIF*s of interaction terms, defines tolerance, and says which *VIF*s
+are bolded.
+
+For
+[`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md)
+tables, the note gives the number of respondents, says which items were
+reverse-scored and how scale scores were computed, and defines the
+statistics.
+
 For
 [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
-tables, the note says how the factors were extracted and rotated.
+tables, the note says how the factors were extracted and rotated (for
+`lavaan` models, the sample size, the estimator, and that the
+correlations are standardized).
 
 For
 [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
@@ -83,8 +124,9 @@ tables, the note can say
 
 For
 [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
-tables of regression models (`lm`, `glm`, `polr`, `clm`, `lme4`, and
-`glmmTMB` models, or a list of models), the note can say
+tables of regression models (`lm`, `glm`, `polr`, `clm`, `multinom`,
+`zeroinfl`, `hurdle`, `lme4`, `glmmTMB`, and `nlme` models, or a list of
+models), the note can say
 
 - which robust standard errors were used (e.g., `vcov = "HC3"`),
 
@@ -95,6 +137,20 @@ tables of regression models (`lm`, `glm`, `polr`, `clm`, `lme4`, and
 
 - the scale of the zero-inflation and dispersion coefficients of
   `glmmTMB` models,
+
+- the residual correlation structure and variance function of
+  [`nlme::lme`](https://rdrr.io/pkg/nlme/man/lme.html) models,
+
+- the reference category of multinomial models
+  ([`nnet::multinom`](https://rdrr.io/pkg/nnet/man/multinom.html)),
+
+- the count distribution and the meaning of the zero model of
+  zero-inflated and hurdle models (`pscl`),
+
+- the effect-size measure and model of meta-analyses
+  ([`metafor::rma`](https://wviechtb.github.io/metafor/reference/rma.uni.html))
+  and, for tables of studies, the test of the pooled estimate, its
+  prediction interval, and the test of heterogeneity,
 
 - what the standardized coefficient (\\\beta\\), exponentiated
   coefficient (e.g., *OR*), confidence interval, and model-comparison
@@ -163,7 +219,7 @@ if (requireNamespace("afex", quietly = TRUE)) {
   apa_note(apa_anova(fit_afex))
 }
 #> Contrasts set to contr.sum for the following variables: treatment
-#> [1] "Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected. *MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared."
+#> [1] "Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected (Greenhouse & Geisser, 1959). *MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared (Olejnik & Algina, 2003)."
 
 # Factor analysis
 fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")

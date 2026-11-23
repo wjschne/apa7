@@ -8,6 +8,7 @@ library(flextable)
 library(ftExtra)
 library(tidyr)
 library(stringr)
+library(correlation)
 ```
 
 Some tables, like correlation matrices, can be standardized and
@@ -18,7 +19,7 @@ make the final styling of a complex table a little easier.
 
 By default, the output of `apa_cor`
 [flextable](https://davidgohel.github.io/flextable/), with significant
-correlations bolded.
+correlations starred.
 
 ``` r
 
@@ -33,13 +34,13 @@ trees |>
 | 3.                              | Volume | 30.17 | 16.44 | .97 | \*\*\* | .60 | \*\*\* | —   |     |
 | \*\* p \< .01. \*\*\* p \< .001 |        |       |       |     |        |     |        |     |     |
 
-Table 1. Correlation table using flextable via `apa_cor`
+Table 1: Correlation Table
 
 Significant correlations can be bolded instead.
 
 ``` r
 
-trees |> 
+trees |>
   apa_cor(bold_significant = TRUE)
 ```
 
@@ -50,7 +51,44 @@ trees |>
 | 3.  | Volume | 30.17 | 16.44 | .97 | .60 | — |
 | Note. Correlations significant at p \< .05 are bolded. |  |  |  |  |  |  |
 
-Table 2. Bolding significant correlations
+Table 2: Bolding Significant Correlations
+
+## Summary functions
+
+You can include any named list of summary functions:
+
+``` r
+
+# Named list of descriptive functions
+my_summaries <- list(Median = median, "Interquartile Range" = IQR)
+
+apa_cor(trees, summary_functions = my_summaries)
+```
+
+| Variable |  | Median | Interquartile Range | 1 |  | 2 |  | 3 |  |
+|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Girth | 12.90 | 4.20 | — |  |  |  |  |  |
+| 2.  | Height | 76.00 | 8.00 | .52 | \*\* | — |  |  |  |
+| 3.  | Volume | 24.20 | 17.90 | .97 | \*\*\* | .60 | \*\*\* | — |  |
+| \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |
+
+You can also use a plain vector of descriptive functions from these
+options:
+`"IQR", "Interquartile Range", "Kurtosis", "MAD", "Median Absolute Deviation", "M", "Mean", "Med", "Median", "n", "N", "Quantile", "Range", "SD", "Skewness", "Var", "Variance"`
+
+``` r
+
+my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
+
+apa_cor(trees, summary_functions = my_summaries)
+```
+
+| Variable |  | n | M | SD | Skewness | Kurtosis | 1 |  | 2 |  | 3 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Girth | 31 | 13.25 |  3.14 | 0.50 | −0.71 | — |  |  |  |  |  |
+| 2.  | Height | 31 | 76.00 |  6.37 | −0.36 | −0.72 | .52 | \*\* | — |  |  |  |
+| 3.  | Volume | 31 | 30.17 | 16.44 | 1.01 | 0.25 | .97 | \*\*\* | .60 | \*\*\* | — |  |
+| \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |
 
 ## Styling options
 
@@ -58,7 +96,7 @@ Your styling options include:
 
 - `note` A custom markdown formatted note. Overrides automatic note
   about bolded correlations being significant. Default: `NULL`
-- `p_value` Significance value. Default: `.05`
+- `p_value` Significance value. Default: `0.05`
 - `digits` Number of digits for rounding. Default: `2`
 - `bold_significant` Whether to bold significant correlations. Default:
   `FALSE`
@@ -79,27 +117,9 @@ For example,
 
 ``` r
 
-# Named list of descriptive functions
-my_summaries <- list(Median = median, "Interquartile Range" = IQR)
-
-apa_cor(trees, summary_functions = my_summaries)
-```
-
-| Variable |  | Median | Interquartile Range | 1 |  | 2 |  | 3 |  |
-|----|----|----|----|----|----|----|----|----|----|
-| 1.  | Girth | 12.90 | 4.20 | — |  |  |  |  |  |
-| 2.  | Height | 76.00 | 8.00 | .52 | \*\* | — |  |  |  |
-| 3.  | Volume | 24.20 | 17.90 | .97 | \*\*\* | .60 | \*\*\* | — |  |
-| \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |
-
-``` r
-
-# or a vector descriptives
-my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
-
 trees |>
   apa_cor(
-    p_value = .001,
+    p_value = 0.001,
     digits = 2,
     bold_significant = TRUE,
     significance_note = TRUE,
@@ -120,6 +140,8 @@ trees |>
 | 3.  | Volume | 31 | 30.17 | 16.44 | 1.01 | 0.25 | .97 | .60 | — |
 | Note. Correlations significant at p \< .001 are bolded. |  |  |  |  |  |  |  |  |  |
 
+Table 3: Alternative Styling
+
 To remove summary statistics entirely, set `summary_functions` to `NA`
 or `NULL`.
 
@@ -134,6 +156,8 @@ apa_cor(trees, summary_functions = NA, bold_significant = FALSE)
 | 2.                              | Height | .52 | \*\*   | —   |        |     |     |
 | 3.                              | Volume | .97 | \*\*\* | .60 | \*\*\* | —   |     |
 | \*\* p \< .01. \*\*\* p \< .001 |        |     |        |     |        |     |     |
+
+Table 4: Removing Summary Functions
 
 ## Customization
 
@@ -166,6 +190,8 @@ apa_cor(trees) |>
 | \*\* p \< .01. \*\*\* p \< .001 |         |       |       |     |        |     |        |     |     |
 | 1This is a footnote.            |         |       |       |     |        |     |        |     |     |
 
+Table 5: Styling a Table with flextable Functions
+
 ## Output to tibble
 
 If you need to process the underlying data before converting to
@@ -194,3 +220,82 @@ apa_cor(trees, output = "tibble") |>
 | 1. Girth  | 13.25 |  3.14 | —   |        |     |        |     |     |
 | 2. Height | 76.00 |  6.37 | .52 | \*\*   | —   |        |     |     |
 | 3. Volume | 30.17 | 16.44 | .97 | \*\*\* | .60 | \*\*\* | —   |     |
+
+Table 6: Customizing a Table with flextable Functions.
+
+## Correlations from the correlation package
+
+`apa_cor` computes Pearson correlations with
+[`psych::corTest`](https://rdrr.io/pkg/psych/man/corr.test.html). For
+other kinds of correlations, compute them with
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+from the [correlation](https://easystats.github.io/correlation/)
+package, and give the result to `apa_cor`. For example, Spearman rank
+correlations:
+
+``` r
+
+correlation(trees, method = "spearman") |>
+  apa_cor()
+```
+
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  |
+|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Girth | 13.25 |  3.14 | — |  |  |  |  |  |
+| 2.  | Height | 76.00 |  6.37 | .44 | \* | — |  |  |  |
+| 3.  | Volume | 30.17 | 16.44 | .95 | \*\*\* | .58 | \*\* | — |  |
+| Note. Values are Spearman correlations. p-values are adjusted for multiple comparisons with Holm’s method (Holm, 1979). |  |  |  |  |  |  |  |  |  |
+| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |
+
+Table 7: Spearman rank correlations from the correlation package
+
+The note says what kind of correlations are shown. Other options from
+the
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+function include:
+
+| Option        | Correlation                     |
+|:--------------|:--------------------------------|
+| `pearson`     | Pearson’s Correlation (default) |
+| `spearman`    | Spearman’s Rank Correlation     |
+| `kendall`     | Kendall’s Rank Correlation      |
+| `biserial`    | Biserial Correlation            |
+| `polychoric`  | Polychoric Correlation          |
+| `tetrachoric` | Tetrachoric Correlation         |
+| `biweight`    | Biweight midcorrelation         |
+| `distance`    | Distance Correlation            |
+| `percentage`  | Percentage Bend Correlation     |
+| `blomqvist`   | Blomqvist’s coefficient         |
+| `hoeffding`   | Hoeffding’s D                   |
+| `gamma`       | Gamma Correlation               |
+| `gaussian`    | for Gaussian Rank correlation   |
+| `shepherd`    | for Shepherd’s Pi correlation   |
+
+By default,
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+adjusts the *p*-values for multiple comparisons with Holm’s method, so
+the stars are for the adjusted *p*-values, and the note says so (use
+`p_adjust = "none"` for unadjusted *p*-values). Partial correlations,
+each controlling for the other variables in the table, work the same
+way:
+
+``` r
+
+correlation(trees, partial = TRUE, p_adjust = "none") |>
+  apa_cor()
+```
+
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  |
+|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Girth | 13.25 |  3.14 | — |  |  |  |  |  |
+| 2.  | Height | 76.00 |  6.37 | −.29 |  | — |  |  |  |
+| 3.  | Volume | 30.17 | 16.44 | .96 | \*\*\* | .44 | \* | — |  |
+| Note. Values are partial Pearson correlations, each controlling for all other variables in the table. |  |  |  |  |  |  |  |  |  |
+| \* p \< .05. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |
+
+Table 8: Partial correlations from the correlation package
+
+The means and standard deviations come from the data that
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+keeps with its results. Correlations computed by group, between two sets
+of variables, or with Bayesian methods are not yet supported.

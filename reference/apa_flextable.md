@@ -22,11 +22,11 @@ apa_flextable(
   separate_headers = TRUE,
   apa_style = TRUE,
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
@@ -107,7 +107,8 @@ apa_flextable(
 
 - font_size:
 
-  font size
+  font size, in points. If `NULL` (default), the size set with
+  `apa7_defaults(font_size = )` (12 unless changed).
 
 - text_color:
 
@@ -123,8 +124,10 @@ apa_flextable(
 
 - line_spacing:
 
-  spacing between lines of the header and body. Table notes are
-  single-spaced.
+  spacing between lines of the header and body (e.g., 2 for double
+  spacing or 1 for single spacing). If `NULL` (default), the spacing set
+  with `apa7_defaults(line_spacing = )` (2 unless changed). Table notes
+  are single-spaced.
 
 - horizontal_padding:
 
@@ -140,7 +143,13 @@ apa_flextable(
 
 - table_width:
 
-  table width (in pixels, 0 for auto)
+  proportion of the width of the container (e.g., the page or text
+  column) that the table occupies, from 0 to 1: 1 (default) is the full
+  width, and .5 is half the width. With `pretty_widths = TRUE`, the
+  column widths are also set to fill the same proportion of the width of
+  the text area, which is 6.5 inches (letter-size paper with 1-inch
+  margins) unless changed with `apa7_defaults(page_width = )` (e.g.,
+  `apa7_defaults(page_width = "a4")`).
 
 - markdown:
 

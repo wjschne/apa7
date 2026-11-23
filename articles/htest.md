@@ -27,9 +27,12 @@ sizes are computed from the data by the
 | Chi-square test of independence | `"chisq"` | `y ~ group` | Cramér’s *V* |
 
 Several outcomes on the left side of the formula, joined with `+`, give
-one row each. In the console, `apa_htest` returns an ordinary tibble. In
-Quarto and R Markdown documents, the tibble is displayed as an APA-style
-table automatically, and `apa_flextable` customizes it further.
+one row each. Test results that were already computed (e.g., by
+`t.test`) can also be formatted (see [Test Results Already
+Computed](#test-results-already-computed)). In the console, `apa_htest`
+returns an ordinary tibble. In Quarto and R Markdown documents, the
+tibble is displayed as an APA-style table automatically, and
+`apa_flextable` customizes it further.
 
 ## Comparing Two Groups
 
@@ -211,7 +214,7 @@ Table 1: Paired-Samples *t* test
 
 *Note*. Paired *t* test compares Drug 1 with Drug 2. *d*_(av) divides
 the mean difference by the average of the two variables’ standard
-deviations. CI = confidence interval for *d*_(av).
+deviations (Lakens, 2013). CI = confidence interval for *d*_(av).
 
 With one pair, the variable names head their descriptive statistics, and
 differences are the first variable minus the second.
@@ -556,14 +559,62 @@ predictor) variable are observed, so rows can have different sample
 sizes. Paired tests use the rows in which both variables of the pair are
 observed.
 
-## Why Not Format `htest` Objects?
+## Test Results Already Computed
 
 Functions like `t.test` return `htest` objects, which have the test
-statistic and *p*-value but not the data. Effect sizes need the data:
-Cohen’s *d* from Welch’s test, for example, cannot be computed exactly
-from *t* alone. `apa_htest` runs the tests itself, so its effect sizes
-are computed from the data rather than approximated from the test
-statistic.
+statistic and *p*-value but not the data. `apa_htest` also accepts these
+objects, or a list of objects of the same kind, with one row per test.
+The names of the list label the rows:
+
+``` r
+
+car_tests <- list(
+  Weight = cor.test(mtcars$mpg, mtcars$wt),
+  Displacement = cor.test(mtcars$mpg, mtcars$disp),
+  Horsepower = cor.test(mtcars$mpg, mtcars$hp)
+)
+apa_htest(car_tests) |>
+  apa_flextable(note = TRUE)
+```
+
+| Variable | n | r | 95% CI | t(30) | p |
+|----|----|----|----|----|----|
+| Weight | 32 | −.87 | \[−.93, −.74\] | −9.56 | \<.001 |
+| Displacement | 32 | −.85 | \[−.92, −.71\] | −8.75 | \<.001 |
+| Horsepower | 32 | −.78 | \[−.89, −.59\] | −6.74 | \<.001 |
+| Note. Results are from Pearson correlation tests. CI = confidence interval for r. |  |  |  |  |  |
+
+Effect sizes, however, are computed from what the objects keep, and that
+is not always enough:
+
+| Test | Effect size from the object |
+|----|----|
+| One-sample *t* test | Cohen’s *d* = *t*/√*n*, exactly |
+| Paired *t* test | *d*_(z) = *t*/√*n*, exactly (not *d*_(av), which needs the data) |
+| Welch’s or Student’s *t* test | Cohen’s *d* ≈ 2*t*/√*df*, which assumes groups of equal size |
+| Correlation test | The correlation itself |
+| Chi-square test of independence | Cramér’s *V* (or *φ*, or Cohen’s *w*), exactly, from the observed table |
+| Wilcoxon tests | None, because the group sizes are not kept |
+
+For two groups, the approximation can be noticeably off when the groups
+differ in size or variance, and the note says that it is an
+approximation:
+
+``` r
+
+t.test(mpg ~ am, data = mtcars) |>
+  apa_htest() |>
+  apa_flextable(note = TRUE)
+```
+
+| Variable | t(18.33) | p | Cohen’s d | 95% CI |
+|----|----|----|----|----|
+| mpg by am | −3.77 | .001 | −1.76 | \[−2.82, −0.67\] |
+| Note. The result is from Welch’s t test. Cohen’s d is approximated from t and its degrees of freedom (2t/√df), which assumes groups of equal size. CI = confidence interval for Cohen’s d. |  |  |  |  |
+
+When the data are at hand, giving them to `apa_htest` is better: the
+effect sizes are then computed from the data rather than approximated
+from the test statistic, and the table has descriptive statistics.
 
 ## References
 

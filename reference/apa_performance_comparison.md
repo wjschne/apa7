@@ -62,6 +62,25 @@ explained by the fixed effects), and by default the conditional *R*^2^
 `deltaR2_conditional`) are shown too, because adding random effects
 changes the conditional but not the marginal *R*^2^.
 
+Nested `lavaan` models (e.g., the configural, metric, and scalar models
+of a measurement invariance analysis) are compared each with the one
+before it, so they should be listed from the least to the most
+constrained. Each row shows the fit of the model (any of the metrics of
+[`apa_performance.lavaan()`](https://wjschne.github.io/apa7/reference/apa_performance.md)),
+followed, under a "Change from previous model" spanner, by the
+chi-square difference test from
+[`lavaan::lavTestLRT()`](https://rdrr.io/pkg/lavaan/man/lavTestLRT.html)
+(`"deltaChi2"`, `"deltaChi2_df"`, `"p_deltaChi2"`) and the changes in
+fit indices (`"deltaCFI"`, `"deltaTLI"`, `"deltaRMSEA"`, `"deltaSRMR"`),
+shown with three decimals. The default metrics are `"Chi2"`,
+`"Chi2_df"`, `"CFI"`, `"RMSEA"`, `"RMSEA_CI"`, `"SRMR"`, `"deltaChi2"`,
+`"deltaChi2_df"`, `"p_deltaChi2"`, `"deltaCFI"`, and `"deltaRMSEA"`.
+With a robust estimator (e.g., MLR or WLSMV), the difference test is
+scaled (e.g., the Satorra-Bentler scaled difference test), and the
+changes in fit indices are computed from their robust versions.
+[`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+names the difference test. `starred` is ignored for `lavaan` models.
+
 ## Examples
 
 ``` r

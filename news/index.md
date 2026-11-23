@@ -1,7 +1,140 @@
 # Changelog
 
-## apa7 (development version)
+## apa7 0.3.0
 
+### Changes that can affect existing tables
+
+These change the output of code that worked with apa7 0.2.0.
+
+- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md):
+  `table_width` is now a proportion of the page width (from 0 to 1,
+  default 1), as in
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+  rather than a width in inches. Values greater than 1 are still read as
+  inches, with a warning that gives the proportion to use instead. The
+  table’s width now matches `table_width`: before, the number column’s
+  adjustment made the table wider than requested (e.g., 6.71 rather than
+  6.5 inches), and very narrow tables could get a Variable column of
+  negative width.
+- The `accuracy` setting now changes the number of decimals in tables.
+  Before, the default column formats kept the accuracy they had when
+  apa7 was loaded, so `apa7_defaults(accuracy = .001)` did not change
+  the decimals of most tables. Setting `column_formats` without
+  `accuracy` in
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  makes the formats’ own accuracy the `accuracy` setting.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  introduces the fixed and random effects of mixed models (`lme4`,
+  `glmmTMB`, and `nlme`) with “Fixed effects” and “Random effects”
+  heading rows, as
+  [`parameters::model_parameters()`](https://easystats.github.io/parameters/reference/model_parameters.html)
+  does. Use `effect_headings = FALSE` to leave them out. The
+  random-effects heading names the statistic of the *SD* rows (e.g.,
+  “Random effects (*SD*)”), and each cluster (grouping factor) gets a
+  subheading with its terms indented below it, so cluster names are not
+  repeated on every row. Correlations name their own statistic (e.g.,
+  “*r* (Constant, Days)”), and nested clusters are spelled out (e.g.,
+  “Classroom in School”).
+- Table notes are now single-spaced, even when the table is
+  double-spaced. This applies to `apa_flextable(note = TRUE)`,
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md),
+  and footers styled by
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md).
+  `line_spacing` now sets only the spacing of the header and body.
+
+### New table functions
+
+- New
+  [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
+  makes descriptive statistics tables (“Table 1”): *M* (*SD*) or *Mdn*
+  (*IQR*) for continuous variables and *n* (%) for categorical
+  variables, with a column for each group of `by` and for the whole
+  sample, and optional tests of group differences.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  says which statistics are shown and lists missing values.
+- [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
+  uses Fisher’s exact test instead of the chi-square test for a
+  categorical variable whose table has an expected count below 5, and
+  the note names those variables (`categorical_test = "chisq"` or
+  `"fisher"` chooses one test for all). New `missing = "row"` shows the
+  missing values of each variable in a “Missing” row instead of the
+  note, and `range = TRUE` adds a “Range” row (minimum and maximum)
+  below each continuous variable.
+- New
+  [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md)
+  makes reliability and item analysis tables: for each item, *M*, *SD*,
+  the corrected item–total correlation, and Cronbach’s α if deleted,
+  followed for each scale by the scale mean and *SD*, α with a
+  confidence interval, McDonald’s *ω*_(total), and the mean inter-item
+  correlation. It handles several scales, reverse-keyed items, and items
+  scored 0 or 1 (difficulty and KR-20), and `level = "scales"` gives one
+  row per scale.
+- New
+  [`apa_means()`](https://wjschne.github.io/apa7/reference/apa_means.md),
+  [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md),
+  and
+  [`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md)
+  make tables of estimated marginal means, contrasts (e.g., pairwise
+  comparisons after an ANOVA), and simple slopes (e.g., to probe a
+  moderation effect) from
+  [`modelbased::estimate_means()`](https://easystats.github.io/modelbased/reference/estimate_means.html),
+  [`estimate_contrasts()`](https://easystats.github.io/modelbased/reference/estimate_contrasts.html),
+  and
+  [`estimate_slopes()`](https://easystats.github.io/modelbased/reference/estimate_slopes.html).
+  They take a model (with the modelbased arguments, such as `by`,
+  `contrast`, `trend`, and `p_adjust`) or the modelbased output. Other
+  variables in `by` get heading rows, probabilities from logistic models
+  have no leading zero, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  says what the values are, how the other predictors were held constant,
+  on which scale the estimates are, which level was subtracted from
+  which, and how *p*-values were adjusted for multiple comparisons.
+  Moderator values set with a modelbased shortcut are named (e.g.,
+  `by = "x=[sd]"` gives “−1*SD* (12.23)”, “*M* (14.23)”, and “+1*SD*
+  (16.23)”, and `"x=[fivenum]"` gives the minimum, quartiles, median,
+  and maximum), contrasts between such values (`contrast = "x=[sd]"`)
+  are labeled by name (e.g., “+1*SD* − *M*”), and a numeric variable
+  named in `by` without values (`by = "x"`) is set to its mean and 1
+  *SD* above and below it rather than to the 10 values that modelbased
+  uses by default. `by`, `contrast` (in
+  [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md)),
+  and `trend` (in
+  [`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md))
+  are named arguments, and their variable names can be quoted or
+  unquoted (e.g., `apa_contrasts(fit, contrast = cyl, by = am)`).
+- [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md)
+  adds Cohen’s *d* with its confidence interval for models of continuous
+  outcomes with an identity link (e.g.,
+  [`lm()`](https://rdrr.io/r/stats/lm.html) and
+  [`aov()`](https://rdrr.io/r/stats/aov.html)): each difference divided
+  by the model’s residual standard deviation, with an interval that
+  accounts for the uncertainty in that standard deviation (as in
+  `emmeans::eff_size()`). For mixed models, give the standard deviation
+  with `sd`. `effect_size = FALSE` leaves *d* out, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  says how it was computed.
+- The note of
+  [`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md)
+  gives the Johnson–Neyman intervals (Johnson & Neyman, 1936) when the
+  slope depends on a single continuous moderator through a two-way
+  interaction: the values of the moderator, within its observed range,
+  at which the slope is significant. The boundaries are computed exactly
+  from the coefficients and their covariance matrix, rather than from a
+  grid of moderator values. `johnson_neyman = FALSE` leaves them out.
+- New
+  [`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md)
+  makes tables of collinearity diagnostics from
+  [`performance::check_collinearity()`](https://easystats.github.io/performance/reference/check_collinearity.html):
+  the variance inflation factor (*VIF*) of each predictor with its
+  confidence interval, and tolerance (or the standard-error inflation
+  factor and the tolerance interval). Terms with more than 1 *df* get
+  generalized *VIF*s, models with several parts (e.g., zero-inflated
+  models) get a heading for each part, and `flag = 10` (or 5) bolds
+  large *VIF*s.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the terms with generalized *VIF*s, explains the *VIF*s of
+  interaction terms, and defines tolerance.
 - New
   [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
   runs *t* tests (Welch’s or Student’s, two-group or one-sample),
@@ -29,6 +162,45 @@
   [`effectsize::repeated_measures_d()`](https://easystats.github.io/effectsize/reference/repeated_measures_d.html).
   New `pair_labels` argument sets the headings above each pair’s
   descriptive statistics.
+- [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
+  accepts test results already computed: an `htest` object from
+  [`t.test()`](https://rdrr.io/r/stats/t.test.html),
+  [`wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html),
+  [`cor.test()`](https://rdrr.io/r/stats/cor.test.html), or
+  [`chisq.test()`](https://rdrr.io/r/stats/chisq.test.html), or a list
+  of them. Effect sizes are computed from what the objects keep (exactly
+  for one-sample and paired *t* tests and for chi-square tests of
+  independence, and approximately for two-sample *t* tests), and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  says how.
+- New
+  [`apa_subgroups()`](https://wjschne.github.io/apa7/reference/apa_subgroups.md)
+  makes a table of a subgroup analysis of a meta-analysis fit with
+  [`metafor::rma()`](https://wviechtb.github.io/metafor/reference/rma.uni.html):
+  each subgroup’s *k*, pooled estimate, confidence interval, *p*, and
+  *I*², followed by the overall estimate. By default, each subgroup has
+  its own *τ*² and the subgroups are compared with *Q*_(between); with
+  `tau2 = "common"`, the estimates and the test (*Q*_(M), or *F* with
+  the Knapp–Hartung adjustment) come from a meta-regression with the
+  subgroup as a moderator.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  describes the model and gives the test of subgroup differences.
+- New
+  [`apa_publication_bias()`](https://wjschne.github.io/apa7/reference/apa_publication_bias.md)
+  makes a table of tests and corrections for publication bias in
+  meta-analyses fit with
+  [`metafor::rma()`](https://wviechtb.github.io/metafor/reference/rma.uni.html):
+  Egger’s regression test with its limit estimate, Begg and Mazumdar’s
+  rank correlation test, trim and fill with the number of imputed
+  studies and the adjusted estimate, and (optionally) the fail-safe *N*.
+  Adjusted estimates are on the same scale as in
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md),
+  and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  gives the unadjusted pooled estimate and describes each method.
+
+### New models
+
 - [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)
   makes *F* tables of the fixed effects of linear mixed models from
   [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) or
@@ -58,6 +230,247 @@
   [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
   gives their scale. glmmTMB models also work in lists of models and in
   [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md).
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  and
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  support linear mixed models fit with
+  [`nlme::lme()`](https://rdrr.io/pkg/nlme/man/lme.html). Fixed effects
+  are tested with *t* tests using nlme’s degrees of freedom, random
+  effects are shown as for `lme4` models, and parameters of residual
+  correlation structures (e.g., `corAR1()`) and variance functions
+  (e.g., `varIdent()`) are shown below the residual *SD*.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the structures and says how the degrees of freedom were
+  computed. `lme` models also work in lists of models and in
+  [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md).
+- [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  makes fit-index tables for `lavaan` models (e.g., from
+  [`lavaan::cfa()`](https://rdrr.io/pkg/lavaan/man/cfa.html) and
+  [`lavaan::sem()`](https://rdrr.io/pkg/lavaan/man/sem.html)): the model
+  *χ*² test, CFI, TLI, RMSEA with its 90% confidence interval, and SRMR
+  (or any of these plus AIC and BIC). Models fit with robust estimators
+  (e.g., MLR or WLSMV) show the scaled *χ*² test and robust (or scaled)
+  indices.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  gives the sample size, the estimator, and how missing data were
+  handled, and defines the abbreviations. Lists of lavaan models give
+  one row per model.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  makes parameter tables for `lavaan` models. Fully standardized
+  estimates (*β*) with their standard errors and *p*-values are shown by
+  default (`standardize = FALSE` for unstandardized estimates), under
+  headings for factor loadings (e.g., Visual → x1), regressions (e.g.,
+  Speed ← Visual), correlations (e.g., Visual ↔︎ Textual), and defined
+  parameters such as indirect effects. Variances, intercepts, and
+  thresholds can be added. Parameters fixed to set the scale are not
+  tested, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names them, along with the estimator, the standardization, and robust
+  or bootstrap standard errors.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  supports multiple-group `lavaan` models. The groups are shown side by
+  side under column spanners (or stacked under group headings with
+  `groups = "rows"`), and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  gives each group’s size and names the parameters constrained to be
+  equal across groups.
+- [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+  and
+  [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
+  accept `lavaan` models. The loading matrix shows the fully
+  standardized loadings, sorted as for exploratory analyses, with
+  loadings fixed at 0 left blank (cross-loadings are shown), and the
+  factor correlation table shows the standardized latent correlations.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  gives the sample size and the estimator.
+- [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md)
+  compares nested `lavaan` models (e.g., the configural, metric, and
+  scalar models of a measurement invariance analysis), each with the one
+  before it. Each row shows the model’s fit and, under a “Change from
+  previous model” spanner, the *χ*² difference test from
+  [`lavaan::lavTestLRT()`](https://rdrr.io/pkg/lavaan/man/lavTestLRT.html)
+  (scaled for robust estimators) and the changes in CFI and RMSEA (or
+  TLI and SRMR).
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the difference test.
+- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
+  accepts the output of
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html),
+  so the table can show Spearman, Kendall, robust, or partial
+  correlations. The note says what kind of correlations are shown and
+  how the *p*-values were adjusted for multiple comparisons.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  and
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  support multinomial logistic regression models fit with
+  [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html). Each
+  outcome category gets a heading row naming its comparison with the
+  reference category (e.g., “Part time vs. Not working”), with its
+  coefficients indented below it (or `category_headings = FALSE` for
+  labels such as “Part time: Constant”). Exponentiated coefficients are
+  odds ratios relative to the reference category, labeled *OR*, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the reference category.
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  reports McFadden’s pseudo-*R*², and lists of multinomial models are
+  compared with likelihood ratio tests.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  and
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  support zero-inflated and hurdle count models fit with
+  [`pscl::zeroinfl()`](https://rdrr.io/pkg/pscl/man/zeroinfl.html) and
+  [`pscl::hurdle()`](https://rdrr.io/pkg/pscl/man/hurdle.html). The
+  count model and the zero model appear under their own headings (“Count
+  model”, and “Zero-inflation model” or “Zero hurdle model”), and only
+  the count model’s coefficients are exponentiated (*IRR*).
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the count distribution, gives the negative binomial dispersion
+  parameter, and says what the zero model’s coefficients mean. Lists of
+  these models are compared with likelihood ratio tests.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  and
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  support meta-analyses fit with
+  [`metafor::rma()`](https://wviechtb.github.io/metafor/reference/rma.uni.html).
+  For models without moderators,
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  shows each study’s effect size, confidence interval, and percentage of
+  the total weight, followed by the pooled estimate under a rule. The
+  effect-size column is named by the measure (e.g., *g*, *r*, or *RR*);
+  ratios are exponentiated, and Fisher’s *z* values are converted back
+  to correlations (`transform = FALSE` keeps the analysis scale).
+  Meta-regressions get a coefficient table, with exponentiated
+  coefficients for ratio measures.
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  gives *k*, *Q*, *τ*², *I*² (and *τ*, *H*², and confidence intervals),
+  and, for meta-regressions, the test of the moderators and *R*².
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the measure and the model (including the estimator of *τ*² and
+  the Knapp–Hartung adjustment) and gives the test of the pooled
+  estimate, its prediction interval, and the test of heterogeneity.
+  Multilevel meta-analyses fit with
+  [`metafor::rma.mv()`](https://wviechtb.github.io/metafor/reference/rma.mv.html)
+  (random intercepts at one or more nested levels, e.g., effect sizes in
+  studies) get the same tables, with each level’s variance component
+  (*σ*²) and the multilevel *I*² (Cheung, 2014). A new article describes
+  the tables.
+- [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  and
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  support generalized additive models fit with
+  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html). The table has
+  the parametric terms (coefficients, standard errors, and *t* or *z*
+  tests) and the smooth terms (effective degrees of freedom and
+  approximate *F* or *χ*² tests) under their own headings
+  (`terms = "parametric"` or `"smooth"` shows one kind). Smooth terms
+  are labeled by type and variables (e.g., “s(Age)”, “te(Longitude,
+  Latitude)”), with a row for each level of a factor-`by` variable, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the method that estimated the smoothing parameters.
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  gives the adjusted *R*² and the deviance explained. Lists of GAMs are
+  compared by *R*² and *AIC*, without nested tests, which are not well
+  defined for penalized smooths.
+
+### Table notes and citations
+
+- Articles cited in table notes (e.g., for trim and fill or the
+  multilevel *I*²) can be resolved by citeproc and added to the
+  reference list. apa7 comes with a BibTeX file of these references, and
+  [`apa7_write_bib()`](https://wjschne.github.io/apa7/reference/apa7_write_bib.md)
+  copies it to a document’s folder. With the new `citations` argument of
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  (or `options(apa7.citations = )`), citations are written as Pandoc
+  citation keys (`"keys"`, e.g., `[@duvalTrimFillSimple2000]`) or as
+  text (`"text"`, e.g., “(Duval & Tweedie, 2000)”). The default,
+  `"auto"`, writes a key when a Quarto or R Markdown document is being
+  rendered and its bibliography has that entry, and text otherwise, so
+  listing the file in the document’s `bibliography` is enough. The keys
+  are those of Zotero’s Better BibTeX extension. Notes cite the methods
+  they name: Kenward–Roger and Satterthwaite degrees of freedom,
+  Greenhouse–Geisser and Huynh–Feldt corrections, generalized *η*²,
+  Feldt’s confidence interval for α and McDonald’s *ω*_(total), the
+  generalized *VIF*, paired-samples *d*, Holm and Benjamini–Hochberg
+  adjustments, the DerSimonian–Laird estimator and Knapp–Hartung
+  adjustment, the multilevel *I*², publication-bias methods, the MLM and
+  MLR estimators and scaled *χ*² difference tests of `lavaan`, and
+  pseudo-*R*² (Tjur, Nagelkerke, McFadden, and the marginal *R*² of
+  mixed models), which notes of lists of models now define.
+
+### Settings
+
+- [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  sets all of apa7’s settings in one place: new `print` and `citations`
+  arguments set the `apa7.print` and `apa7.citations` options. Its other
+  simple settings (`accuracy`, `font_family`, `intercept_text`,
+  `width_aware_padding`, and `page_width`) are now R options, too
+  (`apa7.accuracy`, `apa7.font_family`, `apa7.intercept_text`,
+  `apa7.width_aware_padding`, and `apa7.page_width`), so they can be set
+  with [`options()`](https://rdrr.io/r/base/options.html), including in
+  an `.Rprofile` file, before apa7 is loaded.
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  checks its values before changing anything, and it returns the
+  previous values of the settings it changed, which
+  `do.call(apa7_defaults, old)` restores (before, it returned the
+  settings’ environment itself, which changed along with the settings).
+  `apa7_defaults(reset = TRUE)` now restores the same *p*-value
+  formatter that is used when apa7 is loaded.
+- New `page_width` setting in
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  sets the width of the text area that tables fill: a number in inches,
+  or the name of a paper size, whose width less APA’s 1-inch margins is
+  used (e.g., `apa7_defaults(page_width = "a4")` for 6.27 inches). The
+  paper sizes are those of Typst’s `page` function (e.g., `"a4"`,
+  `"a5"`, `"us-letter"`, `"us-legal"`).
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  and
+  [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md)
+  use it in place of the fixed 6.5 inches (the width of letter-size
+  paper with 1-inch margins, which is still the default).
+- New `font_size` setting in
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  (the `apa7.font_size` option) sets the font size of all tables and
+  their notes (12 points by default).
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md),
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  and
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
+  use it unless `font_size` is given.
+- New `line_spacing` setting in
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  (the `apa7.line_spacing` option) sets the spacing of the headers and
+  bodies of all tables (2, double spacing, by default; APA style also
+  allows 1.5 or single spacing in tables).
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md),
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  and
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
+  use it unless `line_spacing` is given. Notes stay single-spaced.
+
+### Other improvements and bug fixes
+
+- New `random_scale` argument for mixed models in
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md):
+  `"sd"` (default) for standard deviations and correlations, or
+  `"variance"` for variances and covariances.
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  defines the symbols.
+- [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  keeps the table width set by `table_width` when
+  `pretty_widths = TRUE`. Before,
+  [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md)
+  reset it to the full width, so in HTML a table could be stretched
+  wider than its columns.
+- Decimal-aligned columns in
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  tables are centered in HTML as well as in Word.
+- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
+  centers every summary column (e.g., *SD*, which was off-center when
+  its values had different numbers of digits).
 - [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
   no longer re-formats row labels that
   [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
@@ -65,13 +478,13 @@
   [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
   have already formatted. Before, random-effect labels such as “Subject:
   *r* (Constant, Days)” lost their spacing and commas in flextables.
-- Table notes are now single-spaced, even when the table is
-  double-spaced. This applies to `apa_flextable(note = TRUE)`,
-  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
-  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md),
-  and footers styled by
-  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md).
-  `line_spacing` now sets only the spacing of the header and body.
+- The documentation of `table_width` in
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md),
+  and
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
+  now says that it is a proportion of the container’s width (from 0 to
+  1), not a width in pixels.
 
 ## apa7 0.2.0 *2026-10-18*
 

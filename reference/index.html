@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">apa7</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,11 +22,16 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/anova.html">Analysis of Variance Tables</a></li>
     <li><a class="dropdown-item" href="../articles/chisquare.html">Contingency Tables</a></li>
     <li><a class="dropdown-item" href="../articles/correlations.html">Correlations</a></li>
+    <li><a class="dropdown-item" href="../articles/descriptives.html">Descriptive Statistics Tables</a></li>
     <li><a class="dropdown-item" href="../articles/factor-analysis.html">Factor Analysis Tables</a></li>
     <li><a class="dropdown-item" href="../articles/htest.html">Hypothesis Tests</a></li>
+    <li><a class="dropdown-item" href="../articles/lavaan.html">Structural Equation Model Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/marginal-means.html">Estimated Marginal Means, Contrasts, and Simple Slopes</a></li>
+    <li><a class="dropdown-item" href="../articles/meta-analysis.html">Meta-Analysis Tables</a></li>
     <li><a class="dropdown-item" href="../articles/multilevel.html">Multilevel Model Tables</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression Analysis Tables</a></li>
-    <li><a class="dropdown-item" href="../articles/summarize.html">Summarize Data</a></li>
+    <li><a class="dropdown-item" href="../articles/reliability.html">Reliability and Item Analysis Tables</a></li>
+    <li><a class="dropdown-item" href="../articles/summarize.html">Building Tables by Hand</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -76,10 +81,24 @@
 
         <dt>
 
+          <code><a href="apa_means.html">apa_means()</a></code> <code><a href="apa_means.html">apa_contrasts()</a></code> <code><a href="apa_means.html">apa_slopes()</a></code>
+
+        </dt>
+        <dd>Estimated marginal means, contrasts, and slopes tables</dd>
+
+        <dt>
+
           <code><a href="apa_cor.html">apa_cor()</a></code>
 
         </dt>
         <dd>APA-formatted correlation table</dd>
+
+        <dt>
+
+          <code><a href="apa_descriptives.html">apa_descriptives()</a></code>
+
+        </dt>
+        <dd>Descriptive statistics table ("Table 1")</dd>
 
         <dt>
 
@@ -114,7 +133,7 @@
           <code><a href="apa_performance.html">apa_performance()</a></code>
 
         </dt>
-        <dd>format model performance metrics in APA style</dd>
+        <dd>Fit indices of lavaan models</dd>
 
         <dt>
 
@@ -122,6 +141,34 @@
 
         </dt>
         <dd>format model comparison metrics in APA style</dd>
+
+        <dt>
+
+          <code><a href="apa_publication_bias.html">apa_publication_bias()</a></code>
+
+        </dt>
+        <dd>Publication bias table for a meta-analysis</dd>
+
+        <dt>
+
+          <code><a href="apa_subgroups.html">apa_subgroups()</a></code>
+
+        </dt>
+        <dd>Subgroup analysis table for a meta-analysis</dd>
+
+        <dt>
+
+          <code><a href="apa_reliability.html">apa_reliability()</a></code>
+
+        </dt>
+        <dd>Reliability and item analysis table</dd>
+
+        <dt>
+
+          <code><a href="apa_collinearity.html">apa_collinearity()</a></code>
+
+        </dt>
+        <dd>Collinearity diagnostics table</dd>
       </dl></div><div class="section level2">
       <h2 id="style-flextables">Style flextables<a class="anchor" aria-label="anchor" href="#style-flextables"></a></h2>
 
@@ -330,6 +377,13 @@
 
         </dt>
         <dd>Run shiny app to make a document in APA style via Quarto</dd>
+
+        <dt>
+
+          <code><a href="apa7_write_bib.html">apa7_write_bib()</a></code> <code><a href="apa7_write_bib.html">apa7_bib()</a></code>
+
+        </dt>
+        <dd>Citations in table notes</dd>
       </dl></div><div class="section level2">
       <h2 id="misc">Misc<a class="anchor" aria-label="anchor" href="#misc"></a></h2>
 

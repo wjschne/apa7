@@ -8,6 +8,9 @@ object, or the output of
 [`parameters::factor_analysis()`](https://easystats.github.io/parameters/reference/principal_components.html)
 or
 [`parameters::principal_components()`](https://easystats.github.io/parameters/reference/principal_components.html).
+For a `lavaan` model, the table shows the correlations among the latent
+variables in the fully standardized solution. When latent variables are
+linked by regression paths, these correlations are implied by the model.
 
 ## Usage
 
@@ -22,9 +25,8 @@ apa_factor_cor(fit, factor_names = NULL, digits = 2)
   a [`psych::fa`](https://rdrr.io/pkg/psych/man/fa.html),
   [`psych::principal`](https://rdrr.io/pkg/psych/man/principal.html),
   [`parameters::factor_analysis`](https://easystats.github.io/parameters/reference/principal_components.html),
-  or
-  [`parameters::principal_components`](https://easystats.github.io/parameters/reference/principal_components.html)
-  object
+  [`parameters::principal_components`](https://easystats.github.io/parameters/reference/principal_components.html),
+  or `lavaan` object
 
 - factor_names:
 

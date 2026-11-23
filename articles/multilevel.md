@@ -16,10 +16,12 @@ independent and understates uncertainty. Multilevel (mixed-effects)
 models account for the nesting with random effects. `apa_parameters`
 accepts models fit with
 [`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html),
-[`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html), and
+[`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html),
+[`nlme::lme`](https://rdrr.io/pkg/nlme/man/lme.html), and
 [`glmmTMB::glmmTMB`](https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html) and
 displays the fixed effects as in an ordinary regression table, followed
-by the random-effect standard deviations and correlations.
+by the random-effect standard deviations and correlations, each under
+its own heading.
 
 ## Linear Mixed Models
 
@@ -87,19 +89,23 @@ apa_parameters(
 )
 ```
 
-| Variable                   | B      | SE    | 95% CI             | t     | df     | p      |
-|----------------------------|--------|-------|--------------------|-------|--------|--------|
-| Constant                   | 267.97 | 10.87 | \[245.43, 290.50\] | 24.65 |  22.15 | \<.001 |
-| Days                       |  11.44 |  1.10 | \[  9.26,  13.61\] | 10.41 | 125.00 | \<.001 |
-| Participant: SD (Constant) |  41.80 |       |                    |       |        |        |
-| Residual SD                |  30.22 |       |                    |       |        |        |
+| Variable            | B      | SE    | 95% CI             | t     | df     | p      |
+|---------------------|--------|-------|--------------------|-------|--------|--------|
+| Fixed effects       |        |       |                    |       |        |        |
+|  Constant           | 267.97 | 10.87 | \[245.43, 290.50\] | 24.65 |  22.15 | \<.001 |
+|  Days               |  11.44 |  1.10 | \[  9.26,  13.61\] | 10.41 | 125.00 | \<.001 |
+| Random effects (SD) |        |       |                    |       |        |        |
+|  Participant        |        |       |                    |       |        |        |
+|   Constant          |  41.80 |       |                    |       |        |        |
+|  Residual           |  30.22 |       |                    |       |        |        |
 
-The table has two parts. The fixed effects are read like ordinary
-regression coefficients: at baseline, the average reaction time is about
-268 ms, and it increases by about 11 ms per day of sleep restriction.
-Below them, the random effects show the standard deviation (*SD*) of
-participants’ intercepts around the average intercept, and the residual
-*SD* of observations around each participant’s own line.
+The table has two parts, each under a heading. The fixed effects are
+read like ordinary regression coefficients: at baseline, the average
+reaction time is about 268 ms, and it increases by about 11 ms per day
+of sleep restriction. Below them, the random effects show the standard
+deviation (*SD*) of participants’ intercepts around the average
+intercept, and the residual *SD* of observations around each
+participant’s own line.
 
 For linear mixed models, `apa_parameters` tests fixed effects with *t*
 tests that use Kenward–Roger degrees of freedom, which account for the
@@ -129,14 +135,17 @@ apa_parameters(
 )
 ```
 
-| Variable                        | B      | SE   | 95% CI             | t(17) | p      |
-|---------------------------------|--------|------|--------------------|-------|--------|
-| Constant                        | 267.97 | 8.27 | \[250.53, 285.41\] | 32.42 | \<.001 |
-| Days                            |  11.44 | 1.85 | \[  7.54,  15.33\] |  6.20 | \<.001 |
-| Participant: SD (Constant)      |  30.96 |      |                    |       |        |
-| Participant: SD (Days)          |   6.77 |      |                    |       |        |
-| Participant: r (Constant, Days) |    .18 |      |                    |       |        |
-| Residual SD                     |  25.53 |      |                    |       |        |
+| Variable             | B      | SE   | 95% CI             | t(17) | p      |
+|----------------------|--------|------|--------------------|-------|--------|
+| Fixed effects        |        |      |                    |       |        |
+|  Constant            | 267.97 | 8.27 | \[250.53, 285.41\] | 32.42 | \<.001 |
+|  Days                |  11.44 | 1.85 | \[  7.54,  15.33\] |  6.20 | \<.001 |
+| Random effects (SD)  |        |      |                    |       |        |
+|  Participant         |        |      |                    |       |        |
+|   Constant           |  30.96 |      |                    |       |        |
+|   Days               |   6.77 |      |                    |       |        |
+|   r (Constant, Days) |    .18 |      |                    |       |        |
+|  Residual            |  25.53 |      |                    |       |        |
 
 The average slope is unchanged, but its standard error is larger,
 because the model now recognizes that participants’ slopes vary: the
@@ -145,8 +154,35 @@ day. The correlation (*r*) between participants’ intercepts and slopes
 is small. When all fixed effects share the same degrees of freedom, as
 here, they appear in the *t* column header.
 
-The random-effect rows can be omitted with `random = FALSE`, and
-confidence intervals can be added with `"CI"`.
+The “Random effects” heading names the statistic of the rows below it
+(*SD*), and each cluster (here, Participant) has a subheading with its
+terms indented below it. The correlation names its own statistic (*r*).
+With several clusters, crossed or nested, each gets its own subheading.
+With `random_scale = "variance"`, the random effects are variances
+(*Var*) and covariances (*Cov*) instead:
+
+``` r
+
+apa_parameters(sleep2, random_scale = "variance")
+```
+
+| Variable               | B      | SE   | t(17) | p      |
+|------------------------|--------|------|-------|--------|
+| Fixed effects          |        |      |       |        |
+|  Constant              | 267.97 | 8.27 | 32.42 | \<.001 |
+|  Days                  |  11.44 | 1.85 |  6.20 | \<.001 |
+| Random effects (Var)   |        |      |       |        |
+|  Participant           |        |      |       |        |
+|   Constant             | 958.35 |      |       |        |
+|   Days                 |  45.78 |      |       |        |
+|   Cov (Constant, Days) |  37.20 |      |       |        |
+|  Residual              | 651.60 |      |       |        |
+
+The random-effect rows can be omitted with `random = FALSE`, and the
+“Fixed effects” and “Random effects” headings can be omitted with
+`effect_headings = FALSE`, in which case each random-effect label names
+its cluster and statistic (e.g., Participant: *SD* (Days)). Confidence
+intervals can be added with `"CI"`.
 
 ``` r
 
@@ -202,21 +238,30 @@ apa_parameters(list(sleep0, sleep1, sleep2)) |>
 |----|----|----|----|----|----|----|----|----|----|----|----|
 |  |  |  |  |  |  |  | R2 | ΔR2 |  | R2 | ΔR2 |
 | Model 1 |  |  |  |  |  |  | .00 |  |  | .49 |  |
-|  | Constant | 307.99 | 10.17 | 30.29 |  17.00 | \<.001 |  |  |  |  |  |
-|  | Participant: SD (Constant) |  40.62 |  |  |  |  |  |  |  |  |  |
-|  | Residual SD |  41.11 |  |  |  |  |  |  |  |  |  |
+|  | Fixed effects |  |  |  |  |  |  |  |  |  |  |
+|  |  Constant | 307.99 | 10.17 | 30.29 |  17.00 | \<.001 |  |  |  |  |  |
+|  | Random effects (SD) |  |  |  |  |  |  |  |  |  |  |
+|  |  Participant |  |  |  |  |  |  |  |  |  |  |
+|  |   Constant |  40.62 |  |  |  |  |  |  |  |  |  |
+|  |  Residual |  41.11 |  |  |  |  |  |  |  |  |  |
 | Model 2 |  |  |  |  |  |  | .21 | .21\*\*\* |  | .73 | .23 |
-|  | Constant | 267.97 | 10.87 | 24.65 |  22.15 | \<.001 |  |  |  |  |  |
-|  | Days |  11.44 |  1.10 | 10.41 | 125.00 | \<.001 |  |  |  |  |  |
-|  | Participant: SD (Constant) |  41.80 |  |  |  |  |  |  |  |  |  |
-|  | Residual SD |  30.22 |  |  |  |  |  |  |  |  |  |
+|  | Fixed effects |  |  |  |  |  |  |  |  |  |  |
+|  |  Constant | 267.97 | 10.87 | 24.65 |  22.15 | \<.001 |  |  |  |  |  |
+|  |  Days |  11.44 |  1.10 | 10.41 | 125.00 | \<.001 |  |  |  |  |  |
+|  | Random effects (SD) |  |  |  |  |  |  |  |  |  |  |
+|  |  Participant |  |  |  |  |  |  |  |  |  |  |
+|  |   Constant |  41.80 |  |  |  |  |  |  |  |  |  |
+|  |  Residual |  30.22 |  |  |  |  |  |  |  |  |  |
 | Model 3 |  |  |  |  |  |  | .21 | .00\*\*\* |  | .81 | .08 |
-|  | Constant | 267.97 |  8.27 | 32.42 |  17.00 | \<.001 |  |  |  |  |  |
-|  | Days |  11.44 |  1.85 |  6.20 |  17.00 | \<.001 |  |  |  |  |  |
-|  | Participant: SD (Constant) |  30.96 |  |  |  |  |  |  |  |  |  |
-|  | Participant: SD (Days) |   6.77 |  |  |  |  |  |  |  |  |  |
-|  | Participant: r (Constant, Days) |    .18 |  |  |  |  |  |  |  |  |  |
-|  | Residual SD |  25.53 |  |  |  |  |  |  |  |  |  |
+|  | Fixed effects |  |  |  |  |  |  |  |  |  |  |
+|  |  Constant | 267.97 |  8.27 | 32.42 |  17.00 | \<.001 |  |  |  |  |  |
+|  |  Days |  11.44 |  1.85 |  6.20 |  17.00 | \<.001 |  |  |  |  |  |
+|  | Random effects (SD) |  |  |  |  |  |  |  |  |  |  |
+|  |  Participant |  |  |  |  |  |  |  |  |  |  |
+|  |   Constant |  30.96 |  |  |  |  |  |  |  |  |  |
+|  |   Days |   6.77 |  |  |  |  |  |  |  |  |  |
+|  |   r (Constant, Days) |    .18 |  |  |  |  |  |  |  |  |  |
+|  |  Residual |  25.53 |  |  |  |  |  |  |  |  |  |
 
 The random slope does not change the marginal *R*², because the fixed
 effects are the same in both models, but the likelihood ratio test shows
@@ -228,7 +273,7 @@ predictors:
 
 ``` r
 
-apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>  
+apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>
   apa_flextable()
 ```
 
@@ -237,6 +282,83 @@ apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>
 | Model 1 | .00        | .00         | .49           | .49            |       |     |        |
 | Model 2 | .21        | .21         | .73           | .23            | 78.62 | 1   | \<.001 |
 | Model 3 | .21        | .00         | .81           | .08            | 25.31 | 2   | \<.001 |
+
+### Correlated residuals with nlme
+
+lme4 assumes that, after the random effects are taken into account, a
+participant’s residuals are independent. In daily measurements, though,
+a participant who is unusually slow on one day is often unusually slow
+the next day too. The nlme package can model such residual correlation.
+Here the random-slope model is refit with
+[`nlme::lme`](https://rdrr.io/pkg/nlme/man/lme.html) and a first-order
+autoregressive (AR(1)) correlation among each participant’s residuals:
+
+``` r
+
+sleep_lme <- nlme::lme(
+  Reaction ~ Days,
+  random = ~ Days | Participant,
+  correlation = nlme::corAR1(),
+  data = d_sleep
+)
+tbl_sleep_lme <- apa_parameters(sleep_lme)
+tbl_sleep_lme
+```
+
+| Variable                      | B      | SE   | t(125) | p      |
+|-------------------------------|--------|------|--------|--------|
+| Fixed effects                 |        |      |        |        |
+|  Constant                     | 266.85 | 7.82 | 34.13  | \<.001 |
+|  Days                         |  11.76 | 1.89 |  6.21  | \<.001 |
+| Random effects (SD)           |        |      |        |        |
+|  Participant                  |        |      |        |        |
+|   Constant                    |  20.36 |      |        |        |
+|   Days                        |   5.46 |      |        |        |
+|   r (Constant, Days)          |    .97 |      |        |        |
+|  Residual                     |  30.91 |      |        |        |
+|  Residual autocorrelation (φ) |    .45 |      |        |        |
+
+The fixed effects are tested with *t* tests whose degrees of freedom are
+computed by nlme from the grouping levels at which each effect varies,
+rather than with Kenward–Roger degrees of freedom. The parameters of the
+residual structure are shown below the residual *SD*: residuals on
+adjacent days correlate about .45. The table note names the structure:
+
+``` r
+
+apa_note(tbl_sleep_lme)
+```
+
+    [1] "Degrees of freedom are computed by nlme from the grouping levels at which each effect varies. Residuals within Participant have a first-order autoregressive (AR(1)) correlation structure. *SD* = standard deviation; *r* = correlation."
+
+Because the AR(1) structure and the random slopes both describe how a
+participant’s reaction times hang together over days, they compete with
+each other: with correlated residuals, the intercept *SD* is smaller and
+the correlation between intercepts and slopes is nearly 1, a sign that
+these data cannot fully separate the two. A likelihood ratio test
+compares the model with and without correlated residuals:
+
+``` r
+
+sleep_lme0 <- nlme::lme(
+  Reaction ~ Days,
+  random = ~ Days | Participant,
+  data = d_sleep
+)
+apa_performance_comparison(
+  list(`Independent residuals` = sleep_lme0, `AR(1) residuals` = sleep_lme)
+)
+```
+
+| Model | R2marginal | ΔR2marginal | R2conditional | ΔR2conditional | χ2 | df | p |
+|----|----|----|----|----|----|----|----|
+| Independent residuals | .21 | .21 | .81 |  .81 |  |  |  |
+| AR(1) residuals | .22 | .01 | .72 | −.09 | 9.64 | 1 | .002 |
+
+Variance functions (the `weights` argument, e.g.,
+`nlme::varIdent(form = ~ 1 | Group)` for a separate residual *SD* in
+each group) are displayed the same way, with a row for each parameter
+and a sentence in the note.
 
 ## Generalized Linear Mixed Models
 
@@ -279,17 +401,21 @@ glmer_va <- glmer(
 apa_parameters(glmer_va)
 ```
 
-| Variable              | B     | SE   | OR   | z      | p      |
-|-----------------------|-------|------|------|--------|--------|
-| Constant              |  0.55 | 0.39 | 1.74 |   1.43 |  .15   |
-| Anger                 |  0.06 | 0.02 | 1.06 |   3.41 | \<.001 |
-| Gender–Male           |  0.32 | 0.19 | 1.38 |   1.67 |  .09   |
-| Behavior–Scold        | −1.06 | 0.18 | 0.35 |  −5.73 | \<.001 |
-| Behavior–Shout        | −2.10 | 0.19 | 0.12 | −11.20 | \<.001 |
-| Mode–Do               | −0.71 | 0.15 | 0.49 |  −4.67 | \<.001 |
-| Situation–Self        | −1.05 | 0.15 | 0.35 |  −6.94 | \<.001 |
-| Person: SD (Constant) |  1.34 |      |      |        |        |
-| Item: SD (Constant)   |  0.34 |      |      |        |        |
+| Variable            | B     | SE   | OR   | z      | p      |
+|---------------------|-------|------|------|--------|--------|
+| Fixed effects       |       |      |      |        |        |
+|  Constant           |  0.55 | 0.39 | 1.74 |   1.43 |  .15   |
+|  Anger              |  0.06 | 0.02 | 1.06 |   3.41 | \<.001 |
+|  Gender–Male        |  0.32 | 0.19 | 1.38 |   1.67 |  .09   |
+|  Behavior–Scold     | −1.06 | 0.18 | 0.35 |  −5.73 | \<.001 |
+|  Behavior–Shout     | −2.10 | 0.19 | 0.12 | −11.20 | \<.001 |
+|  Mode–Do            | −0.71 | 0.15 | 0.49 |  −4.67 | \<.001 |
+|  Situation–Self     | −1.05 | 0.15 | 0.35 |  −6.94 | \<.001 |
+| Random effects (SD) |       |      |      |        |        |
+|  Person             |       |      |      |        |        |
+|   Constant          |  1.34 |      |      |        |        |
+|  Item               |       |      |      |        |        |
+|   Constant          |  0.34 |      |      |        |        |
 
 Each point of trait anger multiplies the odds of endorsing an item by
 about 1.06. Scolding and shouting are endorsed less often than cursing,
@@ -344,15 +470,18 @@ apa_parameters(tmb_nb)
 
 | Variable            | B     | SE   | IRR  | z     | p      |
 |---------------------|-------|------|------|-------|--------|
-| Constant            |  0.58 | 0.23 | 1.79 |  2.57 |  .01   |
-| Mined–Yes           | −2.26 | 0.28 | 0.10 | −7.97 | \<.001 |
-| Species–PR          | −1.32 | 0.29 | 0.27 | −4.59 | \<.001 |
-| Species–DM          |  0.37 | 0.22 | 1.45 |  1.65 |  .10   |
-| Species–EC-A        | −0.71 | 0.25 | 0.49 | −2.81 |  .005  |
-| Species–EC-L        |  0.57 | 0.22 | 1.77 |  2.61 |  .009  |
-| Species–DES-L       |  0.79 | 0.22 | 2.21 |  3.66 | \<.001 |
-| Species–DF          |  0.31 | 0.23 | 1.37 |  1.34 |  .18   |
-| Site: SD (Constant) |  0.54 |      |      |       |        |
+| Fixed effects       |       |      |      |       |        |
+|  Constant           |  0.58 | 0.23 | 1.79 |  2.57 |  .01   |
+|  Mined–Yes          | −2.26 | 0.28 | 0.10 | −7.97 | \<.001 |
+|  Species–PR         | −1.32 | 0.29 | 0.27 | −4.59 | \<.001 |
+|  Species–DM         |  0.37 | 0.22 | 1.45 |  1.65 |  .10   |
+|  Species–EC-A       | −0.71 | 0.25 | 0.49 | −2.81 |  .005  |
+|  Species–EC-L       |  0.57 | 0.22 | 1.77 |  2.61 |  .009  |
+|  Species–DES-L      |  0.79 | 0.22 | 2.21 |  3.66 | \<.001 |
+|  Species–DF         |  0.31 | 0.23 | 1.37 |  1.34 |  .18   |
+| Random effects (SD) |       |      |      |       |        |
+|  Site               |       |      |      |       |        |
+|   Constant          |  0.54 |      |      |       |        |
 
 As with `glmer`, coefficients are tested with *z* tests, and
 coefficients of models with a log link are exponentiated. For count
@@ -386,33 +515,37 @@ tbl_zip
 | Variable             | B     | SE   | IRR  | z     | p      |
 |----------------------|-------|------|------|-------|--------|
 | Conditional model    |       |      |      |       |        |
-|  Constant            |  0.91 | 0.14 | 2.49 |  6.40 | \<.001 |
-|  Mined–Yes           | −1.27 | 0.27 | 0.28 | −4.72 | \<.001 |
-|  Species–PR          | −1.27 | 0.24 | 0.28 | −5.27 | \<.001 |
-|  Species–DM          |  0.27 | 0.14 | 1.31 |  1.95 |  .05   |
-|  Species–EC-A        | −0.57 | 0.21 | 0.57 | −2.75 |  .006  |
-|  Species–EC-L        |  0.67 | 0.13 | 1.95 |  5.20 | \<.001 |
-|  Species–DES-L       |  0.63 | 0.13 | 1.87 |  4.96 | \<.001 |
-|  Species–DF          |  0.12 | 0.15 | 1.12 |  0.78 |  .43   |
-|  Site: SD (Constant) |  0.33 |      |      |       |        |
+|  Fixed effects       |       |      |      |       |        |
+|   Constant           |  0.91 | 0.14 | 2.49 |  6.40 | \<.001 |
+|   Mined–Yes          | −1.27 | 0.27 | 0.28 | −4.72 | \<.001 |
+|   Species–PR         | −1.27 | 0.24 | 0.28 | −5.27 | \<.001 |
+|   Species–DM         |  0.27 | 0.14 | 1.31 |  1.95 |  .05   |
+|   Species–EC-A       | −0.57 | 0.21 | 0.57 | −2.75 |  .006  |
+|   Species–EC-L       |  0.67 | 0.13 | 1.95 |  5.20 | \<.001 |
+|   Species–DES-L      |  0.63 | 0.13 | 1.87 |  4.96 | \<.001 |
+|   Species–DF         |  0.12 | 0.15 | 1.12 |  0.78 |  .43   |
+|  Random effects (SD) |       |      |      |       |        |
+|   Site               |       |      |      |       |        |
+|    Constant          |  0.33 |      |      |       |        |
 | Zero-inflation model |       |      |      |       |        |
-|  Constant            | −1.05 | 0.16 |      | −6.39 | \<.001 |
-|  Mined–Yes           |  1.84 | 0.31 |      |  5.87 | \<.001 |
+|  Fixed effects       |       |      |      |       |        |
+|   Constant           | −1.05 | 0.16 |      | −6.39 | \<.001 |
+|   Mined–Yes          |  1.84 | 0.31 |      |  5.87 | \<.001 |
 
-Each part of the model has its own heading. Only the conditional model’s
-coefficients are exponentiated, because the zero-inflation coefficients
-are log odds: the probability of an excess zero is about .26 at unmined
-sites (the inverse logit of −1.05) and .69 at mined sites (the inverse
-logit of −1.05 + 1.84). Mined sites have both more excess zeros and
-fewer salamanders otherwise. The table note says what the zero-inflation
-coefficients are:
+Each part of the model has its own heading, with its fixed and random
+effects under subheadings. Only the conditional model’s coefficients are
+exponentiated, because the zero-inflation coefficients are log odds: the
+probability of an excess zero is about .26 at unmined sites (the inverse
+logit of −1.05) and .69 at mined sites (the inverse logit of −1.05 +
+1.84). Mined sites have both more excess zeros and fewer salamanders
+otherwise. The table note says what the zero-inflation coefficients are:
 
 ``` r
 
 apa_note(tbl_zip)
 ```
 
-    [1] "Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the conditional model). *IRR* = incidence rate ratio."
+    [1] "Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the conditional model). *IRR* = incidence rate ratio; *SD* = standard deviation."
 
 The two models explain the zeros differently, and their *AIC*s can be
 compared with `apa_performance`. Here the negative binomial model fits
@@ -454,18 +587,22 @@ glmmTMB::glmmTMB(
 | Variable             | B     | SE   | IRR  | z     | p      |
 |----------------------|-------|------|------|-------|--------|
 | Conditional model    |       |      |      |       |        |
-|  Constant            |  0.64 | 0.21 | 1.89 |  3.07 |  .002  |
-|  Mined–Yes           | −2.19 | 0.27 | 0.11 | −8.12 | \<.001 |
-|  Species–PR          | −1.39 | 0.29 | 0.25 | −4.88 | \<.001 |
-|  Species–DM          |  0.29 | 0.22 | 1.33 |  1.27 |  .20   |
-|  Species–EC-A        | −0.76 | 0.25 | 0.47 | −3.02 |  .003  |
-|  Species–EC-L        |  0.56 | 0.22 | 1.75 |  2.55 |  .01   |
-|  Species–DES-L       |  0.72 | 0.22 | 2.06 |  3.31 | \<.001 |
-|  Species–DF          |  0.16 | 0.24 | 1.18 |  0.69 |  .49   |
-|  Site: SD (Constant) |  0.45 |      |      |       |        |
+|  Fixed effects       |       |      |      |       |        |
+|   Constant           |  0.64 | 0.21 | 1.89 |  3.07 |  .002  |
+|   Mined–Yes          | −2.19 | 0.27 | 0.11 | −8.12 | \<.001 |
+|   Species–PR         | −1.39 | 0.29 | 0.25 | −4.88 | \<.001 |
+|   Species–DM         |  0.29 | 0.22 | 1.33 |  1.27 |  .20   |
+|   Species–EC-A       | −0.76 | 0.25 | 0.47 | −3.02 |  .003  |
+|   Species–EC-L       |  0.56 | 0.22 | 1.75 |  2.55 |  .01   |
+|   Species–DES-L      |  0.72 | 0.22 | 2.06 |  3.31 | \<.001 |
+|   Species–DF         |  0.16 | 0.24 | 1.18 |  0.69 |  .49   |
+|  Random effects (SD) |       |      |      |       |        |
+|   Site               |       |      |      |       |        |
+|    Constant          |  0.45 |      |      |       |        |
 | Dispersion model     |       |      |      |       |        |
-|  Constant            |  0.08 | 0.14 |      |  0.56 |  .57   |
-|  Mined–Yes           | −1.20 | 0.38 |      | −3.18 |  .002  |
+|  Fixed effects       |       |      |      |       |        |
+|   Constant           |  0.08 | 0.14 |      |  0.56 |  .57   |
+|   Mined–Yes          | −1.20 | 0.38 |      | −3.18 |  .002  |
 
 ### Fit and comparisons
 

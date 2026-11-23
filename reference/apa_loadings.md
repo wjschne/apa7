@@ -1,7 +1,8 @@
 # Factor loadings table
 
 Makes an APA-style table of factor loadings from an exploratory factor
-analysis or a principal components analysis.
+analysis, a principal components analysis, or a confirmatory factor
+analysis fit with `lavaan`.
 
 ## Usage
 
@@ -28,21 +29,23 @@ apa_loadings(
   a [`psych::fa`](https://rdrr.io/pkg/psych/man/fa.html),
   [`psych::principal`](https://rdrr.io/pkg/psych/man/principal.html),
   [`parameters::factor_analysis`](https://easystats.github.io/parameters/reference/principal_components.html),
-  or
-  [`parameters::principal_components`](https://easystats.github.io/parameters/reference/principal_components.html)
-  object
+  [`parameters::principal_components`](https://easystats.github.io/parameters/reference/principal_components.html),
+  or `lavaan` object
 
 - sort_loading:
 
   sort the rows so that variables are grouped by the factor with their
   largest loading, and by the size of that loading within each factor
   (as in
-  [`psych::fa.sort()`](https://rdrr.io/pkg/psych/man/fa.sort.html))
+  [`psych::fa.sort()`](https://rdrr.io/pkg/psych/man/fa.sort.html)). If
+  `FALSE`, the rows keep the order of the model (for `lavaan` models,
+  the order of the model syntax).
 
 - min_loading:
 
   minimum absolute loading to display. Use `NA` or 0 to show all
-  loadings.
+  loadings. Defaults to .2, except for `lavaan` models, whose estimated
+  loadings are all shown.
 
 - factor_names:
 
@@ -102,6 +105,24 @@ output wraps a [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html)
 model. Its loadings are the correlations between the variables and the
 components when the variables are standardized (the default,
 `standardize = TRUE`).
+
+For a [`lavaan::cfa()`](https://rdrr.io/pkg/lavaan/man/cfa.html) or
+[`lavaan::sem()`](https://rdrr.io/pkg/lavaan/man/sem.html) model, the
+loadings are the fully standardized estimates (as in
+[`lavaan::standardizedSolution()`](https://rdrr.io/pkg/lavaan/man/standardizedSolution.html)),
+and loadings fixed at 0 are left blank. As for exploratory analyses, the
+rows are sorted by the factor with each variable's largest loading and
+by the size of that loading (use `sort_loading = FALSE` to keep the
+order of the model syntax). Every estimated loading is shown, unless
+`min_loading` is set. The communality is the proportion of an
+indicator's variance explained by the factors (\\R^2\\), and the
+uniqueness is its standardized residual variance. Variable and factor
+names are shown as written in the model, with the first letter
+capitalized and underscores replaced by spaces. Loadings of higher-order
+factors (regressions among latent variables) are not part of this table;
+see
+[`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md).
+Multiple-group models are not yet supported.
 
 Loadings smaller in absolute value than `min_loading` are left blank.
 With `bold_max = TRUE`, the largest displayed loading in each row is
@@ -195,4 +216,20 @@ parameters::principal_components(mtcars[, 1:7], n = 2) |>
 #> 5 Hp        .87  " .36"
 #> 6 Drat     −.75  " .48"
 #> 7 Qsec     −.54  "−.81"
+
+# Confirmatory factor analysis
+if (requireNamespace("lavaan", quietly = TRUE)) {
+  hs_model <- "visual =~ x1 + x2 + x3
+               textual =~ x4 + x5 + x6
+               speed =~ x7 + x8 + x9"
+  fit_cfa <- lavaan::cfa(hs_model, data = lavaan::HolzingerSwineford1939)
+  apa_loadings(fit_cfa, communality = TRUE)
+  apa_factor_cor(fit_cfa)
+}
+#> # A tibble: 3 × 4
+#>   Factor     `1`   `2`    `3`  
+#>   <chr>      <chr> <chr>  <chr>
+#> 1 1. Visual  —     ""     ""   
+#> 2 2. Textual  .46  "—"    ""   
+#> 3 3. Speed    .47  " .28" "—"  
 ```

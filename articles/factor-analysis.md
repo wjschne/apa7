@@ -26,6 +26,9 @@ from the easystats functions
 [`parameters::factor_analysis`](https://easystats.github.io/parameters/reference/principal_components.html)
 and
 [`parameters::principal_components`](https://easystats.github.io/parameters/reference/principal_components.html).
+For confirmatory factor analyses fit with lavaan, see the [structural
+equation model
+article](https://wjschne.github.io/apa7/articles/lavaan.md).
 
 The workflow is the same as for the other apa7 tables:
 
@@ -94,7 +97,7 @@ keeps them as they are.
 apa_loadings(fit_bfi, format_variable_names = FALSE)
 ```
 
-| Variable                                 | PA2  | PA3  | PA4  | PA5  | PA1  |
+| Variable                                 | PA2  | PA3  | PA1  | PA4  | PA5  |
 |------------------------------------------|------|------|------|------|------|
 | Get angry easily                         |  .81 |      |      |      |      |
 | Get irritated easily                     |  .78 |      |      |      |      |

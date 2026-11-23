@@ -10,11 +10,11 @@ object according to APA style
 apa_style(
   x,
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   horizontal_padding = 3,
   table_align = "left",
   header_align_vertical = c("top", "middle", "bottom"),
@@ -41,7 +41,8 @@ apa_style(
 
 - font_size:
 
-  font size
+  font size, in points. If `NULL` (default), the size set with
+  `apa7_defaults(font_size = )` (12 unless changed).
 
 - text_color:
 
@@ -57,8 +58,10 @@ apa_style(
 
 - line_spacing:
 
-  spacing between lines of the header and body. Table notes are
-  single-spaced.
+  spacing between lines of the header and body (e.g., 2 for double
+  spacing or 1 for single spacing). If `NULL` (default), the spacing set
+  with `apa7_defaults(line_spacing = )` (2 unless changed). Table notes
+  are single-spaced.
 
 - horizontal_padding:
 
@@ -78,7 +81,10 @@ apa_style(
 
 - table_width:
 
-  table width (in pixels, 0 for auto)
+  proportion of the width of the container (e.g., the page or text
+  column) that the table occupies, from 0 to 1: 1 is the full width, and
+  .5 is half the width. With 0, the table is only as wide as its
+  contents need.
 
 - markdown:
 

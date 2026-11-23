@@ -34,7 +34,13 @@ apa_htest(
 
 - data:
 
-  data frame
+  data frame, or test results already computed: an `htest` object from
+  [`stats::t.test()`](https://rdrr.io/r/stats/t.test.html),
+  [`stats::wilcox.test()`](https://rdrr.io/r/stats/wilcox.test.html),
+  [`stats::cor.test()`](https://rdrr.io/r/stats/cor.test.html), or
+  [`stats::chisq.test()`](https://rdrr.io/r/stats/chisq.test.html), or a
+  list of such objects of the same kind (named lists label the rows).
+  See **Test results**.
 
 - formula:
 
@@ -161,6 +167,34 @@ Use [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
 to write a table note that says which tests were done, how the effect
 size was computed, and what the abbreviations stand for.
 
+## Test results
+
+`htest` objects keep the test statistic, its degrees of freedom, and the
+*p*-value, but not the data, so `formula` and the arguments that control
+the tests are not used, and effect sizes are computed from what the
+objects keep:
+
+- One-sample and paired *t* tests: Cohen's *d* (*d*~z~ for paired tests)
+  is exactly \\t/\sqrt{n}\\, with an exact interval from the noncentral
+  *t* distribution.
+
+- Two-sample *t* tests: Cohen's *d* is approximated as \\2t/\sqrt{df}\\
+  ([`effectsize::t_to_d()`](https://easystats.github.io/effectsize/reference/t_to_r.html)),
+  which assumes groups of equal size, and the note says so. For exact
+  values, give `apa_htest()` the data instead.
+
+- Correlation tests: the correlation and, for Pearson's *r*, its
+  interval and the sample size.
+
+- Chi-square tests of independence: Cramér's *V*, \\\phi\\, or Cohen's
+  *w*, computed from the observed table that the object keeps.
+
+- Wilcoxon tests and chi-square goodness-of-fit tests: no effect size,
+  because the objects do not keep the sample sizes.
+
+The rows are labeled by the list's names or, if unnamed, by the objects'
+data names (e.g., "mpg by am"). The table has no descriptive statistics.
+
 ## Examples
 
 ``` r
@@ -231,4 +265,20 @@ tbl
 #> 2 Vs       32    0.35         1      .56   .17            [.00, .51]
 apa_note(tbl)
 #> [1] "Chi-square tests of independence with Am. 2 × 2 tables use Yates's continuity correction. CI = confidence interval for Cramér's *V*."
+
+# Test results already computed
+apa_htest(t.test(mpg ~ am, data = d))
+#> # A tibble: 1 × 5
+#>   Variable  `*t*(18.33)` `*p*` `Cohen's *d*` `95% CI`      
+#>   <chr>     <chr>        <chr> <chr>         <chr>         
+#> 1 mpg by am −3.77        .001  −1.76         [−2.82, −0.67]
+apa_htest(list(
+  Weight = cor.test(d$mpg, d$wt),
+  Displacement = cor.test(d$mpg, d$disp)
+))
+#> # A tibble: 2 × 6
+#>   Variable     `*n*` `*r*` `95% CI`     `*t*(30)` `*p*`
+#>   <chr>        <chr> <chr> <chr>        <chr>     <chr>
+#> 1 Weight       32    −.87  [−.93, −.74] −9.56     <.001
+#> 2 Displacement 32    −.85  [−.92, −.71] −8.75     <.001
 ```
