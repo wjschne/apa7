@@ -21,6 +21,8 @@ apa_contrasts(
   contrast = NULL,
   by = NULL,
   ...,
+  effect_size = NULL,
+  sd = NULL,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
@@ -72,6 +74,16 @@ are shown as they are.}
 \code{contrast = cyl}), quoted or unquoted. Passed to
 \code{\link[modelbased:estimate_contrasts]{modelbased::estimate_contrasts()}}.}
 
+\item{effect_size}{in \code{apa_contrasts()}, whether to add Cohen's \emph{d} and its
+confidence interval. If \code{NULL} (default), \emph{d} is added when it can be
+computed (models of continuous outcomes with an identity link, such as
+\code{lm()}, or any model when \code{sd} is given). If \code{TRUE}, an error is given
+when it cannot be computed.}
+
+\item{sd}{in \code{apa_contrasts()}, the standard deviation that differences are
+divided by to compute Cohen's \emph{d}. If \code{NULL} (default), the model's
+residual standard deviation is used (not for mixed models).}
+
 \item{trend}{predictor whose slopes are estimated (e.g., \code{trend = wt}),
 quoted or unquoted. Passed to \code{\link[modelbased:estimate_slopes]{modelbased::estimate_slopes()}}.}
 }
@@ -116,6 +128,18 @@ tables).
 constant, on which scale the estimates are (for models with a link
 function, such as logistic regression), which level was subtracted from
 which, and how \emph{p}-values were adjusted for multiple comparisons.
+
+In \code{apa_contrasts()}, contrasts from models of continuous outcomes with an
+identity link (e.g., \code{lm()} and \code{aov()}) get Cohen's \emph{d} with its
+confidence interval: each difference divided by the model's residual
+standard deviation (\eqn{\hat{\sigma}}{sigma}), as in
+\code{emmeans::eff_size()}. The interval accounts for the uncertainty in
+\eqn{\hat{\sigma}}{sigma}. For mixed models, there is no single right
+standard deviation to divide by, so \emph{d} is shown only when it is given with
+\code{sd} (e.g., the
+square root of the sum of the variance components and the residual
+variance). \emph{d} is not computed for logistic and other generalized linear
+models.
 
 Bayesian models are not yet supported.
 }

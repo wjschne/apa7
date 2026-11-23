@@ -50,7 +50,7 @@ test_that("apa_contrasts() labels differences and names the p-value adjustment",
   result <- apa_contrasts(fit, contrast = "Species", p_adjust = "holm")
   expect_equal(
     colnames(result),
-    c("Species", "Difference", "*SE*", "95% CI", "*t*(144)", "*p*")
+    c("Species", "Difference", "*SE*", "95% CI", "*d*", "95% CI for *d*", "*t*(144)", "*p*")
   )
   expect_equal(result$Species[1], paste0("versicolor ", minus, " setosa"))
 
@@ -272,4 +272,56 @@ test_that("by given as a named list gets shortcut labels", {
   fit3 <- lm(mpg ~ am * hp * wt, data = d)
   mixed <- apa_slopes(fit3, trend = wt, by = list("am", hp = "[sd]"))
   expect_equal(mixed, apa_slopes(fit3, trend = wt, by = c("am", "hp=[sd]")))
+})
+
+test_that("apa_contrasts() adds Cohen's d for models with a residual SD", {
+  fit <- iris_fit()
+  result <- apa_contrasts(fit, contrast = "Species")
+  mb <- modelbased::estimate_contrasts(fit, contrast = "Species")
+  sigma <- stats::sigma(fit)
+  df <- stats::df.residual(fit)
+  d <- mb$Difference / sigma
+  se <- sqrt((mb$SE / sigma)^2 + d^2 / (2 * df))
+  crit <- stats::qt(0.975, df)
+  unpad <- function(x) gsub("[\u2002-\u200a ]", "", x)
+  num <- function(v) gsub("-", "\u2212", sprintf("%.2f", v))
+  expect_equal(unpad(result$`*d*`), num(d))
+  expect_equal(
+    unpad(result$`95% CI for *d*`[1]),
+    paste0("[", num(d[1] - crit * se[1]), ",", num(d[1] + crit * se[1]), "]")
+  )
+  note <- apa_note(result)
+  expect_match(note, "*d* = difference divided by the residual standard deviation of the model (", fixed = TRUE)
+  expect_match(note, "accounts for the uncertainty in the residual standard deviation", fixed = TRUE)
+
+  # Turned off, or with a given standardizer
+  expect_false("*d*" %in% colnames(apa_contrasts(fit, contrast = "Species", effect_size = FALSE)))
+  given <- apa_contrasts(fit, contrast = "Species", sd = 2)
+  expect_equal(unpad(given$`*d*`[1]), num(mb$Difference[1] / 2))
+  expect_match(apa_note(given), "*d* = difference divided by 2.", fixed = TRUE)
+
+  # Also for modelbased output
+  expect_equal(apa_contrasts(mb)$`*d*`, result$`*d*`)
+
+  # Means and slopes have no d
+  expect_false("*d*" %in% colnames(apa_means(fit, by = "Species")))
+})
+
+test_that("Cohen's d is skipped or refused for logistic and mixed models", {
+  d <- mtcars
+  d$cyl <- factor(d$cyl)
+  g <- glm(am ~ cyl, data = d, family = binomial)
+  expect_false("*d*" %in% colnames(apa_contrasts(g, contrast = cyl)))
+  expect_error(apa_contrasts(g, contrast = cyl, effect_size = TRUE), "identity link")
+
+  skip_if_not_installed("lme4")
+  s <- lme4::sleepstudy
+  s$period <- factor(s$Days %/% 4)
+  m <- lme4::lmer(Reaction ~ period + (1 | Subject), data = s)
+  expect_false("*d*" %in% colnames(apa_contrasts(m, contrast = period)))
+  expect_error(apa_contrasts(m, contrast = period, effect_size = TRUE), "mixed models")
+  expect_true("*d*" %in% colnames(apa_contrasts(m, contrast = period, sd = 50)))
+
+  expect_error(apa_contrasts(g, contrast = cyl, sd = -1), "positive number")
+  expect_error(apa_contrasts(g, contrast = cyl, effect_size = "yes"), "effect_size")
 })

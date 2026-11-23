@@ -103,6 +103,20 @@ apa_contrasts(fit,
 
 The `p_adjust` argument of `estimate_contrasts` offers several methods, including `"tukey"`, `"bonferroni"`, `"holm"`, and `"fdr"`. The note names the method, or says that the *p*-values are not adjusted.
 
+## Effect sizes
+
+The contrast tables above include Cohen's *d* with its confidence interval: each difference divided by the model's residual standard deviation (here, `r round(sigma(fit), 2)`), as in `emmeans::eff_size`. The interval accounts for the uncertainty in the residual standard deviation, and the note says how *d* was computed. Use `effect_size = FALSE` to leave *d* out.
+
+*d* is added automatically for models of continuous outcomes with an identity link, such as `lm` and `aov`. For mixed models, differences can be standardized by different standard deviations (e.g., the residual *SD* for differences within clusters, or the total *SD*), so give the one you want with `sd`:
+
+```{r}
+#| label: contrasts-sd-given
+#| eval: false
+apa_contrasts(fit_mixed, contrast = condition, sd = 12.5)
+```
+
+*d* is not computed for logistic regression and other generalized linear models, whose differences (e.g., in probabilities) are already on an interpretable scale.
+
 # Simple Slopes
 
 A moderation analysis asks whether the effect of one predictor depends on another. In the `mtcars` data, the effect of a car's weight on its fuel efficiency (miles per gallon) may depend on its horsepower:
@@ -204,4 +218,5 @@ With `predict = "link"`, modelbased gives estimates on the link scale (here, log
 
 * `starred = "p"` adds significance stars, and `bolded = "p"` bolds significant values, as in `apa_parameters`.
 * `format_variable_names = FALSE` keeps variable names exactly as they are.
+* `effect_size = FALSE` leaves Cohen's *d* out of contrast tables, and `sd` sets the standard deviation it is computed with.
 * Bayesian models are not yet supported.

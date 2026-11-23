@@ -37,6 +37,18 @@
 #' function, such as logistic regression), which level was subtracted from
 #' which, and how *p*-values were adjusted for multiple comparisons.
 #'
+#' In `apa_contrasts()`, contrasts from models of continuous outcomes with an
+#' identity link (e.g., `lm()` and `aov()`) get Cohen's *d* with its
+#' confidence interval: each difference divided by the model's residual
+#' standard deviation (\eqn{\hat{\sigma}}{sigma}), as in
+#' `emmeans::eff_size()`. The interval accounts for the uncertainty in
+#' \eqn{\hat{\sigma}}{sigma}. For mixed models, there is no single right
+#' standard deviation to divide by, so *d* is shown only when it is given with
+#' `sd` (e.g., the
+#' square root of the sum of the variance components and the residual
+#' variance). *d* is not computed for logistic and other generalized linear
+#' models.
+#'
 #' Bayesian models are not yet supported.
 #'
 #' @param x a model, or output of [modelbased::estimate_means()] (for
@@ -63,6 +75,14 @@
 #' @param bolded columns that are bolded when *p* \eqn{\le}{<=} .05
 #' @param column_formats [column_formats()] object. If `NULL` (default), the
 #'   defaults are used. The estimate column is named `"Estimate"`.
+#' @param effect_size in `apa_contrasts()`, whether to add Cohen's *d* and its
+#'   confidence interval. If `NULL` (default), *d* is added when it can be
+#'   computed (models of continuous outcomes with an identity link, such as
+#'   `lm()`, or any model when `sd` is given). If `TRUE`, an error is given
+#'   when it cannot be computed.
+#' @param sd in `apa_contrasts()`, the standard deviation that differences are
+#'   divided by to compute Cohen's *d*. If `NULL` (default), the model's
+#'   residual standard deviation is used (not for mixed models).
 #' @param format_variable_names if `TRUE` (default), variable names are
 #'   formatted (e.g., `"Sepal.Length"` becomes "Sepal Length"). Factor levels
 #'   are shown as they are.
@@ -115,11 +135,19 @@ apa_contrasts <- function(
   contrast = NULL,
   by = NULL,
   ...,
+  effect_size = NULL,
+  sd = NULL,
   starred = NA,
   bolded = NA,
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
+  if (!is.null(effect_size) && !(isTRUE(effect_size) || isFALSE(effect_size))) {
+    cli::cli_abort("{.arg effect_size} must be {.code NULL}, {.code TRUE}, or {.code FALSE}.")
+  }
+  if (!is.null(sd) && !(is.numeric(sd) && length(sd) == 1 && !is.na(sd) && sd > 0)) {
+    cli::cli_abort("{.arg sd} must be {.code NULL} or a single positive number.")
+  }
   x <- modelbased_call(x, "estimate_contrasts", list(contrast = rlang::enquo(contrast), by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
@@ -127,7 +155,9 @@ apa_contrasts <- function(
     starred = starred,
     bolded = bolded,
     column_formats = column_formats,
-    format_variable_names = format_variable_names
+    format_variable_names = format_variable_names,
+    effect_size = effect_size,
+    sd = sd
   )
 }
 
@@ -449,7 +479,9 @@ modelbased_table <- function(
   starred = NA,
   bolded = NA,
   column_formats = NULL,
-  format_variable_names = TRUE
+  format_variable_names = TRUE,
+  effect_size = FALSE,
+  sd = NULL
 ) {
   d <- as.data.frame(x)
   a <- attributes(x)
@@ -610,6 +642,35 @@ modelbased_table <- function(
   )
   record <- attr(tbl, "apa_note", exact = TRUE)
 
+  # Standardized differences (Cohen's d)
+  es <- NULL
+  if (kind == "contrasts" && !isFALSE(effect_size)) {
+    es <- contrast_effect_sizes(
+      d,
+      model = a$model,
+      info = info,
+      probability = probability,
+      sd = sd,
+      ci = ci,
+      required = isTRUE(effect_size)
+    )
+  }
+  if (!is.null(es)) {
+    d_header <- "*d*"
+    d_ci_header <- paste0(round(ci * 100), "% CI for *d*")
+    tbl[[d_header]] <- align_chr(es$d, accuracy = the$accuracy)
+    tbl[[d_ci_header]] <- ci_md(
+      align_chr(es$CI_low, accuracy = the$accuracy),
+      align_chr(es$CI_high, accuracy = the$accuracy)
+    )
+    # After the CI of the difference (before the test statistic)
+    before <- intersect(c(grep("CI$", colnames(tbl), value = TRUE)[1]), colnames(tbl))
+    if (length(before) == 1 && !is.na(before)) {
+      tbl <- dplyr::relocate(tbl, dplyr::all_of(c(d_header, d_ci_header)), .after = dplyr::all_of(before))
+    }
+    record$headers <- c(record$headers, stats::setNames(c(d_header, d_ci_header), c("d", "d_CI")))
+  }
+
   # Heading rows for the other variables in by
   if (length(heading_vars) > 0) {
     keys <- purrr::map(heading_vars, \(v) {
@@ -685,6 +746,7 @@ modelbased_table <- function(
   record$moderators <- if (kind == "slopes") label(setdiff(focal, trend)) else NULL
   record$contrast_vars <- if (kind == "contrasts") label(contrast_names) else NULL
   record$contrast_values <- contrast_values
+  record$effect_size <- if (!is.null(es)) list(sd = attr(es, "sd"), source = attr(es, "source"), ci = ci)
 
   attr(tbl, "apa_note") <- record
   attr(tbl, "no_format_columns") <- first_header
@@ -804,6 +866,24 @@ modelbased_note_sentences <- function(record) {
     }
   }
 
+  # Standardized differences
+  es <- record$effect_size
+  if (length(es) > 0) {
+    sd_text <- trimws(align_chr(es$sd, accuracy = the$accuracy))
+    sentences <- c(
+      sentences,
+      if (identical(es$source, "sigma")) {
+        paste0(
+          "*d* = difference divided by the residual standard deviation of the model (",
+          sd_text,
+          "); its confidence interval accounts for the uncertainty in the residual standard deviation."
+        )
+      } else {
+        paste0("*d* = difference divided by ", sd_text, ".")
+      }
+    )
+  }
+
   # p-value adjustment
   if (!is.null(record$p_adjust)) {
     adj <- record$p_adjust
@@ -822,4 +902,75 @@ modelbased_note_sentences <- function(record) {
 
   # Abbreviations and probability notes
   c(sentences, parameters_note_sentences(record))
+}
+
+#' Cohen's d for contrasts
+#'
+#' Each difference is divided by the model's residual standard deviation (or
+#' `sd`). The standard error of d accounts for the uncertainty of the
+#' residual SD: \eqn{SE_d^2 = (SE/\sigma)^2 + d^2 / (2 df)}, as in
+#' `emmeans::eff_size()`.
+#' @param d data frame of modelbased contrasts
+#' @param model the model, or NULL
+#' @param info modelbased model information
+#' @param probability whether the contrasts are differences in probabilities
+#' @param sd standardizer given by the user, or NULL
+#' @param ci confidence level
+#' @param required if TRUE, an error is given when d cannot be computed
+#' @returns tibble with d, CI_low, and CI_high (with attributes sd and source),
+#'   or NULL
+#' @keywords internal
+#' @noRd
+contrast_effect_sizes <- function(d, model, info, probability, sd = NULL, ci = 0.95, required = FALSE) {
+  fail <- function(...) {
+    if (required) {
+      cli::cli_abort(c(...), call = rlang::caller_env(3))
+    }
+    NULL
+  }
+  if (!("Difference" %in% colnames(d))) {
+    return(fail("Effect sizes need differences between means."))
+  }
+  link <- if (is.null(info$link_function)) "identity" else info$link_function
+  if (probability || !identical(link, "identity")) {
+    return(fail(
+      "Cohen's {.emph d} is computed only for models of continuous outcomes with an identity link (e.g., {.fn lm} or {.fn aov}).",
+      i = "For logistic and other generalized linear models, differences are not on a standardized scale."
+    ))
+  }
+  source <- "user"
+  df <- if ("df" %in% colnames(d) && all(is.finite(d$df))) d$df else NULL
+  if (is.null(sd)) {
+    if (isTRUE(info$is_mixed)) {
+      return(fail(
+        "For mixed models, give the standard deviation to standardize the differences with {.arg sd}.",
+        i = "For example, the square root of the sum of the variance components and the residual variance, or the residual {.emph SD} for within-cluster differences."
+      ))
+    }
+    sigma <- if (is.null(model)) NULL else tryCatch(insight::get_sigma(model, ci = NULL, verbose = FALSE), error = function(e) NULL)
+    sigma <- suppressWarnings(as.numeric(sigma))
+    if (length(sigma) != 1 || is.na(sigma) || sigma <= 0) {
+      return(fail(
+        "Cohen's {.emph d} needs the model's residual standard deviation, which could not be found.",
+        i = "Give the standard deviation with {.arg sd}."
+      ))
+    }
+    sd <- sigma
+    source <- "sigma"
+    sigma_df <- tryCatch(insight::get_df(model, type = "residual"), error = function(e) NULL)
+    if (length(sigma_df) == 1 && is.finite(sigma_df)) {
+      df <- rep(sigma_df, nrow(d))
+    }
+  }
+  es <- d$Difference / sd
+  se <- if ("SE" %in% colnames(d)) d$SE / sd else rep(NA_real_, nrow(d))
+  # The standardizer's uncertainty, when it was estimated from the model
+  if (source == "sigma" && !is.null(df)) {
+    se <- sqrt(se^2 + es^2 / (2 * df))
+  }
+  crit <- if (is.null(df)) stats::qnorm(1 - (1 - ci) / 2) else stats::qt(1 - (1 - ci) / 2, df)
+  out <- tibble::tibble(d = es, CI_low = es - crit * se, CI_high = es + crit * se)
+  attr(out, "sd") <- sd
+  attr(out, "source") <- source
+  out
 }
