@@ -2819,6 +2819,10 @@ apa_performance.lm <- function(
 
   d <- performance::model_performance(fit, metrics = "all") |>
     tibble::as_tibble()
+  # Multinomial models report McFadden's R2 as R2
+  if (inherits(fit, "multinom") && "R2" %in% colnames(d)) {
+    d <- dplyr::rename(d, R2_McFadden = "R2")
+  }
 
   # GLMs report a pseudo-R2 under its own name
   pr2 <- use_pseudo_r2(d, column_formats)
@@ -2998,7 +3002,7 @@ use_pseudo_r2 <- function(data, column_formats) {
 #' @noRd
 has_fixed_dispersion <- function(fit) {
   # Nested mixed models are also compared with likelihood ratio tests
-  if (inherits(fit, c("polr", "clm", "merMod", "glmmTMB", "lme"))) {
+  if (inherits(fit, c("polr", "clm", "multinom", "merMod", "glmmTMB", "lme"))) {
     return(TRUE)
   }
   if (!inherits(fit, "glm")) {
@@ -3104,6 +3108,10 @@ apa_performance_comparison <- function(
 
     cp <- performance::compare_performance(..., metrics = "all") |>
       tibble::as_tibble()
+    # Multinomial models report McFadden's R2 as R2
+    if (all(purrr::map_lgl(models, \(m) inherits(m, "multinom"))) && "R2" %in% colnames(cp)) {
+      cp <- dplyr::rename(cp, R2_McFadden = "R2")
+    }
 
     pr2 <- use_pseudo_r2(cp, column_formats)
     cp <- pr2$data

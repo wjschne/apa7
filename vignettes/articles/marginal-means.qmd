@@ -42,7 +42,7 @@ estimate_contrasts(fit, contrast = "dose", p_adjust = "holm") |>
   apa_contrasts()
 ```
 
-With a model, variable names in `by`, `contrast`, and `trend` can be quoted or unquoted, so `apa_contrasts(fit, contrast = dose)` works, too, as does `by = c(supplement, dose)`. Values, such as `"hp=[sd]"`, must be quoted.
+With a model, variable names in `by`, `contrast`, and `trend` can be quoted or unquoted, so `apa_contrasts(fit, contrast = dose)` works, too, as does `by = c(supplement, dose)`. Values, such as `"hp=[sd]"`, can be specified in a list (e.g., `list(hp = "[sd]"`).
 
 # Estimated Marginal Means
 

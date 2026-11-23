@@ -57,6 +57,7 @@ Suggests:
     MASS,
     modelbased,
     nlme,
+    nnet,
     ordinal,
     pbkrtest,
     quarto,

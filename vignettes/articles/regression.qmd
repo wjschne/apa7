@@ -122,9 +122,6 @@ As with `lm`, `starred` and `bolded` mark significant coefficients.
 ```{r}
 #| label: glm-starred
 apa_parameters(glm1, starred = "Coefficient", bolded = "p")
-
-sci_md(c(123251,45, .00045), align = TRUE)
-
 ```
 
 ## Comparing logistic regression models
@@ -142,6 +139,42 @@ The model comparison can also be displayed separately with `apa_performance_comp
 ```{r}
 #| label: glm-compare
 apa_performance_comparison(list(glm0, glm1))
+```
+
+# Multinomial Logistic Regression
+
+When the outcome has more than two unordered categories, multinomial logistic regression (`nnet::multinom`) compares each category with a reference category, which is the first level of the outcome. The `Womenlf` data set in the carData package has the work participation of 263 married Canadian women (not working, working part time, or working full time), their husbands' income (in $1,000s), and whether they had children at home. Here, not working is the reference category:
+
+```{r}
+#| label: multinom
+d_work <- carData::Womenlf |>
+  mutate(
+    participation = factor(
+      partic,
+      levels = c("not.work", "parttime", "fulltime"),
+      labels = c("Not working", "Part time", "Full time")
+    ),
+    husband_income = hincome
+  )
+
+multinom1 <- nnet::multinom(
+  participation ~ husband_income + children,
+  data = d_work,
+  trace = FALSE
+)
+
+apa_parameters(multinom1) |>
+  apa_flextable(note = TRUE)
+```
+
+Each comparison gets a heading row with its coefficients indented below it, and the exponentiated coefficients are odds ratios relative to the reference category. Women with children at home had much lower odds of working full time than of not working, but children made little difference to the odds of working part time. To compare the categories with another reference, reorder the levels of the outcome (e.g., with `relevel`) before fitting the model. With `category_headings = FALSE`, each row is labeled with its category instead (e.g., "Part time: Constant").
+
+Lists of multinomial models are compared with McFadden's pseudo-*R*^2^ and likelihood ratio tests:
+
+```{r}
+#| label: multinom-list
+multinom0 <- nnet::multinom(participation ~ husband_income, data = d_work, trace = FALSE)
+apa_performance_comparison(list(multinom0, multinom1))
 ```
 
 # Count Regression
