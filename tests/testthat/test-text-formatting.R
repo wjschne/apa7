@@ -379,7 +379,7 @@ test_that("apa7_defaults() returns the previous values, which restore them", {
   all_old <- apa7_defaults(reset = TRUE)
   expect_setequal(
     names(all_old),
-    c("accuracy", "font_family", "intercept_text", "column_formats", "number_formatter",
+    c("accuracy", "font_family", "font_size", "line_spacing", "intercept_text", "column_formats", "number_formatter",
       "trim_leading_zero", "width_aware_padding", "page_width", "print", "citations")
   )
   expect_true(S7::S7_inherits(all_old$column_formats, column_formats))
@@ -427,4 +427,66 @@ test_that("the default column formats follow the accuracy setting", {
   apa7_defaults(reset = TRUE)
   explicit <- apa_parameters(fit, column_formats = column_formats(accuracy = .001))
   expect_equal(gsub("[\u2002-\u200a ]", "", explicit$`*B*`[2]), minus(sprintf("%.3f", b)))
+})
+
+test_that("font_size sets the font size of all tables", {
+  withr::defer(apa7_defaults(reset = TRUE))
+  apa7_defaults(reset = TRUE)
+  fit <- lm(mpg ~ wt, data = mtcars)
+  size_of <- function(ft) unique(as.vector(ft$body$styles$text$font.size$data))
+
+  expect_equal(size_of(apa_flextable(apa_parameters(fit))), 12)
+
+  old <- apa7_defaults(font_size = 10)
+  expect_equal(old, list(font_size = 12))
+  expect_equal(getOption("apa7.font_size"), 10)
+  ft <- apa_flextable(apa_parameters(fit), note = TRUE)
+  expect_equal(size_of(ft), 10)
+  expect_equal(unique(as.vector(ft$footer$styles$text$font.size$data)), 10)
+  expect_equal(size_of(apa_cor(mtcars[, c("mpg", "wt", "hp")])), 10)
+  expect_equal(size_of(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs))), 10)
+
+  # An explicit argument is used instead
+  expect_equal(size_of(apa_flextable(apa_parameters(fit), font_size = 11)), 11)
+
+  # Set directly as an option
+  withr::with_options(list(apa7.font_size = 14), {
+    expect_equal(size_of(apa_flextable(apa_parameters(fit))), 14)
+  })
+
+  apa7_defaults(reset = TRUE)
+  expect_equal(size_of(apa_flextable(apa_parameters(fit))), 12)
+  expect_error(apa7_defaults(font_size = "big"), "positive number")
+})
+
+test_that("line_spacing sets the spacing of all tables, but not of notes", {
+  withr::defer(apa7_defaults(reset = TRUE))
+  apa7_defaults(reset = TRUE)
+  fit <- lm(mpg ~ wt, data = mtcars)
+  # Spacing is drawn with vertical padding: (line_spacing - 1) * font_size * 2/3
+  pad <- function(ft, part = "body") unique(as.vector(ft[[part]]$styles$pars$padding.top$data))
+
+  ft <- apa_flextable(apa_parameters(fit), note = TRUE)
+  expect_equal(pad(ft), 8)
+  footer_padding <- pad(ft, "footer")
+
+  old <- apa7_defaults(line_spacing = 1)
+  expect_equal(old, list(line_spacing = 2))
+  ft <- apa_flextable(apa_parameters(fit), note = TRUE)
+  expect_equal(pad(ft), 0)
+  expect_equal(pad(ft, "header"), 0)
+  expect_equal(pad(ft, "footer"), footer_padding)
+  expect_equal(pad(apa_cor(mtcars[, c("mpg", "wt", "hp")])), 0)
+  expect_equal(pad(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs))), 0)
+
+  # An explicit argument is used instead
+  expect_equal(pad(apa_flextable(apa_parameters(fit), line_spacing = 1.5)), 4)
+
+  withr::with_options(list(apa7.line_spacing = 1.5), {
+    expect_equal(pad(apa_flextable(apa_parameters(fit))), 4)
+  })
+
+  apa7_defaults(reset = TRUE)
+  expect_equal(pad(apa_flextable(apa_parameters(fit))), 8)
+  expect_error(apa7_defaults(line_spacing = .5), "at least 1")
 })

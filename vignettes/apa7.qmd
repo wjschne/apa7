@@ -41,7 +41,7 @@ apa_parameters(fit)
 
 In a Quarto or R Markdown document, the result is displayed as an APA-style table. In the console, it prints as a tibble, so you can look at it or change it with dplyr functions before it is displayed. For example, you might want to use `filter` to drop rows or `mutate` to customize the display of a one or more variables.
 
-To customize the table, or to save it to a Word file, pass it to `apa_flextable`, which returns a flextable. Any flextable function can change it further (e.g., `flextable::bold` can selectively bold  cells):
+To customize the table, or to save it to a Word file, pass it to `apa_flextable`, which returns a flextable. Any flextable function can change it further (e.g., `flextable::bold` can selectively bold cells):
 
 ```{r}
 #| label: first-flextable
@@ -74,7 +74,7 @@ When using [apaquarto](https://wjschne.github.io/apaquarto/), put the note in th
 Each family of tables has an article with examples and options.
 
 | Analysis | Functions | Article |
-|:---|:---|:---|
+|:-----------------------|:-----------------------|:-----------------------|
 | Regression (linear, logistic, count, ordinal, multinomial) | `apa_parameters`, `apa_performance`, `apa_performance_comparison`, `apa_collinearity` | [Regression](https://wjschne.github.io/apa7/articles/regression.html) |
 | Multilevel models (lme4, glmmTMB, nlme) | `apa_parameters`, `apa_performance` | [Multilevel models](https://wjschne.github.io/apa7/articles/multilevel.html) |
 | ANOVA | `apa_anova` | [ANOVA](https://wjschne.github.io/apa7/articles/anova.html) |
@@ -121,7 +121,7 @@ apa_parameters(list(
 
 apa7's formatting functions are useful in text, too, especially in inline R code (e.g., `` `r knitr::inline_expr("apa_p(.0004, inline = TRUE)")` ``).
 
-*p*-values have no leading zero, and very small ones are written as "<.001" in tables (and "*p* < .001" in text):
+*p*-values have no leading zero, and very small ones are written as "\<.001" in tables (and "*p* \< .001" in text):
 
 ```{r}
 #| label: apa-p
@@ -155,29 +155,47 @@ paste0("*R*", superscript_md("2"), subscript_md("adj"))
 
 # Defaults
 
-`apa7_defaults` sets options for all tables, such as the rounding accuracy, the font, the label of the intercept, and the width of the page that tables fill (6.5 inches, the text width of letter-size paper with 1-inch margins, unless changed to another width in inches or to a paper size such as `"a4"`):
+`apa7_defaults` sets options for all tables, such as the rounding accuracy, the font and its size, the line spacing, the label of the intercept, and the width of the page that tables fill (6.5 inches, the text width of letter-size paper with 1-inch margins, unless changed to another width in inches or to a paper size such as `"a4"`):
 
 ```{r}
 #| label: defaults
 #| eval: false
 apa7_defaults(accuracy = .001, 
-              font_family = "Arial", 
+              font_family = "Arial",
+              font_size = 11,
+              line_spacing = 1,
               intercept_text = "Intercept",
-              page_width = "a4")
+              width_aware_padding = FALSE,
+              page_width = "a4", 
+              print = "tibble",
+              citations = "keys"
+              )
 
 # Back to the defaults
 apa7_defaults(reset = TRUE)
 ```
 
-Each of these settings is also an R option (e.g., `apa7_defaults(page_width = "a4")` sets `options(apa7.page_width = "a4")`), so a setting you always want, such as A4 paper, can go in an `.Rprofile` file that runs at the start of every R session. See `?apa7_defaults` for the list.
+Each of these settings is also an R option
 
-## Print Options
+| Argument            | Option                   | Default           |
+|:--------------------|:-------------------------|:------------------|
+| accuracy            | apa7.accuracy            | .01               |
+| font_family         | apa7.font_family         | "Times New Roman" |
+| intercept_text      | apa7.intercept_text      | "Constant"        |
+| width_aware_padding | apa7.width_aware_padding | TRUE              |
+| page_width          | apa7.page_width          | 6.5               |
+| print               | apa7.print               | "auto"            |
+| citations           | apa7.citations           | "auto"            |
 
-The `print` setting of `apa7_defaults` (the `apa7.print` option) controls how tables are displayed: 
+For example, to set the default font family:
 
-- `options(apa7.print = "auto")` shows tables in documents and tibbles in the console (default option) .
-- `options(apa7.print = "flextable")` shows tables everywhere. 
-- `options(apa7.print = "tibble")` shows tibbles everywhere.
+```{r}
+#| label: fontdefault
+#| eval: false
+
+options(apa.font_family = "Arial")
+```
+
 
 # Writing a Paper with apaquarto
 
@@ -189,4 +207,3 @@ The `print` setting of `apa7_defaults` (the `apa7.print` option) controls how ta
 install_apaquarto()
 make_apaquarto()
 ```
-

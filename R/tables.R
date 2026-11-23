@@ -369,11 +369,11 @@ apa_chisq <- function(
   separate_headers = TRUE,
   apa_style = TRUE,
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
@@ -387,6 +387,12 @@ apa_chisq <- function(
   suppress_warnings = TRUE,
   ...
 ) {
+  if (is.null(line_spacing)) {
+    line_spacing <- the$line_spacing
+  }
+  if (is.null(font_size)) {
+    font_size <- the$font_size
+  }
   if (is.null(font_family)) {
     font_family <- the$font_family
   }
@@ -557,17 +563,23 @@ apa_cor <- function(
   significance_note = TRUE,
   output = c("flextable", "tibble"),
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   table_width = 1,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
   ...
 ) {
+  if (is.null(line_spacing)) {
+    line_spacing <- the$line_spacing
+  }
+  if (is.null(font_size)) {
+    font_size <- the$font_size
+  }
   value <- name <- Variable <- k <- group <- width <- NULL
   if (is.null(font_family)) {
     font_family <- the$font_family
@@ -1022,11 +1034,11 @@ apa_flextable <- function(
   separate_headers = TRUE,
   apa_style = TRUE,
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
@@ -1044,6 +1056,12 @@ apa_flextable <- function(
   note = NULL,
   ...
 ) {
+  if (is.null(line_spacing)) {
+    line_spacing <- the$line_spacing
+  }
+  if (is.null(font_size)) {
+    font_size <- the$font_size
+  }
   # Prevent check warning
   column_n <- row_title <- value <- name <- newname <-
     cnames <- cnames_no_sep <- spanner_deckered <-
@@ -3417,11 +3435,14 @@ model_names <- function(models) {
 #'
 #' @param x object
 #' @param font_family font family
-#' @param font_size font size
+#' @param font_size font size, in points. If `NULL` (default), the size set
+#'   with `apa7_defaults(font_size = )` (12 unless changed).
 #' @param text_color text color
 #' @param border_color border color
 #' @param border_width border width in pixels
-#' @param line_spacing spacing between lines of the header and body. Table
+#' @param line_spacing spacing between lines of the header and body (e.g., 2
+#'   for double spacing or 1 for single spacing). If `NULL` (default), the
+#'   spacing set with `apa7_defaults(line_spacing = )` (2 unless changed). Table
 #'   notes are single-spaced.
 #' @param horizontal_padding horizontal padding (in pixels)
 #' @param markdown apply markdown formatting to header and body
@@ -3448,11 +3469,11 @@ model_names <- function(models) {
 apa_style <- function(
   x,
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   horizontal_padding = 3,
   table_align = "left",
   header_align_vertical = c("top", "middle", "bottom"),
@@ -3465,6 +3486,12 @@ apa_style <- function(
   no_markdown_columns_header = no_markdown_columns,
   separate_headers = TRUE
 ) {
+  if (is.null(line_spacing)) {
+    line_spacing <- the$line_spacing
+  }
+  if (is.null(font_size)) {
+    font_size <- the$font_size
+  }
   header_align_vertical <- match.arg(header_align_vertical)
 
   if (is.null(font_family)) {

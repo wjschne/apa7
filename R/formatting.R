@@ -1016,11 +1016,13 @@ the <- new.env(parent = emptyenv())
 the$accuracy <- .01
 the$intercept_text <- "Constant"
 the$font_family <- "Times New Roman"
+the$font_size <- 12
+the$line_spacing <- 2
 the$page_width <- 6.5
 # Pad to equal rendered width in the$font_family (see num_pad)
 the$width_aware_padding <- TRUE
-# accuracy, intercept_text, font_family, page_width, and width_aware_padding
-# are replaced when the package is loaded by active bindings that read the
+# accuracy, intercept_text, font_family, font_size, line_spacing, page_width,
+# and width_aware_padding are replaced when the package is loaded by active bindings that read the
 # apa7.* options (see bind_option_settings())
 # Superscripts and subscripts are drawn smaller than the base text. Word draws
 # them at about 2/3 of the font size; browsers at about 0.83.
@@ -1866,6 +1868,8 @@ the$column_formats <- column_formats()
 #' |:---|:---|:---|
 #' | `accuracy` | `apa7.accuracy` | `.01` |
 #' | `font_family` | `apa7.font_family` | `"Times New Roman"` |
+#' | `font_size` | `apa7.font_size` | `12` |
+#' | `line_spacing` | `apa7.line_spacing` | `2` |
 #' | `intercept_text` | `apa7.intercept_text` | `"Constant"` |
 #' | `width_aware_padding` | `apa7.width_aware_padding` | `TRUE` |
 #' | `page_width` | `apa7.page_width` | `6.5` |
@@ -1884,6 +1888,11 @@ the$column_formats <- column_formats()
 #' @param accuracy rounding accuracy of numbers in tables (default: .01, for
 #'   two decimals)
 #' @param font_family font family
+#' @param font_size font size of tables and their notes, in points (default: 12)
+#' @param line_spacing spacing between the lines of tables' headers and
+#'   bodies: 2 (default) for double spacing, 1.5, or 1 for single spacing.
+#'   APA style allows any of these in tables. Table notes are always
+#'   single-spaced.
 #' @param intercept_text what to call the intercept
 #' @param column_formats column formatting functions
 #' @param number_formatter default function to format numbers
@@ -1923,6 +1932,8 @@ the$column_formats <- column_formats()
 apa7_defaults <- function(
   accuracy = NULL,
   font_family = NULL,
+  font_size = NULL,
+  line_spacing = NULL,
   intercept_text = NULL,
   column_formats = NULL,
   number_formatter = NULL,
@@ -1938,6 +1949,12 @@ apa7_defaults <- function(
   # Check values before changing anything
   if (!is.null(accuracy) && !(is.numeric(accuracy) && length(accuracy) == 1 && !is.na(accuracy) && accuracy > 0)) {
     cli::cli_abort("{.arg accuracy} must be a single positive number (e.g., {.code .01}).")
+  }
+  if (!is.null(font_size) && !(is.numeric(font_size) && length(font_size) == 1 && !is.na(font_size) && font_size > 0)) {
+    cli::cli_abort("{.arg font_size} must be a single positive number (points).")
+  }
+  if (!is.null(line_spacing) && !(is.numeric(line_spacing) && length(line_spacing) == 1 && !is.na(line_spacing) && line_spacing >= 1)) {
+    cli::cli_abort("{.arg line_spacing} must be a single number of at least 1 (e.g., 1 for single spacing or 2 for double spacing).")
   }
   for (arg in c("font_family", "intercept_text")) {
     value <- get(arg)
@@ -1972,6 +1989,8 @@ apa7_defaults <- function(
   settings <- list(
     accuracy = accuracy,
     font_family = font_family,
+    font_size = font_size,
+    line_spacing = line_spacing,
     intercept_text = intercept_text,
     width_aware_padding = width_aware_padding,
     page_width = page_width,
@@ -2000,7 +2019,8 @@ apa7_defaults <- function(
 
   given <- names(previous)[!vapply(
     list(
-      accuracy = accuracy, font_family = font_family, intercept_text = intercept_text,
+      accuracy = accuracy, font_family = font_family, font_size = font_size,
+      line_spacing = line_spacing, intercept_text = intercept_text,
       column_formats = column_formats, number_formatter = number_formatter,
       trim_leading_zero = trim_leading_zero, width_aware_padding = width_aware_padding,
       page_width = page_width, print = print, citations = citations
@@ -2021,6 +2041,8 @@ apa7_defaults <- function(
 apa7_option_settings <- list(
   accuracy = list(option = "apa7.accuracy", default = .01),
   font_family = list(option = "apa7.font_family", default = "Times New Roman"),
+  font_size = list(option = "apa7.font_size", default = 12),
+  line_spacing = list(option = "apa7.line_spacing", default = 2),
   intercept_text = list(option = "apa7.intercept_text", default = "Constant"),
   width_aware_padding = list(option = "apa7.width_aware_padding", default = TRUE),
   page_width = list(option = "apa7.page_width", default = 6.5, read = function(x) page_text_width(x)),
@@ -2034,7 +2056,7 @@ apa7_option_settings <- list(
 apa7_current_defaults <- function() {
   options_now <- lapply(apa7_option_settings, \(s) getOption(s$option, s$default))
   c(
-    options_now[c("accuracy", "font_family", "intercept_text")],
+    options_now[c("accuracy", "font_family", "font_size", "line_spacing", "intercept_text")],
     list(
       column_formats = the$column_formats,
       number_formatter = the$number_formatter,
@@ -2051,7 +2073,7 @@ apa7_current_defaults <- function() {
 #' @keywords internal
 #' @noRd
 bind_option_settings <- function(env = the) {
-  for (name in c("accuracy", "font_family", "intercept_text", "width_aware_padding", "page_width")) {
+  for (name in c("accuracy", "font_family", "font_size", "line_spacing", "intercept_text", "width_aware_padding", "page_width")) {
     setting <- apa7_option_settings[[name]]
     if (exists(name, envir = env, inherits = FALSE)) {
       rm(list = name, envir = env)

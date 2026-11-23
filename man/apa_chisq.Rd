@@ -18,11 +18,11 @@ apa_chisq(
   separate_headers = TRUE,
   apa_style = TRUE,
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
@@ -64,7 +64,8 @@ apa_chisq(
 
 \item{font_family}{font family}
 
-\item{font_size}{font size}
+\item{font_size}{font size, in points. If \code{NULL} (default), the size set
+with \code{apa7_defaults(font_size = )} (12 unless changed).}
 
 \item{text_color}{text color}
 
@@ -72,7 +73,9 @@ apa_chisq(
 
 \item{border_width}{border width in pixels}
 
-\item{line_spacing}{spacing between lines of the header and body. Table
+\item{line_spacing}{spacing between lines of the header and body (e.g., 2
+for double spacing or 1 for single spacing). If \code{NULL} (default), the
+spacing set with \code{apa7_defaults(line_spacing = )} (2 unless changed). Table
 notes are single-spaced.}
 
 \item{horizontal_padding}{horizontal padding (in pixels)}

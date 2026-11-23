@@ -7,6 +7,8 @@
 apa7_defaults(
   accuracy = NULL,
   font_family = NULL,
+  font_size = NULL,
+  line_spacing = NULL,
   intercept_text = NULL,
   column_formats = NULL,
   number_formatter = NULL,
@@ -23,6 +25,13 @@ apa7_defaults(
 two decimals)}
 
 \item{font_family}{font family}
+
+\item{font_size}{font size of tables and their notes, in points (default: 12)}
+
+\item{line_spacing}{spacing between the lines of tables' headers and
+bodies: 2 (default) for double spacing, 1.5, or 1 for single spacing.
+APA style allows any of these in tables. Table notes are always
+single-spaced.}
 
 \item{intercept_text}{what to call the intercept}
 
@@ -70,6 +79,8 @@ that runs at the start of every R session, before apa7 is loaded:\tabular{lll}{
    Argument \tab Option \tab Default \cr
    \code{accuracy} \tab \code{apa7.accuracy} \tab \code{.01} \cr
    \code{font_family} \tab \code{apa7.font_family} \tab \code{"Times New Roman"} \cr
+   \code{font_size} \tab \code{apa7.font_size} \tab \code{12} \cr
+   \code{line_spacing} \tab \code{apa7.line_spacing} \tab \code{2} \cr
    \code{intercept_text} \tab \code{apa7.intercept_text} \tab \code{"Constant"} \cr
    \code{width_aware_padding} \tab \code{apa7.width_aware_padding} \tab \code{TRUE} \cr
    \code{page_width} \tab \code{apa7.page_width} \tab \code{6.5} \cr

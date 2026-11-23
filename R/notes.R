@@ -836,10 +836,13 @@ add_note_footer <- function(
   ft,
   text,
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   horizontal_padding = 3
 ) {
+  if (is.null(font_size)) {
+    font_size <- the$font_size
+  }
   if (is.null(text)) {
     return(ft)
   }

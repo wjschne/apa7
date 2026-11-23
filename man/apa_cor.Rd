@@ -14,11 +14,11 @@ apa_cor(
   significance_note = TRUE,
   output = c("flextable", "tibble"),
   font_family = NULL,
-  font_size = 12,
+  font_size = NULL,
   text_color = "black",
   border_color = "black",
   border_width = 0.5,
-  line_spacing = 2,
+  line_spacing = NULL,
   table_width = 1,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
@@ -46,7 +46,8 @@ output of \code{\link[correlation:correlation]{correlation::correlation()}} (see
 
 \item{font_family}{font family}
 
-\item{font_size}{font size}
+\item{font_size}{font size, in points. If \code{NULL} (default), the size set
+with \code{apa7_defaults(font_size = )} (12 unless changed).}
 
 \item{text_color}{text color}
 
@@ -54,7 +55,9 @@ output of \code{\link[correlation:correlation]{correlation::correlation()}} (see
 
 \item{border_width}{border width in pixels}
 
-\item{line_spacing}{spacing between lines of the header and body. Table
+\item{line_spacing}{spacing between lines of the header and body (e.g., 2
+for double spacing or 1 for single spacing). If \code{NULL} (default), the
+spacing set with \code{apa7_defaults(line_spacing = )} (2 unless changed). Table
 notes are single-spaced.}
 
 \item{table_width}{proportion of the width of the page that the table
