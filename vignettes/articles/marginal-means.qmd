@@ -79,7 +79,9 @@ Pairwise comparisons of the doses, with *p*-values adjusted by Holm's method:
 
 ```{r}
 #| label: contrasts-dose
-apa_contrasts(fit, contrast = "dose", p_adjust = "holm") |>
+apa_contrasts(fit, 
+              contrast = "dose", 
+              p_adjust = "holm") |>
   apa_flextable(note = TRUE)
 ```
 
@@ -87,7 +89,10 @@ Each row is the first level minus the second (e.g., 1 − 0.5), and the note say
 
 ```{r}
 #| label: contrasts-by
-apa_contrasts(fit, contrast = "dose", by = "supplement", p_adjust = "holm") |>
+apa_contrasts(fit,
+              contrast = "dose",
+              by = "supplement",
+              p_adjust = "holm") |>
   apa_flextable(note = TRUE)
 ```
 
@@ -112,7 +117,35 @@ apa_slopes(fit_mod, trend = "wt", by = "hp=c(100, 150, 200)") |>
   apa_flextable(note = TRUE)
 ```
 
-Weight lowers fuel efficiency less in more powerful cars. modelbased has shortcuts for common moderator values, such as `by = "hp=[sd]"` for the mean and one standard deviation above and below it.
+Weight lowers fuel efficiency less in more powerful cars.
+
+modelbased has shortcuts for common moderator values, and `apa_slopes` names the values they give. A numeric moderator named without values (`by = "hp"`) is set to its mean and 1 standard deviation above and below it, as with `by = "hp=[sd]"`:
+
+```{r}
+#| label: slopes-sd
+apa_slopes(fit_mod, trend = "wt", by = "hp") |>
+  apa_flextable(note = TRUE)
+```
+
+With `by = "hp=[fivenum]"`, the slopes are at the minimum, lower quartile, median, upper quartile, and maximum:
+
+```{r}
+#| label: slopes-fivenum
+apa_slopes(fit_mod, trend = "wt", by = "hp=[fivenum]") |>
+  apa_flextable(note = TRUE)
+```
+
+Other named shortcuts are `"[quartiles]"`, `"[minmax]"`, and `"[mad]"` (the median and 1 median absolute deviation above and below it). The shortcuts, and the default for a numeric variable named without values, work the same way in `apa_means` and `apa_contrasts`. For example, the difference between manual and automatic transmissions at three values of horsepower:
+
+```{r}
+#| label: contrasts-sd
+d_cars_am <- mtcars
+d_cars_am$am <- factor(d_cars_am$am, labels = c("Automatic", "Manual"))
+fit_am <- lm(mpg ~ am * hp, data = d_cars_am)
+
+apa_contrasts(fit_am, contrast = "am", by = "hp") |>
+  apa_flextable(note = TRUE)
+```
 
 Without `by`, `apa_slopes` gives the average slope of the predictor:
 

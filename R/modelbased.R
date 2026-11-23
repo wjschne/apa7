@@ -19,6 +19,19 @@
 #' indented. Numeric levels (e.g., values of a continuous moderator) are
 #' rounded to 2 decimals.
 #'
+#' Values set with a modelbased shortcut are named, with the value in
+#' parentheses: `"x=[sd]"` (or `"x=[meansd]"`) gives "\eqn{-}{-}1*SD*",
+#' "*M*", and "+1*SD*"; `"x=[mad]"` gives "\eqn{-}{-}1*MAD*", "*Mdn*", and
+#' "+1*MAD*"; `"x=[fivenum]"` gives "Min", "*Q*~1~", "*Mdn*", "*Q*~3~",
+#' and "Max"; `"x=[quartiles]"` gives "*Q*~1~", "*Mdn*", and "*Q*~3~";
+#' and `"x=[minmax]"` gives "Min" and "Max". Contrasts between such values
+#' (e.g., `contrast = "x=[sd]"`) are labeled by name (e.g.,
+#' "+1*SD* \eqn{-}{-} *M*"), and the note gives the values. With a model, a
+#' numeric variable named in `by` without values (e.g., `by = "x"`) is set to
+#' its mean and 1 *SD* above and below it, as with `by = "x=[sd]"` (rather
+#' than the modelbased default of 10 values, which suits plots better than
+#' tables).
+#'
 #' [apa_note()] says what the values are, how the other predictors were held
 #' constant, on which scale the estimates are (for models with a link
 #' function, such as logistic regression), which level was subtracted from
@@ -69,7 +82,7 @@ apa_means <- function(
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
-  x <- modelbased_estimates(x, "estimate_means", ...)
+  x <- modelbased_call(x, "estimate_means", ...)
   modelbased_table(
     x,
     kind = "means",
@@ -90,7 +103,7 @@ apa_contrasts <- function(
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
-  x <- modelbased_estimates(x, "estimate_contrasts", ...)
+  x <- modelbased_call(x, "estimate_contrasts", ...)
   modelbased_table(
     x,
     kind = "contrasts",
@@ -111,7 +124,7 @@ apa_slopes <- function(
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
-  x <- modelbased_estimates(x, "estimate_slopes", ...)
+  x <- modelbased_call(x, "estimate_slopes", ...)
   modelbased_table(
     x,
     kind = "slopes",
@@ -120,6 +133,22 @@ apa_slopes <- function(
     column_formats = column_formats,
     format_variable_names = format_variable_names
   )
+}
+
+#' modelbased output, computed from a model if needed, with numeric
+#' variables named in `by` without values set to their mean and 1 SD above
+#' and below it
+#' @keywords internal
+#' @noRd
+modelbased_call <- function(x, fun, ...) {
+  if (inherits(x, "data.frame")) {
+    return(modelbased_estimates(x, fun, ...))
+  }
+  args <- list(...)
+  if (!is.null(args$by)) {
+    args$by <- modelbased_numeric_by(x, args$by)
+  }
+  do.call(modelbased_estimates, c(list(x, fun), args))
 }
 
 #' modelbased output, computed from a model if needed
@@ -157,6 +186,110 @@ modelbased_estimates <- function(x, fun, ...) {
   )
   f <- getExportedValue("modelbased", fun)
   f(x, ...)
+}
+
+#' Set numeric variables named in by without values (e.g., "x") to their
+#' mean and 1 SD above and below it ("x=[sd]")
+#' @keywords internal
+#' @noRd
+modelbased_numeric_by <- function(model, by) {
+  data <- tryCatch(
+    insight::get_data(model, verbose = FALSE),
+    error = function(e) NULL
+  )
+  if (is.null(data) || !is.character(by)) {
+    return(by)
+  }
+  continuous <- vapply(
+    by,
+    \(v) {
+      v %in% colnames(data) &&
+        is.numeric(data[[v]]) &&
+        length(unique(stats::na.omit(data[[v]]))) > 2
+    },
+    logical(1)
+  )
+  by[continuous] <- paste0(by[continuous], "=[sd]")
+  by
+}
+
+#' Labels of moderator values set with a modelbased shortcut
+#'
+#' For example, `"x=[sd]"` gives "-1*SD* (12.23)", "*M* (14.23)", and
+#' "+1*SD* (16.23)", and `"x=[fivenum]"` gives the minimum, quartiles,
+#' median, and maximum.
+#' @param v values of the variable
+#' @param var name of the variable
+#' @param by the `by` attribute of the modelbased output
+#' @returns labels, or `NULL` if no shortcut was used
+#' @keywords internal
+#' @noRd
+modelbased_shortcut_labels <- function(v, var, by) {
+  if (!is.numeric(v)) {
+    return(NULL)
+  }
+  shortcut <- modelbased_shortcut(var, by)
+  names <- modelbased_shortcut_names(shortcut)
+  values <- sort(unique(v))
+  if (is.null(names) || length(values) != length(names)) {
+    return(NULL)
+  }
+  labels <- paste0(names[match(v, values)], " (", modelbased_values(v), ")")
+  attr(labels, "shortcut") <- shortcut
+  labels
+}
+
+#' Shortcut (e.g., "sd") used for a variable in by or contrast specifications
+#' (e.g., "x=[sd]"), or NULL
+#' @keywords internal
+#' @noRd
+modelbased_shortcut <- function(var, specs) {
+  spec <- specs[startsWith(specs, paste0(var, "=["))]
+  if (length(spec) != 1) {
+    return(NULL)
+  }
+  sub("^.*=\\[(.*)\\]$", "\\1", spec)
+}
+
+#' Names of the values a shortcut gives, from lowest to highest
+#' @keywords internal
+#' @noRd
+modelbased_shortcut_names <- function(shortcut) {
+  if (is.null(shortcut)) {
+    return(NULL)
+  }
+  minus <- "\u2212"
+  switch(
+    shortcut,
+    sd = ,
+    meansd = c(paste0(minus, "1*SD*"), "*M*", "+1*SD*"),
+    mad = c(paste0(minus, "1*MAD*"), "*Mdn*", "+1*MAD*"),
+    fivenum = c("Min", "*Q*~1~", "*Mdn*", "*Q*~3~", "Max"),
+    quartiles = c("*Q*~1~", "*Mdn*", "*Q*~3~"),
+    minmax = c("Min", "Max"),
+    NULL
+  )
+}
+
+#' Definitions of the symbols in shortcut labels
+#' @keywords internal
+#' @noRd
+modelbased_shortcut_abbreviations <- function(shortcuts) {
+  defs <- character(0)
+  if ("mad" %in% shortcuts) {
+    defs <- c(defs, "*MAD*" = "median absolute deviation")
+  }
+  if ("quartiles" %in% shortcuts) {
+    defs <- c(defs, "*Q*~1~" = "first quartile", "*Q*~3~" = "third quartile")
+  } else if ("fivenum" %in% shortcuts) {
+    # fivenum() gives Tukey's hinges, which can differ slightly from quartiles
+    defs <- c(
+      defs,
+      "*Q*~1~" = "first quartile (lower hinge)",
+      "*Q*~3~" = "third quartile (upper hinge)"
+    )
+  }
+  defs
 }
 
 #' Format numeric levels (e.g., moderator values) for row labels
@@ -220,6 +353,17 @@ modelbased_table <- function(
     cli::cli_abort("Cannot find the estimates in {.arg x}.") # nocov
   }
   focal <- intersect(a$focal_terms, colnames(d))
+  # Labels of a variable's levels, naming shortcut values (e.g., "+1*SD*")
+  shortcuts <- character(0)
+  contrast_values <- NULL
+  level_labels <- function(var) {
+    labels <- modelbased_shortcut_labels(d[[var]], var, a$by)
+    if (is.null(labels)) {
+      return(modelbased_values(d[[var]]))
+    }
+    shortcuts <<- c(shortcuts, attr(labels, "shortcut"))
+    as.character(labels)
+  }
   trend <- a$trend
   contrast_vars <- a$contrast
 
@@ -229,12 +373,26 @@ modelbased_table <- function(
     }
     row_var <- focal[length(focal)]
     heading_vars <- focal[-length(focal)]
-    row_label <- modelbased_values(d[[row_var]])
+    row_label <- level_labels(row_var)
     first_header <- label(row_var)
   } else if (kind == "contrasts") {
-    heading_vars <- setdiff(focal, contrast_vars)
+    contrast_names <- sub("=.*$", "", contrast_vars)
+    heading_vars <- setdiff(focal, contrast_names)
     row_label <- paste0(d$Level1, " \u2212 ", d$Level2)
-    first_header <- if (length(contrast_vars) == 1) label(contrast_vars) else "Contrast"
+    first_header <- if (length(contrast_vars) == 1) label(contrast_names) else "Contrast"
+    # Values set with a shortcut (e.g., "x=[sd]") are named (e.g., "*M* \u2212 \u22121*SD*")
+    if (length(contrast_vars) == 1) {
+      shortcut <- modelbased_shortcut(contrast_names, contrast_vars)
+      names <- modelbased_shortcut_names(shortcut)
+      level1 <- suppressWarnings(as.numeric(as.character(d$Level1)))
+      level2 <- suppressWarnings(as.numeric(as.character(d$Level2)))
+      values <- sort(unique(c(level1, level2)))
+      if (!is.null(names) && !anyNA(values) && length(values) == length(names)) {
+        row_label <- paste0(names[match(level1, values)], " \u2212 ", names[match(level2, values)])
+        shortcuts <- c(shortcuts, shortcut)
+        contrast_values <- paste0(names, " = ", modelbased_values(values))
+      }
+    }
   } else {
     moderators <- setdiff(focal, trend)
     if (length(moderators) == 0) {
@@ -244,7 +402,7 @@ modelbased_table <- function(
     } else {
       row_var <- moderators[length(moderators)]
       heading_vars <- moderators[-length(moderators)]
-      row_label <- modelbased_values(d[[row_var]])
+      row_label <- level_labels(row_var)
       first_header <- label(row_var)
     }
   }
@@ -335,6 +493,11 @@ modelbased_table <- function(
   # Heading rows for the other variables in by
   if (length(heading_vars) > 0) {
     keys <- purrr::map(heading_vars, \(v) {
+      shortcut <- modelbased_shortcut_labels(d[[v]], v, a$by)
+      if (!is.null(shortcut)) {
+        shortcuts <<- c(shortcuts, attr(shortcut, "shortcut"))
+        return(paste0(label(v), ": ", as.character(shortcut)))
+      }
       sep <- if (is.numeric(d[[v]])) " = " else ": "
       paste0(label(v), sep, modelbased_values(d[[v]]))
     })
@@ -383,6 +546,10 @@ modelbased_table <- function(
   }
 
   record$table <- "modelbased"
+  record$abbreviations <- combine_abbreviations(
+    record$abbreviations,
+    modelbased_shortcut_abbreviations(shortcuts)
+  )
   record$kind <- kind
   record$response <- if (is.null(a$response)) NULL else label(a$response)
   record$coef_name <- coef_col
@@ -396,7 +563,8 @@ modelbased_table <- function(
   record$p_adjust <- if ("p" %in% colnames(d)) a$p_adjust else NULL
   record$trend <- if (is.null(trend)) NULL else label(trend)
   record$moderators <- if (kind == "slopes") label(setdiff(focal, trend)) else NULL
-  record$contrast_vars <- if (kind == "contrasts") label(contrast_vars) else NULL
+  record$contrast_vars <- if (kind == "contrasts") label(contrast_names) else NULL
+  record$contrast_values <- contrast_values
 
   attr(tbl, "apa_note") <- record
   attr(tbl, "no_format_columns") <- first_header
@@ -448,6 +616,17 @@ modelbased_note_sentences <- function(record) {
       )
     )
   )
+
+  # Values of a contrasted variable set with a shortcut
+  if (length(record$contrast_values) > 0) {
+    sentences <- c(
+      sentences,
+      paste0(
+        "The values of ", record$contrast_vars, " are ",
+        and_list(record$contrast_values), "."
+      )
+    )
+  }
 
   # Other predictors
   held <- record$held

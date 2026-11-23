@@ -135,3 +135,79 @@ test_that("inputs are checked", {
   expect_error(apa_slopes(iris), "plain data frame")
   expect_warning(apa_contrasts(ec, p_adjust = "holm"), "ignored")
 })
+
+test_that("shortcut moderator values are named, and numeric by defaults to [sd]", {
+  fit <- lm(mpg ~ wt * hp, data = mtcars)
+  m <- mean(mtcars$hp)
+  s <- stats::sd(mtcars$hp)
+  expected <- c(
+    sprintf("%s1*SD* (%.2f)", minus, m - s),
+    sprintf("*M* (%.2f)", m),
+    sprintf("+1*SD* (%.2f)", m + s)
+  )
+  expect_equal(apa_slopes(fit, trend = "wt", by = "hp=[sd]")$Hp, expected)
+  # A numeric moderator without values is set to its mean and 1 SD around it
+  expect_equal(apa_slopes(fit, trend = "wt", by = "hp")$Hp, expected)
+  # Also from modelbased output
+  es <- modelbased::estimate_slopes(fit, trend = "wt", by = "hp=[sd]")
+  expect_equal(apa_slopes(es)$Hp, expected)
+
+  five <- apa_slopes(fit, trend = "wt", by = "hp=[fivenum]")
+  expect_equal(
+    five$Hp,
+    c("Min (52)", "*Q*~1~ (96)", "*Mdn* (123)", "*Q*~3~ (180)", "Max (335)")
+  )
+  expect_match(apa_note(five), "*Q*~1~ = first quartile (lower hinge)", fixed = TRUE)
+
+  # Explicit values are left as they are
+  expect_equal(apa_slopes(fit, trend = "wt", by = "hp=c(100, 150)")$Hp, c("100", "150"))
+
+  # Shortcut values in heading rows
+  d <- mtcars
+  d$am <- factor(d$am, labels = c("Auto", "Manual"))
+  fit2 <- lm(mpg ~ wt * hp * am, data = d)
+  headed <- apa_slopes(fit2, trend = "wt", by = c("hp", "am"))
+  expect_equal(headed$Am[1], paste0("Hp: ", expected[1]))
+  expect_equal(headed$Am[2], paste0(em, "Auto"))
+})
+
+test_that("numeric by defaults to [sd] in means and contrasts; contrasted shortcut values are named", {
+  d <- mtcars
+  d$am <- factor(d$am, labels = c("Auto", "Manual"))
+  fit <- lm(mpg ~ am * hp, data = d)
+  m <- mean(d$hp)
+  s <- stats::sd(d$hp)
+  sd_labels <- c(
+    sprintf("%s1*SD* (%.2f)", minus, m - s),
+    sprintf("*M* (%.2f)", m),
+    sprintf("+1*SD* (%.2f)", m + s)
+  )
+  expect_equal(apa_means(fit, by = "hp")$Hp, sd_labels)
+  by_hp <- apa_contrasts(fit, contrast = "am", by = "hp")
+  expect_equal(by_hp$Am[c(1, 3, 5)], paste0("Hp: ", sd_labels))
+
+  # Contrasts between shortcut values
+  sd_contrasts <- apa_contrasts(fit, contrast = "hp=[sd]")
+  expect_equal(colnames(sd_contrasts)[1], "Hp")
+  expect_equal(
+    sd_contrasts$Hp,
+    c(
+      paste0("*M* ", minus, " ", minus, "1*SD*"),
+      paste0("+1*SD* ", minus, " ", minus, "1*SD*"),
+      paste0("+1*SD* ", minus, " *M*")
+    )
+  )
+  expect_match(
+    apa_note(sd_contrasts),
+    sprintf("The values of Hp are %s1*SD* = %.2f, *M* = %.2f, and +1*SD* = %.2f.", minus, m - s, m, m + s),
+    fixed = TRUE
+  )
+  five <- apa_contrasts(fit, contrast = "hp=[fivenum]")
+  expect_equal(five$Hp[4], paste0("Max ", minus, " Min"))
+  expect_match(apa_note(five), "lower hinge", fixed = TRUE)
+
+  # With other variables in by
+  grouped <- apa_contrasts(fit, contrast = "hp=[sd]", by = "am")
+  expect_equal(grouped$Hp[1], "Am: Auto")
+  expect_equal(grouped$Hp[2], paste0(em, "*M* ", minus, " ", minus, "1*SD*"))
+})

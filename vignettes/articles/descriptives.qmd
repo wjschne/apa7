@@ -35,8 +35,6 @@ Functions that automate your descriptive statistics tables for you (e.g., the am
 
 Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that apa7 and flextable can do most of the rest after that. 
 
-# Data Setup
-
 ```{r dataprocessing}
 d <- ggplot2::diamonds %>% 
   select(cut, price, carat, depth, table) %>% 
@@ -53,7 +51,6 @@ d <- ggplot2::diamonds %>%
   pivot_wider(names_from = Variable) 
 ```
 
-# The `apa_flextable` function
 
 The `apa_flextable` function handles most of the formatting automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
 

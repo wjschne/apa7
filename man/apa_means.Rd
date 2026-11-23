@@ -77,6 +77,19 @@ Any other variables in \code{by} get heading rows, with the rows below them
 indented. Numeric levels (e.g., values of a continuous moderator) are
 rounded to 2 decimals.
 
+Values set with a modelbased shortcut are named, with the value in
+parentheses: \code{"x=[sd]"} (or \code{"x=[meansd]"}) gives "\eqn{-}{-}1\emph{SD}",
+"\emph{M}", and "+1\emph{SD}"; \code{"x=[mad]"} gives "\eqn{-}{-}1\emph{MAD}", "\emph{Mdn}", and
+"+1\emph{MAD}"; \code{"x=[fivenum]"} gives "Min", "\emph{Q}~1~", "\emph{Mdn}", "\emph{Q}~3~",
+and "Max"; \code{"x=[quartiles]"} gives "\emph{Q}~1~", "\emph{Mdn}", and "\emph{Q}~3~";
+and \code{"x=[minmax]"} gives "Min" and "Max". Contrasts between such values
+(e.g., \code{contrast = "x=[sd]"}) are labeled by name (e.g.,
+"+1\emph{SD} \eqn{-}{-} \emph{M}"), and the note gives the values. With a model, a
+numeric variable named in \code{by} without values (e.g., \code{by = "x"}) is set to
+its mean and 1 \emph{SD} above and below it, as with \code{by = "x=[sd]"} (rather
+than the modelbased default of 10 values, which suits plots better than
+tables).
+
 \code{\link[=apa_note]{apa_note()}} says what the values are, how the other predictors were held
 constant, on which scale the estimates are (for models with a link
 function, such as logistic regression), which level was subtracted from
