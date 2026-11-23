@@ -1,4 +1,6 @@
 .onLoad <- function(...) {
+  # Settings such as the$accuracy read and write their apa7.* options
+  bind_option_settings()
   if ("S7_on_load" %in% getNamespaceExports("S7")) {
     suppressMessages(getExportedValue("S7", "S7_on_load")()) # nocov
   } else {

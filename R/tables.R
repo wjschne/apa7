@@ -506,6 +506,14 @@ apa_chisq <- function(
 #' @param summary_functions Any named list of functions that summarize data columns (e.g., `list(Mean = mean, SD = sd)`). Can also be a character vector of function names (e.g., `c("n", "M", "SD")`). Functions available in a character vector: IQR, Interquartile Range, Kurtosis, MAD, Median Absolute Deviation, M, Mean, Med, Median, n, N, Quantile, Range, SD, Skewness, Var, Variance
 #' @param keep_empty_star_columns Keep remove empty star columns (Default: `TRUE`)
 #' @param column_formats column_formats object
+#' @param table_width proportion of the width of the page that the table
+#'   occupies, from 0 to 1: 1 (default) is the full width, and .5 is half the
+#'   width. The column widths are scaled to fill this proportion of the width
+#'   of the text area, which is 6.5 inches (letter-size paper with 1-inch
+#'   margins) unless changed with `apa7_defaults(page_width = )`. With
+#'   0, the column widths are left as they are. In apa7 0.2.0 and earlier,
+#'   `table_width` was a width in inches; values greater than 1 are still
+#'   read as inches, with a warning.
 #' @inheritParams apa_style
 #' @param ... <[`data-masking`][rlang::args_data_masking]> parameters passed to psych::corTest (not used for [correlation::correlation()] output)
 #' @details
@@ -554,7 +562,7 @@ apa_cor <- function(
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
-  table_width = 6.5,
+  table_width = 1,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
@@ -567,6 +575,23 @@ apa_cor <- function(
   output <- match.arg(output)
   if (is.null(column_formats)) {
     column_formats <- column_formats()
+  }
+  # table_width is a proportion of the page width, as in apa_flextable().
+  # In apa7 0.2.0 and earlier, it was a width in inches, so values above 1
+  # are still read as inches (with a warning).
+  if (!is.numeric(table_width) || length(table_width) != 1 || is.na(table_width) || table_width < 0) {
+    cli::cli_abort("{.arg table_width} must be a proportion of the page width, from 0 to 1.")
+  }
+  if (table_width > 1) {
+    proportion <- table_width / page_width_in()
+    cli::cli_warn(c(
+      "{.arg table_width} is now a proportion of the page width (from 0 to 1), as in {.fn apa_flextable}.",
+      i = "{table_width} was read as a width in inches. Use {.code table_width = {signif(proportion, 2)}} instead."
+    ))
+    table_width_in <- table_width
+    table_width <- min(proportion, 1)
+  } else {
+    table_width_in <- table_width * page_width_in()
   }
 
   if (bold_significant) {
@@ -770,6 +795,7 @@ apa_cor <- function(
       border_color = border_color,
       border_width = border_width,
       line_spacing = line_spacing,
+      table_width = table_width,
       auto_format_columns = FALSE
     )
 
@@ -900,13 +926,20 @@ apa_cor <- function(
       dplyr::mutate(width = max(value, na.rm = TRUE), .by = group) |>
       dplyr::pull(width)
 
-    w <- table_width * w / sum(w)
+    # With table_width = 0, the widths from pretty_widths() are kept
+    if (table_width_in > 0) {
+      # The number column is as wide as its labels need, and the other
+      # columns share the rest of the width in proportion to their widths,
+      # so the total is the requested width
+      number_width <- (.444 * font_size * max(nchar(d_msd[["apa7listcolumn"]])) + 4) / 72
+      rest <- max(table_width_in - number_width, 0)
+      w[-1] <- rest * w[-1] / sum(w[-1])
+      w[1] <- number_width
 
-    w1 <- w[1]
-    w[1] <- (.444 * font_size * max(nchar(d_msd[["apa7listcolumn"]])) + 4) / 72
-    w[2] <- w[2] + w[1] - w1
-
-    d_R <- flextable::width(d_R, width = w)
+      d_R <- flextable::width(d_R, width = w)
+    }
+    # Proportion of the page width (autofit() and pretty_widths() reset it)
+    d_R$properties$width <- table_width
   }
 
   d_R
@@ -944,6 +977,13 @@ apa_cor <- function(
 #' @param no_format_columns Column name or tidyselect function. selected columns are not formatted. Columns named in a `"no_format_columns"` attribute of `data` (set by functions such as [apa_loadings()]) are not formatted either. Likewise, a rule is drawn above the first body row whose first-column text matches a `"rule_above"` attribute of `data`.
 #' @param add_breaks_between_spanners add breaks between spanners if TRUE
 #' @param note table note placed below the table, after "*Note*.". The note is single-spaced. If `TRUE`, the note is written by [apa_note()] from what a table function such as [apa_anova()], [apa_parameters()], or [apa_loadings()] recorded. A character string is used as the note (markdown is allowed), and `NULL` or `FALSE` (default) adds no note. Use this for documents that are not made with apaquarto. With apaquarto, use the `apa-note` chunk option instead (e.g., `#| apa-note: !expr apa7::apa_note(tbl)`), so that the note is placed and styled by apaquarto and is not added twice.
+#' @param table_width proportion of the width of the container (e.g., the
+#'   page or text column) that the table occupies, from 0 to 1: 1 (default)
+#'   is the full width, and .5 is half the width. With `pretty_widths = TRUE`,
+#'   the column widths are also set to fill the same proportion of the width
+#'   of the text area, which is 6.5 inches (letter-size paper with 1-inch
+#'   margins) unless changed with `apa7_defaults(page_width = )` (e.g.,
+#'   `apa7_defaults(page_width = "a4")`).
 #' @inheritParams apa_style
 #' @param ... arguments passed to `apa_style`
 
@@ -1254,7 +1294,9 @@ apa_flextable <- function(
     ft <- flextable::align(ft, j = 1, part = "body")
   }
   if (pretty_widths) {
-    ft <- pretty_widths(ft, table_width = table_width * 6.5)
+    ft <- pretty_widths(ft, table_width = table_width * page_width_in())
+    # pretty_widths() sets the width property to 1 (the full container)
+    ft$properties$width <- table_width
   }
 
   if (is.null(font_family)) {
@@ -3388,7 +3430,10 @@ model_names <- function(models) {
 #' @param table_align table alignment ("left", "center", "right")
 #' @param header_align_vertical vertical alignment of headers. Can be "top", "middle", or "bottom"
 #' @param layout table layout ("autofit", "fixed")
-#' @param table_width table width (in pixels, 0 for auto)
+#' @param table_width proportion of the width of the container (e.g., the
+#'   page or text column) that the table occupies, from 0 to 1: 1 is the full
+#'   width, and .5 is half the width. With 0, the table is only as wide as
+#'   its contents need.
 #' @param no_markdown_columns body columns that should not be treated as markdown
 #' @param no_markdown_columns_header column headers that should not be treated as markdown
 #' @param separate_headers separate headers into column spanner labels
@@ -3604,7 +3649,9 @@ apa_style <- function(
 #' Use flextable::dim_pretty to fit column widths
 #'
 #' @param x flextable
-#' @param table_width width of table
+#' @param table_width width of table, in `unit`. If `NULL` (default), the
+#'   width of the text area set with `apa7_defaults(page_width = )` (6.5
+#'   inches unless changed). Use 0 to keep the widths that fit the contents.
 #' @param min_width minimum width of columns
 #' @param unit Can be `in`, `cm`, or `mm`
 #' @return flextable::flextable
@@ -3613,8 +3660,13 @@ pretty_widths <- function(
   x,
   min_width = 0.05,
   unit = c("in", "cm", "mm"),
-  table_width = 6.5
+  table_width = NULL
 ) {
+  if (is.null(table_width)) {
+    # The page width set with apa7_defaults(), in the requested unit
+    unit_name <- match.arg(unit, choices = c("in", "cm", "mm"))
+    table_width <- page_width_in() * c(`in` = 1, cm = 2.54, mm = 25.4)[[unit_name]]
+  }
   unit <- match.arg(unit, choices = c("in", "cm", "mm"))
   pwidth <- flextable::dim_pretty(x, unit = unit)$widths
   pwidth[pwidth < min_width] <- min_width

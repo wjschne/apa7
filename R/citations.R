@@ -16,7 +16,8 @@
 #'   document's bibliography has the entries.
 #'
 #' The form is set by the `citations` argument of [apa_note()], or for all
-#' notes by `options(apa7.citations = )`: `"auto"` (default), `"keys"`, or
+#' notes by `apa7_defaults(citations = )` (or `options(apa7.citations = )`):
+#' `"auto"` (default), `"keys"`, or
 #' `"text"`. With `"auto"`, a citation is written as a key when a Quarto or
 #' R Markdown document is being rendered and its `bibliography` (in the YAML
 #' header) has an entry with that key, and as text otherwise (e.g., in the

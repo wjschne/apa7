@@ -12,11 +12,15 @@ apa7_defaults(
   number_formatter = NULL,
   trim_leading_zero = NULL,
   width_aware_padding = NULL,
+  page_width = NULL,
+  print = NULL,
+  citations = NULL,
   reset = FALSE
 )
 }
 \arguments{
-\item{accuracy}{numeric (default: .01)}
+\item{accuracy}{rounding accuracy of numbers in tables (default: .01, for
+two decimals)}
 
 \item{font_family}{font family}
 
@@ -30,16 +34,68 @@ apa7_defaults(
 
 \item{width_aware_padding}{if \code{TRUE} (default), \code{\link[=align_chr]{align_chr()}} pads text to equal rendered width in \code{font_family} (when the font is installed). If \code{FALSE}, text is padded with one figure space per missing character.}
 
+\item{page_width}{width of the text area of the page, which tables fill
+when \code{table_width = 1} in \code{\link[=apa_flextable]{apa_flextable()}} and \code{\link[=apa_cor]{apa_cor()}}: a number (in
+inches) or the name of a paper size, whose width less APA's 1-inch
+margins on each side is used (e.g., \code{"us-letter"} gives 6.5 inches, the
+default, and \code{"a4"} gives 6.27 inches). Paper sizes are those of Typst's
+\code{page} function (e.g., \code{"a4"}, \code{"a5"}, \code{"us-letter"}, \code{"us-legal"},
+\code{"jis-b5"}); see \url{https://typst.app/docs/reference/layout/page/#parameters-paper}.}
+
+\item{print}{how tables made by apa7 functions (see \link{apa7_tbl}) are
+displayed: \code{"auto"} (default) as tables in Quarto and R Markdown
+documents and as tibbles in the console, \code{"flextable"} as tables
+everywhere, or \code{"tibble"} as tibbles everywhere}
+
+\item{citations}{how articles cited in table notes are written: \code{"auto"}
+(default), \code{"keys"}, or \code{"text"}. See \code{\link[=apa7_write_bib]{apa7_write_bib()}}.}
+
 \item{reset}{if \code{TRUE}, reset all defaults (except as specified)}
 }
 \value{
-previous defaults
+the previous values of the settings that were changed (all of
+them with \code{reset = TRUE}), invisibly, as a list that restores them when
+passed back to \code{apa7_defaults()} (e.g., with \code{\link[=do.call]{do.call()}})
 }
 \description{
-Set defaults for apa7 package
+Sets options that apply to all apa7 tables. Settings that are not given
+are left as they are.
+}
+\details{
+Each setting except \code{column_formats}, \code{number_formatter}, and
+\code{trim_leading_zero} is stored as an R option (e.g.,
+\code{apa7_defaults(page_width = "a4")} sets \code{options(apa7.page_width = "a4")}),
+so it can also be set with \code{\link[=options]{options()}}, including in an \code{.Rprofile} file
+that runs at the start of every R session, before apa7 is loaded:\tabular{lll}{
+   Argument \tab Option \tab Default \cr
+   \code{accuracy} \tab \code{apa7.accuracy} \tab \code{.01} \cr
+   \code{font_family} \tab \code{apa7.font_family} \tab \code{"Times New Roman"} \cr
+   \code{intercept_text} \tab \code{apa7.intercept_text} \tab \code{"Constant"} \cr
+   \code{width_aware_padding} \tab \code{apa7.width_aware_padding} \tab \code{TRUE} \cr
+   \code{page_width} \tab \code{apa7.page_width} \tab \code{6.5} \cr
+   \code{print} \tab \code{apa7.print} \tab \code{"auto"} \cr
+   \code{citations} \tab \code{apa7.citations} \tab \code{"auto"} \cr
+}
+
+
+\code{column_formats}, \code{number_formatter}, and \code{trim_leading_zero} are objects
+that need apa7 to be loaded, so they are set only with \code{apa7_defaults()}
+and last for the R session.
+
+The default column formats follow \code{accuracy}: changing it (with
+\code{apa7_defaults()} or the \code{apa7.accuracy} option) changes the number of
+decimals in tables. Setting \code{column_formats} without \code{accuracy} makes the
+formats' own accuracy the \code{accuracy} setting.
 }
 \examples{
-apa7_defaults(accuracy = .001)
+old <- apa7_defaults(accuracy = .001)
+
+# Tables as wide as the text on A4 paper with 1-inch margins
+apa7_defaults(page_width = "a4")
+
+# Restore the earlier accuracy
+do.call(apa7_defaults, old)
+
 # Reset to package defaults
 apa7_defaults(reset = TRUE)
 }

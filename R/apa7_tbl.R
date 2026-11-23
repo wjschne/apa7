@@ -7,7 +7,8 @@
 #' they are rendered as an [apa_flextable()] automatically. In the console they
 #' print as tibbles.
 #'
-#' The `apa7.print` option controls this behavior:
+#' The `apa7.print` option (also set with `apa7_defaults(print = )`)
+#' controls this behavior:
 #'
 #' * `"auto"` (default): flextable in knitr/Quarto, tibble in the console.
 #' * `"flextable"`: flextable everywhere.

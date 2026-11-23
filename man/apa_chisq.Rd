@@ -81,7 +81,13 @@ notes are single-spaced.}
 
 \item{layout}{table layout ("autofit", "fixed")}
 
-\item{table_width}{table width (in pixels, 0 for auto)}
+\item{table_width}{proportion of the width of the container (e.g., the
+page or text column) that the table occupies, from 0 to 1: 1 (default)
+is the full width, and .5 is half the width. With \code{pretty_widths = TRUE},
+the column widths are also set to fill the same proportion of the width
+of the text area, which is 6.5 inches (letter-size paper with 1-inch
+margins) unless changed with \code{apa7_defaults(page_width = )} (e.g.,
+\code{apa7_defaults(page_width = "a4")}).}
 
 \item{markdown}{apply markdown formatting to header and body}
 

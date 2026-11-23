@@ -27,7 +27,8 @@ they are rendered as an \code{\link[=apa_flextable]{apa_flextable()}} automatica
 print as tibbles.
 }
 \details{
-The \code{apa7.print} option controls this behavior:
+The \code{apa7.print} option (also set with \code{apa7_defaults(print = )})
+controls this behavior:
 \itemize{
 \item \code{"auto"} (default): flextable in knitr/Quarto, tibble in the console.
 \item \code{"flextable"}: flextable everywhere.

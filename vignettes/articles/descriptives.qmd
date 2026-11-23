@@ -165,4 +165,4 @@ apa_descriptives(
 * `digits` and `percent_digits` set the decimal places of the statistics and the percentages.
 * `format_variable_names = FALSE` keeps unlabeled variable names exactly as they are.
 
-For tables with other layouts, see the [article on summarizing data](summarize.html), which builds a table step by step with flextable.
+For tables with other layouts, see [Building tables by hand](summarize.html), which shows how to make any data frame into an APA-style table.

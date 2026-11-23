@@ -37,7 +37,8 @@ document's bibliography has the entries.
 }
 
 The form is set by the \code{citations} argument of \code{\link[=apa_note]{apa_note()}}, or for all
-notes by \code{options(apa7.citations = )}: \code{"auto"} (default), \code{"keys"}, or
+notes by \code{apa7_defaults(citations = )} (or \code{options(apa7.citations = )}):
+\code{"auto"} (default), \code{"keys"}, or
 \code{"text"}. With \code{"auto"}, a citation is written as a key when a Quarto or
 R Markdown document is being rendered and its \code{bibliography} (in the YAML
 header) has an entry with that key, and as text otherwise (e.g., in the

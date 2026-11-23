@@ -333,3 +333,98 @@ test_that("apa_format_columns", {
 
   expect_equal(colnames(d2), c("95% CI", "t", "$p$"))
 })
+
+test_that("simple settings are R options, which apa7_defaults() sets", {
+  withr::defer(apa7_defaults(reset = TRUE))
+  apa7_defaults(reset = TRUE)
+  expect_true(bindingIsActive("accuracy", apa7:::the))
+
+  # Options set directly (e.g., in .Rprofile) are used
+  withr::local_options(apa7.page_width = "a4", apa7.intercept_text = "Intercept")
+  expect_equal(apa7:::the$page_width, 210 / 25.4 - 2)
+  expect_equal(apa7:::the$intercept_text, "Intercept")
+  expect_equal(apa_parameters(lm(mpg ~ wt, data = mtcars))$Variable[1], "Intercept")
+
+  # apa7_defaults() writes the options
+  apa7_defaults(page_width = 6, print = "tibble", citations = "text", font_family = "Arial")
+  expect_equal(getOption("apa7.page_width"), 6)
+  expect_equal(getOption("apa7.print"), "tibble")
+  expect_equal(getOption("apa7.citations"), "text")
+  expect_equal(apa7:::the$font_family, "Arial")
+
+  # reset removes them, so the package defaults apply
+  apa7_defaults(reset = TRUE)
+  expect_null(getOption("apa7.page_width"))
+  expect_null(getOption("apa7.print"))
+  expect_equal(apa7:::the$page_width, 6.5)
+  expect_equal(apa7:::the$font_family, "Times New Roman")
+  expect_identical(apa7:::the$pvalue_formatter, apa7:::default_pvalue_formatter)
+})
+
+test_that("apa7_defaults() returns the previous values, which restore them", {
+  withr::defer(apa7_defaults(reset = TRUE))
+  apa7_defaults(reset = TRUE)
+  old <- apa7_defaults(accuracy = .001, page_width = "a4", print = "flextable")
+  expect_equal(old, list(accuracy = .01, page_width = 6.5, print = "auto"))
+  expect_equal(apa7:::the$accuracy, .001)
+
+  second <- apa7_defaults(page_width = "us-letter")
+  expect_equal(second, list(page_width = "a4"))
+
+  do.call(apa7_defaults, old)
+  expect_equal(apa7:::the$accuracy, .01)
+  expect_equal(apa7:::the$page_width, 6.5)
+  expect_equal(getOption("apa7.print"), "auto")
+
+  all_old <- apa7_defaults(reset = TRUE)
+  expect_setequal(
+    names(all_old),
+    c("accuracy", "font_family", "intercept_text", "column_formats", "number_formatter",
+      "trim_leading_zero", "width_aware_padding", "page_width", "print", "citations")
+  )
+  expect_true(S7::S7_inherits(all_old$column_formats, column_formats))
+})
+
+test_that("apa7_defaults() checks its values before changing anything", {
+  withr::defer(apa7_defaults(reset = TRUE))
+  apa7_defaults(reset = TRUE)
+  expect_error(apa7_defaults(accuracy = .001, print = "html"), "print")
+  expect_equal(apa7:::the$accuracy, .01)
+  expect_error(apa7_defaults(citations = "bib"), "citations")
+  expect_error(apa7_defaults(accuracy = -1), "positive number")
+  expect_error(apa7_defaults(font_family = 3), "character string")
+  expect_error(apa7_defaults(width_aware_padding = "yes"), "TRUE")
+})
+
+test_that("the default column formats follow the accuracy setting", {
+  withr::defer(apa7_defaults(reset = TRUE))
+  apa7_defaults(reset = TRUE)
+  fit <- lm(mpg ~ wt, data = mtcars)
+  b <- coef(fit)[["wt"]]
+  b_text <- function() gsub("[\u2002-\u200a ]", "", apa_parameters(fit)$`*B*`[2])
+  minus <- function(x) sub("-", "\u2212", x)
+
+  expect_equal(b_text(), minus(sprintf("%.2f", b)))
+  apa7_defaults(accuracy = .001)
+  expect_equal(b_text(), minus(sprintf("%.3f", b)))
+  expect_equal(apa7:::the$column_formats@accuracy, .001)
+
+  # Set directly as an option
+  withr::with_options(list(apa7.accuracy = .1), {
+    expect_equal(b_text(), minus(sprintf("%.1f", b)))
+  })
+
+  # Column formats set without accuracy keep their own accuracy
+  apa7_defaults(column_formats = column_formats(accuracy = .0001))
+  expect_equal(getOption("apa7.accuracy"), .0001)
+  expect_equal(b_text(), minus(sprintf("%.4f", b)))
+
+  # With both, accuracy wins
+  apa7_defaults(column_formats = column_formats(accuracy = .0001), accuracy = .01)
+  expect_equal(b_text(), minus(sprintf("%.2f", b)))
+
+  # A column_formats argument is used as it is
+  apa7_defaults(reset = TRUE)
+  explicit <- apa_parameters(fit, column_formats = column_formats(accuracy = .001))
+  expect_equal(gsub("[\u2002-\u200a ]", "", explicit$`*B*`[2]), minus(sprintf("%.3f", b)))
+})

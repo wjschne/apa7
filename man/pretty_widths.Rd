@@ -8,7 +8,7 @@ pretty_widths(
   x,
   min_width = 0.05,
   unit = c("in", "cm", "mm"),
-  table_width = 6.5
+  table_width = NULL
 )
 }
 \arguments{
@@ -18,7 +18,9 @@ pretty_widths(
 
 \item{unit}{Can be \verb{in}, \code{cm}, or \code{mm}}
 
-\item{table_width}{width of table}
+\item{table_width}{width of table, in \code{unit}. If \code{NULL} (default), the
+width of the text area set with \code{apa7_defaults(page_width = )} (6.5
+inches unless changed). Use 0 to keep the widths that fit the contents.}
 }
 \value{
 flextable::flextable

@@ -19,7 +19,7 @@ apa_cor(
   border_color = "black",
   border_width = 0.5,
   line_spacing = 2,
-  table_width = 6.5,
+  table_width = 1,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
@@ -57,7 +57,14 @@ output of \code{\link[correlation:correlation]{correlation::correlation()}} (see
 \item{line_spacing}{spacing between lines of the header and body. Table
 notes are single-spaced.}
 
-\item{table_width}{table width (in pixels, 0 for auto)}
+\item{table_width}{proportion of the width of the page that the table
+occupies, from 0 to 1: 1 (default) is the full width, and .5 is half the
+width. The column widths are scaled to fill this proportion of the width
+of the text area, which is 6.5 inches (letter-size paper with 1-inch
+margins) unless changed with \code{apa7_defaults(page_width = )}. With
+0, the column widths are left as they are. In apa7 0.2.0 and earlier,
+\code{table_width} was a width in inches; values greater than 1 are still
+read as inches, with a warning.}
 
 \item{keep_empty_star_columns}{Keep remove empty star columns (Default: \code{TRUE})}
 

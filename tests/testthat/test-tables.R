@@ -1041,3 +1041,28 @@ test_that("each cluster gets a subheading; nested clusters are spelled out", {
   expect_true(all(c("\u2003School", "\u2003Item") %in% labels))
   expect_equal(sum(labels == "\u2003\u2003Constant"), 2)
 })
+
+test_that("apa_cor() table_width is a proportion, with inches still accepted", {
+  d <- mtcars[, c("mpg", "wt", "hp")]
+  total_width <- function(ft) sum(ft$body$colwidths)
+
+  # Default: the full width of 6.5 inches, as before
+  full <- apa_cor(d)
+  expect_equal(total_width(full), 6.5, tolerance = 1e-6)
+  expect_equal(full$properties$width, 1)
+
+  half <- apa_cor(d, table_width = .5)
+  expect_equal(total_width(half), 3.25, tolerance = 1e-6)
+  expect_equal(half$properties$width, .5)
+
+  # Values above 1 are read as inches, with a warning
+  expect_warning(inches <- apa_cor(d, table_width = 5), "now a proportion")
+  expect_equal(total_width(inches), 5, tolerance = 1e-6)
+  expect_equal(inches$properties$width, 5 / 6.5)
+
+  # 0 keeps the widths from pretty_widths()
+  expect_no_error(apa_cor(d, table_width = 0))
+
+  expect_error(apa_cor(d, table_width = -1), "proportion")
+  expect_error(apa_cor(d, table_width = "wide"), "proportion")
+})

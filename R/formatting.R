@@ -1016,19 +1016,24 @@ the <- new.env(parent = emptyenv())
 the$accuracy <- .01
 the$intercept_text <- "Constant"
 the$font_family <- "Times New Roman"
+the$page_width <- 6.5
 # Pad to equal rendered width in the$font_family (see num_pad)
 the$width_aware_padding <- TRUE
+# accuracy, intercept_text, font_family, page_width, and width_aware_padding
+# are replaced when the package is loaded by active bindings that read the
+# apa7.* options (see bind_option_settings())
 # Superscripts and subscripts are drawn smaller than the base text. Word draws
 # them at about 2/3 of the font size; browsers at about 0.83.
 the$script_scale <- 2 / 3
-the$number_formatter <- \(x, accuracy = the$accuracy, ...) {
+default_number_formatter <- function(x, accuracy = the$accuracy, ...) {
   align_chr(x, accuracy = accuracy, ...)
 }
+the$number_formatter <- default_number_formatter
 
 the$sci_number_formatter <- \(x, digits = 2, ...) {
   sci_md(x, digits = digits, align = TRUE)
 }
-the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
+default_pvalue_formatter <- function(x, accuracy = the$accuracy, ...) {
   max_digits <- 3
   min_digits <- round(-log10(accuracy))
   if (max_digits < min_digits) {
@@ -1045,10 +1050,12 @@ the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
     format_numeric_character = FALSE
   )
 }
+the$pvalue_formatter <- default_pvalue_formatter
 
-the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) {
+default_trim_leading_zero <- function(x, accuracy = the$accuracy, ...) {
   align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, ...)
 }
+the$trim_leading_zero <- default_trim_leading_zero
 the$variable_name_formatter <- variable_name_formatter
 
 # Columns ----
@@ -1846,20 +1853,71 @@ the$column_formats <- column_formats()
 
 #' Set defaults for apa7 package
 #'
-#' @param accuracy numeric (default: .01)
+#' Sets options that apply to all apa7 tables. Settings that are not given
+#' are left as they are.
+#'
+#' Each setting except `column_formats`, `number_formatter`, and
+#' `trim_leading_zero` is stored as an R option (e.g.,
+#' `apa7_defaults(page_width = "a4")` sets `options(apa7.page_width = "a4")`),
+#' so it can also be set with [options()], including in an `.Rprofile` file
+#' that runs at the start of every R session, before apa7 is loaded:
+#'
+#' | Argument | Option | Default |
+#' |:---|:---|:---|
+#' | `accuracy` | `apa7.accuracy` | `.01` |
+#' | `font_family` | `apa7.font_family` | `"Times New Roman"` |
+#' | `intercept_text` | `apa7.intercept_text` | `"Constant"` |
+#' | `width_aware_padding` | `apa7.width_aware_padding` | `TRUE` |
+#' | `page_width` | `apa7.page_width` | `6.5` |
+#' | `print` | `apa7.print` | `"auto"` |
+#' | `citations` | `apa7.citations` | `"auto"` |
+#'
+#' `column_formats`, `number_formatter`, and `trim_leading_zero` are objects
+#' that need apa7 to be loaded, so they are set only with `apa7_defaults()`
+#' and last for the R session.
+#'
+#' The default column formats follow `accuracy`: changing it (with
+#' `apa7_defaults()` or the `apa7.accuracy` option) changes the number of
+#' decimals in tables. Setting `column_formats` without `accuracy` makes the
+#' formats' own accuracy the `accuracy` setting.
+#'
+#' @param accuracy rounding accuracy of numbers in tables (default: .01, for
+#'   two decimals)
 #' @param font_family font family
 #' @param intercept_text what to call the intercept
 #' @param column_formats column formatting functions
 #' @param number_formatter default function to format numbers
 #' @param trim_leading_zero default function to trim leading zeros from numbers
 #' @param width_aware_padding if `TRUE` (default), [align_chr()] pads text to equal rendered width in `font_family` (when the font is installed). If `FALSE`, text is padded with one figure space per missing character.
+#' @param page_width width of the text area of the page, which tables fill
+#'   when `table_width = 1` in [apa_flextable()] and [apa_cor()]: a number (in
+#'   inches) or the name of a paper size, whose width less APA's 1-inch
+#'   margins on each side is used (e.g., `"us-letter"` gives 6.5 inches, the
+#'   default, and `"a4"` gives 6.27 inches). Paper sizes are those of Typst's
+#'   `page` function (e.g., `"a4"`, `"a5"`, `"us-letter"`, `"us-legal"`,
+#'   `"jis-b5"`); see <https://typst.app/docs/reference/layout/page/#parameters-paper>.
+#' @param print how tables made by apa7 functions (see [apa7_tbl]) are
+#'   displayed: `"auto"` (default) as tables in Quarto and R Markdown
+#'   documents and as tibbles in the console, `"flextable"` as tables
+#'   everywhere, or `"tibble"` as tibbles everywhere
+#' @param citations how articles cited in table notes are written: `"auto"`
+#'   (default), `"keys"`, or `"text"`. See [apa7_write_bib()].
 #' @param reset if `TRUE`, reset all defaults (except as specified)
 #'
-#' @return previous defaults
+#' @return the previous values of the settings that were changed (all of
+#'   them with `reset = TRUE`), invisibly, as a list that restores them when
+#'   passed back to `apa7_defaults()` (e.g., with [do.call()])
 #' @export
 #'
 #' @examples
-#' apa7_defaults(accuracy = .001)
+#' old <- apa7_defaults(accuracy = .001)
+#'
+#' # Tables as wide as the text on A4 paper with 1-inch margins
+#' apa7_defaults(page_width = "a4")
+#'
+#' # Restore the earlier accuracy
+#' do.call(apa7_defaults, old)
+#'
 #' # Reset to package defaults
 #' apa7_defaults(reset = TRUE)
 apa7_defaults <- function(
@@ -1870,54 +1928,67 @@ apa7_defaults <- function(
   number_formatter = NULL,
   trim_leading_zero = NULL,
   width_aware_padding = NULL,
+  page_width = NULL,
+  print = NULL,
+  citations = NULL,
   reset = FALSE
 ) {
-  old <- the
-  if (reset) {
-    the$accuracy <- .01
-    the$column_formats <- column_formats()
-    the$intercept_text <- "Constant"
-    the$font_family <- "Times New Roman"
-    the$width_aware_padding <- TRUE
-    the$number_formatter <- \(x, accuracy = the$accuracy, ...) {
-      align_chr(
-        x,
-        accuracy = accuracy,
-        ...
-      )
+  previous <- apa7_current_defaults()
+
+  # Check values before changing anything
+  if (!is.null(accuracy) && !(is.numeric(accuracy) && length(accuracy) == 1 && !is.na(accuracy) && accuracy > 0)) {
+    cli::cli_abort("{.arg accuracy} must be a single positive number (e.g., {.code .01}).")
+  }
+  for (arg in c("font_family", "intercept_text")) {
+    value <- get(arg)
+    if (!is.null(value) && !(is.character(value) && length(value) == 1 && !is.na(value))) {
+      cli::cli_abort("{.arg {arg}} must be a single character string.")
     }
-    the$trim_leading_zero <- \(x, accuracy = the$accuracy, ...) {
-      align_chr(
-        x,
-        accuracy = accuracy,
-        trim_leading_zeros = TRUE,
-        ...
-      )
-    }
-    the$pvalue_formatter <- \(x, accuracy = the$accuracy, ...) {
-      # nocov start
-      max_digits <- 3
-      min_digits <- round(-log10(accuracy))
-      if (max_digits < min_digits) {
-        max_digits <- min_digits
-      }
-      align_chr(apa_p(x, min_digits = min_digits, max_digits = max_digits, ...))
-    } # nocov end
+  }
+  if (!is.null(width_aware_padding) && !(isTRUE(width_aware_padding) || isFALSE(width_aware_padding))) {
+    cli::cli_abort("{.arg width_aware_padding} must be {.code TRUE} or {.code FALSE}.")
+  }
+  if (!is.null(page_width)) {
+    page_text_width(page_width)
+  }
+  if (!is.null(print) && !(is.character(print) && length(print) == 1 && print %in% c("auto", "flextable", "tibble"))) {
+    cli::cli_abort("{.arg print} must be {.val auto}, {.val flextable}, or {.val tibble}.")
+  }
+  if (!is.null(citations)) {
+    citations_mode(citations)
   }
 
-  if (!is.null(accuracy)) {
-    the$accuracy <- accuracy
+  if (reset) {
+    options(stats::setNames(
+      rep(list(NULL), length(apa7_option_settings)),
+      purrr::map_chr(apa7_option_settings, "option")
+    ))
+    the$column_formats <- column_formats()
+    the$number_formatter <- default_number_formatter
+    the$trim_leading_zero <- default_trim_leading_zero
+    the$pvalue_formatter <- default_pvalue_formatter
   }
-  if (!is.null(font_family)) {
-    the$font_family <- font_family
-  }
-  if (!is.null(width_aware_padding)) {
-    the$width_aware_padding <- width_aware_padding
-  }
-  if (!is.null(intercept_text)) {
-    the$intercept_text <- intercept_text
+
+  settings <- list(
+    accuracy = accuracy,
+    font_family = font_family,
+    intercept_text = intercept_text,
+    width_aware_padding = width_aware_padding,
+    page_width = page_width,
+    print = print,
+    citations = citations
+  )
+  for (name in names(settings)) {
+    if (!is.null(settings[[name]])) {
+      options(stats::setNames(list(settings[[name]]), apa7_option_settings[[name]]$option))
+    }
   }
   if (!is.null(column_formats)) {
+    # The formats' accuracy becomes the accuracy setting, unless accuracy is
+    # also given (then the formats follow it)
+    if (is.null(accuracy) && length(column_formats@accuracy) == 1) {
+      options(apa7.accuracy = column_formats@accuracy)
+    }
     the$column_formats <- column_formats
   }
   if (!is.null(number_formatter)) {
@@ -1927,7 +1998,111 @@ apa7_defaults <- function(
     the$trim_leading_zero <- trim_leading_zero
   }
 
-  invisible(old)
+  given <- names(previous)[!vapply(
+    list(
+      accuracy = accuracy, font_family = font_family, intercept_text = intercept_text,
+      column_formats = column_formats, number_formatter = number_formatter,
+      trim_leading_zero = trim_leading_zero, width_aware_padding = width_aware_padding,
+      page_width = page_width, print = print, citations = citations
+    )[names(previous)],
+    is.null,
+    logical(1)
+  )]
+  changed <- if (reset) names(previous) else given
+  invisible(previous[changed])
+}
+
+#' Settings stored as R options
+#'
+#' Each has its option name, its default, and (for `page_width`) a function
+#' that turns the stored value into what the package uses.
+#' @keywords internal
+#' @noRd
+apa7_option_settings <- list(
+  accuracy = list(option = "apa7.accuracy", default = .01),
+  font_family = list(option = "apa7.font_family", default = "Times New Roman"),
+  intercept_text = list(option = "apa7.intercept_text", default = "Constant"),
+  width_aware_padding = list(option = "apa7.width_aware_padding", default = TRUE),
+  page_width = list(option = "apa7.page_width", default = 6.5, read = function(x) page_text_width(x)),
+  print = list(option = "apa7.print", default = "auto"),
+  citations = list(option = "apa7.citations", default = "auto")
+)
+
+#' Current settings, as apa7_defaults() takes them
+#' @keywords internal
+#' @noRd
+apa7_current_defaults <- function() {
+  options_now <- lapply(apa7_option_settings, \(s) getOption(s$option, s$default))
+  c(
+    options_now[c("accuracy", "font_family", "intercept_text")],
+    list(
+      column_formats = the$column_formats,
+      number_formatter = the$number_formatter,
+      trim_leading_zero = the$trim_leading_zero
+    ),
+    options_now[c("width_aware_padding", "page_width", "print", "citations")]
+  )
+}
+
+#' Make the settings in `the` read and write their R options
+#'
+#' Called when the package is loaded, so that `the$accuracy` (and the other
+#' settings stored as options) always gives the current option.
+#' @keywords internal
+#' @noRd
+bind_option_settings <- function(env = the) {
+  for (name in c("accuracy", "font_family", "intercept_text", "width_aware_padding", "page_width")) {
+    setting <- apa7_option_settings[[name]]
+    if (exists(name, envir = env, inherits = FALSE)) {
+      rm(list = name, envir = env)
+    }
+    makeActiveBinding(
+      name,
+      local({
+        setting <- setting
+        function(value) {
+          if (missing(value)) {
+            stored <- getOption(setting$option)
+            if (is.null(stored)) {
+              return(setting$default)
+            }
+            if (is.null(setting$read)) stored else setting$read(stored)
+          } else {
+            options(stats::setNames(list(value), setting$option))
+          }
+        }
+      }),
+      env
+    )
+  }
+
+  # The default column formats follow the accuracy setting: when it changes,
+  # the formats' accuracy (which is written into each formatter) is updated
+  if (exists("column_formats", envir = env, inherits = FALSE)) {
+    stored <- get("column_formats", envir = env)
+    rm(list = "column_formats", envir = env)
+  } else {
+    stored <- column_formats() # nocov
+  }
+  env$.column_formats <- stored
+  makeActiveBinding(
+    "column_formats",
+    function(value) {
+      if (missing(value)) {
+        cf <- env$.column_formats
+        accuracy <- env$accuracy
+        if (!isTRUE(all.equal(cf@accuracy, accuracy))) {
+          cf@accuracy <- accuracy
+          env$.column_formats <- cf
+        }
+        cf
+      } else {
+        env$.column_formats <- value
+      }
+    },
+    env
+  )
+  invisible(env)
 }
 
 #' Format data columns
