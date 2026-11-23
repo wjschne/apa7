@@ -14,6 +14,7 @@ filters:
 #| include: false
 library(apa7)
 library(metafor)
+library(dplyr)
 ```
 
 ```{r}

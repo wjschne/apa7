@@ -71,6 +71,7 @@ test_that("zero-inflation and dispersion parts get headings and notes", {
 })
 
 test_that("Gaussian glmmTMB models show random effects and no exponentiated column", {
+  skip_if_not_installed("lme4")
   skip_if_not_installed("glmmTMB")
   fit <- glmmTMB::glmmTMB(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
   result <- apa_parameters(fit)
@@ -95,6 +96,7 @@ test_that("apa_performance and model comparisons accept glmmTMB models", {
 })
 
 test_that("apa_flextable keeps mixed-model labels and part headings as made", {
+  skip_if_not_installed("lme4")
   skip_if_not_installed("glmmTMB")
   fit_zi <- glmmTMB::glmmTMB(
     count ~ mined + (1 | site),

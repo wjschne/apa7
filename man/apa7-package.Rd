@@ -6,7 +6,7 @@
 \alias{apa7-package}
 \title{apa7: Writing Documents in American Psychological Association Style, Seventh Edition}
 \description{
-Create American Psychological Association Style, Seventh Edition documents. Format numbers and text consistent with APA style. Create tables that comply with APA style by extending 'flextable' functions.
+Create tables and format statistics in the style of the Publication Manual of the American Psychological Association, Seventh Edition. Functions turn fitted models and data into APA-style tables (regression, mixed, multinomial, count, and generalized additive models; ANOVA; hypothesis tests; descriptive statistics; correlations; reliability; factor analysis; structural equation models; estimated marginal means; and meta-analyses), write their table notes, and extend 'flextable' for tables made by hand.
 }
 \seealso{
 Useful links:

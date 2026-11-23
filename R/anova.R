@@ -430,7 +430,8 @@ afex_corrected_factors <- function(fit, formatter) {
 #' @export
 #' @rdname apa_anova
 #' @examples
-#' if (requireNamespace("lmerTest", quietly = TRUE) &&
+#' if (requireNamespace("lme4", quietly = TRUE) &&
+#'   requireNamespace("lmerTest", quietly = TRUE) &&
 #'   requireNamespace("pbkrtest", quietly = TRUE)) {
 #'   fit_lmer <- lme4::lmer(
 #'     Reaction ~ Days + (Days | Subject),

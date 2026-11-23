@@ -180,7 +180,8 @@ if (requireNamespace("afex", quietly = TRUE)) {
   )
   apa_anova(fit_afex)
 }
-if (requireNamespace("lmerTest", quietly = TRUE) &&
+if (requireNamespace("lme4", quietly = TRUE) &&
+  requireNamespace("lmerTest", quietly = TRUE) &&
   requireNamespace("pbkrtest", quietly = TRUE)) {
   fit_lmer <- lme4::lmer(
     Reaction ~ Days + (Days | Subject),

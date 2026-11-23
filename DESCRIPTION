@@ -1,14 +1,18 @@
 Package: apa7
 Title: Writing Documents in American Psychological Association
     Style, Seventh Edition
-Version: 0.2.0.9000
+Version: 0.3.0
 Authors@R: 
     person("W. Joel", "Schneider", , "w.joel.schneider@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0002-8393-5316"))
-Description: Create American Psychological Association Style, Seventh
-    Edition documents. Format numbers and text consistent with APA style.
-    Create tables that comply with APA style by extending 'flextable'
-    functions.
+Description: Create tables and format statistics in the style of the
+    Publication Manual of the American Psychological Association, Seventh
+    Edition. Functions turn fitted models and data into APA-style tables
+    (regression, mixed, multinomial, count, and generalized additive models;
+    ANOVA; hypothesis tests; descriptive statistics; correlations;
+    reliability; factor analysis; structural equation models; estimated
+    marginal means; and meta-analyses), write their table notes, and extend
+    'flextable' for tables made by hand.
 License: CC0
 URL: https://github.com/wjschne/apa7, https://wjschne.github.io/apa7/
 BugReports: https://github.com/wjschne/apa7/issues
@@ -54,16 +58,16 @@ Suggests:
     lme4,
     lmerTest,
     marginaleffects,
+    MASS,
     metadat,
     metafor,
     mgcv,
-    MASS,
     modelbased,
     nlme,
     nnet,
-    pscl,
     ordinal,
     pbkrtest,
+    pscl,
     quarto,
     ragg,
     rclipboard,

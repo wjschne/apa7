@@ -335,6 +335,7 @@ test_that("apa_note describes afex tables and sphericity corrections", {
 })
 
 test_that("apa_note survives dplyr verbs and errors without a record", {
+  skip_if_not_installed("lme4")
   fit <- aov(mpg ~ cyl * am, data = d_anova)
   tbl <- apa_anova(fit)
   expect_equal(apa_note(dplyr::filter(tbl, Source != "Error")), apa_note(tbl))
@@ -350,6 +351,7 @@ lmer_data <- function() {
 }
 
 test_that("apa_anova() gives F tests of lmer fixed effects with Kenward-Roger df", {
+  skip_if_not_installed("lme4")
   skip_if_not_installed("lmerTest")
   skip_if_not_installed("pbkrtest")
   fit <- lme4::lmer(Reaction ~ Days * Group + (Days | Subject), data = lmer_data())
@@ -399,6 +401,7 @@ test_that("apa_anova() offers Satterthwaite df, other types, and effect sizes fr
 })
 
 test_that("apa_anova() formats lmerTest ANOVA tables", {
+  skip_if_not_installed("lme4")
   skip_if_not_installed("lmerTest")
   fit <- lmerTest::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
   result <- apa_anova(anova(fit))
@@ -410,6 +413,7 @@ test_that("apa_anova() formats lmerTest ANOVA tables", {
 })
 
 test_that("apa_anova() rejects generalized linear mixed models", {
+  skip_if_not_installed("lme4")
   skip_if_not_installed("lmerTest")
   fit <- lme4::glmer(
     cbind(incidence, size - incidence) ~ period + (1 | herd),

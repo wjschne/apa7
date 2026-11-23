@@ -2,6 +2,7 @@ library(apa7)
 library(testthat)
 
 test_that("apa_parameters.lme shows fixed effects with nlme's df and random effects", {
+  skip_if_not_installed("lme4")
   skip_if_not_installed("nlme")
   fit <- nlme::lme(Reaction ~ Days, random = ~ Days | Subject, data = lme4::sleepstudy)
   result <- apa_parameters(fit)
