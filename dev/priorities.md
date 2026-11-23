@@ -122,13 +122,14 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
 - [x] `apa_flextable(x, note = TRUE)` adds the generated note as a footer line for plain Quarto, R Markdown, and Word (or `note = "text"` for custom text), like `apa_cor()`'s `note` argument
 - [x] Column-format definitions: an `abbreviation` slot in `column_format()` (e.g., `*MSE*` = mean square error) so `apa_note()` defines every abbreviation used in a table's headers, for any table type
 - [x] Give a clear message when the `apa_note` attribute has been lost (e.g., after `bind_rows()` or a join)
-- [ ] Citations in notes: some `apa_note()` text cites articles in plain text (e.g., "Cheung, 2014" for multilevel *I*^2^; Begg & Mazumdar, 1994, Duval & Tweedie, 2000, and Egger et al., 1997 for publication bias). Decide how these should work in a reproducible analysis, especially with apaquarto: plain text the author must add to the reference list by hand, Pandoc citation keys (e.g., `[@cheung2014]`) that apaquarto resolves from the document's bibliography (which needs the entries, e.g., from a `.bib` file shipped with apa7 or a helper that writes them), or an option to choose. Check whether citation keys survive the `apa-note` chunk option and `apa_flextable(note = TRUE)` (flextable footers are not processed by Pandoc's citeproc).
+- [x] Citations in notes: references ship in `inst/apa7.bib` (exported from the apa7 Zotero collection, Better BibTeX keys); note functions write `cite()` markers, and `apa_note(citations = )` / `options(apa7.citations = )` writes them as Pandoc keys or text (`"auto"`: keys when rendering and the document's bibliography has the entry). `apa7_write_bib()` copies the file. Verified with apaquarto (HTML and Word, both the `apa-note` option and `apa_flextable(note = TRUE)`). When adding a cited method, add the reference to the Zotero collection, re-export `inst/apa7.bib`, and cite it with `cite("key")`. Before export, check the Zotero entry: sentence-case titles (Better BibTeX braces protect Title Case words from citeproc), full page ranges, article numbers as "Article 863", no trailing periods. A test checks that every key cited in the code is in `inst/apa7.bib`.
 
 ## Ideas / backlog
 
 <!-- New ideas go here until they get a priority -->
 
-- [ ]
+- [ ] Rework apa7.qmd to be a better introduction for new users. Currently it gets too much into the details. Also, should cover all of apa7's tasks. Maybe move detailed explanations into an article about fully customized tables and the inner workings of apa7's tables.
+- [ ] Make a better contingency table article.
 
 ## Done
 

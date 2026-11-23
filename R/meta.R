@@ -561,7 +561,7 @@ meta_estimator <- function(method) {
   estimators <- c(
     REML = "restricted maximum likelihood",
     ML = "maximum likelihood",
-    DL = "the DerSimonian\u2013Laird estimator",
+    DL = paste0("the DerSimonian\u2013Laird estimator ", cite("dersimonianMetaanalysisClinicalTrials1986")),
     HE = "the Hedges estimator",
     HS = "the Hunter\u2013Schmidt estimator",
     HSk = "the Hunter\u2013Schmidt estimator (with small-sample correction)",
@@ -604,7 +604,7 @@ meta_model_sentence <- function(record) {
     )
   }
   knha <- if (isTRUE(record$t_test)) {
-    ", and tests and confidence intervals use the Knapp\u2013Hartung adjustment"
+    paste0(", and tests and confidence intervals use the Knapp\u2013Hartung adjustment ", cite("knappImprovedTestsRandom2003"))
   } else {
     ""
   }
@@ -749,7 +749,7 @@ meta_fit_note_sentences <- function(record) {
       sentences,
       paste0("Variance components were estimated by ", meta_estimator(record$method), "."),
       if (any(c("I2", "I2_levels") %in% metrics)) {
-        "*I*^2^ is the multilevel *I*^2^ (Cheung, 2014): the percentage of total variability due to heterogeneity at all levels, or at the level in the subscript."
+        paste0("*I*^2^ is the multilevel *I*^2^ ", cite("cheungModelingDependentEffect2014"), ": the percentage of total variability due to heterogeneity at all levels, or at the level in the subscript.")
       }
     )
   } else if (!(record$method %in% c("EE", "FE", "CE")) && any(c("tau2", "tau", "tau2_CI", "I2", "R2") %in% metrics)) {

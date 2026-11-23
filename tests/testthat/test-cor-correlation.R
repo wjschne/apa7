@@ -26,7 +26,7 @@ test_that("apa_cor() formats correlation::correlation() output like data", {
 test_that("the note names the kind of correlation and the p-value adjustment", {
   skip_if_not_installed("correlation")
   holm <- footer_lines(apa_cor(correlation::correlation(d_cor)))
-  expect_equal(holm[1], "Note. p-values are adjusted for multiple comparisons with Holm’s method.")
+  expect_equal(holm[1], "Note. p-values are adjusted for multiple comparisons with Holm’s method (Holm, 1979).")
   expect_match(holm[2], "p.<.[.]05")
 
   spearman <- correlation::correlation(d_cor, method = "spearman", p_adjust = "none")

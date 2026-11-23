@@ -59,7 +59,7 @@ test_that("apa_contrasts() labels differences and names the p-value adjustment",
 
   note <- apa_note(result)
   expect_match(note, "(the first level minus the second)", fixed = TRUE)
-  expect_match(note, "adjusted for multiple comparisons with Holm's method.", fixed = TRUE)
+  expect_match(note, "adjusted for multiple comparisons with Holm's method (Holm, 1979).", fixed = TRUE)
 
   unadjusted <- apa_contrasts(fit, contrast = "Species")
   expect_match(apa_note(unadjusted), "not adjusted for multiple comparisons", fixed = TRUE)

@@ -116,6 +116,11 @@
 #'
 #' @param x a table made by [apa_anova()], [apa_htest()], [apa_parameters()], [apa_loadings()], or [apa_factor_cor()]
 #' @param collapse string that joins the sentences. Use `NULL` to get a character vector with one sentence per element.
+#' @param citations how articles cited in the note are written: `"auto"`,
+#'   `"keys"` (Pandoc citation keys, e.g., `[@duvalTrimFillSimple2000]`), or
+#'   `"text"` (e.g., "(Duval & Tweedie, 2000)"). If `NULL` (default), the
+#'   `apa7.citations` option is used, which is `"auto"` unless set. See
+#'   [apa7_write_bib()].
 #'
 #' @returns character
 #' @export
@@ -145,7 +150,8 @@
 #' lm(mpg ~ cyl + wt, data = mtcars) |>
 #'   apa_parameters(starred = "p") |>
 #'   apa_note()
-apa_note <- function(x, collapse = " ") {
+apa_note <- function(x, collapse = " ", citations = NULL) {
+  citations <- citations_mode(citations)
   record <- attr(x, "apa_note", exact = TRUE)
   if (is.null(record)) {
     cli::cli_abort(c(
@@ -173,6 +179,8 @@ apa_note <- function(x, collapse = " ") {
     sem = sem_note_sentences(record),
     cli::cli_abort("Unknown table type {.val {record$table}}.") # nocov
   )
+
+  sentences <- resolve_citations(sentences, citations)
 
   if (is.null(collapse)) {
     return(sentences)
@@ -311,7 +319,9 @@ anova_note_sentences <- function(record) {
           kenward = paste0("Kenward", intToUtf8(8211), "Roger"),
           satterthwaite = "Satterthwaite"
         ),
-        " approximations."
+        " approximations ",
+        df_method_citation(record$df_method),
+        "."
       )
     )
   }
@@ -346,7 +356,13 @@ anova_note_sentences <- function(record) {
           or_list(record$corrected_factors),
           " are ",
           correction_name,
-          " corrected."
+          " corrected ",
+          cite(switch(
+            record$correction,
+            GG = "greenhouseMethodsAnalysisProfile1959",
+            HF = "huynhEstimationBoxCorrection1976"
+          )),
+          "."
         )
       )
     }
@@ -654,7 +670,7 @@ merge_parameters_note_records <- function(
     ) {
       performance_abbreviations <- combine_abbreviations(
         stats::setNames(
-          "variance explained by fixed effects",
+          paste0("variance explained by fixed effects ", cite("nakagawaGeneralSimpleMethod2013")),
           performance_headers[["R2"]]
         ),
         performance_abbreviations
@@ -712,7 +728,9 @@ parameters_note_sentences <- function(record) {
         paste0(
           "Degrees of freedom are ",
           paste(df_names[known], collapse = " and "),
-          " approximations."
+          " approximations ",
+          paste(vapply(known, df_method_citation, character(1)), collapse = " "),
+          "."
         )
       )
     }

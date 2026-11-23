@@ -756,14 +756,14 @@ modelbased_table <- function(
 #' Names of p-value adjustment methods
 #' @keywords internal
 #' @noRd
-p_adjust_names <- c(
-  holm = "Holm's method",
+p_adjust_names <- function() c(
+  holm = paste0("Holm's method ", cite("holmSimpleSequentiallyRejective1979")),
   bonferroni = "the Bonferroni correction",
   tukey = "Tukey's method",
   hochberg = "Hochberg's method",
   hommel = "Hommel's method",
-  BH = "the Benjamini\u2013Hochberg false discovery rate correction",
-  fdr = "the Benjamini\u2013Hochberg false discovery rate correction",
+  BH = paste0("the Benjamini\u2013Hochberg false discovery rate correction ", cite("benjaminiControllingFalseDiscovery1995")),
+  fdr = paste0("the Benjamini\u2013Hochberg false discovery rate correction ", cite("benjaminiControllingFalseDiscovery1995")),
   BY = "the Benjamini\u2013Yekutieli correction",
   sidak = "the \u0160id\u00e1k correction",
   scheffe = "Scheff\u00e9's method",
@@ -892,7 +892,7 @@ modelbased_note_sentences <- function(record) {
         sentences <- c(sentences, "*p*-values are not adjusted for multiple comparisons.")
       }
     } else {
-      method <- if (adj %in% names(p_adjust_names)) p_adjust_names[[adj]] else paste0("the ", adj, " method")
+      method <- if (adj %in% names(p_adjust_names())) p_adjust_names()[[adj]] else paste0("the ", adj, " method")
       sentences <- c(
         sentences,
         paste0("*p*-values are adjusted for multiple comparisons with ", method, ".")

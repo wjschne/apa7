@@ -42,7 +42,7 @@ test_that("item rows match psych::alpha(), with scale statistics below", {
   note <- apa_note(result)
   expect_match(note, "Agreeableness: *n* = 2,709; Conscientiousness: *n* = 2,707", fixed = TRUE)
   expect_match(note, "Items marked (R) were reverse-scored.", fixed = TRUE)
-  expect_match(note, "CI = 95% confidence interval (Feldt)", fixed = TRUE)
+  expect_match(note, "CI = 95% confidence interval (Feldt et al., 1987)", fixed = TRUE)
   # Labels are not formatted again in flextables
   expect_equal(apa_flextable(result)$body$dataset[[1]], result$Item)
 })

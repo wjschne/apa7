@@ -970,6 +970,8 @@ htest_note_sentences <- function(record) {
         record$effect_size_header,
         how,
         if (startsWith(record$effect_size, "g_")) ", with a small-sample correction",
+        " ",
+        cite("lakensCalculatingReportingEffect2013"),
         "."
       )
     )

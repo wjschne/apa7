@@ -362,8 +362,8 @@ reliability_note_sentences <- function(record) {
       "&alpha; if deleted" = "Cronbach's &alpha; without the item"
     ),
     "&alpha;" = "Cronbach's &alpha;",
-    "CI" = paste0(ci, " confidence interval (Feldt)"),
-    if (isTRUE(record$omega)) c("*&omega;*~total~" = "McDonald's &omega;~total~ from a one-factor model"),
+    "CI" = paste0(ci, " confidence interval ", cite("feldtStatisticalInferenceCoefficient1987")),
+    if (isTRUE(record$omega)) c("*&omega;*~total~" = paste0("McDonald's &omega;~total~ ", cite("mcdonaldTestTheoryUnified1999"), " from a one-factor model")),
     if (record$level == "scales") c("*k*" = "number of items", "Mean *r*" = "mean inter-item correlation")
   )
   sentences <- c(sentences, abbreviation_sentence(defs))

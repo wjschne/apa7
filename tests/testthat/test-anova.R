@@ -282,12 +282,12 @@ test_that("apa_note describes afex tables and sphericity corrections", {
     paste0(
       "Degrees of freedom and *p*-values for effects involving Phase or Hour are Greenhouse",
       intToUtf8(8211),
-      "Geisser corrected."
+      "Geisser corrected (Greenhouse & Geisser, 1959)."
     )
   )
   expect_equal(
     notes[3],
-    "*MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared."
+    "*MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared (Olejnik & Algina, 2003)."
   )
 
   # Huynh-Feldt and no correction

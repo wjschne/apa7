@@ -1,8 +1,6 @@
 ---
 title: "Hypothesis Tests"
 format: html
-execute: 
-  cache: true
 knitr:
   opts_chunk:
     fig-cap-location: top

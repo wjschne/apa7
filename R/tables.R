@@ -578,7 +578,8 @@ apa_cor <- function(
   if (inherits(data, "easycorrelation")) {
     parts <- correlation_parts(data)
     ct <- parts$ct
-    cor_sentences <- parts$sentences
+    # apa_cor() writes its note itself, so citations are resolved here
+    cor_sentences <- resolve_citations(parts$sentences, citations_mode())
     data <- parts$data
     if (is.null(data)) {
       # Without the data, there is nothing to summarize
@@ -2749,15 +2750,18 @@ apa_parameters.list <- function(
   show_performance <- !(is.null(performance_parameters) ||
     length(performance_parameters) == 0 ||
     all(is.na(performance_parameters)))
+  note_formats <- column_formats
   if (show_performance) {
+    comparison <- apa_performance_comparison(
+      fit,
+      metrics = performance_parameters,
+      starred = starred
+    )
+    note_formats <- attr(comparison, "column_formats", exact = TRUE) %||% column_formats
     d_fit <- d_fit |>
       flextable::as_grouped_data(groups = "Model") |>
       dplyr::left_join(
-        apa_performance_comparison(
-          fit,
-          metrics = performance_parameters,
-          starred = starred
-        ),
+        comparison,
         by = dplyr::join_by(Model)
       ) |>
       dplyr::mutate(dplyr::across(.cols = dplyr::where(is.character), \(x) dplyr::replace_values(x, from = NA, to = "")))
@@ -2772,7 +2776,7 @@ apa_parameters.list <- function(
     purrr::map(model_tables, \(x) attr(x, "apa_note", exact = TRUE)),
     performance = if (show_performance) performance_parameters,
     performance_starred = show_performance && any(starred %in% performance_parameters),
-    column_formats = column_formats
+    column_formats = note_formats
   )
   as_apa7_tbl(d_fit)
 }
@@ -2990,6 +2994,26 @@ use_pseudo_r2 <- function(data, column_formats) {
       )
     }
   }
+  # Define the pseudo-R2 in table notes, unless a definition was given
+  definitions <- c(
+    R2_Tjur = paste0("Tjur's coefficient of discrimination ", cite("tjurCoefficientsDeterminationLogistic2009")),
+    R2_Nagelkerke = paste0("Nagelkerke's pseudo-*R*^2^ ", cite("nagelkerkeNoteGeneralDefinition1991")),
+    R2_McFadden = paste0("McFadden's pseudo-*R*^2^ ", cite("mcfaddenConditionalLogitAnalysis1974"))
+  )
+  if (
+    found %in% names(definitions) &&
+      !is.null(column_formats$R2) &&
+      length(column_formats$R2@abbreviation) == 0
+  ) {
+    column_formats$R2@abbreviation <- definitions[[found]]
+  }
+  # The change in R2 names the same pseudo-R2
+  if (
+    !is.null(column_formats$deltaR2) && !is.null(column_formats$R2) &&
+      identical(column_formats$deltaR2@abbreviation, the$columns$deltaR2@abbreviation)
+  ) {
+    column_formats$deltaR2@abbreviation <- paste0("change in ", column_formats$R2@header)
+  }
   list(data = data, column_formats = column_formats)
 }
 
@@ -3199,11 +3223,15 @@ apa_performance_comparison <- function(
     model_labels <- paste("Model", seq_len(nrow(cp))) # nocov
   }
 
-  cp |>
+  out <- cp |>
     dplyr::select(Model = Name, dplyr::any_of(metrics)) |>
     dplyr::mutate(Model = model_labels) |>
     apa_format_columns(column_formats) |>
     as_apa7_tbl()
+  # The column formats used (e.g., with the pseudo-R2 named), for the notes of
+  # apa_parameters() tables of lists of models
+  attr(out, "column_formats") <- column_formats
+  out
 }
 
 #' Labels for a list of models

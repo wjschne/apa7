@@ -4,12 +4,18 @@
 \alias{apa_note}
 \title{Write a table note}
 \usage{
-apa_note(x, collapse = " ")
+apa_note(x, collapse = " ", citations = NULL)
 }
 \arguments{
 \item{x}{a table made by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_htest]{apa_htest()}}, \code{\link[=apa_parameters]{apa_parameters()}}, \code{\link[=apa_loadings]{apa_loadings()}}, or \code{\link[=apa_factor_cor]{apa_factor_cor()}}}
 
 \item{collapse}{string that joins the sentences. Use \code{NULL} to get a character vector with one sentence per element.}
+
+\item{citations}{how articles cited in the note are written: \code{"auto"},
+\code{"keys"} (Pandoc citation keys, e.g., \verb{[@duvalTrimFillSimple2000]}), or
+\code{"text"} (e.g., "(Duval & Tweedie, 2000)"). If \code{NULL} (default), the
+\code{apa7.citations} option is used, which is \code{"auto"} unless set. See
+\code{\link[=apa7_write_bib]{apa7_write_bib()}}.}
 }
 \value{
 character

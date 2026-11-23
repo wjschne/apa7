@@ -1,8 +1,6 @@
 ---
 title: "Structural Equation Model Tables"
 format: html
-execute: 
-  cache: true
 knitr:
   opts_chunk:
     fig-cap-location: top

@@ -1359,7 +1359,7 @@ the$columns <- list(
     header = "*&eta;*^2^~G~",
     latex = "$\\eta^2_G$",
     formatter = the$trim_leading_zero,
-    abbreviation = "generalized eta squared"
+    abbreviation = paste0("generalized eta squared ", cite("olejnikGeneralizedEtaOmega2003"))
   ),
   Epsilon2 = column_format(
     name = "Epsilon2",

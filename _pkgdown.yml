@@ -63,6 +63,7 @@ reference:
     contents:
       - install_apaquarto
       - make_apaquarto
+      - apa7_write_bib
   - title: Misc
     desc: Other Functions
     contents:

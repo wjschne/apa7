@@ -227,7 +227,7 @@ test_that("paired t tests offer d_z, d_rm, and Hedges' g versions", {
     d_paired$drug1, d_paired$drug2, method = "z", adjust = FALSE
   )
   expect_equal(as_num(result_z$`*d*~z~`), round(es_z$d_z, 2))
-  expect_match(apa_note(result_z), "standard deviation of the differences.", fixed = TRUE)
+  expect_match(apa_note(result_z), "standard deviation of the differences (Lakens, 2013).", fixed = TRUE)
 
   result_g <- apa_htest(d_paired, Pair(drug1, drug2) ~ 1, effect_size = "hedges_g")
   es_g <- effectsize::repeated_measures_d(

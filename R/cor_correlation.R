@@ -95,12 +95,12 @@ correlation_note_sentences <- function(
   if (length(p_adjust) == 1 && !is.na(p_adjust) && !(p_adjust %in% c("none", ""))) {
     adjustment <- switch(
       p_adjust,
-      holm = "Holm's method",
+      holm = paste0("Holm's method ", cite("holmSimpleSequentiallyRejective1979")),
       hochberg = "Hochberg's method",
       hommel = "Hommel's method",
       bonferroni = "the Bonferroni correction",
       BH = ,
-      fdr = paste0("the Benjamini", intToUtf8(8211), "Hochberg false discovery rate method"),
+      fdr = paste0("the Benjamini", intToUtf8(8211), "Hochberg false discovery rate method ", cite("benjaminiControllingFalseDiscovery1995")),
       BY = paste0("the Benjamini", intToUtf8(8211), "Yekutieli method"),
       p_adjust
     )

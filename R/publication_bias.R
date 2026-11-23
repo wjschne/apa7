@@ -221,7 +221,7 @@ publication_bias_note_sentences <- function(record) {
     sentences <- c(
       sentences,
       paste0(
-        "Egger's regression test is the test of the standard error in a meta-regression of the effect sizes on their standard errors",
+        "Egger's regression test ", cite("eggerBiasMetaanalysisDetected1997"), " is the test of the standard error in a meta-regression of the effect sizes on their standard errors",
         if (isTRUE(record$has_estimate)) "; its adjusted estimate is the predicted effect as the standard error approaches zero" else "",
         "."
       )
@@ -230,7 +230,7 @@ publication_bias_note_sentences <- function(record) {
   if ("rank" %in% methods) {
     sentences <- c(
       sentences,
-      "The rank correlation test (Begg & Mazumdar, 1994) is Kendall's *&tau;* between the standardized effect sizes and their sampling variances."
+      paste0("The rank correlation test ", cite("beggOperatingCharacteristicsRank1994"), " is Kendall's *&tau;* between the standardized effect sizes and their sampling variances.")
     )
   }
   tf <- record$details$trimfill
@@ -238,7 +238,7 @@ publication_bias_note_sentences <- function(record) {
     sentences <- c(
       sentences,
       paste0(
-        "Trim and fill (Duval & Tweedie, 2000; ", tf$estimator, " estimator) imputed ",
+        "Trim and fill ", cite("duvalTrimFillSimple2000"), " with the ", tf$estimator, " estimator imputed ",
         tf$k0, if (tf$k0 == 1) " study" else " studies",
         if (tf$k0 > 0) paste0(" on the ", tf$side, " side of the funnel plot") else "",
         "; its adjusted estimate includes ",

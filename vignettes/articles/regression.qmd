@@ -328,6 +328,26 @@ apa_parameters(lm1, column_formats = cf) |>
 
 The generated note is a starting point. Add to it with `paste` (e.g., `paste(apa_note(tbl_lm), "Education was dummy coded with None as the reference group.")`), or use `collapse = NULL` to get one sentence per element, so you can drop or reword sentences. `apa_note` reads an attribute of the table that dplyr functions such as `mutate` and `filter` keep but some operations (e.g., joins) drop, so call it on the table that `apa_parameters` returned.
 
+## Citations in notes
+
+Some notes cite the articles that describe a method: for example, the notes of meta-analysis tables cite the articles on trim and fill and the multilevel *I*^2^, and the notes of `lavaan` model comparisons cite the article on the scaled *&chi;*^2^ difference test. In the console, and in documents without the references, the citations are written as text (e.g., "(Duval & Tweedie, 2000)"), which you would add to the reference list by hand.
+
+To have the citations formatted and added to the reference list automatically, write the references that come with apa7 to the document's folder in the setup chunk and list the file in the YAML header:
+
+```{r}
+#| label: write-bib
+#| eval: false
+apa7::apa7_write_bib("apa7.bib")
+```
+
+```yaml
+bibliography: [references.bib, apa7.bib]
+```
+
+When the document is rendered, `apa_note` writes each citation whose reference is in the document's bibliography as a Pandoc citation key (e.g., `[@duvalTrimFillSimple2000]`), which Pandoc (or [apaquarto](https://wjschne.github.io/apaquarto/)) turns into a citation such as "(Duval & Tweedie, 2000)" and an entry in the reference list. This works for notes in the `apa-note` chunk option and from `apa_flextable(note = TRUE)`. The keys are those that the Better BibTeX extension for Zotero makes, so references exported from Zotero work, too.
+
+To choose the form yourself, use `apa_note(tbl, citations = "keys")` or `citations = "text"`, or set it for all notes with `options(apa7.citations = "keys")`. Text is the right choice for tables saved directly to Word (e.g., with `flextable::save_as_docx`), because Pandoc never sees them.
+
 # Printing Options
 
 The `apa7.print` option controls how the output of `apa_parameters`, `apa_performance`, and `apa_performance_comparison` is displayed.

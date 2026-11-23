@@ -137,6 +137,10 @@ apa_performance(fit_schools) |>
 
 `apa_performance` gives the variance of the true effects at each level (*&sigma;*^2^, with the level as a subscript) and the multilevel *I*^2^ (Cheung, 2014), the percentage of the total variability due to heterogeneity at all levels. With `metrics = "all"`, the table adds *&sigma;* and confidence intervals of *&sigma;*^2^ for each level, and *I*^2^ for each level. Meta-regressions of multilevel models work as for `rma`. Random effects with an `~ inner | outer` structure (e.g., correlated outcomes within studies) are not yet supported.
 
+# Citations in Notes
+
+Some notes cite the articles that describe a method (e.g., trim and fill and the multilevel *I*^2^). In the console and in this article, the citations are written as text. To have them formatted and added to the reference list of a Quarto or R Markdown document, see [Citations in notes](regression.html#citations-in-notes) in the regression article.
+
 # Options
 
 * `method = "EE"` in `rma` fits an equal-effects model; the table labels the pooled estimate accordingly, and there is no prediction interval or *&tau;*^2^.

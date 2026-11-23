@@ -37,8 +37,8 @@ test_that("apa_publication_bias shows Egger's test, the rank test, and trim and 
 
   note <- apa_note(result)
   expect_match(note, "The unadjusted pooled estimate of the 13 studies is *RR* = 0.49, 95% CI [0.34, 0.70].", fixed = TRUE)
-  expect_match(note, "Egger's regression test is the test of the standard error", fixed = TRUE)
-  expect_match(note, "Trim and fill (Duval & Tweedie, 2000; L0 estimator) imputed 1 study on the right side of the funnel plot", fixed = TRUE)
+  expect_match(note, "Egger's regression test (Egger et al., 1997) is the test of the standard error", fixed = TRUE)
+  expect_match(note, "Trim and fill (Duval & Tweedie, 2000) with the L0 estimator imputed 1 study on the right side of the funnel plot", fixed = TRUE)
   expect_match(note, "*k*~0~ = number of imputed studies", fixed = TRUE)
   expect_equal(apa_flextable(result)$body$dataset[[1]], result$Method)
 })

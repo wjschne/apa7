@@ -190,12 +190,13 @@ lavaan_estimator_name <- function(options, tests) {
   se <- options$se
   if (est == "ML") {
     if ("yuan.bentler.mplus" %in% tests || "yuan.bentler" %in% tests) {
-      return("robust maximum likelihood (MLR)")
+      return(paste0("robust maximum likelihood (MLR), as described by ", cite("yuanThreeLikelihoodbasedMethods2000", narrative = TRUE)))
     }
     if ("satorra.bentler" %in% tests) {
       return(paste0(
         "maximum likelihood with a Satorra", intToUtf8(8211),
-        "Bentler scaled test statistic (MLM)"
+        "Bentler scaled test statistic (MLM), as described by ",
+        cite("satorraCorrectionsTestStatistics1994", narrative = TRUE)
       ))
     }
     if (any(c("scaled.shifted", "mean.var.adjusted") %in% tests)) {
@@ -1027,12 +1028,20 @@ lavaan_lrt_method <- function(x) {
 #' @keywords internal
 #' @noRd
 lavaan_lrt_description <- function(method) {
-  sb <- paste0("Satorra", intToUtf8(8211), "Bentler")
   labels <- c(
     standard = "a likelihood ratio (*&chi;*^2^ difference) test",
-    satorra.bentler.2001 = paste0("the ", sb, " (2001) scaled *&chi;*^2^ difference test"),
-    satorra.bentler.2010 = paste0("the ", sb, " (2010) strictly positive scaled *&chi;*^2^ difference test"),
-    satorra.2000 = "the Satorra (2000) scaled and shifted *&chi;*^2^ difference test"
+    satorra.bentler.2001 = paste0(
+      "the scaled *&chi;*^2^ difference test of ",
+      cite("satorraScaledDifferenceChisquare2001", narrative = TRUE)
+    ),
+    satorra.bentler.2010 = paste0(
+      "the strictly positive scaled *&chi;*^2^ difference test of ",
+      cite("satorraEnsuringPositivenessScaled2010", narrative = TRUE)
+    ),
+    satorra.2000 = paste0(
+      "the scaled and shifted *&chi;*^2^ difference test of ",
+      cite("satorraScaledAdjustedRestricted2000", narrative = TRUE)
+    )
   )
   out <- labels[method]
   out[is.na(out)] <- "a scaled *&chi;*^2^ difference test"

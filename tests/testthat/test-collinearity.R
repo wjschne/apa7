@@ -15,7 +15,7 @@ test_that("apa_collinearity shows VIF, its CI, and tolerance", {
   expect_equal(unpad(result$Tolerance[1]), sub("^0", "", sprintf("%.2f", cc$Tolerance[1])))
 
   note <- apa_note(result)
-  expect_match(note, "For Cyl, which has more than 1 *df*, *VIF* is the generalized *VIF*.", fixed = TRUE)
+  expect_match(note, "For Cyl, which has more than 1 *df*, *VIF* is the generalized *VIF* (Fox & Monette, 1992).", fixed = TRUE)
   expect_match(note, "Tolerance = 1/*VIF*", fixed = TRUE)
   expect_match(note, "*VIF* = variance inflation factor; CI = confidence interval.", fixed = TRUE)
   expect_no_match(note, "bolded", fixed = TRUE)

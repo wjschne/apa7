@@ -219,7 +219,8 @@ collinearity_note_sentences <- function(record) {
         and_list(record$generalized),
         ", which ",
         if (length(record$generalized) == 1) "has" else "have",
-        " more than 1 *df*, *VIF* is the generalized *VIF*",
+        " more than 1 *df*, *VIF* is the generalized *VIF* ",
+        cite("foxGeneralizedCollinearityDiagnostics1992"),
         if ("SE_factor" %in% columns) {
           ", and *VIF*^1/(2*df*)^ is comparable across terms with different *df*"
         } else {

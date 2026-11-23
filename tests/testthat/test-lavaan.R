@@ -329,7 +329,12 @@ test_that("robust lavaan comparisons name the scaled difference test", {
   )
   expect_match(
     apa_note(result),
-    "Satorra–Bentler (2001) scaled *&chi;*^2^ difference test",
+    "the scaled *&chi;*^2^ difference test of Satorra and Bentler (2001)",
+    fixed = TRUE
+  )
+  expect_match(
+    apa_note(result, citations = "keys"),
+    "the scaled *&chi;*^2^ difference test of @satorraScaledDifferenceChisquare2001",
     fixed = TRUE
   )
   # Changes in fit indices alone have no difference test
