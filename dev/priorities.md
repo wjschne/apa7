@@ -106,7 +106,8 @@ Roughly in order of how often they appear in APA-style papers. `apa_parameters()
 - [ ] Factor retention (`parameters::n_factors()`) and cluster analysis (`parameters::cluster_analysis()`)
 - [x] Meta-analyses (`metafor::rma()`): study-level effect sizes with weights and the pooled estimate, heterogeneity (*Q*, *I*², *τ*²) with `apa_performance()`, and meta-regressions (computed from the metafor object rather than `parameters`, which gives equal-effects inverse-variance weights rather than percentages and exponentiates only the pooled estimate)
   - [x] Multilevel models (`rma.mv` with nested random intercepts): variance components and multilevel *I*^2^ for each level
-  - [ ] Possible additions: `rma.mv` with `~ inner | outer` structures (multivariate models), `rma.mh`/`rma.peto`, subgroup tables, and publication-bias tests (Egger's test, trim and fill)
+  - [ ] Possible additions: `rma.mv` with `~ inner | outer` structures (multivariate models), `rma.mh`/`rma.peto`, and subgroup tables
+  - [x] Publication bias with `apa_publication_bias()`: Egger's test (with limit estimate), rank correlation test, trim and fill, and fail-safe *N* (`rma` models only)
 - [ ] Bayesian models (`brms`, `rstanarm`) via `bayestestR` (on hold until the other major easystats analyses are supported)
 
 ## Table notes
@@ -121,6 +122,7 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
 - [x] `apa_flextable(x, note = TRUE)` adds the generated note as a footer line for plain Quarto, R Markdown, and Word (or `note = "text"` for custom text), like `apa_cor()`'s `note` argument
 - [x] Column-format definitions: an `abbreviation` slot in `column_format()` (e.g., `*MSE*` = mean square error) so `apa_note()` defines every abbreviation used in a table's headers, for any table type
 - [x] Give a clear message when the `apa_note` attribute has been lost (e.g., after `bind_rows()` or a join)
+- [ ] Citations in notes: some `apa_note()` text cites articles in plain text (e.g., "Cheung, 2014" for multilevel *I*^2^; Begg & Mazumdar, 1994, Duval & Tweedie, 2000, and Egger et al., 1997 for publication bias). Decide how these should work in a reproducible analysis, especially with apaquarto: plain text the author must add to the reference list by hand, Pandoc citation keys (e.g., `[@cheung2014]`) that apaquarto resolves from the document's bibliography (which needs the entries, e.g., from a `.bib` file shipped with apa7 or a helper that writes them), or an option to choose. Check whether citation keys survive the `apa-note` chunk option and `apa_flextable(note = TRUE)` (flextable footers are not processed by Pandoc's citeproc).
 
 ## Ideas / backlog
 
