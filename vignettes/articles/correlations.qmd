@@ -3,10 +3,15 @@ title: "Correlations"
 knitr:
   opts_chunk: 
     dev: "ragg_png"
+execute: 
+  cache: true
 format: html
 ---
 
-```{r setup, include = FALSE}
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 library(apa7)
 library(dplyr)
 library(flextable)
@@ -14,57 +19,77 @@ library(ftExtra)
 library(tidyr)
 library(stringr)
 library(correlation)
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r loading}
 <<setup>>
 ```
 
-Some tables, like correlation matrices, can be standardized and automated. Others are uniquely tied to a specific purpose, and no function could anticipate their structure. The apa7 package has a few functions to automate what can be automated and a styling function to make the final styling of a complex table a little easier.
+Correlation matrices look simple enough...until you try to make one by hand in MS Word. The `apa_cor` function can remove most of the tedium by formatting most of what can automated, and any finishing touches can be added with a styling function.
+
+The examples use the `epi.bfi` data set from the psychTools package, which has personality, depression, and anxiety scores for 231 participants in studies at Northwestern University's Personality, Motivation, and Cognition Laboratory. Openness, conscientiousness, extraversion, agreeableness, and neuroticism are Big Five scale scores, and depression is the Beck Depression Inventory score. 
+
+```{r}
+#| label: data
+d_personality <- psychTools::epi.bfi |>
+  select(
+    Openness = bfopen,
+    Conscientiousness = bfcon,
+    Extraversion = bfext,
+    Agreeablness = bfagree,
+    Neuroticism = bfneur,
+    Depression = bdi
+  )
+```
 
 By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/flextable/), with significant correlations starred.
 
 ```{r}
-#| label: tbl-treesflex
-#| tbl-cap: Correlation Table
+#| label: tbl-cor
+#| tbl-cap: Correlations Among Personality and Depression
 #| message: false
-trees |> 
+d_personality |> 
   apa_cor()
+
 ```
 
 Significant correlations can be bolded instead.
 
 ```{r}
-#| label: tbl-stars
-#| tbl-cap: Bolding Significant Correlations
+#| label: tbl-bold
+#| tbl-cap: Correlations With Significant Correlations in Bold
 #| message: false
-trees |>
+d_personality |>
   apa_cor(bold_significant = TRUE)
+
 ```
 
 # Summary functions
 
 You can include any named list of summary functions:
 
-
-
-
 ```{r}
+#| label: tbl-median-iqr
+#| tbl-cap: "Correlations Among Personality and Depression With Medians and Interquartile Ranges"
 # Named list of descriptive functions
-my_summaries <- list(Median = median, "Interquartile Range" = IQR)
+my_summaries <- list(Mdn = median, "*IQR*" = IQR)
 
-apa_cor(trees, summary_functions = my_summaries)
-
-
+apa_cor(d_personality, 
+        summary_functions = my_summaries, 
+        star_significant = FALSE)
 ```
 
 
 You can also use a plain vector of descriptive functions from these options: `"IQR", "Interquartile Range", "Kurtosis", "MAD", "Median Absolute Deviation", "M", "Mean", "Med", "Median", "n", "N", "Quantile", "Range", "SD", "Skewness", "Var", "Variance"`
 
 ```{r}
+#| label: tbl-summaries
+#| tbl-cap: "Correlations Among Personality and Depression With Additional Summary Statistics"
 my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
 
-apa_cor(trees, summary_functions = my_summaries)
+apa_cor(d_personality, summary_functions = my_summaries)
+
 ```
 
 
@@ -91,11 +116,9 @@ For example,
 
 ```{r}
 #| label: tbl-altstyle
-#| tbl-cap: Alternative Styling
+#| tbl-cap: Correlations With Alternative Styling
 
-
-
-trees |>
+d_personality |>
   apa_cor(
     p_value = 0.001,
     digits = 2,
@@ -115,8 +138,8 @@ To remove summary statistics entirely, set `summary_functions` to `NA` or `NULL`
 
 ```{r}
 #| label: tbl-nosummary
-#| tbl-cap: Removing Summary Functions
-apa_cor(trees, summary_functions = NA, bold_significant = FALSE)
+#| tbl-cap: Correlations Without Summary Statistics
+apa_cor(d_personality, summary_functions = NA)
 ```
 
 # Customization
@@ -126,17 +149,13 @@ The styling options for `apa_cor` are minimal, but flextable allows for all kind
 
 ```{r}
 #| label: tbl-altflextable
-#| tbl-cap: Styling a Table with flextable Functions
-apa_cor(trees) |>
+#| tbl-cap: Correlations Styled With flextable Functions
+apa_cor(d_personality, table_width = .5) |>
   flextable::footnote(
     i = 2,
     j = "Variable",
     value = flextable::as_paragraph("This is a footnote."),
     part = "body"
-  ) |>
-  flextable::set_table_properties(
-    width = .5,
-    align = "left"
   )
 
 ```
@@ -147,8 +166,8 @@ If you need to process the underlying data before converting to flextable (or us
 
 ```{r}
 #| label: tbl-tibble
-#| tbl-cap: Customizing a Table with flextable Functions.
-apa_cor(trees, output = "tibble") |>
+#| tbl-cap: Correlations With a Row Title
+apa_cor(d_personality, output = "tibble") |>
   mutate(apa7listcolumn = str_trim(apa7listcolumn)) |>
   unite(col = Variable, 
         apa7listcolumn, 
@@ -156,24 +175,23 @@ apa_cor(trees, output = "tibble") |>
         sep = "&thinsp;") |>
   add_row(Variable = "Row title", .before = 1) |>
   apa_flextable(no_format_columns = "Variable") |>
-  padding(i = 2:4,
+  padding(i = 2:7,
           j = 1,
-          padding.left = 15) 
+          padding.left = 15)
 ```
 
-# Correlations from the correlation package
+# Other Kinds of Correlations
 
-`apa_cor` computes Pearson correlations with `psych::corTest`. For other kinds of correlations, compute them with `correlation::correlation` from the [correlation](https://easystats.github.io/correlation/) package, and give the result to `apa_cor`. For example, Spearman rank correlations:
+`apa_cor` computes the correlations with `correlation::correlation` from the [correlation](https://easystats.github.io/correlation/) package: by default, Pearson correlations with unadjusted *p*-values. Depression scores are skewed, as the skewness in the summary statistics above shows, so rank correlations are a reasonable alternative. The `method` argument chooses the kind of correlation. For example, Spearman rank correlations:
 
 ```{r}
 #| label: tbl-spearman
-#| tbl-cap: Spearman rank correlations from the correlation package
+#| tbl-cap: Spearman Rank Correlations Among Personality and  Depression
 #| message: false
-correlation(trees, method = "spearman") |>
-  apa_cor()
+apa_cor(d_personality, method = "spearman")
 ```
 
-The note says what kind of correlations are shown. Other options from the `correlation::correlation` function include:
+The note says what kind of correlations are shown. Other options for `method` include:
 
 | Option        | Correlation                    |
 |:--------------|:-------------------------------|
@@ -192,14 +210,32 @@ The note says what kind of correlations are shown. Other options from the `corre
 | `gaussian`    | for Gaussian Rank correlation  | 
 | `shepherd`    | for Shepherd's Pi correlation  |
 
-By default, `correlation::correlation` adjusts the *p*-values for multiple comparisons with Holm's method, so the stars are for the adjusted *p*-values, and the note says so (use `p_adjust = "none"` for unadjusted *p*-values). Partial correlations, each controlling for the other variables in the table, work the same way:
+To adjust the *p*-values (and so the stars) for multiple comparisons, use `p_adjust` (e.g., `p_adjust = "holm"`), and the note says how they were adjusted. Partial correlations, each controlling for the other variables in the table, need only `partial = TRUE`:
 
 ```{r}
 #| label: tbl-partial
-#| tbl-cap: Partial correlations from the correlation package
+#| tbl-cap: Partial Correlations Among Personality and Depression
 #| message: false
-correlation(trees, partial = TRUE, p_adjust = "none") |>
+apa_cor(d_personality, partial = TRUE)
+```
+
+Partial correlations can differ considerably from ordinary correlations. With zero-order correlations, openness and extraversion correlate at .27, but once other personality variables are held constant, the partial correlation between them is close to zero.
+
+Other arguments of `correlation::correlation` (e.g., `robust = TRUE`, `winsorize = .2`, or `multilevel = TRUE`) can be given to `apa_cor` as well. Variable names with spaces work for every kind of correlation, because `apa_cor` gives the variables internal names while it computes the correlations. (Called directly, `correlation::correlation` does not accept such names for partial or multilevel correlations.)
+
+The output of `correlation::correlation` can also be given to `apa_cor`:
+
+```{r}
+#| label: tbl-correlation-output
+#| tbl-cap: Spearman Rank Correlations Computed by the correlation Package
+#| message: false
+correlation(d_personality, method = "spearman") |>
   apa_cor()
 ```
 
-The means and standard deviations come from the data that `correlation::correlation` keeps with its results. Correlations computed by group, between two sets of variables, or with Bayesian methods are not yet supported.
+Here, `correlation::correlation` adjusted the *p*-values with Holm's method, its default, so the stars are for the adjusted *p*-values, and the note says so. The means and standard deviations come from the data that `correlation::correlation` keeps with its results. Correlations computed by group, between two sets of variables, or with Bayesian methods are not yet supported.
+
+# References
+
+::: {#refs}
+:::

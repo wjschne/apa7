@@ -1,0 +1,54 @@
+/* Copy of pkgdown/extra.css for articles rendered directly with Quarto.
+   Quarto's preview server serves only files inside the Quarto project
+   (vignettes/), so pkgdown/extra.css cannot be linked from here. Keep the
+   two files the same. */
+
+/* APA-style table and figure captions and notes in the articles.
+   apaquarto's filters (run by vignettes/articles/_metadata.yml) write these
+   classes; the rules follow apaquarto's apa.css, which pkgdown does not load.
+   Sizes and colors are left to the site's theme.
+   vignettes/articles/articles.css is a copy for articles rendered directly
+   with Quarto; keep the two files the same. */
+
+/* Label ("Table 1") in bold on its own line */
+.FigureTitle {
+  font-weight: bold;
+  margin: 0.5em 0 0.25em;
+  text-align: left;
+}
+.FigureTitle p {
+  text-indent: 0;
+  margin: 0;
+  text-align: left;
+}
+
+/* Title in italics below the label */
+.Caption {
+  font-style: italic;
+  text-align: left;
+}
+.Caption p {
+  text-indent: 0;
+  margin: 0 0 0.5em;
+}
+
+/* Note below the table or figure */
+.FigureNote {
+  text-align: left;
+}
+.FigureNote p {
+  text-indent: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Captions above, left-aligned (Quarto centers figure captions) */
+figcaption.quarto-float-caption {
+  text-align: left;
+}
+
+/* Space around each table and figure */
+.FigureWithNote,
+.FigureWithoutNote {
+  margin-block: 2em;
+}

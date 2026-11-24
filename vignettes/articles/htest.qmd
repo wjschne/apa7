@@ -4,9 +4,6 @@ format: html
 knitr:
   opts_chunk:
     fig-cap-location: top
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -59,7 +56,8 @@ d_iris <- iris |>
 ```
 
 ```{r}
-#| label: welch
+#| label: tbl-welch
+#| tbl-cap: "Welch's *t* Tests Comparing Setosa and Versicolor Irises"
 apa_htest(
   d_iris,
   `Sepal Length` + `Sepal Width` + `Petal Length` + `Petal Width` ~ Species
@@ -75,7 +73,8 @@ Differences are the first group (in factor level order) minus the second, so a p
 With `var_equal = TRUE`, the table shows Student's *t* test, which assumes equal variances, and Cohen's *d* uses the pooled standard deviation. Hedges' *g* corrects *d* for its small-sample bias.
 
 ```{r}
-#| label: student
+#| label: tbl-student
+#| tbl-cap: "Student's *t* Tests Comparing Setosa and Versicolor Irises With Hedges' *g*"
 apa_htest(
   d_iris,
   `Sepal Length` + `Sepal Width` ~ Species,
@@ -89,13 +88,18 @@ apa_htest(
 Other arguments are passed to the test function. For example, `alternative = "greater"` makes a one-sided test. Effect size intervals stay two-sided, and the table note says that the *p*-values are one-sided.
 
 ```{r}
-#| label: one-sided
+#| label: tbl-one-sided
+#| tbl-cap: "One-Sided Welch's *t* Test of Sepal Width"
 tbl_greater <- apa_htest(
   d_iris,
   `Sepal Width` ~ Species,
   alternative = "greater"
 )
 tbl_greater
+```
+
+```{r}
+#| label: one-sided-note
 apa_note(tbl_greater)
 ```
 
@@ -104,7 +108,8 @@ apa_note(tbl_greater)
 To compare a mean with a fixed value, put `1` on the right side of the formula and give the value as `mu`. In `ToothGrowth`, is the mean tooth length different from 20?
 
 ```{r}
-#| label: one-sample
+#| label: tbl-one-sample
+#| tbl-cap: "One-Sample *t* Test of Tooth Length Against 20"
 d_tooth <- ToothGrowth |>
   rename(Length = len)
 
@@ -141,7 +146,7 @@ With one pair, the variable names head their descriptive statistics, and differe
 
 ## Effect sizes for paired data
 
-Paired data have several versions of Cohen's *d*, which differ in the standard deviation that the mean difference is divided by (Lakens, 2013):
+Paired data have several versions of Cohen's *d*, which differ in the standard deviation that the mean difference is divided by [@lakensCalculatingReportingEffect2013]:
 
 | `effect_size` | Effect size | Mean difference divided by |
 |---|---|---|
@@ -153,7 +158,8 @@ Paired data have several versions of Cohen's *d*, which differ in the standard d
 The default, *d*~av~, is on the same scale as *d* for two independent groups, so it can be compared with between-subjects studies. *d*~z~ is often much larger, because the *SD* of the differences is small when the two variables are highly correlated. It describes how consistent the change is rather than how large it is relative to individual differences. `"cohens_d"` is the same as `"d_av"`, and `"hedges_g"` is the same as `"g_av"`. All of them come from `effectsize::repeated_measures_d`.
 
 ```{r}
-#| label: paired-dz
+#| label: tbl-paired-dz
+#| tbl-cap: "Paired-Samples *t* Test With *d*~z~"
 apa_htest(d_sleep, Pair(`Drug 1`, `Drug 2`) ~ 1, effect_size = "d_z")
 ```
 
@@ -164,7 +170,8 @@ apa_htest(d_sleep, Pair(`Drug 1`, `Drug 2`) ~ 1, effect_size = "d_z")
 Join several pairs with `+` to get one row per pair. Their descriptive statistics are headed "First" and "Second" unless you set `pair_labels`. In this made-up study, anxiety and depression were measured before and after an intervention:
 
 ```{r}
-#| label: several-pairs
+#| label: tbl-several-pairs
+#| tbl-cap: "Paired-Samples *t* Tests of Anxiety and Depression Before and After Treatment"
 set.seed(1)
 d_prepost <- tibble(
   `Anxiety Pre` = rnorm(40, 50, 10),
@@ -190,7 +197,8 @@ Each pair uses the rows in which both of its variables are observed.
 With `test = "wilcoxon"`, the table shows each group's median (*Mdn*), the Wilcoxon test statistic (*W* for the rank-sum test, *V* for the signed-rank test), and the rank-biserial correlation (*r*~rb~). Like other correlations, *r*~rb~ ranges from −1 to 1 and has no leading zero.
 
 ```{r}
-#| label: wilcoxon
+#| label: tbl-wilcoxon
+#| tbl-cap: "Wilcoxon Rank-Sum Tests Comparing Setosa and Versicolor Irises"
 apa_htest(
   d_iris,
   `Sepal Length` + `Sepal Width` ~ Species,
@@ -206,7 +214,8 @@ With ties in the data, `wilcox.test` cannot compute exact *p*-values and warns a
 Signed-rank tests use the same formulas as one-sample and paired *t* tests:
 
 ```{r}
-#| label: signed-rank
+#| label: tbl-signed-rank
+#| tbl-cap: "Wilcoxon Signed-Rank Test of Extra Sleep Under Two Drugs"
 apa_htest(
   d_sleep,
   Pair(`Drug 1`, `Drug 2`) ~ 1,
@@ -224,7 +233,8 @@ Every patient slept more with Drug 2 (or the same with both), so *r*~rb~ is −1
 With `test = "cor"`, each variable on the left is correlated with the variable on the right. The table shows the sample size, the correlation with its confidence interval, and the *t* test of the correlation.
 
 ```{r}
-#| label: cor
+#| label: tbl-cor
+#| tbl-cap: "Pearson Correlations of Car Characteristics With Weight"
 d_cars <- mtcars |>
   rename(
     `Miles per Gallon` = mpg,
@@ -243,7 +253,8 @@ apa_htest(
 `method = "spearman"` or `method = "kendall"` gives rank correlations, which have no confidence interval:
 
 ```{r}
-#| label: spearman
+#| label: tbl-spearman
+#| tbl-cap: "Spearman Correlations of Fuel Economy and Horsepower With Weight"
 apa_htest(
   d_cars,
   `Miles per Gallon` + Horsepower ~ Weight,
@@ -312,7 +323,8 @@ tbl_iris
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the same note below the table. Do not combine it with the `apa-note` chunk option, or the note will appear twice.
 
 ```{r}
-#| label: note-flextable
+#| label: tbl-note-flextable
+#| tbl-cap: "Welch's *t* Tests of Setosa and Versicolor Irises With a Generated Note"
 apa_flextable(tbl_iris, note = TRUE)
 ```
 
@@ -323,7 +335,8 @@ The generated note is a starting point. With `collapse = NULL`, `apa_note` retur
 `starred` puts significance stars on the columns you name, and `bolded` bolds significant values:
 
 ```{r}
-#| label: bolded
+#| label: tbl-bolded
+#| tbl-cap: "Welch's *t* Tests With Significant *p*-Values in Bold"
 apa_htest(
   d_iris,
   `Sepal Length` + `Sepal Width` ~ Species,
@@ -336,7 +349,8 @@ apa_htest(
 `descriptives = FALSE` drops the descriptive statistics, and `effect_size = "none"` drops the effect size:
 
 ```{r}
-#| label: fewer
+#| label: tbl-fewer
+#| tbl-cap: "Welch's *t* Tests Without Descriptive Statistics or Effect Sizes"
 apa_htest(
   d_iris,
   `Sepal Length` + `Sepal Width` ~ Species,
@@ -358,7 +372,8 @@ Each test uses the rows in which the outcome and the grouping (or predictor) var
 Functions like `t.test` return `htest` objects, which have the test statistic and *p*-value but not the data. `apa_htest` also accepts these objects, or a list of objects of the same kind, with one row per test. The names of the list label the rows:
 
 ```{r}
-#| label: htest-objects
+#| label: tbl-htest-objects
+#| tbl-cap: "Correlations of Fuel Economy With Weight, Displacement, and Horsepower"
 car_tests <- list(
   Weight = cor.test(mtcars$mpg, mtcars$wt),
   Displacement = cor.test(mtcars$mpg, mtcars$disp),
@@ -382,7 +397,8 @@ Effect sizes, however, are computed from what the objects keep, and that is not 
 For two groups, the approximation can be noticeably off when the groups differ in size or variance, and the note says that it is an approximation:
 
 ```{r}
-#| label: htest-object-welch
+#| label: tbl-htest-object-welch
+#| tbl-cap: "Welch's *t* Test of Fuel Economy by Transmission Type"
 t.test(mpg ~ am, data = mtcars) |>
   apa_htest() |>
   apa_flextable(note = TRUE)
@@ -392,4 +408,5 @@ When the data are at hand, giving them to `apa_htest` is better: the effect size
 
 # References
 
-Lakens, D. (2013). Calculating and reporting effect sizes to facilitate cumulative science: A practical primer for *t*-tests and ANOVAs. *Frontiers in Psychology, 4*, Article 863. <https://doi.org/10.3389/fpsyg.2013.00863>
+::: {#refs}
+:::

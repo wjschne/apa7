@@ -20,7 +20,8 @@
 #' `"auto"` (default), `"keys"`, or
 #' `"text"`. With `"auto"`, a citation is written as a key when a Quarto or
 #' R Markdown document is being rendered and its `bibliography` (in the YAML
-#' header) has an entry with that key, and as text otherwise (e.g., in the
+#' header, or for a whole Quarto project or folder in `_quarto.yml` or
+#' `_metadata.yml`) has an entry with that key, and as text otherwise (e.g., in the
 #' console, or in a table saved with [flextable::save_as_docx()]). So listing
 #' the file written by `apa7_write_bib()` in the YAML header is enough:
 #'
@@ -180,10 +181,15 @@ document_bib_keys <- function() {
     return(NULL) # nocov
   }
   files <- tryCatch(unlist(rmarkdown::metadata$bibliography), error = function(e) NULL)
+  input_dir <- tryCatch(dirname(knitr::current_input(dir = TRUE)), error = function(e) ".")
+  if (length(files) == 0) {
+    # Quarto gives knitr only the document's own metadata, so a bibliography
+    # set for a whole folder or project is read from those files
+    files <- quarto_bib_files(input_dir)
+  }
   if (length(files) == 0) {
     return(NULL)
   }
-  input_dir <- tryCatch(dirname(knitr::current_input(dir = TRUE)), error = function(e) ".")
   keys <- character(0)
   for (f in files) {
     path <- if (file.exists(f)) f else file.path(input_dir, f)
@@ -192,6 +198,49 @@ document_bib_keys <- function() {
     }
   }
   keys
+}
+
+#' Bibliography files set in a Quarto project's metadata files
+#'
+#' Looks for `bibliography` in `_metadata.yml` (directory metadata) and
+#' `_quarto.yml` (project metadata), from the document's folder up to the
+#' project's root folder. The nearest file that sets it wins, as in Quarto.
+#' Outside a Quarto project, directory metadata does not apply.
+#' @param input_dir folder of the document being rendered
+#' @returns paths of the bibliography files (relative paths are relative to
+#'   the metadata file that names them), or `character(0)`
+#' @keywords internal
+#' @noRd
+quarto_bib_files <- function(input_dir) {
+  if (!requireNamespace("yaml", quietly = TRUE)) {
+    return(character(0)) # nocov
+  }
+  dir <- normalizePath(input_dir, winslash = "/", mustWork = FALSE)
+  found <- character(0)
+  repeat {
+    for (meta in c("_metadata.yml", "_quarto.yml")) {
+      path <- file.path(dir, meta)
+      if (length(found) == 0 && file.exists(path)) {
+        bib <- tryCatch(
+          unlist(yaml::read_yaml(path)$bibliography),
+          error = function(e) NULL
+        )
+        if (length(bib) > 0) {
+          absolute <- grepl("^([A-Za-z]:)?[/\\\\]", bib)
+          found <- ifelse(absolute, bib, file.path(dir, bib))
+        }
+      }
+    }
+    if (file.exists(file.path(dir, "_quarto.yml"))) {
+      return(found)
+    }
+    parent <- dirname(dir)
+    if (identical(parent, dir)) {
+      # Not in a Quarto project
+      return(character(0))
+    }
+    dir <- parent
+  }
 }
 
 #' Turn citation markers into text or keys

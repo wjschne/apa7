@@ -4,9 +4,6 @@ format: html
 knitr:
   opts_chunk:
     fig-cap-location: top
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -38,7 +35,8 @@ library(dplyr)
 The `dat.molloy2014` data set in the metadat package (installed with metafor) has the correlations between conscientiousness and medication adherence in 16 studies. Correlations are meta-analyzed as Fisher's *z* values (`measure = "ZCOR"` in `escalc`), and `slab` gives the study labels:
 
 ```{r}
-#| label: molloy
+#| label: tbl-molloy
+#| tbl-cap: "Correlations Between Conscientiousness and Medication Adherence"
 d_adherence <- escalc(
   measure = "ZCOR",
   ri = ri,
@@ -62,7 +60,8 @@ The column of effect sizes is named by the measure given to `escalc`: for exampl
 `apa_performance` gives the heterogeneity statistics:
 
 ```{r}
-#| label: molloy-heterogeneity
+#| label: tbl-molloy-heterogeneity
+#| tbl-cap: "Heterogeneity of the Correlations Between Conscientiousness and Medication Adherence"
 apa_performance(fit_adherence) |>
   apa_flextable(note = TRUE)
 ```
@@ -74,7 +73,8 @@ With `metrics = "all"`, the table adds *&tau;*, *H*^2^, and confidence intervals
 In the `dat.bcg` data set, 13 trials compared the risk of tuberculosis in people who were and were not vaccinated with BCG. The effect sizes are risk ratios, which are analyzed on the log scale and exponentiated for the table:
 
 ```{r}
-#| label: bcg
+#| label: tbl-bcg
+#| tbl-cap: "Effectiveness of the BCG Vaccine Against Tuberculosis"
 d_bcg <- escalc(
   measure = "RR",
   ai = tpos, bi = tneg, ci = cpos, di = cneg,
@@ -97,12 +97,17 @@ apa_parameters(fit_bcg) |>
 Moderators are added with `mods`. The vaccine appeared to work better in trials farther from the equator, so here the absolute latitude of each trial is a moderator:
 
 ```{r}
-#| label: bcg-metareg
+#| label: tbl-bcg-metareg
+#| tbl-cap: "Meta-Regression of BCG Vaccine Effectiveness on Latitude"
 fit_latitude <- rma(yi, vi, mods = ~ Latitude, data = d_bcg)
 
 apa_parameters(fit_latitude) |>
   apa_flextable(note = TRUE)
+```
 
+```{r}
+#| label: tbl-bcg-metareg-fit
+#| tbl-cap: "Heterogeneity in the Meta-Regression on Latitude"
 apa_performance(fit_latitude) |>
   apa_flextable(note = TRUE)
 ```
@@ -114,7 +119,8 @@ For a meta-regression, `apa_parameters` shows the intercept and moderators, as f
 A subgroup analysis compares the pooled estimates of groups of studies. In the BCG trials, participants were assigned to the vaccine at random, alternately, or systematically. `apa_subgroups` pools each group of trials and compares them:
 
 ```{r}
-#| label: subgroups
+#| label: tbl-subgroups
+#| tbl-cap: "BCG Vaccine Effectiveness by Method of Treatment Allocation"
 apa_subgroups(fit_bcg, Allocation) |>
   apa_flextable(note = TRUE)
 ```
@@ -126,7 +132,8 @@ By default, each subgroup has its own *&tau;*^2^, and the subgroups are compared
 `apa_publication_bias` tests for publication bias (small-study effects) and gives estimates adjusted for it, as computed by metafor: Egger's regression test, with its limit estimate (the predicted effect of a study with a standard error of zero); Begg and Mazumdar's rank correlation test; and trim and fill, with the number of studies it imputed (*k*~0~) and the pooled estimate with them included:
 
 ```{r}
-#| label: publication-bias
+#| label: tbl-publication-bias
+#| tbl-cap: "Tests of Publication Bias in Studies of Conscientiousness and Medication Adherence"
 apa_publication_bias(fit_adherence) |>
   apa_flextable(note = TRUE)
 ```
@@ -138,7 +145,8 @@ The adjusted estimates are on the same scale as the table of studies (here, corr
 When studies report several effect sizes, the effect sizes are not independent, and a multilevel (three-level) model with `rma.mv` has a random intercept for each level. In the `dat.konstantopoulos2011` data set, 56 schools in 11 school districts compared the achievement of students on modified and traditional school calendars (standardized mean differences). The table of a multilevel model has a row for each effect size, so this example shows only the pooled estimate (`studies = FALSE`):
 
 ```{r}
-#| label: multilevel
+#| label: tbl-schools
+#| tbl-cap: "Multilevel Meta-Analysis of the Effects of Modified School Calendars"
 fit_schools <- rma.mv(
   yi, vi,
   random = ~ 1 | district / school,
@@ -147,12 +155,16 @@ fit_schools <- rma.mv(
 
 apa_parameters(fit_schools, studies = FALSE) |>
   apa_flextable(note = TRUE)
+```
 
+```{r}
+#| label: tbl-schools-heterogeneity
+#| tbl-cap: "Heterogeneity at Each Level of the Multilevel Meta-Analysis"
 apa_performance(fit_schools) |>
   apa_flextable(note = TRUE)
 ```
 
-`apa_performance` gives the variance of the true effects at each level (*&sigma;*^2^, with the level as a subscript) and the multilevel *I*^2^ (Cheung, 2014), the percentage of the total variability due to heterogeneity at all levels. With `metrics = "all"`, the table adds *&sigma;* and confidence intervals of *&sigma;*^2^ for each level, and *I*^2^ for each level. Meta-regressions of multilevel models work as for `rma`. Random effects with an `~ inner | outer` structure (e.g., correlated outcomes within studies) are not yet supported.
+`apa_performance` gives the variance of the true effects at each level (*&sigma;*^2^, with the level as a subscript) and the multilevel *I*^2^ [@cheungModelingDependentEffect2014], the percentage of the total variability due to heterogeneity at all levels. With `metrics = "all"`, the table adds *&sigma;* and confidence intervals of *&sigma;*^2^ for each level, and *I*^2^ for each level. Meta-regressions of multilevel models work as for `rma`. Random effects with an `~ inner | outer` structure (e.g., correlated outcomes within studies) are not yet supported.
 
 # Citations in Notes
 
@@ -164,3 +176,8 @@ Some notes cite the articles that describe a method (e.g., trim and fill and the
 * `test = "knha"` in `rma` uses the Knapp–Hartung adjustment; the pooled estimate is tested with *t*, and the note says so.
 * `studies = FALSE` shows only the pooled estimate, with its test, instead of the study rows.
 * Multilevel models with random intercepts (`rma.mv` with `random = ~ 1 | study / effect`) are supported; random effects with an `~ inner | outer` structure are not yet supported.
+
+# References
+
+::: {#refs}
+:::

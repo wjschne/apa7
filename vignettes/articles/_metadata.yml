@@ -1,0 +1,42 @@
+# Shared settings for all articles (Quarto applies this file to every
+# document in this folder).
+# - ../../inst/apa7.bib: references cited in apa7's table notes (shipped with
+#   the package; exported from the apa7 Zotero collection)
+# - refs.bib: references cited only in the articles
+bibliography:
+  - ../../inst/apa7.bib
+  - refs.bib
+csl: apa.csl
+link-citations: true
+# Table and figure notes (apa-note), captions, and citations are processed by
+# apaquarto's filters, in the order apaquarto runs them: notes first, so that
+# citations in notes are resolved too. Citations are processed by apaquarto's
+# citeprocr.lua rather than Quarto's citeproc, so that narrative citations use
+# "and" instead of "&" (e.g., "Friendly and Franklin (1980)") and possessive
+# citations work (@key ['s] gives "Hofmann's (1978)").
+citeproc: false
+filters:
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/apaextractfigure.lua
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/embednote.lua
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/apanote.lua
+  # Table and figure captions: label ("Table 1") in bold on its own line,
+  # title in italics below it, as apaquarto formats them
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/apafloat.lua
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/apacaption.lua
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/apaafternote.lua
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/citeprocr.lua
+  - at: post-render
+    path: _extensions/wjschne/apaquarto/apaandcite.lua
+# Captions above figures and tables, as in APA style
+fig-cap-location: top
+tbl-cap-location: top
+# Caption and note styles for direct renders: a copy of pkgdown/extra.css,
+# which pkgdown adds to the site itself (keep the two the same)
+css: articles.css

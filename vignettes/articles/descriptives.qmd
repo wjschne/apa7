@@ -4,9 +4,6 @@ format: html
 knitr:
   opts_chunk:
     fig-cap-location: top
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -99,7 +96,8 @@ Variables are named by their formatted names unless `labels` gives better ones. 
 With `by`, each group gets a column, with its size in the header, followed by a column for the whole sample (`total = FALSE` leaves it out). Rows whose group is missing are left out, and the note says how many.
 
 ```{r}
-#| label: survey-by-sex
+#| label: tbl-survey-by-sex
+#| tbl-cap: "Characteristics of Students by Sex"
 apa_descriptives(
   d_survey,
   variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
@@ -121,7 +119,8 @@ Age is strongly skewed in this sample (most students are about 20, a few much ol
 With `test = TRUE`, a *p* column tests the group differences: Welch's *t* test (two groups) or Welch's one-way ANOVA (more groups) for variables described by their mean, the Kruskal–Wallis test for variables described by their median, and the chi-square test of independence for categorical variables. When a categorical variable's table has an expected count below 5, where the chi-square approximation is poor, Fisher's exact test is used for that variable instead, and the note names it (`categorical_test = "chisq"` or `"fisher"` uses one test for all categorical variables). Tests are not shown by default, because many journals discourage testing baseline differences in randomized trials, where any difference is due to chance.
 
 ```{r}
-#| label: survey-tests
+#| label: tbl-survey-tests
+#| tbl-cap: "Characteristics of Students by Sex With Tests of Group Differences"
 apa_descriptives(
   d_survey,
   variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
@@ -143,7 +142,8 @@ apa_descriptives(
 By default, the note lists the missing values. With `missing = "row"`, each variable with missing values gets a "Missing" row with the number of missing values in each column instead. With `range = TRUE`, each continuous variable gets a "Range" row with its minimum and maximum:
 
 ```{r}
-#| label: survey-missing-range
+#| label: tbl-survey-missing-range
+#| tbl-cap: "Characteristics of Students by Sex With Ranges and Missing Values"
 apa_descriptives(
   d_survey,
   variables = c("Height", "Pulse", "Smoke"),

@@ -4,9 +4,6 @@ format: html
 knitr:
   opts_chunk:
     fig-cap-location: top
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -49,7 +46,8 @@ With a model, variable names in `by`, `contrast`, and `trend` can be quoted or u
 The `ToothGrowth` data set has the tooth length of 60 guinea pigs given one of three doses of vitamin C (0.5, 1, or 2 mg/day) by one of two delivery methods (orange juice or ascorbic acid). Here is a two-way ANOVA:
 
 ```{r}
-#| label: fit
+#| label: tbl-fit
+#| tbl-cap: "Analysis of Variance of Tooth Length by Supplement and Dose"
 d_tooth <- ToothGrowth |> 
   rename(length = len,
          supplement = supp) |> 
@@ -65,7 +63,8 @@ apa_anova(fit) |>
 The means of each dose, averaged over the two delivery methods:
 
 ```{r}
-#| label: means-dose
+#| label: tbl-means-dose
+#| tbl-cap: "Estimated Marginal Means of Tooth Length by Dose"
 apa_means(fit, by = dose) |>
   apa_flextable(note = TRUE)
 ```
@@ -73,7 +72,8 @@ apa_means(fit, by = dose) |>
 With more than one variable in `by`, the last variable labels the rows, and each level of the other variables gets a heading row:
 
 ```{r}
-#| label: means-both
+#| label: tbl-means-both
+#| tbl-cap: "Estimated Marginal Means of Tooth Length by Supplement and Dose"
 apa_means(fit, by = c(supplement, dose)) |>
   apa_flextable(note = TRUE)
 ```
@@ -83,7 +83,8 @@ apa_means(fit, by = c(supplement, dose)) |>
 Pairwise comparisons of the doses, with *p*-values adjusted by Holm's method:
 
 ```{r}
-#| label: contrasts-dose
+#| label: tbl-contrasts-dose
+#| tbl-cap: "Pairwise Comparisons of Doses"
 apa_contrasts(fit, 
               contrast = dose, 
               p_adjust = "holm") |>
@@ -93,7 +94,8 @@ apa_contrasts(fit,
 Each row is the first level minus the second (e.g., 1 − 0.5), and the note says so. To follow up the interaction, compare the doses separately for each delivery method with `by`:
 
 ```{r}
-#| label: contrasts-by
+#| label: tbl-contrasts-by
+#| tbl-cap: "Pairwise Comparisons of Doses Within Each Supplement"
 apa_contrasts(fit,
               contrast = dose,
               by = supplement,
@@ -122,7 +124,8 @@ apa_contrasts(fit_mixed, contrast = condition, sd = 12.5)
 A moderation analysis asks whether the effect of one predictor depends on another. In the `mtcars` data, the effect of a car's weight on its fuel efficiency (miles per gallon) may depend on its horsepower:
 
 ```{r}
-#| label: moderation
+#| label: tbl-moderation
+#| tbl-cap: "Regression of Fuel Economy on Weight, Horsepower, and Their Interaction"
 
 d_mtcars <- mtcars |> 
   mutate(am = factor(am, 
@@ -143,7 +146,8 @@ apa_parameters(fit_mod) |>
 Without `by`, `apa_slopes` gives the average slope of the predictor:
 
 ```{r}
-#| label: slope-average
+#| label: tbl-slope-average
+#| tbl-cap: "Average Slope of Weight"
 apa_slopes(fit_mod, trend = Weight) |>
   apa_flextable(note = TRUE)
 ```
@@ -151,7 +155,8 @@ apa_slopes(fit_mod, trend = Weight) |>
 Simple slopes show the effect of weight at chosen values of horsepower (here, 100, 150, and 200):
 
 ```{r}
-#| label: slopes
+#| label: tbl-slopes
+#| tbl-cap: "Simple Slopes of Weight at Selected Values of Horsepower"
 apa_slopes(fit_mod, 
            trend = Weight, 
            by = list(Horsepower = c(100, 150, 200))) |>
@@ -165,7 +170,8 @@ The notes of the simple-slopes tables above also give the Johnson–Neyman inter
 modelbased has shortcuts for common moderator values, and `apa_slopes` names the values they give. A numeric moderator named without values (`by = "hp"`) is set to its mean and 1 standard deviation above and below it, as with `by = "hp=[sd]"`:
 
 ```{r}
-#| label: slopes-sd
+#| label: tbl-slopes-sd
+#| tbl-cap: "Simple Slopes of Weight at the Mean of Horsepower and 1 *SD* Above and Below It"
 apa_slopes(fit_mod, trend = Weight, by = Horsepower) |>
   apa_flextable(note = TRUE)
 ```
@@ -173,7 +179,8 @@ apa_slopes(fit_mod, trend = Weight, by = Horsepower) |>
 With `by = "hp=[fivenum]"`, the slopes are at the minimum, lower quartile, median, upper quartile, and maximum:
 
 ```{r}
-#| label: slopes-fivenum
+#| label: tbl-slopes-fivenum
+#| tbl-cap: "Simple Slopes of Weight at the Five-Number Summary of Horsepower"
 apa_slopes(fit_mod, trend = Weight, 
            by = list(Horsepower = "[fivenum]")) |>
   apa_flextable(note = TRUE)
@@ -182,7 +189,8 @@ apa_slopes(fit_mod, trend = Weight,
 Other named shortcuts are `"[quartiles]"`, `"[minmax]"`, and `"[mad]"` (the median and 1 median absolute deviation above and below it). The shortcuts, and the default for a numeric variable named without values, work the same way in `apa_means` and `apa_contrasts`. For example, the difference between manual and automatic transmissions at three values of horsepower:
 
 ```{r}
-#| label: contrasts-sd
+#| label: tbl-contrasts-sd
+#| tbl-cap: "Differences Between Transmission Types at Three Levels of Horsepower"
 fit_am <- lm(MPG ~ Transmission * Horsepower, data = d_mtcars)
 
 apa_contrasts(fit_am, contrast = Transmission, by = Horsepower) |>
@@ -194,7 +202,8 @@ apa_contrasts(fit_am, contrast = Transmission, by = Horsepower) |>
 For models with a link function, modelbased reports estimates on the response scale by default. For logistic regression, the estimates are probabilities, which have no leading zero in APA style, and the contrasts are differences in probabilities. The `birthwt` data set in the MASS package has the birth weights of 189 babies. Here, the probability of a low birth weight (under 2.5 kg) depends on the mother's race, holding her weight at its mean and averaging over whether she smoked during pregnancy:
 
 ```{r}
-#| label: logistic
+#| label: tbl-logistic-means
+#| tbl-cap: "Estimated Probabilities of Low Birth Weight by Race"
 d_birth <- MASS::birthwt |> 
   mutate(race = factor(race, labels = c("White", "Black", "Other")),
          smoke = factor(smoke, labels = c("No", "Yes"))) |> 
@@ -209,7 +218,11 @@ fit_logistic <- glm(
 
 apa_means(fit_logistic, by = race) |>
   apa_flextable(note = TRUE)
+```
 
+```{r}
+#| label: tbl-logistic-contrasts
+#| tbl-cap: "Differences in the Probability of Low Birth Weight Between Races"
 apa_contrasts(fit_logistic, contrast = race, p_adjust = "holm") |>
   apa_flextable(note = TRUE)
 ```
@@ -217,7 +230,8 @@ apa_contrasts(fit_logistic, contrast = race, p_adjust = "holm") |>
 With `predict = "link"`, modelbased gives estimates on the link scale (here, log odds) instead, and the note says so.
 
 ```{r}
-#| label: logistic-link
+#| label: tbl-logistic-link
+#| tbl-cap: "Differences in the Log Odds of Low Birth Weight Between Races"
 apa_contrasts(fit_logistic, 
               contrast = race, 
               p_adjust = "holm", 

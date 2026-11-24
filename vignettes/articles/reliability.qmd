@@ -4,9 +4,6 @@ format: html
 knitr:
   opts_chunk:
     fig-cap-location: top
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -37,7 +34,8 @@ The statistics come from the [psych](https://personality-project.org/r/psych/) p
 The `bfi` data set in the psych package has 25 personality items from 2,800 people, answered on a 6-point scale. Give `apa_reliability` a named list of scales, each a vector of item names. Items worded in the opposite direction (e.g., A1, "Am indifferent to the feelings of others") are reverse-scored with `reverse`. `item_range` gives the lowest and highest possible responses, which are used to reverse the items:
 
 ```{r}
-#| label: bfi-reliability
+#| label: tbl-bfi-reliability
+#| tbl-cap: "Item Analysis of the Agreeableness and Conscientiousness Scales"
 bfi_scales <- list(
   Agreeableness = paste0("A", 1:5),
   Conscientiousness = paste0("C", 1:5)
@@ -58,7 +56,8 @@ Each scale has a heading, with its items and statistics indented below it. Rever
 A1 has the weakest item–total correlation of the agreeableness items, and deleting it would raise α slightly, from .70 to .72. With `flag = TRUE`, item–total correlations below .30 (or another cutoff, with `min_item_total`) and values of α if deleted that exceed the scale's α are bolded:
 
 ```{r}
-#| label: bfi-flag
+#| label: tbl-bfi-flag
+#| tbl-cap: "Item Analysis With Flagged Items"
 apa_reliability(
   bfi,
   scales = bfi_scales,
@@ -74,7 +73,8 @@ apa_reliability(
 When the items have been examined and the paper reports only the scales, `level = "scales"` gives one row per scale. This table pairs naturally with a correlation table of the scale scores (see `apa_cor`).
 
 ```{r}
-#| label: bfi-scales
+#| label: tbl-bfi-scales
+#| tbl-cap: "Reliability of the Big Five Scales"
 apa_reliability(
   bfi,
   scales = list(
@@ -96,7 +96,8 @@ apa_reliability(
 For tests whose items are scored correct (1) or incorrect (0), *M* is the item's difficulty (the proportion of correct answers), *r*~it~ is the corrected point-biserial correlation, and α equals the Kuder–Richardson formula 20 (KR-20). `apa_reliability` detects such items and says so in the table and the note. Here, 300 simulated students answered 6 items of increasing difficulty:
 
 ```{r}
-#| label: binary
+#| label: tbl-binary
+#| tbl-cap: "Item Analysis of Six Simulated Binary Test Items"
 set.seed(1)
 ability <- rnorm(300)
 difficulty <- seq(-1, 1, length.out = 6)

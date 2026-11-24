@@ -23,7 +23,7 @@ When observations are nested (trials within participants, students within classr
 
 # Linear Mixed Models
 
-How quickly does performance deteriorate when people do not get enough sleep, and are some people more vulnerable than others? Belenky et al. (2003) restricted 18 participants to 3 hours of sleep per night and measured their average reaction time on a vigilance task each day. The data are in the `sleepstudy` data set from the lme4 package. Days 0 and 1 were adaptation and training, and Day 2 was the baseline, so we keep Days 2 through 9 and count days of sleep restriction from the baseline.
+How quickly does performance deteriorate when people do not get enough sleep, and are some people more vulnerable than others? @belenkyPatternsPerformanceDegradation2003 restricted 18 participants to 3 hours of sleep per night and measured their average reaction time on a vigilance task each day. The data are in the `sleepstudy` data set from the lme4 package. Days 0 and 1 were adaptation and training, and Day 2 was the baseline, so we keep Days 2 through 9 and count days of sleep restriction from the baseline.
 
 ```{r}
 #| label: sleep-data
@@ -38,7 +38,8 @@ d_sleep <- sleepstudy |>
 A model with only a random intercept for each participant shows how much of the variability in reaction time lies between participants. The intraclass correlation (ICC) is the proportion of the variance that is due to stable differences between participants.
 
 ```{r}
-#| label: sleep0
+#| label: tbl-sleep0
+#| tbl-cap: "Fit of the Unconditional Model of Reaction Time"
 sleep0 <- lmer(Reaction ~ 1 + (1 | Participant), data = d_sleep)
 apa_performance(sleep0)
 ```
@@ -52,7 +53,8 @@ Also displayed is the marginal *R*^2^, the proportion of variance explained by f
 The next model adds days of sleep restriction as a fixed effect. Each participant still has their own intercept, but all participants are assumed to slow down at the same rate.
 
 ```{r}
-#| label: sleep1
+#| label: tbl-sleep1
+#| tbl-cap: "Reaction Time by Days of Sleep Restriction With Random Intercepts"
 sleep1 <- lmer(Reaction ~ Days + (1 | Participant), 
                data = d_sleep)
 
@@ -76,7 +78,8 @@ For linear mixed models, `apa_parameters` tests fixed effects with *t* tests tha
 Do participants differ in how quickly they deteriorate? Adding a random slope for days lets each participant have their own rate of change.
 
 ```{r}
-#| label: sleep2
+#| label: tbl-sleep2
+#| tbl-cap: "Reaction Time by Days of Sleep Restriction With Random Intercepts and Slopes"
 sleep2 <- lmer(Reaction ~ Days + (Days | Participant), 
                data = d_sleep)
 
@@ -95,14 +98,16 @@ The average slope is unchanged, but its standard error is larger, because the mo
 The "Random effects" heading names the statistic of the rows below it (*SD*), and each cluster (here, Participant) has a subheading with its terms indented below it. The correlation names its own statistic (*r*). With several clusters, crossed or nested, each gets its own subheading. With `random_scale = "variance"`, the random effects are variances (*Var*) and covariances (*Cov*) instead:
 
 ```{r}
-#| label: sleep2-variance
+#| label: tbl-sleep2-variance
+#| tbl-cap: "Random-Slope Model With Random Effects as Variances and Covariances"
 apa_parameters(sleep2, random_scale = "variance")
 ```
 
 The random-effect rows can be omitted with `random = FALSE`, and the "Fixed effects" and "Random effects" headings can be omitted with `effect_headings = FALSE`, in which case each random-effect label names its cluster and statistic (e.g., Participant: *SD* (Days)). Confidence intervals can be added with `"CI"`.
 
 ```{r}
-#| label: sleep2-ci
+#| label: tbl-sleep2-ci
+#| tbl-cap: "Fixed Effects of the Random-Slope Model"
 apa_parameters(
   sleep2,
   predictor_parameters = c("Parameter", "Coefficient", "SE", "CI", "t", "df_error", "p"),
@@ -117,7 +122,8 @@ apa_parameters(
 For mixed models, `apa_performance` reports the marginal *R*^2^ (the variance explained by the fixed effects), the conditional *R*^2^ (the variance explained by the fixed and random effects together), and the ICC.
 
 ```{r}
-#| label: sleep2-performance
+#| label: tbl-sleep2-performance
+#| tbl-cap: "Fit of the Random-Slope Model"
 apa_performance(sleep2)
 ```
 
@@ -126,7 +132,8 @@ apa_performance(sleep2)
 A list of mixed models is compared with likelihood ratio tests, and the change in marginal *R*^2^ is shown for each model. When the models differ in their fixed effects, the likelihood ratio test is based on maximum likelihood rather than restricted maximum likelihood (REML) estimates, as it should be.
 
 ```{r}
-#| label: sleep-list
+#| label: tbl-sleep-list
+#| tbl-cap: "Three Multilevel Models of Reaction Time"
 #| message: false
 apa_parameters(list(sleep0, sleep1, sleep2)) |> 
   # as_tibble() |> 
@@ -144,7 +151,8 @@ The random slope does not change the marginal *R*^2^, because the fixed effects 
 The comparison can also be displayed on its own with `apa_performance_comparison`, here including the model with no predictors:
 
 ```{r}
-#| label: sleep-compare
+#| label: tbl-sleep-compare
+#| tbl-cap: "Comparison of Three Multilevel Models of Reaction Time"
 #| message: false
 apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>
   apa_flextable()
@@ -155,7 +163,8 @@ apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>
 lme4 assumes that, after the random effects are taken into account, a participant's residuals are independent. In daily measurements, though, a participant who is unusually slow on one day is often unusually slow the next day too. The nlme package can model such residual correlation. Here the random-slope model is refit with `nlme::lme` and a first-order autoregressive (AR(1)) correlation among each participant's residuals:
 
 ```{r}
-#| label: sleep-lme
+#| label: tbl-sleep-lme
+#| tbl-cap: "Random-Slope Model With First-Order Autoregressive Residuals"
 sleep_lme <- nlme::lme(
   Reaction ~ Days,
   random = ~ Days | Participant,
@@ -176,7 +185,8 @@ apa_note(tbl_sleep_lme)
 Because the AR(1) structure and the random slopes both describe how a participant's reaction times hang together over days, they compete with each other: with correlated residuals, the intercept *SD* is smaller and the correlation between intercepts and slopes is nearly 1, a sign that these data cannot fully separate the two. A likelihood ratio test compares the model with and without correlated residuals:
 
 ```{r}
-#| label: sleep-lme-compare
+#| label: tbl-sleep-lme-compare
+#| tbl-cap: "Comparison of Models With Independent and Autoregressive Residuals"
 #| message: false
 sleep_lme0 <- nlme::lme(
   Reaction ~ Days,
@@ -199,7 +209,8 @@ The `VerbAgg` data set from the lme4 package contains 316 people's responses to 
 Because every person responds to every item, people and items are crossed random effects.
 
 ```{r}
-#| label: verbagg
+#| label: tbl-verbagg
+#| tbl-cap: "Logistic Mixed Model of Endorsing Verbally Aggressive Reactions"
 d_va <- VerbAgg |>
   mutate(
     Response = r2 == "Y",
@@ -246,7 +257,8 @@ The counts have a mean of 1.32 but a variance of 6.95, and 60% of them are zeros
 A negative binomial model adds a dispersion parameter that lets the variance grow faster than the mean. Sites are a random effect, because each site was surveyed for every species.
 
 ```{r}
-#| label: salamander-nb
+#| label: tbl-salamander-nb
+#| tbl-cap: "Negative Binomial Mixed Model of Salamander Counts"
 tmb_nb <- glmmTMB::glmmTMB(
   Count ~ Mined + Species + (1 | Site),
   family = glmmTMB::nbinom2,
@@ -262,7 +274,8 @@ As with `glmer`, coefficients are tested with *z* tests, and coefficients of mod
 Another account of the many zeros is that some surveys could not have found any salamanders (e.g., because the stream was buried by mining), while the others produced counts as usual. A zero-inflated model has two parts: a conditional model of the counts, and a logistic model of whether a zero is one of these excess zeros. Here a zero-inflated Poisson model lets the probability of an excess zero differ between mined and unmined sites:
 
 ```{r}
-#| label: salamander-zip
+#| label: tbl-salamander-zip
+#| tbl-cap: "Zero-Inflated Poisson Mixed Model of Salamander Counts"
 tmb_zip <- glmmTMB::glmmTMB(
   Count ~ Mined + Species + (1 | Site),
   ziformula = ~ Mined,
@@ -283,7 +296,8 @@ apa_note(tbl_zip)
 The two models explain the zeros differently, and their *AIC*s can be compared with `apa_performance`. Here the negative binomial model fits better:
 
 ```{r}
-#| label: salamander-aic
+#| label: tbl-salamander-aic
+#| tbl-cap: "Information Criteria of the Negative Binomial and Zero-Inflated Poisson Models"
 apa_performance(
   list(`Negative binomial` = tmb_nb, `Zero-inflated Poisson` = tmb_zip),
   metrics = c("AIC", "BIC")
@@ -295,7 +309,8 @@ apa_performance(
 With `dispformula`, the dispersion parameter itself is modeled, and the table has a "Dispersion model" part. For negative binomial models, a larger dispersion parameter means less overdispersion, so the negative coefficient here means that counts at mined sites are more overdispersed. As the note says, dispersion coefficients are on the log scale.
 
 ```{r}
-#| label: salamander-disp
+#| label: tbl-salamander-disp
+#| tbl-cap: "Negative Binomial Mixed Model With Dispersion Depending on Mining"
 glmmTMB::glmmTMB(
   Count ~ Mined + Species + (1 | Site),
   dispformula = ~ Mined,
@@ -310,7 +325,8 @@ glmmTMB::glmmTMB(
 `apa_performance` reports the marginal and conditional *R*^2^ and the ICC of glmmTMB models, and nested models are compared with likelihood ratio tests, as for lme4 models:
 
 ```{r}
-#| label: salamander-compare
+#| label: tbl-salamander-compare
+#| tbl-cap: "Comparison of Salamander Models With and Without Species"
 tmb_nb0 <- glmmTMB::glmmTMB(
   Count ~ Mined + (1 | Site),
   family = glmmTMB::nbinom2,
@@ -320,3 +336,8 @@ apa_performance_comparison(
   list(`Mining` = tmb_nb0, `Mining and species` = tmb_nb)
 )
 ```
+
+# References
+
+::: {#refs}
+:::

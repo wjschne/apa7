@@ -71,6 +71,41 @@ test_that("auto uses keys only for entries in the document's bibliography", {
   )
 })
 
+test_that("a bibliography in Quarto directory or project metadata is found", {
+  skip_if_not_installed("yaml")
+  root <- withr::local_tempdir()
+  sub <- file.path(root, "articles")
+  dir.create(sub)
+  writeLines("project:\n  type: default", file.path(root, "_quarto.yml"))
+  writeLines("bibliography:\n  - ../refs.bib\n  - more.bib", file.path(sub, "_metadata.yml"))
+  expect_equal(
+    basename(apa7:::quarto_bib_files(sub)),
+    c("refs.bib", "more.bib")
+  )
+  expect_true(all(startsWith(apa7:::quarto_bib_files(sub), normalizePath(sub, winslash = "/"))))
+  # Project metadata applies when the folder sets no bibliography
+  writeLines("project:\n  type: default\nbibliography: refs.bib", file.path(root, "_quarto.yml"))
+  unlink(file.path(sub, "_metadata.yml"))
+  expect_equal(basename(apa7:::quarto_bib_files(sub)), "refs.bib")
+  # Directory metadata does not apply outside a Quarto project
+  outside <- withr::local_tempdir()
+  writeLines("bibliography: refs.bib", file.path(outside, "_metadata.yml"))
+  expect_equal(apa7:::quarto_bib_files(outside), character(0))
+
+  # auto resolves keys from the bibliography in directory metadata
+  writeLines(
+    c("@article{duvalTrimFillSimple2000,", "  author = {Duval, Sue and Tweedie, Richard},", "  year = 2000", "}"),
+    file.path(root, "refs.bib")
+  )
+  withr::local_options(knitr.in.progress = TRUE)
+  local_mocked_bindings(metadata = list(), .package = "rmarkdown")
+  local_mocked_bindings(current_input = function(dir = FALSE) file.path(sub, "doc.qmd"), .package = "knitr")
+  expect_equal(
+    apa7:::resolve_citations(paste0("A ", apa7:::cite("duvalTrimFillSimple2000"), "."), "auto"),
+    "A [@duvalTrimFillSimple2000]."
+  )
+})
+
 test_that("several keys are cited together, all as keys or all as text", {
   s <- paste0("Method ", apa7:::cite(c("duvalTrimFillSimple2000", "cheungModelingDependentEffect2014")), ".")
   expect_equal(

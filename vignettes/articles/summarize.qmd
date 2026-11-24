@@ -58,7 +58,8 @@ d
 With the flextable package's APA theme (set in the setup chunk with `set_flextable_defaults`), `flextable` gets us close:
 
 ```{r}
-#| label: initialflextable
+#| label: tbl-initialflextable
+#| tbl-cap: "Regression Results as a Default flextable"
 flextable(d)
 ```
 
@@ -74,7 +75,8 @@ Getting from "close" to "exactly right" takes a series of polishing steps:
 flextable has functions for each of these, but applying them by hand is tedious. As a general-purpose package, flextable should not be expected to know the rules of a particular style guide. `apa_flextable` applies them all:
 
 ```{r}
-#| label: apa_flextable
+#| label: tbl-apa-flextable
+#| tbl-cap: "Regression Results With Models as Row Titles"
 apa_flextable(d, row_title_column = Model)
 ```
 
@@ -83,14 +85,16 @@ apa_flextable(d, row_title_column = Model)
 Row titles can be aligned to the left, center, or right:
 
 ```{r}
-#| label: centeralign
+#| label: tbl-centeralign
+#| tbl-cap: "Regression Results With Centered Row Titles"
 apa_flextable(d, row_title_column = Model, row_title_align = "center")
 ```
 
 Without row titles, groups can be shown with a vertically merged column instead:
 
 ```{r}
-#| label: vmerge
+#| label: tbl-vmerge
+#| tbl-cap: "Regression Results With Merged Model Cells"
 d |>
   mutate(Model = str_remove(Model, "Model ")) |>
   apa_flextable() |>
@@ -125,14 +129,19 @@ d_diamonds <- ggplot2::diamonds |>
   pivot_wider(names_from = Variable)
 
 d_diamonds
+```
 
+```{r}
+#| label: tbl-diamonds
+#| tbl-cap: "Descriptive Statistics of Diamond Characteristics by Cut"
 apa_flextable(d_diamonds)
 ```
 
 `separate_headers = FALSE` turns this off. `column_spanner_label` adds the same spanner to several columns, selected by name or with tidyselect functions such as `starts_with`. The selected columns are moved next to the first one (`relocate = FALSE` keeps them in place):
 
 ```{r}
-#| label: columnspanners
+#| label: tbl-columnspanners
+#| tbl-cap: "Regression Results With Column Spanners"
 d |>
   column_spanner_label("Significance test", c(t, df, p)) |>
   column_spanner_label("Coefficients", starts_with("b")) |>
@@ -146,7 +155,8 @@ d |>
 By default, a narrow blank column separates groups of columns under different spanners. `add_break_columns` inserts break columns yourself, after any column selected by name or with a tidyselect function:
 
 ```{r}
-#| label: breakdiamonds
+#| label: tbl-breakdiamonds
+#| tbl-cap: "Descriptive Statistics of Diamond Characteristics With Break Columns"
 d_diamonds |>
   add_break_columns(ends_with("SD"), omit_last = TRUE) |>
   apa_flextable()
@@ -161,7 +171,8 @@ d_diamonds |>
 `align_chr` rounds numbers (to .01 by default), replaces hyphens with true minus signs, and pads numbers with figure spaces on both sides of the decimal so that all values in a column have the same width:
 
 ```{r}
-#| label: alignchr
+#| label: tbl-alignchr
+#| tbl-cap: "Numbers Aligned on the Decimal Point"
 tibble(x = align_chr(c(2.431, -0.4, -10, 101))) |>
   apa_flextable(table_width = .2) |>
   align(align = "center")
@@ -170,7 +181,8 @@ tibble(x = align_chr(c(2.431, -0.4, -10, 101))) |>
 Trailing zeros can be dropped, and leading zeros can be trimmed (for statistics such as correlations that cannot exceed 1):
 
 ```{r}
-#| label: zeroes
+#| label: tbl-zeroes
+#| tbl-cap: "Numbers Aligned Without Trailing or Leading Zeros"
 tibble(x = align_chr(c(2.431, -0.4, -10, 101),
                      drop0trailing = TRUE,
                      trim_leading_zeros = TRUE)) |>
@@ -183,7 +195,8 @@ tibble(x = align_chr(c(2.431, -0.4, -10, 101),
 `add_star_column` adds significance stars in a column of their own, so the numbers stay aligned. The column to the left of the stars is right-aligned, and the stars are left-aligned:
 
 ```{r}
-#| label: addstar
+#| label: tbl-addstar
+#| tbl-cap: "Coefficients With a Star Column"
 d_star <- tibble(
   Predictor = c("Constant", "Socioeconomic status"),
   b = c(.45, .55),
@@ -197,7 +210,8 @@ apa_flextable(d_star)
 If stars are already appended to numbers, `separate_star_column` moves them into a column of their own:
 
 ```{r}
-#| label: separatestarcolumn
+#| label: tbl-separatestarcolumn
+#| tbl-cap: "Coefficients With Stars in Their Own Column"
 tibble(
   Predictor = c("Constant", "Socioeconomic status"),
   b = c("1.10***", "2.32*"),
@@ -214,7 +228,8 @@ tibble(
 flextable has no hanging indent, so `hanging_indent` wraps text and indents the continuation lines with figure spaces:
 
 ```{r}
-#| label: quotetable
+#| label: tbl-quotetable
+#| tbl-cap: "Quotations With Hanging Indents"
 d_quote <- tibble(
   Quote = c(
     "Believe those who are seeking the truth. Doubt those who find it.",
@@ -249,7 +264,8 @@ d_quote |>
 `add_list_column` numbers the rows. Set `type` to `"A"`, `"a"`, `"I"`, or `"i"` for letters or Roman numerals:
 
 ```{r}
-#| label: numberedlist
+#| label: tbl-numberedlist
+#| tbl-cap: "Quotations as a Lettered List"
 d_quote |>
   add_list_column(Quote, type = "A", sep = ") ") |>
   apa_flextable() |>
@@ -262,7 +278,8 @@ d_quote |>
 `apa_flextable` formats the columns and headers it recognizes (e.g., `b`, `beta`, `t`, `df`, and `p`). To turn this off:
 
 ```{r}
-#| label: autooff
+#| label: tbl-autooff
+#| tbl-cap: "Regression Results Without Automatic Column Formatting"
 apa_flextable(d, row_title_column = Model, auto_format_columns = FALSE)
 ```
 
@@ -281,7 +298,8 @@ cf_predictor <- column_format(
 `column_formats` makes the full set of default formats, which can be changed. Here, numbers are rounded to .001, the new `Predictor` format is added, and `beta` is no longer formatted:
 
 ```{r}
-#| label: myformats
+#| label: tbl-myformats
+#| tbl-cap: "Regression Results With Custom Column Formats"
 my_formats <- column_formats(accuracy = .001)
 my_formats$Predictor <- cf_predictor
 my_formats$beta <- NULL
@@ -292,7 +310,8 @@ apa_flextable(d, row_title_column = Model, column_formats = my_formats)
 To use the formats in every table, set them with `apa7_defaults(column_formats = my_formats)`. These are the default formats:
 
 ```{r}
-#| label: formattibble
+#| label: tbl-formattibble
+#| tbl-cap: "Default Column Formats in apa7"
 column_formats()@get_tibble |>
   select(-formatter) |>
   arrange(name, .locale = "en") |>
@@ -304,7 +323,8 @@ column_formats()@get_tibble |>
 `apa_flextable` returns a flextable, so any flextable function can change it afterward. For example, to bold one cell:
 
 ```{r}
-#| label: selectivebold
+#| label: tbl-selectivebold
+#| tbl-cap: "Regression Results With One Cell in Bold"
 apa_flextable(d, row_title_column = Model) |>
   bold(i = 3, j = 3)
 ```
@@ -312,7 +332,8 @@ apa_flextable(d, row_title_column = Model) |>
 These flextable functions solve common formatting problems. Each can be applied to selected rows (including rows chosen by a condition on the data) and columns:
 
 ```{r}
-#| label: flextablefunctions
+#| label: tbl-flextablefunctions
+#| tbl-cap: "Common flextable Formatting Functions"
 #| echo: false
 tibble::tribble(
   ~Target, ~Function, ~Purpose,
@@ -345,7 +366,8 @@ tibble::tribble(
 Here the unstandardized and standardized coefficients of the two models are side by side, with stars appended to the unstandardized coefficients and a note below the table:
 
 ```{r}
-#| label: fullcontrol
+#| label: tbl-fullcontrol
+#| tbl-cap: "Coefficients of Two Models Side by Side"
 d |>
   # Decimal-align b and append stars
   mutate(b = paste0(align_chr(b), p2stars(p))) |>
@@ -384,7 +406,8 @@ d |>
 These steps can also be applied one at a time. Here they are with column spanners added for illustration:
 
 ```{r}
-#| label: intrepid
+#| label: tbl-intrepid
+#| tbl-cap: "Regression Results Grouped by Model With Column Spanners"
 d |>
   # Column spanners
   rename_with(.cols = c(b, beta), \(x) paste0("Coefficients_", x)) |>

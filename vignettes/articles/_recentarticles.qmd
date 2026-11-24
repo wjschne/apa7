@@ -3,12 +3,7 @@ title: "Using apa7 and flextable to Recreate Tables from Recent APA Journal Arti
 author:
   - name: W. Joel Schneider
     affiliations: Temple University
-    email: schneider@temple.edu
-    corresponding: true
-suppress-title-page: true
-format: apaquarto-html
-bibliography: refs.bib
-floatsintext: true
+format: html
 execute: 
   cache: true
 ---

@@ -10,20 +10,19 @@ knitr:
     fig-width: 7
     fig-height: 7
     out-width: 100%
-filters:  
-  - quarto
-  - apanote
 ---
 
 ```{r}
 #| label: setup
 #| include: false
+#| cache: false
 library(dplyr)
 library(apa7)
 library(afex)
 library(car)
 library(ggplot2)
 my_font <- "Roboto Condensed"
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -52,7 +51,7 @@ The `apa_anova` function makes APA-style analysis of variance (ANOVA) source tab
 
 ## A one-way design
 
-In the `Friendly` data set from the carData package (Friendly & Franklin, 1980), 30 participants learned a list of 40 words over several trials, 10 in each of three presentation formats: standard free recall, a format in which the words a participant had already recalled were presented before the other words, and a format in which they were mixed in with the other words. Does the number of words recalled on the final trial differ by presentation format?
+In the `Friendly` data set from the carData package [@friendlyInteractivePresentationMultitrial1980], 30 participants learned a list of 40 words over several trials, 10 in each of three presentation formats: standard free recall, a format in which the words a participant had already recalled were presented before the other words, and a format in which they were mixed in with the other words. Does the number of words recalled on the final trial differ by presentation format?
 
 ```{r}
 #| label: setup-friendly
@@ -91,7 +90,7 @@ d_recall |>
 
 ```{r}
 #| label: tbl-one-way
-#| tbl-cap: A One-Way ANOVA Table
+#| tbl-cap: One-Way ANOVA Table
 
 apa_anova(fit_recall)
 ```
@@ -101,7 +100,8 @@ The table has a row for each effect and a row for the error term (the residuals)
 In the console, `apa_anova` prints as an ordinary tibble, so you can inspect it or post-process it with dplyr. Here `as_tibble` is used to show that tibble in this document.
 
 ```{r}
-#| label: one-way-tibble
+#| label: tbl-one-way-tibble
+#| tbl-cap: "The One-Way ANOVA Table as a Tibble"
 apa_anova(fit_recall) |>
   tibble::as_tibble()
 ```
@@ -110,7 +110,8 @@ In follow-up tests using `apa_contrast`, we can see that performance was lower i
 
 
 ```{r}
-#| label: contrast-display
+#| label: tbl-contrast-display
+#| tbl-cap: "Pairwise Comparisons of Words Recalled Between Presentation Formats"
 apa_contrasts(fit_recall, 
               contrast = `Presentation Format`, 
               p_adjust = "tukey",
@@ -119,6 +120,7 @@ apa_contrasts(fit_recall,
     `Presentation Format`, 
     "Recalled Words ")) |> 
   apa_flextable(note = TRUE)
+
 ```
 
 
@@ -128,7 +130,7 @@ apa_contrasts(fit_recall,
 
 ## A factorial design
 
-The `Adler` data set from the carData package comes from a study of experimenter expectancy effects @adlerImpactPriorSets1973. Experimenters collected ratings of how successful people in photographs appeared to be. The photographs had been chosen because the people in them looked neither especially successful nor unsuccessful. Before collecting the data, the experimenters were told to expect either high or low ratings, and they were told to get good data, to get scientific data, or were given no such instruction. The outcome is the average success rating each experimenter obtained.
+The `Adler` data set from the carData package comes from a study of experimenter expectancy effects [@adlerImpactPriorSets1973], in a simplified version from @ericksonUnderstandingData1977. Experimenters collected ratings of how successful people in photographs appeared to be. The photographs had been chosen because the people in them looked neither especially successful nor unsuccessful. Before collecting the data, the experimenters were told to expect either high or low ratings, and they were told to get good data, to get scientific data, or were given no such instruction. The outcome is the average success rating each experimenter obtained.
 
 ```{r}
 #| label: adler-data
@@ -173,7 +175,8 @@ d_adler |>
 The factorial model tests both main effects and their interaction. Interaction terms are labeled with a multiplication sign (e.g., Instruction × Expected Ratings).
 
 ```{r}
-#| label: factorial
+#| label: tbl-factorial
+#| tbl-cap: "Analysis of Variance of Success Ratings by Instruction and Expected Ratings"
 fit_adler <- aov(`Success Rating` ~ Instruction * `Expected Ratings`, data = d_adler)
 apa_anova(fit_adler)
 ```
@@ -183,7 +186,8 @@ apa_anova(fit_adler)
 The `anova_parameters` argument selects the columns and their order. `"Effect_Size"` stands for whichever effect size is selected (see below), and `"CI"` adds its confidence interval. Columns are labeled by `apa_anova` automatically.
 
 ```{r}
-#| label: columns
+#| label: tbl-columns
+#| tbl-cap: "Analysis of Variance of Success Ratings With Selected Columns"
 apa_anova(
   fit_adler,
   anova_parameters = c("Parameter", "df", "F", "p", "Effect_Size")
@@ -193,7 +197,8 @@ apa_anova(
 To mark significant effects, `starred` adds significance stars to a column, and `bolded` bolds the values of a column when the effect is significant. Columns are named as in `anova_parameters` (e.g., `"Parameter"` for the Source column).
 
 ```{r}
-#| label: starred
+#| label: tbl-starred
+#| tbl-cap: "Analysis of Variance of Success Ratings With Significance Stars"
 apa_anova(fit_adler, starred = "F")
 ```
 
@@ -216,18 +221,20 @@ By default, `apa_anova` displays partial eta squared (*&eta;*^2^~p~), the most c
 *&eta;*^2^ overestimates the population effect size in small samples. *&omega;*^2^ and *&epsilon;*^2^ are less biased, so they are good choices for small samples.
 
 ```{r}
-#| label: omega
+#| label: tbl-omega
+#| tbl-cap: "Analysis of Variance of Success Ratings With Partial Omega Squared"
 apa_anova(fit_adler, effect_size = "omega")
 ```
 
-Generalized *&eta;*^2^ (Olejnik & Algina, 2003) is comparable across designs with different numbers of between- and within-subjects factors, which makes it useful for meta-analysis and for comparing studies. It is the default effect size in afex.
+Generalized *&eta;*^2^ [@olejnikGeneralizedEtaOmega2003] is comparable across designs with different numbers of between- and within-subjects factors, which makes it useful for meta-analysis and for comparing studies. It is the default effect size in afex.
 
 ## Confidence intervals
 
 APA style recommends reporting confidence intervals for effect sizes. Add `"CI"` to `anova_parameters` to show them.
 
 ```{r}
-#| label: ci
+#| label: tbl-ci
+#| tbl-cap: "Analysis of Variance of Success Ratings With 90% Confidence Intervals for Partial Eta Squared"
 apa_anova(
   fit_adler,
   anova_parameters = c(
@@ -237,7 +244,7 @@ apa_anova(
 )
 ```
 
-Intervals are two-sided. Because *F* tests are one-sided, a 90% interval is a natural companion to an *F* test with *&alpha;* = .05: the interval excludes 0 if and only if the *F* test is significant (Steiger, 2004). Its lower bound is 0 when the test is not significant. Set `ci = 0.95` for 95% intervals.
+Intervals are two-sided. Because *F* tests are one-sided, a 90% interval is a natural companion to an *F* test with *&alpha;* = .05: the interval excludes 0 if and only if the *F* test is significant [@steigerTestEffectSize2004]. Its lower bound is 0 when the test is not significant. Set `ci = 0.95` for 95% intervals.
 
 Intervals are not shown for generalized *&eta;*^2^, because the intervals computed by effectsize for it can exclude the point estimate. If you request them, `apa_anova` gives a warning and leaves them out.
 
@@ -293,7 +300,8 @@ d_moore |>
 By default, `apa_anova` uses Type 1 (sequential) sums of squares, as `anova` and `summary.aov` do. Each effect is adjusted only for the effects entered before it, so the results depend on the order of the terms in the formula.
 
 ```{r}
-#| label: moore-type1
+#| label: tbl-moore-type1
+#| tbl-cap: "Analysis of Variance of Conformity by Authoritarianism and Partner Status (Type 1 Sums of Squares)"
 fit_moore <- lm(conformity ~ Authoritarianism * `Partner Status`, data = d_moore)
 apa_anova(fit_moore)
 ```
@@ -301,14 +309,16 @@ apa_anova(fit_moore)
 Set `type = 2` or `type = 3` for Type 2 or Type 3 sums of squares, which are computed with `car::Anova`. Type 2 tests adjust each main effect for the other main effects but not for the interaction, which is appropriate when the interaction is negligible.
 
 ```{r}
-#| label: moore-type2
+#| label: tbl-moore-type2
+#| tbl-cap: "Analysis of Variance of Conformity by Authoritarianism and Partner Status (Type 2 Sums of Squares)"
 apa_anova(fit_moore, type = 2)
 ```
 
 Type 3 tests adjust each effect for all other effects, including interactions. Type 3 tests are meaningful only when factors are coded with contrasts that sum to zero (e.g., `contr.sum`), not with R's default treatment contrasts, so set the contrasts before fitting the model:
 
 ```{r}
-#| label: moore-type3
+#| label: tbl-moore-type3
+#| tbl-cap: "Analysis of Variance of Conformity by Authoritarianism and Partner Status (Type 3 Sums of Squares)"
 #| message: false
 fit_moore_sum <- lm(
   conformity ~ Authoritarianism * `Partner Status`,
@@ -321,13 +331,15 @@ apa_anova(fit_moore_sum, type = 3)
 A table from `car::Anova` or `anova` can also be passed to `apa_anova` directly. It already has a type of sums of squares, so the `type` argument is not needed.
 
 ```{r}
-#| label: car-anova
+#| label: tbl-car-anova
+#| tbl-cap: "Type 2 Analysis of Variance of Conformity Computed With `car::Anova`"
 car::Anova(fit_moore, type = 2) |>
   apa_anova()
 ```
 
 ```{r}
-#| label: moorecontrast
+#| label: tbl-moorecontrast
+#| tbl-cap: "Effect of Partner Status on Conformity at Each Level of Authoritarianism"
 apa_contrasts(fit_moore, contrast = `Partner Status`, by = Authoritarianism, effect_size = FALSE) |> 
   apa_flextable(note = TRUE)
 ```
@@ -338,7 +350,8 @@ apa_contrasts(fit_moore, contrast = `Partner Status`, by = Authoritarianism, eff
 An analysis of covariance (ANCOVA) is an ANOVA with one or more continuous covariates. Fit it with `lm` or `aov`. Here, partner status is tested while controlling for participants' authoritarianism scores. Type 2 sums of squares adjust each effect for the other, regardless of the order of the terms.
 
 ```{r}
-#| label: ancova
+#| label: tbl-ancova
+#| tbl-cap: "Analysis of Covariance of Conformity by Partner Status, Controlling for Authoritarianism Score"
 fit_ancova <- lm(conformity ~ `Authoritarianism Score` + `Partner Status`, data = d_moore)
 apa_anova(fit_ancova, type = 2)
 ```
@@ -347,7 +360,7 @@ apa_anova(fit_ancova, type = 2)
 
 ## Error strata with `aov`
 
-In the `obk.long` data set from the afex package (O'Brien & Kaiser, 1985), 16 participants in three treatment groups were measured before treatment, after treatment, and at follow-up. Each phase had five measurements, which we average here.
+In the `obk.long` data set from the afex package [@obrienMANOVAMethodAnalyzing1985], 16 participants in three treatment groups were measured before treatment, after treatment, and at follow-up. Each phase had five measurements, which we average here.
 
 ```{r}
 #| label: obk-data
@@ -360,7 +373,8 @@ d_obk <- obk.long |>
 In base R, a mixed design with a between-subjects factor (treatment) and a within-subjects factor (phase) is fit with `aov` and an `Error` term. Each error stratum has its own error term. `apa_anova` introduces each stratum with a heading row and indents its effects.
 
 ```{r}
-#| label: obk-aov
+#| label: tbl-obk-aov
+#| tbl-cap: "Mixed Analysis of Variance of Treatment and Phase With Error Strata"
 fit_obk_aov <- aov(value ~ Treatment * Phase + Error(id / Phase), data = d_obk)
 apa_anova(fit_obk_aov)
 ```
@@ -372,7 +386,8 @@ With `aov`, sums of squares are Type 1, and no correction is made for violations
 The afex package fits repeated-measures ANOVAs with Type 3 sums of squares and corrects the degrees of freedom of within-subjects effects for violations of sphericity (Greenhouse–Geisser by default). In afex models, each effect has its own error term, so the table shows the degrees of freedom of each effect and its error term (*df*~effect~ and *df*~error~) and the mean squared error (*MSE*), as afex's `nice` function does. As in afex, generalized *&eta;*^2^ is the default effect size.
 
 ```{r}
-#| label: obk-afex
+#| label: tbl-obk-afex
+#| tbl-cap: "Mixed Analysis of Variance of Treatment and Phase Fit With afex"
 #| message: false
 fit_obk <- aov_ez(
   id = "id",
@@ -387,7 +402,8 @@ apa_anova(fit_obk)
 The degrees of freedom of the within-subjects effects are not whole numbers because they have been corrected for sphericity. To report partial *&eta;*^2^ with confidence intervals instead:
 
 ```{r}
-#| label: obk-afex-partial
+#| label: tbl-obk-afex-partial
+#| tbl-cap: "Mixed Analysis of Variance of Treatment and Phase With Partial Eta Squared and 90% Confidence Intervals"
 apa_anova(
   fit_obk,
   generalized = FALSE,
@@ -405,7 +421,8 @@ The sphericity correction is set when the model is fit or printed in afex (e.g.,
 Repeated-measures ANOVAs need complete data from every participant, and they average over repeated measurements within each cell. Linear mixed models fit with `lme4::lmer` have neither requirement. Here the same O'Brien and Kaiser data are analyzed without averaging the five measurements within each phase, with a random intercept for each participant:
 
 ```{r}
-#| label: obk-lmer
+#| label: tbl-obk-lmer
+#| tbl-cap: "*F* Tests of Treatment and Phase in a Linear Mixed Model"
 d_obk_trials <- obk.long |>
   mutate(phase = factor(phase, levels = c("pre", "post", "fup"))) |>
   rename(Treatment = treatment, Phase = phase)
@@ -430,7 +447,8 @@ Tests are Type 3 by default, as in lmerTest. lmerTest's Type 3 tests do not depe
 Sums of squares and effect sizes have no agreed-upon definitions in mixed models, so they are not shown by default. When a partial effect size is requested, it is computed from *F* and its degrees of freedom (e.g., `effectsize::F_to_eta2`), and the note says that it only approximates the effect size:
 
 ```{r}
-#| label: obk-lmer-eta
+#| label: tbl-obk-lmer-eta
+#| tbl-cap: "*F* Tests of Treatment and Phase in a Linear Mixed Model With Partial Eta Squared"
 apa_anova(
   fit_obk_lmer,
   effect_size = "eta",
@@ -473,7 +491,6 @@ With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `a
 #| apa-note: !expr apa7::apa_note(tbl_obk)
 #| echo: fenced
 tbl_obk
-
 ```
 
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the same note below the table (or pass your own text as `note`). Do not combine it with the `apa-note` chunk option, or the note will appear twice.
@@ -490,7 +507,8 @@ Variable names are converted to title case (e.g., `correct` would become Correct
 Further formatting is available with `apa_flextable`.
 
 ```{r}
-#| label: flextable
+#| label: tbl-flextable
+#| tbl-cap: "Analysis of Variance of Success Ratings Formatted With `apa_flextable`"
 apa_anova(fit_adler) |>
   apa_flextable(table_width = .8)
 ```
@@ -505,14 +523,5 @@ apa_anova(fit_adler) |>
 
 # References
 
-Adler, N. E. (1973). Impact of prior sets given experimenters and subjects on the experimenter expectancy effect. *Sociometry, 36*(1), 113–126. <https://doi.org/10.2307/2786286>
-
-Erickson, B. H., & Nosanchuk, T. A. (1977). *Understanding data*. McGraw-Hill Ryerson.
-
-Friendly, M., & Franklin, P. (1980). Interactive presentation in multitrial free recall. *Memory & Cognition, 8*(3), 265–270. <https://doi.org/10.3758/BF03197614>
-
-O'Brien, R. G., & Kaiser, M. K. (1985). MANOVA method for analyzing repeated measures designs: An extensive primer. *Psychological Bulletin, 97*(2), 316–333. <https://doi.org/10.1037/0033-2909.97.2.316>
-
-Olejnik, S., & Algina, J. (2003). Generalized eta and omega squared statistics: Measures of effect size for some common research designs. *Psychological Methods, 8*(4), 434–447. <https://doi.org/10.1037/1082-989X.8.4.434>
-
-Steiger, J. H. (2004). Beyond the *F* test: Effect size confidence intervals and tests of close fit in the analysis of variance and contrast analysis. *Psychological Methods, 9*(2), 164–182. <https://doi.org/10.1037/1082-989X.9.2.164>
+::: {#refs}
+:::

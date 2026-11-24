@@ -11,10 +11,13 @@ library(dplyr)
 library(tidyr)
 library(flextable)
 library(ftExtra)
+my_font <- "Roboto Condensed"
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}
-#| label: setup
+#| label: setupdisplay
+<<setup>>
 ```
 
 # Data
@@ -31,45 +34,31 @@ d <- mtcars |>
 The default output of the `apa_chisq` function is a contingency table with a chi-square test of independence in the table note. The output is a flextable, which can be modified with flextable commands.
 
 ```{r}
-#| label: apachisq
+#| label: tbl-apachisq
+#| tbl-cap: "Number of Gears by Transmission Type"
 apa_chisq(d)
 ```
 
-# Styling Options
 
-The table can be styled in many ways:
 
-```{r}
-#| label: options
-apa_chisq(
-  d,
-  font_size = 16,
-  line_spacing = 3,
-  text_color = "darkred",
-  border_width = 2,
-  border_color = "gray",
-  font_family = "Arial"
-)
-```
+
 
 ```{r}
-#| label: customization
+#| label: tbl-no-note
+#| tbl-cap: "Number of Gears by Transmission Type Without a Note"
 # No note
 apa_chisq(d, note = NA)
-# Custom note
-apa_chisq(
-  d,
-  note = "This is a *custom* note written in **markdown** $x > \\omega$."
-)
-
 ```
+
+
 
 # What if I want something completely different?
 
 There are a lot of options out there. The flextable package has the `proc_freq` function, which has the ability to include row, column, and total percentages in the table.
 
 ```{r}
-#| label: procfreq
+#| label: tbl-procfreq
+#| tbl-cap: "Number of Gears by Engine Shape"
 mtcars %>%
   proc_freq(row = "gear", col = "vs") %>%
   theme_apa()
@@ -78,7 +67,8 @@ mtcars %>%
 These can be turned off selectively:
 
 ```{r}
-#| label: procfreqoptions
+#| label: tbl-procfreqoptions
+#| tbl-cap: "Number of Gears by Engine Shape Without Percentages"
 mtcars %>%
   proc_freq(
     row = "gear",
@@ -95,6 +85,8 @@ The flextable package's `tabulator` function has considerable power in creating 
 Here I calculate the means, standard deviations, and sample sizes within each cell of a contingency table.
 
 ```{r}
+#| label: tbl-tabulator
+#| tbl-cap: "Mean Number of Warp Breaks by Wool Type and Tension"
 d_tension <- warpbreaks |>
   summarise(
     m = mean(breaks, na.rm = TRUE),
@@ -132,6 +124,8 @@ A subtle difference in this version of the table is that the columns are decimal
 Also, whereas previously the "stub header" (Wool column) was middle aligned, it is now top aligned, which is consistent with comparable examples in the *APA Style Manual*. I am not sure if this is a real rule in APA style, and I actually prefer middle alignment for situations like this.
 
 ```{r warpbreaks}
+#| label: tbl-tension-wide
+#| tbl-cap: "Mean Number of Warp Breaks by Wool Type and Tension in Wide Format"
 d_tension |> 
   rename(M = m, SD = sd) |> 
   pivot_wider_name_first(

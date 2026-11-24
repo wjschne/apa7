@@ -41,7 +41,8 @@ notes by \code{apa7_defaults(citations = )} (or \code{options(apa7.citations = )
 \code{"auto"} (default), \code{"keys"}, or
 \code{"text"}. With \code{"auto"}, a citation is written as a key when a Quarto or
 R Markdown document is being rendered and its \code{bibliography} (in the YAML
-header) has an entry with that key, and as text otherwise (e.g., in the
+header, or for a whole Quarto project or folder in \verb{_quarto.yml} or
+\verb{_metadata.yml}) has an entry with that key, and as text otherwise (e.g., in the
 console, or in a table saved with \code{\link[flextable:save_as_docx]{flextable::save_as_docx()}}). So listing
 the file written by \code{apa7_write_bib()} in the YAML header is enough:
 

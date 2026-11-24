@@ -4,9 +4,6 @@ format: html
 knitr:
   opts_chunk:
     fig-cap-location: top
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -25,7 +22,7 @@ library(psych)
 <<setup>>
 ```
 
-Two functions make APA-style tables from exploratory factor analyses and principal components analyses run with the [psych](https://personality-project.org/r/psych/) package:
+Two functions make APA-style tables from exploratory factor analyses and principal components analyses run with the [psych](https://personality-project.org/r/psych/) package [@revellePsychProceduresPsychological2026]:
 
 * `apa_loadings` makes a table of factor loadings, with optional columns for communalities, uniquenesses, and complexity, and optional rows for variance explained.
 * `apa_factor_cor` makes a table of the correlations among factors after an oblique rotation.
@@ -138,7 +135,7 @@ Three optional columns describe each item:
 
 * `communality = TRUE` adds *h*^2^, the proportion of the item's variance explained by the factors.
 * `uniqueness = TRUE` adds *u*^2^ = 1 − *h*^2^.
-* `complexity = TRUE` adds Hofmann's (1978) complexity index, which is 1 when an item loads on a single factor and increases as its loadings are spread over more factors.
+* `complexity = TRUE` adds @hofmannComplexitySimplicityObjective1978 ['s] complexity index, which is 1 when an item loads on a single factor and increases as its loadings are spread over more factors.
 
 ```{r}
 #| label: tbl-columns
@@ -328,6 +325,5 @@ apa_loadings(fit_bfi,
 
 # References
 
-Hofmann, R. J. (1978). Complexity and simplicity as objective indices descriptive of factor solutions. *Multivariate Behavioral Research, 13*(2), 247–250. <https://doi.org/10.1207/s15327906mbr1302_9>
-
-Revelle, W. (2026). *psych: Procedures for psychological, psychometric, and personality research* (Version `r packageVersion("psych")`) [Computer software]. Northwestern University. <https://CRAN.R-project.org/package=psych>
+::: {#refs}
+:::

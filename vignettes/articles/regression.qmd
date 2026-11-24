@@ -1,9 +1,6 @@
 ---
 title: "Regression Analysis Tables"
 format: html
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -62,7 +59,8 @@ lm3 <- update(lm2, . ~ . + SATV + SATQ)
 In the console, `apa_parameters` prints as an ordinary tibble, so you can inspect it. Here `as_tibble` is used to show that tibble in this document.
 
 ```{r}
-#| label: lm-tibble
+#| label: tbl-lm-tibble
+#| tbl-cap: "Regression of ACT Scores on Age and Gender as a Tibble"
 apa_parameters(lm1) |>
   tibble::as_tibble()
 ```
@@ -70,14 +68,16 @@ apa_parameters(lm1) |>
 In a rendered document, the output of `apa_parameters` is displayed as a table without further processing.
 
 ```{r}
-#| label: lm-auto
+#| label: tbl-lm-auto
+#| tbl-cap: "Regression of ACT Scores on Age and Gender"
 apa_parameters(lm1)
 ```
 
 The output is still a tibble, so ordinary dplyr verbs work. Pass the result to `apa_flextable` to customize the table. For example, to drop the intercept:
 
 ```{r}
-#| label: lm-filter
+#| label: tbl-lm-filter
+#| tbl-cap: "Regression of ACT Scores on Age and Gender Without the Constant"
 apa_parameters(lm1) |>
   filter(Variable != "Constant") 
 ```
@@ -85,7 +85,8 @@ apa_parameters(lm1) |>
 To compare nested models, pass a list. Model fit statistics (*R*^2^, change in *R*^2^, and the *F* test of the change) are added automatically.
 
 ```{r}
-#| label: lm-list
+#| label: tbl-lm-list
+#| tbl-cap: "Hierarchical Regression of ACT Scores"
 apa_parameters(list(lm1, lm2, lm3))
 ```
 
@@ -94,7 +95,8 @@ apa_parameters(list(lm1, lm2, lm3))
 `apa_parameters` also accepts `glm` objects. The table reports coefficients on the link scale (*B*), their standard errors, the exponentiated coefficient, and the test statistic. For logistic regression, the exponentiated coefficient is the odds ratio (*OR*), and the test statistic is *z*.
 
 ```{r}
-#| label: glm1
+#| label: tbl-glm1
+#| tbl-cap: "Logistic Regression of Transmission Type on Weight and Horsepower"
 glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
 apa_parameters(glm1)
 
@@ -103,14 +105,16 @@ apa_parameters(glm1)
 Exponentiated coefficients are added whenever the link function is logit or log. They are labeled *OR* for logit links, *IRR* (incidence rate ratio) for log links in count models, and *RR* (risk ratio) for log links in binomial models. Set `exponentiate = FALSE` to leave them out, or `exponentiate = TRUE` to add them for other links such as probit.
 
 ```{r}
-#| label: glm-noexp
+#| label: tbl-glm-noexp
+#| tbl-cap: "Logistic Regression Coefficients on the Log-Odds Scale"
 apa_parameters(glm1, exponentiate = FALSE)
 ```
 
 To choose and order the columns, use `predictor_parameters`. Columns that the model does not report (for example, *t* for a model tested with *z*) are dropped silently.
 
 ```{r}
-#| label: glm-columns
+#| label: tbl-glm-columns
+#| tbl-cap: "Logistic Regression With Selected Columns"
 apa_parameters(
   glm1,
   predictor_parameters = c("Parameter", "Exp_Coefficient", "z", "p")
@@ -120,7 +124,8 @@ apa_parameters(
 As with `lm`, `starred` and `bolded` mark significant coefficients.
 
 ```{r}
-#| label: glm-starred
+#| label: tbl-glm-starred
+#| tbl-cap: "Logistic Regression With Significance Stars and Bold *p*-Values"
 apa_parameters(glm1, starred = "Coefficient", bolded = "p")
 ```
 
@@ -129,7 +134,8 @@ apa_parameters(glm1, starred = "Coefficient", bolded = "p")
 A list of `glm` models is displayed with a pseudo-*R*^2^ (Tjur's for logistic regression, as chosen by `performance::r2`) and a likelihood ratio test of the change, because the binomial family has a fixed dispersion parameter.
 
 ```{r}
-#| label: glm-list
+#| label: tbl-glm-list
+#| tbl-cap: "Two Logistic Regression Models of Transmission Type"
 glm0 <- glm(am ~ wt, data = mtcars, family = binomial)
 apa_parameters(list(glm0, glm1))
 ```
@@ -137,7 +143,8 @@ apa_parameters(list(glm0, glm1))
 The model comparison can also be displayed separately with `apa_performance_comparison`.
 
 ```{r}
-#| label: glm-compare
+#| label: tbl-glm-compare
+#| tbl-cap: "Comparison of Two Logistic Regression Models of Transmission Type"
 apa_performance_comparison(list(glm0, glm1))
 ```
 
@@ -146,7 +153,8 @@ apa_performance_comparison(list(glm0, glm1))
 When the outcome has more than two unordered categories, multinomial logistic regression (`nnet::multinom`) compares each category with a reference category, which is the first level of the outcome. The `Womenlf` data set in the carData package has the work participation of 263 married Canadian women (not working, working part time, or working full time), their husbands' income (in $1,000s), and whether they had children at home. Here, not working is the reference category:
 
 ```{r}
-#| label: multinom
+#| label: tbl-multinom
+#| tbl-cap: "Multinomial Logistic Regression of Women's Labor-Force Participation"
 d_work <- carData::Womenlf |>
   mutate(
     participation = factor(
@@ -172,7 +180,8 @@ Each comparison gets a heading row with its coefficients indented below it, and 
 Lists of multinomial models are compared with McFadden's pseudo-*R*^2^ and likelihood ratio tests:
 
 ```{r}
-#| label: multinom-list
+#| label: tbl-multinom-list
+#| tbl-cap: "Comparison of Multinomial Models of Labor-Force Participation"
 multinom0 <- nnet::multinom(participation ~ husband_income, data = d_work, trace = FALSE)
 apa_performance_comparison(list(multinom0, multinom1))
 ```
@@ -182,7 +191,8 @@ apa_performance_comparison(list(multinom0, multinom1))
 For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*).
 
 ```{r}
-#| label: poisson
+#| label: tbl-poisson
+#| tbl-cap: "Poisson Regression of the Number of Carburetors"
 glm_pois <- glm(carb ~ wt + hp, data = mtcars, family = poisson)
 apa_parameters(glm_pois)
 ```
@@ -190,7 +200,8 @@ apa_parameters(glm_pois)
 Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests.
 
 ```{r}
-#| label: quasipoisson
+#| label: tbl-quasipoisson
+#| tbl-cap: "Quasi-Poisson Regression of the Number of Carburetors"
 glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
@@ -200,7 +211,8 @@ apa_parameters(glm_qpois)
 Counts often have more zeros than a Poisson or negative binomial model expects. A zero-inflated model (`pscl::zeroinfl`) adds a logistic model of *excess* zeros, which come from cases that could only be zero (e.g., scientists who were not publishing at all). A hurdle model (`pscl::hurdle`) instead has a logistic model of whether the count is zero or positive, and a zero-truncated count model of the positive counts. Either way, `apa_parameters` puts each part under its own heading. Only the count model's coefficients are exponentiated (*IRR*), because the zero model's coefficients are log odds. The `bioChemists` data set in the pscl package has the number of articles 915 biochemistry graduate students published in the last 3 years of their PhD programs, which depends here on their mentors' numbers of articles (`mentor_articles`) and their number of young children (`young_children`). The zero-inflation part has only the mentor's articles:
 
 ```{r}
-#| label: zeroinfl
+#| label: tbl-zeroinfl
+#| tbl-cap: "Zero-Inflated Negative Binomial Regression of Biochemists' Publications"
 data("bioChemists", package = "pscl")
 d_articles <- bioChemists |>
   rename(
@@ -241,7 +253,8 @@ For nested counts, or counts with many zeros, negative binomial and zero-inflate
 Generalized additive models (GAMs), fit with `mgcv::gam`, let a predictor's effect be a smooth curve instead of a straight line. Here, ozone concentration in New York (from the `airquality` data set) depends on smooth functions of temperature and wind speed:
 
 ```{r}
-#| label: gam
+#| label: tbl-gam
+#| tbl-cap: "Generalized Additive Model of Ozone by Temperature and Wind"
 fit_gam <- mgcv::gam(
   Ozone ~ s(Temp) + s(Wind),
   data = airquality,
@@ -257,7 +270,8 @@ The parametric terms (here, only the constant) have coefficients and *t* tests, 
 `apa_performance` gives the adjusted *R*^2^ and the percentage of the deviance explained:
 
 ```{r}
-#| label: gam-performance
+#| label: tbl-gam-performance
+#| tbl-cap: "Fit of the Generalized Additive Model"
 apa_performance(fit_gam)
 ```
 
@@ -268,7 +282,8 @@ The smooth terms are shrunk toward simpler shapes, so nested GAMs cannot be comp
 `apa_collinearity` reports the variance inflation factor (*VIF*) and tolerance of each predictor, as computed by `performance::check_collinearity`. In the third ACT model above, the two SAT scores are correlated, but not enough to inflate their standard errors much:
 
 ```{r}
-#| label: collinearity
+#| label: tbl-collinearity
+#| tbl-cap: "Collinearity Diagnostics of the Full Model of ACT Scores"
 apa_collinearity(lm3) |>
   apa_flextable(note = TRUE)
 ```
@@ -276,7 +291,8 @@ apa_collinearity(lm3) |>
 Education has more than 1 degree of freedom, so its *VIF* is the generalized *VIF*, and the note says so. Add `"SE_factor"` to `columns` for *VIF*^1/(2*df*)^, which can be compared across terms with different degrees of freedom. To bold large *VIF*s, set `flag` to your cutoff (e.g., `flag = 5` or `flag = 10`). In models with interactions, the *VIF*s of the interaction and its components are high in part because product terms are correlated with their components, and the note explains that this does not affect the test of the interaction.
 
 ```{r}
-#| label: collinearity-interaction
+#| label: tbl-collinearity-interaction
+#| tbl-cap: "Collinearity Diagnostics With an Uncentered Interaction"
 lm(ACT ~ SATV * SATQ, data = d) |>
   apa_collinearity(flag = 10) |>
   apa_flextable(note = TRUE)
@@ -286,7 +302,8 @@ lm(ACT ~ SATV * SATQ, data = d) |>
 With centered predictors, these *VIF*s are small, and the note leaves this out.
 
 ```{r}
-#| label: collinearity-interaction-centered
+#| label: tbl-collinearity-centered
+#| tbl-cap: "Collinearity Diagnostics With a Centered Interaction"
 lm(ACT ~ SATV * SATQ, data = datawizard::center(d)) |>
   apa_collinearity(flag = 10) |>
   apa_flextable(note = TRUE)
@@ -335,7 +352,8 @@ tbl_lm
 Without apaquarto (e.g., in a plain Quarto or R Markdown document, or a table saved to Word with `flextable::save_as_docx`), `apa_flextable` can put the note below the table itself. With `note = TRUE`, it uses the note from `apa_note`; a character string is used as the note instead. The note is added after the column widths are set, so a long note does not stretch the table.
 
 ```{r}
-#| label: lm-flextable-note
+#| label: tbl-lm-flextable-note
+#| tbl-cap: "Logistic Regression With a Generated Note"
 apa_parameters(glm1, starred = "p") |>
   apa_flextable(note = TRUE)
 ```
@@ -370,6 +388,8 @@ apa7::apa7_write_bib("apa7.bib")
 ```yaml
 bibliography: [references.bib, apa7.bib]
 ```
+
+In a Quarto project, the bibliography can also be set for the whole project in `_quarto.yml` or for a folder in `_metadata.yml`, and apa7 finds it there.
 
 When the document is rendered, `apa_note` writes each citation whose reference is in the document's bibliography as a Pandoc citation key (e.g., `[@duvalTrimFillSimple2000]`), which Pandoc (or [apaquarto](https://wjschne.github.io/apaquarto/)) turns into a citation such as "(Duval & Tweedie, 2000)" and an entry in the reference list. This works for notes in the `apa-note` chunk option and from `apa_flextable(note = TRUE)`. The keys are those that the Better BibTeX extension for Zotero makes, so references exported from Zotero work, too.
 

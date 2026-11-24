@@ -5,9 +5,6 @@ knitr:
   opts_chunk:
     fig-cap-location: top
     dev: "ragg_png"
-filters:
-  - quarto
-  - apanote
 ---
 
 ```{r}
@@ -38,7 +35,7 @@ The path diagrams in this article are drawn with the [ggdiagram](https://wjschne
 
 # Confirmatory Factor Analysis
 
-In the `HolzingerSwineford1939` data set from the lavaan package, 301 seventh- and eighth-grade students took nine mental ability tests. The tests are thought to measure three abilities: visual (*x*~1~ to *x*~3~), textual (*x*~4~ to *x*~6~), and speed (*x*~7~ to *x*~9~).
+In the `HolzingerSwineford1939` data set from the lavaan package [@holzingerStudyFactorAnalysis1939], 301 seventh- and eighth-grade students took nine mental ability tests. The tests are thought to measure three abilities: visual (*x*~1~ to *x*~3~), textual (*x*~4~ to *x*~6~), and speed (*x*~7~ to *x*~9~).
 
 ```{r}
 #| label: hs-fit
@@ -65,7 +62,7 @@ fit_3 <- cfa(model_3, data = d_cfa)
 
 ```{r}
 #| label: fig-hs
-#| fig-cap: Three-Factor Model of the Holzinger and Swineford (1939) Tests
+#| fig-cap: Three-Factor Model of the @holzingerStudyFactorAnalysis1939 Tests
 #| fig-width: 8
 #| fig-height: 5
 #| code-fold: true
@@ -138,7 +135,8 @@ ggdiagram(font_family = "Roboto Condensed", font_size = 18) +
 `apa_performance` displays the fit indices that are most often reported. A list of models gives one row per model, so the three-factor model can be compared with a model in which a single general factor accounts for all nine tests:
 
 ```{r}
-#| label: hs-performance
+#| label: tbl-hs-performance
+#| tbl-cap: "Fit of the One-Factor and Three-Factor Models of the Ability Tests"
 model_1 <- "g =~ V1 + V2 + V3 + T1 + T2 + T3 + S1 + S2 + S3"
 fit_1 <- cfa(model_1, data = d_cfa)
 
@@ -158,7 +156,8 @@ Other metrics can be chosen with `metrics` (e.g., `metrics = c("Chi2", "Chi2_df"
 `apa_parameters` displays fully standardized estimates (*&beta;*), with their standard errors and *p*-values, under a heading for each kind of parameter. Paths are labeled with arrows: a factor loading such as Visual &rarr; X1 is read "Visual affects X1," and a correlation such as Visual &harr; Textual is a two-headed arrow, as in the path diagram.
 
 ```{r}
-#| label: hs-parameters
+#| label: tbl-hs-parameters
+#| tbl-cap: "Standardized Parameter Estimates of the Three-Factor Model"
 apa_parameters(fit_3) |> 
   apa_flextable(note = TRUE)
 ```
@@ -166,7 +165,8 @@ apa_parameters(fit_3) |>
 Unstandardized estimates (*B*) are shown with `standardize = FALSE`. Here, the first loading of each factor was fixed at 1 to give the factor a scale, so it has no standard error or test, and the note says so. Other columns, such as *&beta;* next to *B*, *z*, and confidence intervals, can be added with `predictor_parameters`:
 
 ```{r}
-#| label: hs-unstandardized
+#| label: tbl-hs-unstandardized
+#| tbl-cap: "Unstandardized and Standardized Parameter Estimates of the Three-Factor Model"
 apa_parameters(
   fit_3,
   standardize = FALSE,
@@ -183,7 +183,8 @@ Variances (labeled "residual" for indicators and outcomes), intercepts, and thre
 A CFA can also be reported in the matrix form used for exploratory factor analysis, with a row for each indicator and a column for each factor. `apa_loadings` shows the standardized loadings and leaves blank the loadings fixed at 0. As in exploratory factor analysis, the rows are grouped by the factor with each indicator's largest loading and sorted by the size of that loading (`sort_loading = FALSE` keeps the order of the model syntax). Suppose that *S*~3~ (counting dots and capital letters) loads on Visual as well as on Speed:
 
 ```{r}
-#| label: hs-loadings
+#| label: tbl-hs-loadings
+#| tbl-cap: "Loadings of the Three-Factor Model With a Cross-Loading"
 model_3x <- "
   Visual  =~ V1 + V2 + V3 + S3
   Textual =~ T1 + T2 + T3
@@ -198,7 +199,8 @@ apa_loadings(fit_3x, communality = TRUE) |>
 The communality (*h*^2^) is the proportion of variance in each indicator explained by the factors (*R*^2^). Rows for the variance explained by each factor can be added with `variance = TRUE`, and `apa_factor_cor` shows the correlations among the factors:
 
 ```{r}
-#| label: hs-factor-cor
+#| label: tbl-hs-factor-cor
+#| tbl-cap: "Correlations Among the Visual, Textual, and Speed Factors"
 apa_factor_cor(fit_3x) |>
   apa_flextable(note = TRUE)
 ```
@@ -208,7 +210,8 @@ apa_factor_cor(fit_3x) |>
 When the model is fit with a robust estimator (e.g., `estimator = "MLR"`, or `"WLSMV"` for ordinal indicators), `apa_performance` shows the scaled *&chi;*^2^ test and the robust versions of CFI, TLI, and RMSEA, and the note says so. With `missing = "fiml"`, the note also says that missing data were handled with full information maximum likelihood.
 
 ```{r}
-#| label: hs-mlr
+#| label: tbl-hs-mlr
+#| tbl-cap: "Fit of the Three-Factor Model With Robust Maximum Likelihood Estimation"
 fit_mlr <- cfa(
   model_3,
   data = d_cfa,
@@ -242,7 +245,8 @@ fit_scalar <- cfa(model_3, data = d_mi, group = "school",
 `apa_performance_comparison` shows the fit of each model, and compares each model with the one before it. The comparison has the *&chi;*^2^ difference test from `lavaan::lavTestLRT` and the changes in CFI and RMSEA, which are often used alongside it because the *&chi;*^2^ test is sensitive to sample size. The models should be listed from the least to the most constrained.
 
 ```{r}
-#| label: hs-invariance
+#| label: tbl-hs-invariance
+#| tbl-cap: "Measurement Invariance of the Three-Factor Model Across Schools"
 apa_performance_comparison(
   Configural = fit_configural,
   Metric = fit_metric,
@@ -251,7 +255,7 @@ apa_performance_comparison(
   apa_flextable(note = TRUE)
 ```
 
-Constraining the loadings to be equal did not worsen the fit much, so metric invariance is plausible. Constraining the intercepts worsened the fit considerably (e.g., a drop in CFI larger than the .01 suggested by Cheung & Rensvold, 2002), so scalar invariance does not hold: at least some tests have different intercepts at the two schools.
+Constraining the loadings to be equal did not worsen the fit much, so metric invariance is plausible. Constraining the intercepts worsened the fit considerably [e.g., a drop in CFI larger than the .01 suggested by @cheungEvaluatingGoodnessofFitIndexes2002], so scalar invariance does not hold: at least some tests have different intercepts at the two schools.
 
 With a robust estimator (e.g., `estimator = "MLR"`), the difference test is scaled (e.g., the Satorra–Bentler scaled difference test), and the note names it. Other metrics, such as `"deltaTLI"` and `"deltaSRMR"`, can be chosen with `metrics`, and `metrics = "all"` shows all of them.
 
@@ -260,7 +264,8 @@ With a robust estimator (e.g., `estimator = "MLR"`), the difference test is scal
 `apa_parameters` shows the estimates of a multiple-group model side by side, with a column spanner for each group, so the groups can be compared row by row. Here are the estimates of the metric model:
 
 ```{r}
-#| label: hs-metric-parameters
+#| label: tbl-hs-metric-parameters
+#| tbl-cap: "Parameter Estimates of the Metric Invariance Model by School"
 apa_parameters(fit_metric) |>
   apa_flextable(note = TRUE)
 ```
@@ -269,7 +274,7 @@ The note gives the size of each group and says which parameters were constrained
 
 # Structural Equation Models
 
-Does industrialization lead to democracy? In Bollen's (1989) classic `PoliticalDemocracy` data set from the lavaan package, industrialization in 1960 was measured in 75 developing countries with three indicators (*x*~1~ to *x*~3~), and political democracy was measured in 1960 and in 1965 with four indicators each (*y*~1~ to *y*~4~ and *y*~5~ to *y*~8~). The same democracy indicator measured in different years can share specific variance, so the residuals of matching indicators are allowed to correlate.
+Does industrialization lead to democracy? In the classic `PoliticalDemocracy` data set [@bollenStructuralEquationsLatent1989] from the lavaan package, industrialization in 1960 was measured in 75 developing countries with three indicators (*x*~1~ to *x*~3~), and political democracy was measured in 1960 and in 1965 with four indicators each (*y*~1~ to *y*~4~ and *y*~5~ to *y*~8~). The same democracy indicator measured in different years can share specific variance, so the residuals of matching indicators are allowed to correlate.
 
 In this model, industrialization affects democracy in 1965 directly (*c*&prime;) and indirectly, through democracy in 1960 (*a* &times; *b*). The labels `a`, `b`, and `c` name the paths, and `:=` defines the indirect and total effects from them.
 
@@ -418,7 +423,8 @@ For clarity, the diagram shows only the structural model. The disturbances (the 
 ## Model fit
 
 ```{r}
-#| label: pd-performance
+#| label: tbl-pd-performance
+#| tbl-cap: "Fit of the Political Democracy Model"
 apa_performance(fit_pd)
 ```
 
@@ -429,7 +435,8 @@ The model fits well. When the lower bound of the RMSEA interval is 0, it is show
 The parameter table has a section for each kind of parameter in the model: the measurement model's loadings, the structural model's regressions, the correlated residuals, and the defined parameters. Regressions are labeled with the arrow pointing from predictor to outcome (Dem65 &larr; Dem60 is read "Dem65 is predicted by Dem60").
 
 ```{r}
-#| label: pd-parameters
+#| label: tbl-pd-parameters
+#| tbl-cap: "Standardized Parameter Estimates of the Political Democracy Model With Significance Stars"
 tbl_pd <- apa_parameters(fit_pd, starred = "p")
 tbl_pd
 ```
@@ -441,7 +448,8 @@ Most of industrialization's effect on democracy in 1965 is indirect: industriali
 Because the sampling distribution of an indirect effect is usually skewed, indirect effects are often tested with bootstrapped confidence intervals. With `se = "bootstrap"`, lavaan's unstandardized confidence intervals are bootstrap percentile intervals. Show them with `standardize = FALSE` and `"CI"`:
 
 ```{r}
-#| label: pd-bootstrap
+#| label: tbl-pd-bootstrap
+#| tbl-cap: "Parameter Estimates of the Political Democracy Model With Bootstrap Confidence Intervals"
 #| warning: false
 set.seed(2026)
 fit_pd_boot <- sem(
@@ -477,8 +485,5 @@ Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the note below the tab
 
 # References
 
-Bollen, K. A. (2026). *Elements of structural equation models (SEMs)*. Cambridge University Press. <https://doi.org/10.1017/9781009312806>
-
-Cheung, G. W., & Rensvold, R. B. (2002). Evaluating goodness-of-fit indexes for testing measurement invariance. *Structural Equation Modeling, 9*(2), 233–255. <https://doi.org/10.1207/S15328007SEM0902_5>
-
-Holzinger, K. J., & Swineford, F. A. (1939). *A study in factor analysis: The stability of a bi-factor solution* (Supplementary Educational Monographs, No. 48). University of Chicago Press.
+::: {#refs}
+:::
