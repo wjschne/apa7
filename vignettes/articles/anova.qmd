@@ -1,9 +1,15 @@
 ---
 title: "Analysis of Variance Tables"
 format: html
+execute:
+  cache: true
 knitr: 
   opts_chunk: 
     fig-cap-location: top
+    dev: "ragg_png"
+    fig-width: 7
+    fig-height: 7
+    out-width: 100%
 filters:  
   - quarto
   - apanote
@@ -16,6 +22,8 @@ library(dplyr)
 library(apa7)
 library(afex)
 library(car)
+library(ggplot2)
+my_font <- "Roboto Condensed"
 ```
 
 ```{r}
@@ -44,20 +52,48 @@ The `apa_anova` function makes APA-style analysis of variance (ANOVA) source tab
 
 ## A one-way design
 
-In the `ToothGrowth` data set, guinea pigs were given one of three doses of vitamin C. Does tooth length differ by dose?
+In the `Friendly` data set from the carData package (Friendly & Franklin, 1980), 30 participants learned a list of 40 words over several trials, 10 in each of three presentation formats: standard free recall, a format in which the words a participant had already recalled were presented before the other words, and a format in which they were mixed in with the other words. Does the number of words recalled on the final trial differ by presentation format?
+
+```{r}
+#| label: setup-friendly
+d_recall <- carData::Friendly |>
+  mutate(
+    condition = factor(
+      condition,
+      levels = c("SFR", "Before", "Meshed"),
+      labels = c("Standard", "Recalled Words First", "Recalled Words Mixed In")
+    )
+  ) |>
+  rename(
+    `Presentation Format` = condition,
+    `Words Recalled` = correct
+  )
+
+fit_recall <- aov(`Words Recalled` ~ `Presentation Format`, data = d_recall)
+```
+
+
+```{r}
+#| label: fig-friendly
+#| fig-cap: Mean Number of Words Recalled by Presentation Format
+#| code-fold: true
+d_recall |> 
+  ggplot(aes(`Presentation Format`, `Words Recalled`, color = `Presentation Format`)) + 
+  # geom_violin() +
+  stat_summary(fun.data = mean_cl_normal, position = position_nudge(.1)) +
+  stat_summary(fun = mean, geom = "text", aes(label = after_stat(y)), position = position_nudge(.15), hjust = 0, family = my_font) +
+  ggbeeswarm::geom_beeswarm(alpha = .5, pch = 16) + 
+  theme_minimal(base_family = my_font, base_size = 16) +
+  theme(legend.position = "none") + 
+  scale_color_viridis_d(begin = .2, end = .7)
+```
+
 
 ```{r}
 #| label: tbl-one-way
 #| tbl-cap: A One-Way ANOVA Table
-d_tooth <- ToothGrowth |>
-  mutate(dose = factor(dose)) |> 
-  rename(Dose = dose,
-         Supplement = supp,
-         Length = len)
 
-fit_dose <- aov(Length ~ Dose, data = d_tooth)
-apa_anova(fit_dose)
-
+apa_anova(fit_recall)
 ```
 
 The table has a row for each effect and a row for the error term (the residuals). Its columns are the sums of squares (*SS*), degrees of freedom (*df*), mean squares (*MS*), the *F* test with its *p*-value, and eta squared (*&eta;*^2^). The default effect size is partial *&eta;*^2^, but in a one-way design, partial and non-partial *&eta;*^2^ are the same, so the column is labeled *&eta;*^2^.
@@ -66,18 +102,80 @@ In the console, `apa_anova` prints as an ordinary tibble, so you can inspect it 
 
 ```{r}
 #| label: one-way-tibble
-apa_anova(fit_dose) |>
+apa_anova(fit_recall) |>
   tibble::as_tibble()
 ```
 
+In follow-up tests using `apa_contrast`, we can see that performance was lower in the standard condition, compared to the other conditions, which had equal means:
+
+
+```{r}
+#| label: contrast-display
+apa_contrasts(fit_recall, 
+              contrast = `Presentation Format`, 
+              p_adjust = "tukey",
+              effect_size = FALSE) |> 
+  mutate(`Presentation Format` = stringr::str_remove(
+    `Presentation Format`, 
+    "Recalled Words ")) |> 
+  apa_flextable(note = TRUE)
+```
+
+
+
+
+
+
 ## A factorial design
 
-The guinea pigs also received vitamin C either as orange juice or as ascorbic acid (`supp`). The factorial model tests both main effects and their interaction. Interaction terms are labeled with a multiplication sign (e.g., Supp × Dose).
+The `Adler` data set from the carData package comes from a study of experimenter expectancy effects @adlerImpactPriorSets1973. Experimenters collected ratings of how successful people in photographs appeared to be. The photographs had been chosen because the people in them looked neither especially successful nor unsuccessful. Before collecting the data, the experimenters were told to expect either high or low ratings, and they were told to get good data, to get scientific data, or were given no such instruction. The outcome is the average success rating each experimenter obtained.
+
+```{r}
+#| label: adler-data
+d_adler <- carData::Adler |>
+  mutate(
+    instruction = factor(
+      instruction,
+      levels = c("none", "good", "scientific"),
+      labels = c("None", "Get Good Data", "Get Scientific Data")
+    ),
+    expectation = factor(
+      expectation,
+      levels = c("low", "high"),
+      labels = c("Low Ratings", "High Ratings")
+    )
+  ) |>
+  rename(
+    Instruction = instruction,
+    `Expected Ratings` = expectation,
+    `Success Rating` = rating
+  )
+```
+
+
+```{r}
+#| label: fig-adler
+#| fig-cap: Mean Success Ratings Across Expected Ratings and Instructions
+d_adler |> 
+  ggplot(aes(`Expected Ratings` , `Success Rating`, color = `Expected Ratings`)) + 
+  # geom_violin() +
+  stat_summary(fun.data = mean_cl_normal, position = position_nudge(.15)) +
+  stat_summary(fun = mean, geom = "text", aes(label = after_stat(y) |> signs::signs(accuracy = .1)), position = position_nudge(.25), hjust = 0, family = my_font, size = .8 * 14 / ggplot2::.pt) +
+  ggbeeswarm::geom_beeswarm(alpha = .5, pch = 16) + 
+  theme_light(base_family = my_font, base_size = 14) +
+  theme(legend.position = "none") + 
+  scale_color_viridis_d(begin = .2, end = .7) + 
+  facet_grid(cols = vars(Instruction), labeller = "label_both") + 
+  scale_y_continuous(labels = signs::signs)
+```
+
+
+The factorial model tests both main effects and their interaction. Interaction terms are labeled with a multiplication sign (e.g., Instruction × Expected Ratings).
 
 ```{r}
 #| label: factorial
-fit_tooth <- aov(Length ~ Supplement * Dose, data = d_tooth)
-apa_anova(fit_tooth)
+fit_adler <- aov(`Success Rating` ~ Instruction * `Expected Ratings`, data = d_adler)
+apa_anova(fit_adler)
 ```
 
 ## Choosing columns
@@ -87,7 +185,7 @@ The `anova_parameters` argument selects the columns and their order. `"Effect_Si
 ```{r}
 #| label: columns
 apa_anova(
-  fit_tooth,
+  fit_adler,
   anova_parameters = c("Parameter", "df", "F", "p", "Effect_Size")
 )
 ```
@@ -96,7 +194,7 @@ To mark significant effects, `starred` adds significance stars to a column, and 
 
 ```{r}
 #| label: starred
-apa_anova(fit_tooth, starred = "F")
+apa_anova(fit_adler, starred = "F")
 ```
 
 # Effect Sizes
@@ -119,7 +217,7 @@ By default, `apa_anova` displays partial eta squared (*&eta;*^2^~p~), the most c
 
 ```{r}
 #| label: omega
-apa_anova(fit_tooth, effect_size = "omega")
+apa_anova(fit_adler, effect_size = "omega")
 ```
 
 Generalized *&eta;*^2^ (Olejnik & Algina, 2003) is comparable across designs with different numbers of between- and within-subjects factors, which makes it useful for meta-analysis and for comparing studies. It is the default effect size in afex.
@@ -131,7 +229,7 @@ APA style recommends reporting confidence intervals for effect sizes. Add `"CI"`
 ```{r}
 #| label: ci
 apa_anova(
-  fit_tooth,
+  fit_adler,
   anova_parameters = c(
     "Parameter", "df", "F", "p", "Effect_Size", "CI"
   ),
@@ -147,12 +245,20 @@ Intervals are not shown for generalized *&eta;*^2^, because the intervals comput
 
 When cell sizes are unequal, the effects in a factorial design are correlated, and the sums of squares depend on how the variance they share is divided. In the `Moore` data set from the carData package, participants were paired with a partner of high or low status, and the number of times they conformed to their partner's judgments was recorded. Participants' authoritarianism was classified as low, medium, or high. The cell sizes are unequal:
 
+
+
+
+
 ```{r}
 #| label: moore
 d_moore <- carData::Moore |>
   mutate(
-    fcategory = factor(fcategory, levels = c("low", "medium", "high")),
-    partner.status = factor(partner.status, levels = c("low", "high"))
+    fcategory = factor(fcategory, 
+                       levels = c("low", "medium", "high"),
+                       labels = c("Low", "Medium", "High")),
+    partner.status = factor(partner.status, 
+                            levels = c("low", "high"),
+                            labels = c("Low", "High"))
   ) |>
   rename(
     Authoritarianism = fcategory,
@@ -162,6 +268,27 @@ d_moore <- carData::Moore |>
 
 table(d_moore$Authoritarianism, d_moore$`Partner Status`)
 ```
+
+
+```{r}
+#| label: fig-moore
+#| fig-cap: Mean Conformity Across Participant and Partner Authoritarianism
+d_moore |> 
+  # rename(`Participant Authoritarianism` = Authoritarianism) |> 
+  ggplot(aes(`Partner Status` , conformity, color = `Partner Status`)) + 
+  # geom_violin() +
+  stat_summary(fun.data = mean_cl_normal, position = position_nudge(.15)) +
+  stat_summary(fun = mean, geom = "text", aes(label = after_stat(y) |> signs::signs(accuracy = .1)), position = position_nudge(.25), hjust = 0, family = my_font, size = .8 * 14 / ggplot2::.pt) +
+  ggbeeswarm::geom_beeswarm(alpha = .5, pch = 16) + 
+  theme_light(base_family = my_font, base_size = 14) +
+  theme(legend.position = "none") + 
+  scale_color_viridis_d(begin = .2, end = .7) + 
+  facet_grid(cols = vars(`Authoritarianism`), labeller = "label_both") + 
+  scale_y_continuous("Conformity", labels = signs::signs) 
+```
+
+
+
 
 By default, `apa_anova` uses Type 1 (sequential) sums of squares, as `anova` and `summary.aov` do. Each effect is adjusted only for the effects entered before it, so the results depend on the order of the terms in the formula.
 
@@ -198,6 +325,13 @@ A table from `car::Anova` or `anova` can also be passed to `apa_anova` directly.
 car::Anova(fit_moore, type = 2) |>
   apa_anova()
 ```
+
+```{r}
+#| label: moorecontrast
+apa_contrasts(fit_moore, contrast = `Partner Status`, by = Authoritarianism, effect_size = FALSE) |> 
+  apa_flextable(note = TRUE)
+```
+
 
 # Analysis of Covariance
 
@@ -351,13 +485,13 @@ The generated note is a starting point. To add to it, combine it with your own t
 
 ## Labels and post-processing
 
-Variable names are converted to title case (e.g., `supp` becomes Supp). For better labels, rename the variables before fitting the model, as was done for the Moore data above. Because the output is a tibble, you can also change the labels afterward.
+Variable names are converted to title case (e.g., `correct` would become Correct). For better labels, rename the variables before fitting the model, as was done for the Moore data above. Because the output is a tibble, you can also change the labels afterward.
 
 Further formatting is available with `apa_flextable`.
 
 ```{r}
 #| label: flextable
-apa_anova(fit_tooth) |>
+apa_anova(fit_adler) |>
   apa_flextable(table_width = .8)
 ```
 
@@ -370,6 +504,12 @@ apa_anova(fit_tooth) |>
 `apa_parameters` returns the same table for `aov` and afex models, so `apa_parameters(fit)` and `apa_anova(fit)` are interchangeable for these models. To display the regression coefficients of an ANOVA model, fit it with `lm` and use `apa_parameters`. For linear mixed models, the two functions show different things: `apa_anova` tests each effect as a whole, and `apa_parameters` shows the fixed-effect coefficients and the random effects.
 
 # References
+
+Adler, N. E. (1973). Impact of prior sets given experimenters and subjects on the experimenter expectancy effect. *Sociometry, 36*(1), 113–126. <https://doi.org/10.2307/2786286>
+
+Erickson, B. H., & Nosanchuk, T. A. (1977). *Understanding data*. McGraw-Hill Ryerson.
+
+Friendly, M., & Franklin, P. (1980). Interactive presentation in multitrial free recall. *Memory & Cognition, 8*(3), 265–270. <https://doi.org/10.3758/BF03197614>
 
 O'Brien, R. G., & Kaiser, M. K. (1985). MANOVA method for analyzing repeated measures designs: An extensive primer. *Psychological Bulletin, 97*(2), 316–333. <https://doi.org/10.1037/0033-2909.97.2.316>
 

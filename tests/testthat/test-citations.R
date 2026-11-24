@@ -13,7 +13,7 @@ test_that("apa7's BibTeX file is parsed into keys, authors, and years", {
   expect_equal(entries$eggerBiasMetaanalysisDetected1997$authors[2], "Davey Smith")
   # Every entry has authors and a four-digit year (a malformed entry would not)
   expect_true(all(lengths(lapply(entries, `[[`, "authors")) > 0))
-  expect_true(all(grepl("^[0-9]{4}$", vapply(entries, `[[`, character(1), "year"))))
+  expect_true(all(grepl("^([0-9]{4}/)?[0-9]{4}$", vapply(entries, `[[`, character(1), "year"))))
   chars <- strsplit(paste(readLines(apa7_bib()), collapse = ""), "")[[1]]
   expect_equal(sum(chars == "{"), sum(chars == "}"))
   expect_equal(apa7:::citation_text("cheungModelingDependentEffect2014"), "Cheung, 2014")
@@ -69,6 +69,33 @@ test_that("auto uses keys only for entries in the document's bibliography", {
     apa7:::resolve_citations(s, "auto"),
     c("A [@duvalTrimFillSimple2000].", "B (Cheung, 2014).")
   )
+})
+
+test_that("several keys are cited together, all as keys or all as text", {
+  s <- paste0("Method ", apa7:::cite(c("duvalTrimFillSimple2000", "cheungModelingDependentEffect2014")), ".")
+  expect_equal(
+    apa7:::resolve_citations(s, "text"),
+    "Method (Duval & Tweedie, 2000; Cheung, 2014)."
+  )
+  expect_equal(
+    apa7:::resolve_citations(s, "keys"),
+    "Method [@duvalTrimFillSimple2000; @cheungModelingDependentEffect2014]."
+  )
+})
+
+test_that("republished works are cited with the original and published years", {
+  dir <- withr::local_tempdir()
+  bib <- file.path(dir, "refs.bib")
+  writeLines(
+    c(
+      "@incollection{tukeyProblem1994,", "  author = {Tukey, John W.},", "  year = 1994,", "  origdate = {1953}", "}",
+      "@incollection{tukeyOther1994,", "  author = {Tukey, John W.},", "  date = {1994},", "  origyear = 1953", "}"
+    ),
+    bib
+  )
+  entries <- apa7:::bib_entries(bib)
+  expect_equal(entries$tukeyProblem1994$year, "1953/1994")
+  expect_equal(entries$tukeyOther1994$year, "1953/1994")
 })
 
 test_that("apa_note() takes citations as an argument or an option", {

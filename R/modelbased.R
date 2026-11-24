@@ -240,7 +240,167 @@ modelbased_call <- function(x, fun, variable_args, ...) {
   if (!is.null(values$by)) {
     values$by <- modelbased_numeric_by(data, values$by)
   }
-  do.call(modelbased_estimates, c(list(x, fun), values))
+  # marginaleffects computes wrong standard errors (0 or NA) when variable
+  # names are not syntactic (e.g., `Partner Status`), so the model is refit
+  # with syntactic names, and the original names are restored in the table
+  renamed <- modelbased_syntactic_model(x, data)
+  if (!is.null(renamed)) {
+    x <- renamed$model
+    for (arg in intersect(c("by", "contrast", "trend"), names(values))) {
+      values[[arg]] <- modelbased_rename_specs(values[[arg]], renamed$names)
+    }
+  }
+  out <- do.call(modelbased_estimates, c(list(x, fun), values))
+  if (!is.null(renamed)) {
+    # Syntactic names, named by the original names
+    attr(out, "apa7_original_names") <- stats::setNames(names(renamed$names), renamed$names)
+  }
+  out
+}
+
+#' The model refit with syntactic variable names
+#'
+#' @param model a model
+#' @param data the model's data
+#' @returns `NULL` if all of the model's variables have syntactic names (or the
+#'   model cannot be refit), otherwise a list with the refit `model` and
+#'   `names`, the syntactic names named by the original names
+#' @keywords internal
+#' @noRd
+modelbased_syntactic_model <- function(model, data) {
+  if (is.null(data)) {
+    return(NULL)
+  }
+  variables <- tryCatch(
+    insight::find_variables(model, flatten = TRUE, verbose = FALSE),
+    error = function(e) NULL
+  )
+  if (is.null(variables)) {
+    variables <- colnames(data)
+  }
+  variables <- intersect(variables, colnames(data))
+  bad <- variables[make.names(variables) != variables]
+  if (length(bad) == 0) {
+    return(NULL)
+  }
+  taken <- colnames(data)
+  new_names <- character(0)
+  for (b in bad) {
+    candidate <- make.names(b)
+    while (candidate %in% c(taken, new_names)) {
+      candidate <- paste0(candidate, "_")
+    }
+    new_names <- c(new_names, candidate)
+  }
+  names(new_names) <- bad
+  fail <- function(reason = NULL) {
+    cli::cli_warn(c(
+      "Variable names that are not syntactic ({.val {bad}}) can make standard errors, tests, and confidence intervals wrong, and the model could not be refit with syntactic names.",
+      "i" = "Rename the variables (e.g., {.code {make.names(bad[1])}}) and fit the model again.",
+      if (!is.null(reason)) c("x" = reason)
+    ))
+    NULL
+  }
+
+  cl <- insight::get_call(model)
+  if (is.null(cl) || !is.call(cl)) {
+    return(fail())
+  }
+  env <- tryCatch(environment(stats::formula(model)), error = function(e) NULL)
+  if (is.null(env)) {
+    env <- globalenv()
+  }
+  rename_symbols <- function(e) {
+    if (is.symbol(e) && as.character(e) %in% names(new_names)) {
+      return(as.name(new_names[[as.character(e)]]))
+    }
+    if (is.call(e)) {
+      return(as.call(lapply(as.list(e), rename_symbols)))
+    }
+    e
+  }
+  args <- as.list(cl)[-1]
+  arg_names <- if (is.null(names(args))) rep("", length(args)) else names(args)
+  for (i in seq_along(args)) {
+    if (identical(arg_names[i], "data")) {
+      next
+    }
+    a <- args[[i]]
+    # A formula stored in an object (e.g., lm(f, data = d))
+    if (is.symbol(a)) {
+      value <- tryCatch(eval(a, env), error = function(e) NULL)
+      if (inherits(value, "formula")) {
+        a <- value
+      }
+    }
+    if (inherits(a, "formula")) {
+      f_env <- environment(a)
+      a <- rename_symbols(a)
+      a <- stats::as.formula(a, env = f_env)
+    } else {
+      a <- rename_symbols(a)
+    }
+    if (is.null(a)) {
+      args[i] <- list(NULL)
+    } else {
+      args[[i]] <- a
+    }
+  }
+  renamed_data <- data
+  colnames(renamed_data)[match(bad, colnames(renamed_data))] <- new_names
+  refit_env <- new.env(parent = env)
+  assign(".apa7_data", renamed_data, envir = refit_env)
+  args$data <- as.name(".apa7_data")
+  new_call <- as.call(c(cl[[1]], args))
+  refit <- tryCatch(eval(new_call, refit_env), error = function(e) e)
+  if (inherits(refit, "error")) {
+    return(fail(conditionMessage(refit)))
+  }
+  # The refit model must be the same model
+  same <- tryCatch(
+    isTRUE(all.equal(
+      as.numeric(stats::logLik(model)),
+      as.numeric(stats::logLik(refit)),
+      tolerance = 1e-6
+    )),
+    error = function(e) {
+      isTRUE(all.equal(
+        unname(insight::get_parameters(model)$Estimate),
+        unname(insight::get_parameters(refit)$Estimate),
+        tolerance = 1e-6
+      ))
+    }
+  )
+  if (!same) {
+    return(fail("The refit model differs from the original model."))
+  }
+  list(model = refit, names = new_names)
+}
+
+#' Variable names in specifications (e.g., `"x y=[sd]"`) replaced with
+#' syntactic names
+#' @param specs character vector of specifications, or other values (returned
+#'   unchanged)
+#' @param new_names syntactic names named by the original names
+#' @keywords internal
+#' @noRd
+modelbased_rename_specs <- function(specs, new_names) {
+  if (!is.character(specs)) {
+    return(specs)
+  }
+  vapply(
+    specs,
+    \(s) {
+      name <- trimws(sub("=.*$", "", s))
+      if (!name %in% names(new_names)) {
+        return(s)
+      }
+      rest <- if (grepl("=", s, fixed = TRUE)) sub("^[^=]*", "", s) else ""
+      paste0(new_names[[name]], rest)
+    },
+    character(1),
+    USE.NAMES = FALSE
+  )
 }
 
 #' Specifications as strings
@@ -515,7 +675,12 @@ modelbased_table <- function(
     cli::cli_abort("Estimates from Bayesian models are not yet supported.")
   }
 
+  # Original names of variables that were renamed to refit the model
+  original <- a$apa7_original_names
   label <- function(v) {
+    if (!is.null(original) && length(v) > 0) {
+      v <- ifelse(v %in% names(original), unname(original[v]), v)
+    }
     if (format_variable_names) variable_name_formatter(v) else v
   }
 
@@ -804,7 +969,7 @@ modelbased_table <- function(
 p_adjust_names <- function() c(
   holm = paste0("Holm's method ", cite("holmSimpleSequentiallyRejective1979")),
   bonferroni = "the Bonferroni correction",
-  tukey = "Tukey's method",
+  tukey = paste0("Tukey's method ", cite(c("kramerExtensionMultipleRange1956", "tukeyProblemMultipleComparisons1994"))),
   hochberg = "Hochberg's method",
   hommel = "Hommel's method",
   BH = paste0("the Benjamini\u2013Hochberg false discovery rate correction ", cite("benjaminiControllingFalseDiscovery1995")),

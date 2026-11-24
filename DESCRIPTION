@@ -52,6 +52,7 @@ Suggests:
     correlation,
     forcats,
     fresh,
+    ggbeeswarm,
     ggplot2,
     glmmTMB,
     lavaan,

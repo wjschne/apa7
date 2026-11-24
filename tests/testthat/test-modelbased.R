@@ -79,7 +79,7 @@ test_that("other variables in by become heading rows", {
   contrasts <- apa_contrasts(fit, contrast = "cyl", by = "am", p_adjust = "tukey")
   expect_equal(contrasts$Cyl[c(1, 5)], c("Am: Auto", "Am: Manual"))
   expect_equal(contrasts$Cyl[2], paste0(em, "6 ", minus, " 4"))
-  expect_match(apa_note(contrasts), "Tukey's method", fixed = TRUE)
+  expect_match(apa_note(contrasts, citations = "text"), "Tukey's method (Kramer, 1956; Tukey, 1953/1994)", fixed = TRUE)
   expect_match(apa_note(contrasts), "Wt is held at its mean", fixed = TRUE)
 })
 
@@ -326,4 +326,58 @@ test_that("Cohen's d is skipped or refused for logistic and mixed models", {
 
   expect_error(apa_contrasts(g, contrast = cyl, sd = -1), "positive number")
   expect_error(apa_contrasts(g, contrast = cyl, effect_size = "yes"), "effect_size")
+})
+
+test_that("variables with non-syntactic names get correct standard errors and keep their names", {
+  skip_if_not_installed("carData")
+  d <- carData::Moore
+  d$Authoritarianism <- factor(d$fcategory, levels = c("low", "medium", "high"))
+  d$`Partner Status` <- factor(d$partner.status, levels = c("low", "high"))
+  d$`Authoritarianism Score` <- d$fscore
+  d_ok <- d
+  names(d_ok)[names(d_ok) == "Partner Status"] <- "Partner_Status"
+  names(d_ok)[names(d_ok) == "Authoritarianism Score"] <- "Authoritarianism_Score"
+
+  fit <- suppressWarnings(lm(conformity ~ Authoritarianism * `Partner Status`, data = d))
+  fit_ok <- lm(conformity ~ Authoritarianism * Partner_Status, data = d_ok)
+  result <- suppressWarnings(apa_contrasts(fit, contrast = `Partner Status`, by = Authoritarianism))
+  expected <- apa_contrasts(fit_ok, contrast = Partner_Status, by = Authoritarianism)
+  expect_equal(colnames(result)[1], "Partner Status")
+  expect_equal(unname(as.list(result)[-1]), unname(as.list(expected)[-1]))
+  expect_equal(result[[1]], expected[[1]])
+
+  means <- suppressWarnings(apa_means(fit, by = c("Authoritarianism", "Partner Status")))
+  means_ok <- apa_means(fit_ok, by = c("Authoritarianism", "Partner_Status"))
+  expect_equal(unname(as.list(means)), unname(as.list(means_ok)))
+
+  # Formula stored in an object, numeric variable with a shortcut, and slopes
+  f <- conformity ~ `Authoritarianism Score` * `Partner Status`
+  fit2 <- suppressWarnings(lm(f, data = d))
+  fit2_ok <- lm(conformity ~ Authoritarianism_Score * Partner_Status, data = d_ok)
+  contrasts <- suppressWarnings(
+    apa_contrasts(fit2, contrast = "Partner Status", by = "Authoritarianism Score=[sd]")
+  )
+  contrasts_ok <- apa_contrasts(fit2_ok, contrast = "Partner_Status", by = "Authoritarianism_Score=[sd]")
+  expect_equal(contrasts[[2]], contrasts_ok[[2]])
+  expect_equal(contrasts[[3]], contrasts_ok[[3]])
+  expect_match(contrasts[[1]][1], "^Authoritarianism Score: ")
+
+  slopes <- suppressWarnings(
+    apa_slopes(fit2, trend = `Authoritarianism Score`, by = `Partner Status`)
+  )
+  slopes_ok <- apa_slopes(fit2_ok, trend = Authoritarianism_Score, by = Partner_Status)
+  expect_equal(unname(as.list(slopes)), unname(as.list(slopes_ok)))
+  expect_match(apa_note(slopes), "simple slopes of Authoritarianism Score")
+})
+
+test_that("mixed models with non-syntactic names are refit", {
+  skip_if_not_installed("lme4")
+  skip_if_not_installed("afex")
+  d <- afex::obk.long
+  d$`Treatment Group` <- d$treatment
+  fit <- suppressWarnings(lme4::lmer(value ~ `Treatment Group` + (1 | id), data = d))
+  result <- suppressWarnings(apa_contrasts(fit, contrast = `Treatment Group`, effect_size = FALSE))
+  expect_equal(colnames(result)[1], "Treatment Group")
+  se <- as.numeric(unpad(result$`*SE*`))
+  expect_true(all(!is.na(se) & se > 0.1))
 })

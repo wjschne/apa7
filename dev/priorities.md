@@ -130,8 +130,9 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
 
 <!-- New ideas go here until they get a priority -->
 
-- [ ] Rework apa7.qmd to be a better introduction for new users. Currently it gets too much into the details. Also, should cover all of apa7's tasks. Maybe move detailed explanations into an article about fully customized tables and the inner workings of apa7's tables.
 - [ ] Make a better contingency table article.
+- [ ] Use examples and data sets relevant to psychology in all articles (e.g., data from `psych`, `psychTools`, `carData`, or simulated psychological variables), replacing general-purpose data sets like `mtcars`, `iris`, and `ToothGrowth`. Process the data so that variable names and factor levels are whole words and phrases that read well in tables.
+  - [x] `anova.qmd`: `carData::Friendly` (one-way) and `carData::Adler` (factorial) replace `ToothGrowth`
 
 ## Done
 

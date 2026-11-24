@@ -16,7 +16,7 @@ that can affect existing tables.
 
 * Local: Windows 11, R 4.6.2 (`R CMD check --as-cran`)
 * win-builder: R-release and R-devel (TO DO)
-* R-hub: Linux (Ubuntu, R-devel), macOS arm64 (R-devel), and Windows (R-devel) (TO DO)
+* R-hub: Linux (Ubuntu, R-devel), macOS arm64 (R-devel), and Windows (R-devel)
 
 ## R CMD check results
 

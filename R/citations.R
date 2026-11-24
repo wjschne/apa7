@@ -112,6 +112,10 @@ bib_entries <- function(path) {
       date <- field("date")
       year <- if (is.na(date)) "n.d." else substr(date, 1, 4)
     }
+    # A republished work is cited with both years, as in "Tukey, 1953/1994"
+    original <- field("origdate")
+    if (is.na(original)) original <- field("origyear")
+    if (!is.na(original)) year <- paste0(substr(original, 1, 4), "/", year)
     entries[[key]] <- list(authors = last_names, year = year)
   }
   entries
@@ -153,13 +157,14 @@ citation_text <- function(key, narrative = FALSE) {
 #'
 #' Note functions write citations as markers, which [apa_note()] turns into
 #' text or citation keys.
-#' @param key citation key in apa7's BibTeX file
+#' @param key citation key in apa7's BibTeX file, or several keys to cite
+#'   together ("(Kramer, 1956; Tukey, 1953/1994)")
 #' @param narrative if `TRUE`, a narrative citation ("Egger et al. (1997)");
 #'   otherwise a parenthetical one ("(Egger et al., 1997)")
 #' @keywords internal
 #' @noRd
 cite <- function(key, narrative = FALSE) {
-  paste0("<<", if (narrative) "citet" else "cite", ":", key, ">>")
+  paste0("<<", if (narrative) "citet" else "cite", ":", paste(key, collapse = ";"), ">>")
 }
 
 #' Keys in the bibliography of the document being rendered
@@ -207,12 +212,21 @@ resolve_citations <- function(sentences, citations = "auto") {
         break
       }
       narrative <- m[2] == "citet"
-      key <- m[3]
-      as_key <- citations == "keys" || (citations == "auto" && key %in% available)
+      keys <- strsplit(m[3], ";", fixed = TRUE)[[1]]
+      # All keys or none, so one parenthesis never mixes keys and text
+      as_key <- citations == "keys" || (citations == "auto" && all(keys %in% available))
       replacement <- if (as_key) {
-        if (narrative) paste0("@", key) else paste0("[@", key, "]")
+        if (narrative) {
+          paste0("@", keys, collapse = ", ")
+        } else {
+          paste0("[", paste0("@", keys, collapse = "; "), "]")
+        }
       } else {
-        if (narrative) citation_text(key, narrative = TRUE) else paste0("(", citation_text(key), ")")
+        if (narrative) {
+          paste(vapply(keys, citation_text, "", narrative = TRUE), collapse = ", ")
+        } else {
+          paste0("(", paste(vapply(keys, citation_text, ""), collapse = "; "), ")")
+        }
       }
       s <- sub(m[1], replacement, s, fixed = TRUE)
     }
