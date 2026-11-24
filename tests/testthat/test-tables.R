@@ -4,6 +4,7 @@ library(testthat)
 # apa_chisq ----
 
 test_that("apa_chisq returns an apaflextable for a valid 2-column data frame", {
+  skip_on_cran()
   result <- apa_chisq(mtcars[, c("am", "gear")])
   expect_true(inherits(result, "flextable"))
   expect_warning(
@@ -49,6 +50,7 @@ test_that("apa_cor returns a tibble when output = 'tibble'", {
 })
 
 test_that("apa_cor tibble output has expected variable column", {
+  skip_on_cran()
   result <- apa_cor(
     mtcars[, c("mpg", "am", "gear")],
     output = "tibble",
@@ -70,6 +72,7 @@ test_that("apa_cor tibble output has expected variable column", {
 })
 
 test_that("apa_cor tibble output has one row per variable", {
+  skip_on_cran()
   vars <- c("mpg", "am", "gear", "carb")
   result <- apa_cor(
     mtcars[, vars],
@@ -195,6 +198,7 @@ test_that("apa_parameters.list aligns values across models", {
 })
 
 test_that("apa_parameters.list handles lists of glm models", {
+  skip_on_cran()
   fits <- suppressWarnings(list(
     glm(am ~ wt, data = mtcars, family = binomial),
     glm(am ~ wt + hp, data = mtcars, family = binomial)
@@ -331,6 +335,7 @@ test_that("apa_flextable handles Model as the row title column", {
 # ordinal models ----
 
 test_that("apa_parameters.polr reports ORs, z tests, and thresholds", {
+  skip_on_cran()
   skip_if_not_installed("MASS")
   skip_if_not_installed("carData")
   fit <- MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE)
@@ -373,6 +378,7 @@ test_that("apa_parameters.clm matches apa_parameters.polr", {
 })
 
 test_that("lists of ordinal models are compared with likelihood ratio tests", {
+  skip_on_cran()
   skip_if_not_installed("MASS")
   skip_if_not_installed("carData")
   m1 <- MASS::polr(poverty ~ gender, data = carData::WVS, Hess = TRUE)
@@ -385,6 +391,7 @@ test_that("lists of ordinal models are compared with likelihood ratio tests", {
 # named lists of models ----
 
 test_that("named lists label models by name", {
+  skip_on_cran()
   fits <- list(
     Cylinders = lm(mpg ~ cyl, data = mtcars),
     `Cylinders and weight` = lm(mpg ~ cyl + wt, data = mtcars)
@@ -480,6 +487,7 @@ test_that("apa_parameters.merMod reports odds ratios for glmer", {
 })
 
 test_that("mixed-model fit and comparisons", {
+  skip_on_cran()
   skip_if_not_installed("lme4")
   skip_if_not_installed("pbkrtest")
   m0 <- lme4::lmer(Reaction ~ Days + (1 | Subject), data = lme4::sleepstudy)
@@ -608,6 +616,7 @@ test_that("apa_parameters.lm passes vcov to model_parameters (robust SEs)", {
 })
 
 test_that("apa_parameters.glm shows exponentiated confidence intervals", {
+  skip_on_cran()
   fit <- glm(carb ~ wt, data = mtcars, family = poisson)
   result <- apa_parameters(fit, predictor_parameters = exp_ci_parameters)
   expect_equal(
@@ -722,6 +731,7 @@ test_that("apa_parameters.list re-aligns confidence intervals across models", {
 # align_padded_columns ----
 
 test_that("apa_flextable left-aligns padded columns and centers the block", {
+  skip_on_cran()
   glm1 <- suppressWarnings(glm(am ~ wt + hp, data = mtcars, family = binomial))
   d <- apa_parameters(
     glm1,
@@ -750,6 +760,7 @@ test_that("apa_flextable left-aligns padded columns and centers the block", {
 # apa7_tbl ----
 
 test_that("apa tables have class apa7_tbl and remain tibbles", {
+  skip_on_cran()
   fit <- lm(mpg ~ cyl + wt, data = mtcars)
   m1 <- lm(mpg ~ cyl, data = mtcars)
   glms <- suppressWarnings(list(
@@ -883,6 +894,7 @@ test_that("add_star_column", {
 
 # apa_flextable ----
 test_that("apa_flextable", {
+  skip_on_cran()
   d <- mtcars %>%
     dplyr::select(vs, am, gear, carb) |>
     tidyr::pivot_longer(-vs, names_to = "Variable") |>
@@ -931,6 +943,7 @@ test_that("pivot_wider_name_first ", {
 })
 
 test_that("apa_cor centers every summary column", {
+  skip_on_cran()
   # Body cells of the summary columns are centered, with equal padding
   summary_alignment <- function(ft) {
     info <- flextable::information_data_paragraph(ft)
@@ -1043,6 +1056,7 @@ test_that("each cluster gets a subheading; nested clusters are spelled out", {
 })
 
 test_that("apa_cor() table_width is a proportion, with inches still accepted", {
+  skip_on_cran()
   d <- mtcars[, c("mpg", "wt", "hp")]
   total_width <- function(ft) sum(ft$body$colwidths)
 

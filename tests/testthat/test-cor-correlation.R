@@ -10,6 +10,7 @@ footer_lines <- function(ft) {
 }
 
 test_that("apa_cor() formats correlation::correlation() output like data", {
+  skip_on_cran()
   skip_if_not_installed("correlation")
   r <- correlation::correlation(d_cor, p_adjust = "none")
   from_cor <- apa_cor(r, output = "tibble")
@@ -24,6 +25,7 @@ test_that("apa_cor() formats correlation::correlation() output like data", {
 })
 
 test_that("the note names the kind of correlation and the p-value adjustment", {
+  skip_on_cran()
   skip_if_not_installed("correlation")
   holm <- footer_lines(apa_cor(correlation::correlation(d_cor)))
   expect_equal(holm[1], "Note. p-values are adjusted for multiple comparisons with Holm’s method (Holm, 1979).")

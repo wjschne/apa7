@@ -430,6 +430,7 @@ test_that("the default column formats follow the accuracy setting", {
 })
 
 test_that("font_size sets the font size of all tables", {
+  skip_on_cran()
   withr::defer(apa7_defaults(reset = TRUE))
   apa7_defaults(reset = TRUE)
   fit <- lm(mpg ~ wt, data = mtcars)
@@ -460,6 +461,7 @@ test_that("font_size sets the font size of all tables", {
 })
 
 test_that("line_spacing sets the spacing of all tables, but not of notes", {
+  skip_on_cran()
   withr::defer(apa7_defaults(reset = TRUE))
   apa7_defaults(reset = TRUE)
   fit <- lm(mpg ~ wt, data = mtcars)

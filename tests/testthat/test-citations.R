@@ -112,6 +112,7 @@ test_that("every key cited in note code is in apa7's BibTeX file", {
 })
 
 test_that("named procedures are cited as keys in keys mode", {
+  skip_on_cran()
   fit <- lm(mpg ~ wt + factor(cyl), data = mtcars)
   expect_match(
     apa_note(apa_collinearity(fit), citations = "keys"),

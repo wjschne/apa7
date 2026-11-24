@@ -11,6 +11,7 @@ reversed_items <- function(vars, reverse) {
 }
 
 test_that("item rows match psych::alpha(), with scale statistics below", {
+  skip_on_cran()
   result <- apa_reliability(
     psych::bfi,
     scales = bfi_scales,

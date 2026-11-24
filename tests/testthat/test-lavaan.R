@@ -282,6 +282,7 @@ invariance_fits <- function(...) {
 }
 
 test_that("apa_performance_comparison() compares each lavaan model with the previous one", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fits <- invariance_fits()
   result <- apa_performance_comparison(fits)
@@ -315,6 +316,7 @@ test_that("apa_performance_comparison() compares each lavaan model with the prev
 })
 
 test_that("robust lavaan comparisons name the scaled difference test", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fits <- invariance_fits(estimator = "MLR")
   result <- apa_performance_comparison(
@@ -356,6 +358,7 @@ mg_model <- paste(
 )
 
 test_that("multiple-group models show groups side by side by default", {
+  skip_on_cran()
   skip_if_not_installed("lavaan")
   fit <- lavaan::sem(
     mg_model,

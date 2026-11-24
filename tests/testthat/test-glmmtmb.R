@@ -82,6 +82,7 @@ test_that("Gaussian glmmTMB models show random effects and no exponentiated colu
 })
 
 test_that("apa_performance and model comparisons accept glmmTMB models", {
+  skip_on_cran()
   skip_if_not_installed("glmmTMB")
   fit1 <- glmmTMB::glmmTMB(count ~ mined + (1 | site), family = glmmTMB::nbinom2, data = tmb_data())
   fit2 <- stats::update(fit1, . ~ . + spp)
@@ -96,6 +97,7 @@ test_that("apa_performance and model comparisons accept glmmTMB models", {
 })
 
 test_that("apa_flextable keeps mixed-model labels and part headings as made", {
+  skip_on_cran()
   skip_if_not_installed("lme4")
   skip_if_not_installed("glmmTMB")
   fit_zi <- glmmTMB::glmmTMB(

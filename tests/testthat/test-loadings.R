@@ -157,6 +157,7 @@ test_that("apa_factor_cor errors without factor correlations", {
 })
 
 test_that("apa_loadings bold_max bolds the largest displayed loading", {
+  skip_on_cran()
   x <- apa_loadings(fit_v, sort_loading = FALSE, bold_max = TRUE)
   m <- as.matrix(x[, -1])
   L <- abs(unclass(fit_v$loadings))
@@ -177,6 +178,7 @@ test_that("apa_loadings bold_max bolds the largest displayed loading", {
 })
 
 test_that("apa_flextable draws a rule above the variance rows", {
+  skip_on_cran()
   x <- apa_loadings(fit_v, variance = TRUE)
   expect_equal(attr(x, "rule_above"), "Sum of squared loadings")
   ft <- apa_flextable(x)

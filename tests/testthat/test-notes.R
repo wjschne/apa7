@@ -72,6 +72,7 @@ test_that("apa_note defines exponentiated coefficients", {
 })
 
 test_that("apa_note describes ordinal models", {
+  skip_on_cran()
   skip_if_not_installed("MASS")
   skip_if_not_installed("carData")
   fit <- MASS::polr(poverty ~ gender + age, data = carData::WVS, Hess = TRUE)
@@ -92,6 +93,7 @@ test_that("apa_note describes ordinal models", {
 })
 
 test_that("apa_note describes mixed models", {
+  skip_on_cran()
   skip_if_not_installed("lme4")
   skip_if_not_installed("pbkrtest")
   m1 <- lme4::lmer(Reaction ~ Days + (Days | Subject), data = lme4::sleepstudy)
@@ -147,6 +149,7 @@ footer_text <- function(ft) {
 }
 
 test_that("apa_flextable adds the generated note with note = TRUE", {
+  skip_on_cran()
   tbl <- apa_parameters(fit_lm, starred = "p")
   ft <- apa_flextable(tbl, note = TRUE)
   expect_equal(flextable::nrow_part(ft, "footer"), 1)
@@ -166,6 +169,7 @@ test_that("apa_flextable adds the generated note with note = TRUE", {
 })
 
 test_that("apa_flextable uses custom note text", {
+  skip_on_cran()
   tbl <- apa_parameters(fit_lm)
   ft <- apa_flextable(tbl, note = "Data are from *mtcars*.")
   expect_equal(footer_text(ft), "Note. Data are from mtcars.")
@@ -176,6 +180,7 @@ test_that("apa_flextable uses custom note text", {
 })
 
 test_that("apa_flextable adds no note by default or when there is nothing to say", {
+  skip_on_cran()
   tbl <- apa_parameters(fit_lm)
   expect_equal(flextable::nrow_part(apa_flextable(tbl), "footer"), 0)
   expect_equal(flextable::nrow_part(apa_flextable(tbl, note = FALSE), "footer"), 0)
@@ -190,11 +195,13 @@ test_that("apa_flextable adds no note by default or when there is nothing to say
 })
 
 test_that("apa_flextable note errors are informative", {
+  skip_on_cran()
   expect_error(apa_flextable(mtcars[1:3, 1:3], note = TRUE), "needs a table made by")
   expect_error(apa_flextable(apa_parameters(fit_lm), note = 3), "must be")
 })
 
 test_that("apa_flextable notes work for ANOVA and loadings tables", {
+  skip_on_cran()
   fit <- aov(mpg ~ cyl * am, data = transform(mtcars, cyl = factor(cyl), am = factor(am)))
   expect_match(footer_text(apa_flextable(apa_anova(fit), note = TRUE)), "^Note[.] Sums of squares")
 
@@ -270,6 +277,7 @@ test_that("loadings notes use column format abbreviations", {
 })
 
 test_that("table notes are single-spaced in all table functions", {
+  skip_on_cran()
   footer_spacing <- function(ft) {
     unique(as.vector(ft$footer$styles$pars$line_spacing$data))
   }

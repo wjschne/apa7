@@ -124,6 +124,7 @@ test_that("apa_performance gives heterogeneity statistics", {
 })
 
 test_that("multilevel meta-analyses (rma.mv) get effect-size rows and variance components", {
+  skip_on_cran()
   d <- metadat::dat.konstantopoulos2011
   fit <- metafor::rma.mv(
     yi, vi,

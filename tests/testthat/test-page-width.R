@@ -20,6 +20,7 @@ test_that("page_width accepts inches and Typst paper sizes", {
 })
 
 test_that("tables fill the page width set with apa7_defaults()", {
+  skip_on_cran()
   withr::defer(apa7_defaults(reset = TRUE))
   fit <- lm(mpg ~ wt + hp, data = mtcars)
 

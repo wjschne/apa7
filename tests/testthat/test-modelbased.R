@@ -137,6 +137,7 @@ test_that("inputs are checked", {
 })
 
 test_that("shortcut moderator values are named, and numeric by defaults to [sd]", {
+  skip_on_cran()
   fit <- lm(mpg ~ wt * hp, data = mtcars)
   m <- mean(mtcars$hp)
   s <- stats::sd(mtcars$hp)
@@ -213,6 +214,7 @@ test_that("numeric by defaults to [sd] in means and contrasts; contrasted shortc
 })
 
 test_that("by, contrast, and trend take unquoted variable names", {
+  skip_on_cran()
   d <- cars_data()
   fit <- lm(mpg ~ cyl * am + hp * wt, data = d)
   expect_equal(apa_means(fit, by = cyl), apa_means(fit, by = "cyl"))
