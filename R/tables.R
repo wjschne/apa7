@@ -686,6 +686,10 @@ apa_cor <- function(
 
   R[upper.tri(R)] <- NA
   diag(R) <- "\u2014"
+  if (!star_significant || bold_significant) {
+    # Without star columns, the values are padded to line up on the decimal
+    R <- pad_correlations(R)
+  }
 
   R <- tibble::as_tibble(R)
 
@@ -784,7 +788,8 @@ apa_cor <- function(
       dplyr::mutate(
         dplyr::across(
           dplyr::where(is.double),
-          \(x) signs::signs(x, accuracy = .1^digits)
+          # Padded to line up on the decimal point
+          \(x) align_chr(x, accuracy = .1^digits, format_integers = TRUE)
         )
       ) |>
       dplyr::mutate(
@@ -927,9 +932,15 @@ apa_cor <- function(
     # apa_flextable() instead left-aligns padded columns with a left padding
     # computed from the column width, which is off once the widths change
     # below, and in HTML, where browsers size columns to their contents.
+    # Correlation columns without star columns are padded the same way.
     summary_keys <- setdiff(
       intersect(colnames(d_tbl), d$col_keys),
-      c("apa7listcolumn", "Variable", as.character(v_seq), star_names)
+      c(
+        "apa7listcolumn",
+        "Variable",
+        if (star_significant && !bold_significant) as.character(v_seq),
+        star_names
+      )
     )
     if (length(summary_keys) > 0) {
       d <- d |>

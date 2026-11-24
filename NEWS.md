@@ -58,6 +58,7 @@ These change the output of code that worked with apa7 0.2.0.
 * `apa_flextable()` keeps the table width set by `table_width` when `pretty_widths = TRUE`. Before, `pretty_widths()` reset it to the full width, so in HTML a table could be stretched wider than its columns.
 * Decimal-aligned columns in `apa_flextable()` tables are centered in HTML as well as in Word.
 * `apa_cor()` centers every summary column (e.g., *SD*, which was off-center when its values had different numbers of digits).
+* `apa_cor()` lines up correlations on the decimal point when there are no star columns (`star_significant = FALSE` or `bold_significant = TRUE`), and lines up the summary columns (e.g., *M*, Skewness, and Kurtosis) on the decimal point.
 * `apa_flextable()` no longer re-formats row labels that `apa_parameters()` (for `lme4` and `glmmTMB` models) and `apa_htest()` have already formatted. Before, random-effect labels such as "Subject: *r* (Constant, Days)" lost their spacing and commas in flextables.
 * The documentation of `table_width` in `apa_flextable()`, `apa_style()`, and `apa_chisq()` now says that it is a proportion of the container's width (from 0 to 1), not a width in pixels.
 

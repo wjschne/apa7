@@ -134,3 +134,41 @@ test_that("apa_cor() correlates logical variables as 0 and 1", {
   ct <- attr(apa_cor(d, output = "tibble"), "cortest")
   expect_equal(unname(ct$r), unname(cor(sapply(d, as.numeric))))
 })
+
+test_that("correlations line up on the decimal point without star columns", {
+  for (args in list(list(star_significant = FALSE), list(bold_significant = TRUE))) {
+    ft <- do.call(apa_cor, c(list(d_cor), args))
+    values <- ft$body$dataset$`1`
+    plain <- gsub("**", "", values, fixed = TRUE)
+    # Positive values and the dash are padded where negative values have a
+    # minus sign, so the decimal points share one position
+    expect_true(all(grepl("^[ - ]+", plain[c(1, 4)])))
+    expect_true(all(startsWith(plain[2:3], "−")))
+    # Cells are padded to equal width and centered, like the summary columns
+    # (to within the width of the narrowest padding space, in ems)
+    expect_lt(diff(range(apa7:::md_text_width(values, "Times New Roman"))), .05)
+    expect_equal(
+      unname(ft$body$styles$pars$text.align$data[2, c("1", "2", "3")]),
+      rep("center", 3)
+    )
+  }
+  # With stars, values are right-aligned against their star columns instead
+  ft <- apa_cor(d_cor)
+  expect_false(any(grepl("[ - ]", ft$body$dataset$`1`)))
+})
+
+test_that("summary columns line up on the decimal point", {
+  ft <- apa_cor(
+    mtcars[, c("mpg", "hp", "wt")],
+    summary_functions = c("M", "SD", "Skewness", "Kurtosis")
+  )
+  for (k in c("*M*", "*SD*", "Skewness", "Kurtosis")) {
+    values <- ft$body$dataset[[k]]
+    expect_lt(diff(range(apa7:::md_text_width(values, "Times New Roman"))), .05, label = k)
+  }
+  # Negative and positive skewness share the decimal position
+  d <- data.frame(x = c(1, 2, 3, 10), y = c(10, 9, 8, 1), z = c(1, 3, 2, 4))
+  sk <- apa_cor(d, summary_functions = c("Skewness"))$body$dataset$Skewness
+  expect_true(any(startsWith(sk, "−")))
+  expect_true(any(grepl("^[ - ]", sk)))
+})

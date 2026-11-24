@@ -186,3 +186,33 @@ correlation_from_data <- function(
   }
   x
 }
+
+#' Pad correlations so that they line up on the decimal point
+#'
+#' Without star columns, each correlation column is one column of text. Its
+#' values are padded on the left (as [align_chr()] does) so that the decimal
+#' points share one position, and then on the right so that every cell has
+#' the same width, so that the column can be centered (as the summary columns
+#' are). Markdown bold markers are added after the left padding, and the
+#' diagonal's dash starts where the decimal points are.
+#' @param R character matrix of formatted correlations, with `NA` above the
+#'   diagonal and a dash on it
+#' @keywords internal
+#' @noRd
+pad_correlations <- function(R) {
+  font <- if (isTRUE(the$width_aware_padding)) the$font_family else NA
+  for (j in seq_len(ncol(R))) {
+    i <- which(!is.na(R[, j]) & seq_len(nrow(R)) != j)
+    if (length(i) == 0) {
+      next
+    }
+    plain <- c(gsub("**", "", R[i, j], fixed = TRUE), ".")
+    padded <- align_chr(plain, side = "left")
+    prefix <- substr(padded, 1, nchar(padded) - nchar(plain))
+    cells <- paste0(prefix, c(R[i, j], R[j, j]))
+    cells <- num_pad(cells, pad_left = FALSE, padding_character = " ", font_family = font)
+    R[i, j] <- cells[seq_along(i)]
+    R[j, j] <- cells[length(cells)]
+  }
+  R
+}
