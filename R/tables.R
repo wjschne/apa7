@@ -521,22 +521,49 @@ apa_chisq <- function(
 #'   `table_width` was a width in inches; values greater than 1 are still
 #'   read as inches, with a warning.
 #' @inheritParams apa_style
-#' @param ... <[`data-masking`][rlang::args_data_masking]> parameters passed to psych::corTest (not used for [correlation::correlation()] output)
+#' @param method kind of correlation (e.g., `"pearson"`, `"spearman"`,
+#'   `"kendall"`, `"biweight"`, or `"percentage"`), passed to
+#'   [correlation::correlation()]. Not used for [correlation::correlation()]
+#'   output.
+#' @param p_adjust method of adjusting the *p*-values (and so the stars) for
+#'   multiple comparisons (e.g., `"holm"`, `"bonferroni"`, or `"fdr"`).
+#'   Unlike [correlation::correlation()], the default is `"none"`. Not used
+#'   for [correlation::correlation()] output.
+#' @param partial if `TRUE`, partial correlations, each controlling for all
+#'   other variables in the table. Not used for [correlation::correlation()]
+#'   output.
+#' @param ... other arguments passed to [correlation::correlation()] (e.g.,
+#'   `robust = TRUE`, `winsorize = .2`, or `multilevel = TRUE`). Not used for
+#'   [correlation::correlation()] output.
 #' @details
-#' By default, `apa_cor()` computes Pearson correlations with
-#' [psych::corTest()], and the stars are for unadjusted *p*-values.
+#' `apa_cor()` computes the correlations with [correlation::correlation()].
+#' By default, they are Pearson correlations of all pairwise complete
+#' observations, and the stars are for unadjusted *p*-values. Use `method`,
+#' `p_adjust`, `partial`, and the other arguments of
+#' [correlation::correlation()] for other kinds of correlations. The column
+#' names of `data` are the variable names in the table, and they can contain
+#' spaces and symbols (e.g., `"Reading comprehension"`) for every kind of
+#' correlation: `apa_cor()` gives the variables internal names while the
+#' correlations are computed. Logical columns are correlated as 0 and 1.
 #'
-#' For other kinds of correlations (e.g., Spearman, Kendall, robust, or
-#' partial correlations), compute them with [correlation::correlation()] and
-#' pass the result as `data`. The table shows its correlations and
-#' *p*-values, and the summary columns are computed from the data that
-#' [correlation::correlation()] keeps with its results. The note says what
-#' kind of correlations are shown (unless they are ordinary Pearson
-#' correlations) and how the *p*-values were adjusted for multiple
-#' comparisons: [correlation::correlation()] uses Holm's method by default,
-#' so the stars are for adjusted *p*-values unless `p_adjust = "none"`.
-#' Correlations computed by group, between two sets of variables, or with
-#' Bayesian methods are not yet supported.
+#' The output of [correlation::correlation()] can also be passed as `data`.
+#' The table shows its correlations and *p*-values, and the summary columns
+#' are computed from the data that [correlation::correlation()] keeps with
+#' its results. Note that [correlation::correlation()] uses Holm's method by
+#' default, so the stars are for adjusted *p*-values unless
+#' `p_adjust = "none"`, and that its partial and multilevel correlations do
+#' not accept variable names with spaces. For those, use
+#' `apa_cor(data, partial = TRUE)` instead.
+#'
+#' The note says what kind of correlations are shown (unless they are
+#' ordinary Pearson correlations) and how the *p*-values were adjusted for
+#' multiple comparisons. Correlations computed by group, between two sets of
+#' variables, or with Bayesian methods are not yet supported.
+#'
+#' In apa7 0.2.0 and earlier, `apa_cor()` computed the correlations with
+#' [psych::corTest()]. Its `adjust` argument is still accepted as
+#' `p_adjust`, with a warning, and `use = "complete"` removes incomplete
+#' rows, with a warning.
 #' @importFrom rlang .data
 #'
 #' @return flextable::flextable
@@ -548,11 +575,14 @@ apa_chisq <- function(
 #'         output = "tibble",
 #'         star_significant = FALSE)
 #'
-#' # Spearman correlations from the correlation package
-#' if (requireNamespace("correlation", quietly = TRUE)) {
-#'   correlation::correlation(trees, method = "spearman") |>
-#'     apa_cor()
-#' }
+#' # Partial Spearman correlations, with variable names that have spaces
+#' d <- mtcars[, c("mpg", "wt", "hp")]
+#' names(d) <- c("Miles per gallon", "Weight (1000 lbs)", "Gross horsepower")
+#' apa_cor(d, method = "spearman", partial = TRUE)
+#'
+#' # Output of correlation::correlation()
+#' correlation::correlation(trees, method = "spearman") |>
+#'   apa_cor()
 apa_cor <- function(
   data,
   note = NULL,
@@ -572,6 +602,9 @@ apa_cor <- function(
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
+  method = "pearson",
+  p_adjust = "none",
+  partial = FALSE,
   ...
 ) {
   if (is.null(line_spacing)) {
@@ -610,24 +643,28 @@ apa_cor <- function(
     star_significant <- FALSE
   }
 
-  # Correlations computed by correlation::correlation()
-  cor_sentences <- character(0)
-  if (inherits(data, "easycorrelation")) {
-    parts <- correlation_parts(data)
-    ct <- parts$ct
-    # apa_cor() writes its note itself, so citations are resolved here
-    cor_sentences <- resolve_citations(parts$sentences, citations_mode())
-    data <- parts$data
-    if (is.null(data)) {
-      # Without the data, there is nothing to summarize
-      summary_functions <- NULL
-      data <- tibble::as_tibble(
-        stats::setNames(rep(list(numeric(0)), length(parts$vars)), parts$vars)
-      )
-    }
-  } else {
-    ct <- psych::corTest(data, ...) |>
-      suppressWarnings()
+  # Correlations are computed by correlation::correlation(), here or by the
+  # user beforehand
+  if (!inherits(data, "easycorrelation")) {
+    data <- correlation_from_data(
+      data,
+      method = method,
+      p_adjust = p_adjust,
+      partial = partial,
+      ...
+    )
+  }
+  parts <- correlation_parts(data)
+  ct <- parts$ct
+  # apa_cor() writes its note itself, so citations are resolved here
+  cor_sentences <- resolve_citations(parts$sentences, citations_mode())
+  data <- parts$data
+  if (is.null(data)) {
+    # Without the data, there is nothing to summarize
+    summary_functions <- NULL
+    data <- tibble::as_tibble(
+      stats::setNames(rep(list(numeric(0)), length(parts$vars)), parts$vars)
+    )
   }
   v_names <- colnames(data)
   v_seq <- seq_len(ncol(data))

@@ -23,6 +23,9 @@ apa_cor(
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
+  method = "pearson",
+  p_adjust = "none",
+  partial = FALSE,
   ...
 )
 }
@@ -75,7 +78,23 @@ read as inches, with a warning.}
 
 \item{column_formats}{column_formats object}
 
-\item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> parameters passed to psych::corTest (not used for \code{\link[correlation:correlation]{correlation::correlation()}} output)}
+\item{method}{kind of correlation (e.g., \code{"pearson"}, \code{"spearman"},
+\code{"kendall"}, \code{"biweight"}, or \code{"percentage"}), passed to
+\code{\link[correlation:correlation]{correlation::correlation()}}. Not used for \code{\link[correlation:correlation]{correlation::correlation()}}
+output.}
+
+\item{p_adjust}{method of adjusting the \emph{p}-values (and so the stars) for
+multiple comparisons (e.g., \code{"holm"}, \code{"bonferroni"}, or \code{"fdr"}).
+Unlike \code{\link[correlation:correlation]{correlation::correlation()}}, the default is \code{"none"}. Not used
+for \code{\link[correlation:correlation]{correlation::correlation()}} output.}
+
+\item{partial}{if \code{TRUE}, partial correlations, each controlling for all
+other variables in the table. Not used for \code{\link[correlation:correlation]{correlation::correlation()}}
+output.}
+
+\item{...}{other arguments passed to \code{\link[correlation:correlation]{correlation::correlation()}} (e.g.,
+\code{robust = TRUE}, \code{winsorize = .2}, or \code{multilevel = TRUE}). Not used for
+\code{\link[correlation:correlation]{correlation::correlation()}} output.}
 }
 \value{
 flextable::flextable
@@ -84,20 +103,34 @@ flextable::flextable
 APA-formatted correlation table
 }
 \details{
-By default, \code{apa_cor()} computes Pearson correlations with
-\code{\link[psych:corTest]{psych::corTest()}}, and the stars are for unadjusted \emph{p}-values.
+\code{apa_cor()} computes the correlations with \code{\link[correlation:correlation]{correlation::correlation()}}.
+By default, they are Pearson correlations of all pairwise complete
+observations, and the stars are for unadjusted \emph{p}-values. Use \code{method},
+\code{p_adjust}, \code{partial}, and the other arguments of
+\code{\link[correlation:correlation]{correlation::correlation()}} for other kinds of correlations. The column
+names of \code{data} are the variable names in the table, and they can contain
+spaces and symbols (e.g., \code{"Reading comprehension"}) for every kind of
+correlation: \code{apa_cor()} gives the variables internal names while the
+correlations are computed. Logical columns are correlated as 0 and 1.
 
-For other kinds of correlations (e.g., Spearman, Kendall, robust, or
-partial correlations), compute them with \code{\link[correlation:correlation]{correlation::correlation()}} and
-pass the result as \code{data}. The table shows its correlations and
-\emph{p}-values, and the summary columns are computed from the data that
-\code{\link[correlation:correlation]{correlation::correlation()}} keeps with its results. The note says what
-kind of correlations are shown (unless they are ordinary Pearson
-correlations) and how the \emph{p}-values were adjusted for multiple
-comparisons: \code{\link[correlation:correlation]{correlation::correlation()}} uses Holm's method by default,
-so the stars are for adjusted \emph{p}-values unless \code{p_adjust = "none"}.
-Correlations computed by group, between two sets of variables, or with
-Bayesian methods are not yet supported.
+The output of \code{\link[correlation:correlation]{correlation::correlation()}} can also be passed as \code{data}.
+The table shows its correlations and \emph{p}-values, and the summary columns
+are computed from the data that \code{\link[correlation:correlation]{correlation::correlation()}} keeps with
+its results. Note that \code{\link[correlation:correlation]{correlation::correlation()}} uses Holm's method by
+default, so the stars are for adjusted \emph{p}-values unless
+\code{p_adjust = "none"}, and that its partial and multilevel correlations do
+not accept variable names with spaces. For those, use
+\code{apa_cor(data, partial = TRUE)} instead.
+
+The note says what kind of correlations are shown (unless they are
+ordinary Pearson correlations) and how the \emph{p}-values were adjusted for
+multiple comparisons. Correlations computed by group, between two sets of
+variables, or with Bayesian methods are not yet supported.
+
+In apa7 0.2.0 and earlier, \code{apa_cor()} computed the correlations with
+\code{\link[psych:corTest]{psych::corTest()}}. Its \code{adjust} argument is still accepted as
+\code{p_adjust}, with a warning, and \code{use = "complete"} removes incomplete
+rows, with a warning.
 }
 \examples{
 apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
@@ -105,9 +138,12 @@ apa_cor(mtcars[, c("mpg", "am", "gear", "carb")],
         output = "tibble",
         star_significant = FALSE)
 
-# Spearman correlations from the correlation package
-if (requireNamespace("correlation", quietly = TRUE)) {
-  correlation::correlation(trees, method = "spearman") |>
-    apa_cor()
-}
+# Partial Spearman correlations, with variable names that have spaces
+d <- mtcars[, c("mpg", "wt", "hp")]
+names(d) <- c("Miles per gallon", "Weight (1000 lbs)", "Gross horsepower")
+apa_cor(d, method = "spearman", partial = TRUE)
+
+# Output of correlation::correlation()
+correlation::correlation(trees, method = "spearman") |>
+  apa_cor()
 }

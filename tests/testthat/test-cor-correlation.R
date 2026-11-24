@@ -80,3 +80,57 @@ test_that("correlation_note_sentences() names other adjustments", {
   )
   expect_length(correlation_note_sentences(p_adjust = "none"), 0)
 })
+
+test_that("apa_cor() computes Pearson correlations with unadjusted p-values, as before", {
+  tbl <- apa_cor(d_cor, output = "tibble")
+  ct <- attr(tbl, "cortest")
+  expect_equal(unname(ct$r), unname(cor(d_cor)))
+  p <- psych::corTest(d_cor)$p
+  expect_equal(ct$p[lower.tri(ct$p)], p[lower.tri(p)])
+  # Pairwise deletion, as psych::corTest() did
+  d_missing <- d_cor
+  d_missing$mpg[c(1, 5, 9)] <- NA
+  ct <- attr(apa_cor(d_missing, output = "tibble"), "cortest")
+  expect_equal(unname(ct$r), unname(cor(d_missing, use = "pairwise")))
+})
+
+test_that("apa_cor() keeps variable names with spaces for every kind of correlation", {
+  d <- d_cor
+  names(d) <- c("Miles per gallon", "Weight (1000 lbs)", "Gross horsepower", "Quarter-mile time")
+  partial <- apa_cor(d, partial = TRUE, method = "spearman")
+  expect_equal(partial$body$dataset$Variable, names(d))
+  expect_match(footer_lines(partial)[1], "Values are partial Spearman correlations", fixed = TRUE)
+  expect_equal(
+    attr(apa_cor(d, partial = TRUE, output = "tibble"), "cortest")$r,
+    attr(apa_cor(d_cor, partial = TRUE, output = "tibble"), "cortest")$r,
+    ignore_attr = TRUE
+  )
+  holm <- footer_lines(apa_cor(d, p_adjust = "holm"))
+  expect_match(holm[1], "Holm", fixed = TRUE)
+})
+
+test_that("apa_cor() accepts the old psych::corTest() arguments with a warning", {
+  expect_warning(
+    tbl <- apa_cor(d_cor, adjust = "holm", output = "tibble"),
+    "p_adjust"
+  )
+  expect_identical(
+    attr(tbl, "cortest"),
+    attr(apa_cor(d_cor, p_adjust = "holm", output = "tibble"), "cortest")
+  )
+  d_missing <- d_cor
+  d_missing$mpg[1] <- NA
+  expect_warning(
+    tbl <- apa_cor(d_missing, use = "complete", output = "tibble"),
+    "na.omit"
+  )
+  expect_equal(unname(attr(tbl, "cortest")$r), unname(cor(stats::na.omit(d_missing))))
+  expect_error(apa_cor(d_cor, y = d_cor), "two sets")
+  expect_error(apa_cor(d_cor[1]), "at least two")
+})
+
+test_that("apa_cor() correlates logical variables as 0 and 1", {
+  d <- data.frame(x = c(TRUE, FALSE, TRUE, TRUE, FALSE), y = 1:5, z = c(2, 1, 4, 3, 5))
+  ct <- attr(apa_cor(d, output = "tibble"), "cortest")
+  expect_equal(unname(ct$r), unname(cor(sapply(d, as.numeric))))
+})

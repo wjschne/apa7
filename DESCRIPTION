@@ -20,6 +20,7 @@ Depends:
     R (>= 4.1.0)
 Imports:
     cli,
+    correlation,
     dplyr,
     effectsize,
     flextable,
@@ -49,7 +50,6 @@ Suggests:
     car,
     carData,
     conflicted,
-    correlation,
     forcats,
     fresh,
     ggbeeswarm,

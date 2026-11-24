@@ -111,3 +111,78 @@ correlation_note_sentences <- function(
   }
   sentences
 }
+
+#' Correlations of a data frame, computed by correlation::correlation()
+#'
+#' The columns get internal names while the correlations are computed, so
+#' variable names with spaces or symbols work for every kind of correlation
+#' (partial and multilevel correlations fit models with formulas, which
+#' cannot use such names). The original names are restored in the result.
+#' @param data data frame
+#' @param method,p_adjust,partial passed to [correlation::correlation()]
+#' @param ... passed to [correlation::correlation()]
+#' @returns an `easycorrelation` object with the original variable names
+#' @keywords internal
+#' @noRd
+correlation_from_data <- function(
+  data,
+  method = "pearson",
+  p_adjust = "none",
+  partial = FALSE,
+  ...,
+  call = rlang::caller_env()
+) {
+  dots <- list(...)
+  # Arguments of psych::corTest(), which apa_cor() used in apa7 0.2.0
+  if ("adjust" %in% names(dots)) {
+    cli::cli_warn(c(
+      "{.arg adjust} is deprecated in {.fn apa_cor}; use {.arg p_adjust} instead.",
+      i = "{.fn apa_cor} now computes correlations with {.fn correlation::correlation}."
+    ))
+    p_adjust <- dots$adjust
+    dots$adjust <- NULL
+  }
+  if ("use" %in% names(dots)) {
+    use <- dots$use
+    dots$use <- NULL
+    if (is.character(use) && grepl("^complete", use)) {
+      data <- stats::na.omit(data)
+    }
+    cli::cli_warn(c(
+      "{.arg use} is deprecated in {.fn apa_cor}.",
+      i = "Correlations use all pairwise complete observations. For listwise deletion, remove incomplete rows first (e.g., with {.fn stats::na.omit})."
+    ))
+  }
+  if ("y" %in% names(dots)) {
+    cli::cli_abort(
+      "Correlations between two sets of variables ({.arg y}) are not supported.",
+      call = call
+    )
+  }
+
+  data <- as.data.frame(dplyr::ungroup(tibble::as_tibble(data)))
+  if (ncol(data) < 2) {
+    cli::cli_abort("{.arg data} needs at least two variables to correlate.", call = call)
+  }
+  logical_columns <- vapply(data, is.logical, logical(1))
+  data[logical_columns] <- lapply(data[logical_columns], as.numeric)
+
+  original <- colnames(data)
+  internal <- paste0("apa7var", seq_along(original))
+  colnames(data) <- internal
+  lookup <- stats::setNames(original, internal)
+  rename <- function(x) unname(ifelse(x %in% internal, lookup[x], x))
+
+  x <- do.call(
+    correlation::correlation,
+    c(list(data, method = method, p_adjust = p_adjust, partial = partial), dots)
+  )
+  x$Parameter1 <- rename(x$Parameter1)
+  x$Parameter2 <- rename(x$Parameter2)
+  d <- attr(x, "data")
+  if (!is.null(d)) {
+    colnames(d) <- rename(colnames(d))
+    attr(x, "data") <- d
+  }
+  x
+}
