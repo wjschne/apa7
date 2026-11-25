@@ -300,7 +300,7 @@ chisq_note_sentences <- function(record) {
   )
   es <- NULL
   if (!is.null(result$effect_size)) {
-    symbol <- if (result$effect_size == "phi") "*&phi;*" else "Cramér's *V*"
+    symbol <- if (result$effect_size == "phi") "*&phi;*" else "Cram\u00e9r's *V*"
     es <- paste0(
       symbol, " = ",
       signs::signs(result$effect_size_value, accuracy = .01, trim_leading_zeros = TRUE)

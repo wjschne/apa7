@@ -210,7 +210,7 @@ pad_correlations <- function(R) {
     padded <- align_chr(plain, side = "left")
     prefix <- substr(padded, 1, nchar(padded) - nchar(plain))
     cells <- paste0(prefix, c(R[i, j], R[j, j]))
-    cells <- num_pad(cells, pad_left = FALSE, padding_character = " ", font_family = font)
+    cells <- num_pad(cells, pad_left = FALSE, padding_character = "\u2007", font_family = font)
     R[i, j] <- cells[seq_along(i)]
     R[j, j] <- cells[length(cells)]
   }
