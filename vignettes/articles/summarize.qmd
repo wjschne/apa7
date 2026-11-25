@@ -31,6 +31,44 @@ set_flextable_defaults(
 <<setup>>
 ```
 
+# Summarizing by Hand
+
+
+
+Functions that automate your descriptive statistics tables for you (e.g., the amazing [gtsummary package](https://www.danieldsjoberg.com/gtsummary/index.html)) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the `apa_flextable` function will get a flextable table close to APA style. You may need to do some additional styling with flextable as well.
+
+The flextable package helper functions for automating summary tables. The `tabulator`, `summarizor`, and `proc_freq` functions are particularly powerful ways of summarizing and describing data. However, I am going to compute my summaries with standard base R and tidyverse functions. Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that apa7 and flextable can do most of the rest after that. 
+
+```{r dataprocessing}
+d <- ggplot2::diamonds %>% 
+  select(cut, price, carat, depth, table) %>% 
+  arrange(cut) %>% 
+  rename_with(str_to_title) %>% 
+  pivot_longer(where(is.numeric), names_to = "Variable") %>% 
+  summarise(
+    M = mean(value, na.rm = TRUE),
+    SD = sd(value, na.rm = TRUE),
+    n = n(),
+    .by = c(Variable, Cut)) %>% 
+  pivot_longer(c(M, SD)) %>% 
+  unite(Variable, Variable, name) %>%
+  pivot_wider(names_from = Variable) 
+```
+
+The `apa_flextable` function handles most of the formatting automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
+
+```{r}
+#| label: tbl-apaflextable
+#| tbl-cap: Price, Carat, Depth, Table Using `apa_flextable`
+d |> 
+  apa_flextable() |> 
+  colformat_char(j = 3:4, prefix = "$") 
+
+```
+
+
+
+
 Functions such as `apa_parameters` and `apa_descriptives` make finished tables from model objects and data. When no function makes the table you need, apa7 can still do most of the work of turning a data frame of results into an APA-style table. This article shows how, starting with `apa_flextable` and ending with full control over every step.
 
 # From a Data Frame to an APA Table
@@ -438,6 +476,8 @@ d |>
   # Step 8: Column widths
   pretty_widths()
 ```
+
+
 
 # Speed
 

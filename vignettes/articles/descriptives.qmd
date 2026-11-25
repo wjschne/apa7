@@ -24,68 +24,39 @@ library(stringr)
 <<setup>>
 ```
 
-# Summarizing by Hand
-
-
-
-Functions that automate your descriptive statistics tables for you (e.g., the amazing [gtsummary package](https://www.danieldsjoberg.com/gtsummary/index.html)) inevitably entail some level of compromise. It is unreasonable for a single function to anticipate the diversity of needs out there. Sometimes you need a table to be a particular way, and you need to do the heaving lifting yourself. After all that, the `apa_flextable` function will get a flextable table close to APA style. You may need to do some additional styling with flextable as well.
-
-The flextable package helper functions for automating summary tables. The `tabulator`, `summarizor`, and `proc_freq` functions are particularly powerful ways of summarizing and describing data. However, I am going to compute my summaries with standard base R and tidyverse functions. Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that apa7 and flextable can do most of the rest after that. 
-
-```{r dataprocessing}
-d <- ggplot2::diamonds %>% 
-  select(cut, price, carat, depth, table) %>% 
-  arrange(cut) %>% 
-  rename_with(str_to_title) %>% 
-  pivot_longer(where(is.numeric), names_to = "Variable") %>% 
-  summarise(
-    M = mean(value, na.rm = TRUE),
-    SD = sd(value, na.rm = TRUE),
-    n = n(),
-    .by = c(Variable, Cut)) %>% 
-  pivot_longer(c(M, SD)) %>% 
-  unite(Variable, Variable, name) %>%
-  pivot_wider(names_from = Variable) 
-```
-
-The `apa_flextable` function handles most of the formatting automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
-
-```{r}
-#| label: tbl-apaflextable
-#| tbl-cap: Price, Carat, Depth, Table Using `apa_flextable`
-d |> 
-  apa_flextable() |> 
-  colformat_char(j = 3:4, prefix = "$") 
-
-```
 
 
 # Automatic Summaries with the `apa_descriptives` Function
 
 The first table of most empirical papers describes the sample. `apa_descriptives` makes this table: for each continuous variable, its mean and standard deviation, *M* (*SD*), and for each categorical variable, the number and percentage of respondents at each level, *n* (%). Numeric variables are treated as continuous, and factors, character vectors, and logical vectors as categorical. Each categorical variable has a heading row, with its levels indented below it.
 
-## The Whole Sample
+## Data Set Summaries
 
-The `survey` data set in the MASS package has the answers of 237 statistics students to a short questionnaire. Without groups, there is one column for the whole sample:
+The `survey` data set in the MASS package [@ripleyMASSSupportFunctions2009] has the answers of 237 statistics students to a short questionnaire. Without groups, there is one column for the whole sample:
 
 ```{r}
 #| label: survey
-d_survey <- MASS::survey |> 
-  mutate(Exer = fct_recode(Exer, Frequently = "Freq") |> fct_relevel("Frequently", after = Inf),
-         Smoke = fct_recode(Smoke, Occasionally = "Occas", Regularly = "Regul") |> fct_relevel("Heavy", after = Inf))
+d_survey <- MASS::survey |>
+  mutate(
+    Exer = fct_recode(
+      Exer, 
+      Frequently = "Freq") |> 
+      fct_relevel("Frequently", after = Inf),
+    Smoke = fct_recode(
+      Smoke, 
+      Occasionally = "Occas", 
+      Regularly = "Regul") |> 
+      fct_relevel("Heavy", after = Inf)
+  ) |> 
+  select(Age, 
+         `Height (cm)` = Height, 
+         `Pulse (beats per minute)` = Pulse, 
+         Smoking = Smoke, 
+         Exercise = Exer,
+         Sex)
 
 
-
-apa_descriptives(
-  d_survey,
-  variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
-  labels = c(
-    Height = "Height (cm)",
-    Pulse = "Pulse (beats per minute)",
-    Smoke = "Smoking",
-    Exer = "Exercise"
-  )
-) |>
+apa_descriptives(d_survey, format_variable_names = FALSE) |>
   apa_flextable(note = TRUE)
 ```
 
@@ -100,14 +71,8 @@ With `by`, each group gets a column, with its size in the header, followed by a 
 #| tbl-cap: "Characteristics of Students by Sex"
 apa_descriptives(
   d_survey,
-  variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
-  by = "Sex",
-  labels = c(
-    Height = "Height (cm)",
-    Pulse = "Pulse (beats per minute)",
-    Smoke = "Smoking",
-    Exer = "Exercise"
-  )
+  format_variable_names = FALSE,
+  by = Sex
 ) |>
   apa_flextable(note = TRUE)
 ```
@@ -123,16 +88,9 @@ With `test = TRUE`, a *p* column tests the group differences: Welch's *t* test (
 #| tbl-cap: "Characteristics of Students by Sex With Tests of Group Differences"
 apa_descriptives(
   d_survey,
-  variables = c("Age", "Height", "Pulse", "Smoke", "Exer"),
-  by = "Sex",
+  by = Sex,
   continuous = c(Age = "median_iqr"),
-  test = TRUE,
-  labels = c(
-    Height = "Height (cm)",
-    Pulse = "Pulse (beats per minute)",
-    Smoke = "Smoking",
-    Exer = "Exercise"
-  )
+  test = TRUE
 ) |>
   apa_flextable(note = TRUE)
 ```
