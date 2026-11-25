@@ -1890,6 +1890,14 @@ the$column_formats <- column_formats()
 #' that need apa7 to be loaded, so they are set only with `apa7_defaults()`
 #' and last for the R session.
 #'
+#' When `page_width` and `table_width` are not set, a Quarto or R Markdown
+#' document being rendered supplies them: its `papersize` sets the paper, and
+#' apaquarto's `documentmode` sets the margins (0.75 inches on each side in
+#' journal mode, `jou`, and 1.5 inches on the left in thesis mode). In
+#' journal mode, which sets the text in two columns, tables are as wide as a
+#' column by default. A setting made with `apa7_defaults()` or [options()]
+#' overrides the document.
+#'
 #' The default column formats follow `accuracy`: changing it (with
 #' `apa7_defaults()` or the `apa7.accuracy` option) changes the number of
 #' decimals in tables. Setting `column_formats` without `accuracy` makes the
@@ -1912,7 +1920,9 @@ the$column_formats <- column_formats()
 #'   fill with `table_width = "page"` (or `1`, by default): a number (in
 #'   inches) or the name of a paper size, whose width less APA's 1-inch
 #'   margins on each side is used (e.g., `"us-letter"` gives 6.5 inches, the
-#'   default, and `"a4"` gives 6.27 inches). Paper sizes are those of Typst's
+#'   default, and `"a4"` gives 6.27 inches). If not set, the width comes
+#'   from the paper and margins of the document being rendered, if any (see
+#'   Details). Paper sizes are those of Typst's
 #'   `page` function (e.g., `"a4"`, `"a5"`, `"us-letter"`, `"us-legal"`,
 #'   `"jis-b5"`); see <https://typst.app/docs/reference/layout/page/#parameters-paper>.
 #' @param landscape_width width of the text area of a landscape page, in
@@ -1934,7 +1944,9 @@ the$column_formats <- column_formats()
 #'   `"page"`, `"landscape"`, `"column"`, or a named number (e.g.,
 #'   `c(column = 1)`). In a two-column document, `table_width = "column"`
 #'   makes tables as wide as a column, and a proportion given to a table
-#'   function is then a proportion of the column.
+#'   function is then a proportion of the column. If not set, tables in a
+#'   document in apaquarto's journal mode (`documentmode: jou`) are as wide as
+#'   a column.
 #' @param print how tables made by apa7 functions (see [apa7_tbl]) are
 #'   displayed: `"auto"` (default) as tables in Quarto and R Markdown
 #'   documents and as tibbles in the console, `"flextable"` as tables

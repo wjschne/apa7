@@ -278,9 +278,19 @@ page_text_width <- function(page_width, margin = 1, call = rlang::caller_env()) 
   text_width
 }
 
-#' Width of the text area set with apa7_defaults(page_width = )
+#' Width of the text area of a portrait page, in inches
+#'
+#' Set with `apa7_defaults(page_width = )`. Otherwise, in a document being
+#' rendered, the width of its paper less its side margins (see
+#' `document_layout()`), or else 6.5 inches.
 #' @keywords internal
 #' @noRd
 page_width_in <- function() {
+  if (is.null(getOption("apa7.page_width"))) {
+    layout <- document_layout()
+    if (!is.null(layout)) {
+      return(typst_paper_widths[[layout$paper]] / 25.4 - layout$margins)
+    }
+  }
   the$page_width %||% 6.5
 }

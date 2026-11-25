@@ -190,3 +190,57 @@ test_that("the code chunk's apa7-width option sets the width of its tables", {
   ft <- in_chunk(list(`apa7-width` = "landscape"), apa_flextable(apa_parameters(fit)))
   expect_equal(total_width(ft), 9, tolerance = 1e-6)
 })
+
+test_that("paper sizes written as in Pandoc and LaTeX are matched to Typst's names", {
+  name <- apa7:::typst_paper_name
+  expect_equal(name("letter"), "us-letter")
+  expect_equal(name("letterpaper"), "us-letter")
+  expect_equal(name("USLetter"), "us-letter")
+  expect_equal(name("us-letter"), "us-letter")
+  expect_equal(name("a4paper"), "a4")
+  expect_equal(name("A4"), "a4")
+  expect_equal(name("legal"), "us-legal")
+  expect_equal(name("b5"), "iso-b5")
+  expect_equal(name("a3"), "a3")
+  expect_null(name("napkin"))
+  expect_null(name(NULL))
+})
+
+test_that("widths follow the paper and documentmode of the document being rendered", {
+  skip_if_not_installed("jsonlite")
+  withr::defer(apa7_defaults(reset = TRUE))
+  render <- function(metadata, code) {
+    info <- withr::local_tempfile(fileext = ".json")
+    jsonlite::write_json(list(format = list(metadata = metadata)), info, auto_unbox = TRUE)
+    withr::local_envvar(QUARTO_EXECUTE_INFO = info)
+    withr::local_options(knitr.in.progress = TRUE)
+    code
+  }
+  widths <- function() {
+    c(
+      page = apa7:::page_width_in(),
+      landscape = apa7:::landscape_width_in(),
+      column = apa7:::column_width_in(),
+      default = apa7:::resolve_table_width()$inches
+    )
+  }
+  a4 <- 210 / 25.4
+  expect_equal(render(list(papersize = "a4"), widths()), c(page = a4 - 2, landscape = 297 / 25.4 - 2, column = (a4 - 1.5) * .48, default = a4 - 2))
+  # Journal mode: 0.75-inch margins, and tables are a column wide
+  expect_equal(render(list(documentmode = "jou"), widths()), c(page = 7, landscape = 9, column = 3.36, default = 3.36))
+  expect_equal(render(list(documentmode = "journal", papersize = "a4paper"), widths())[["default"]], (a4 - 1.5) * .48)
+  # Thesis mode: a 1.5-inch left margin
+  expect_equal(render(list(documentmode = "thesis"), widths())[["page"]], 6)
+  expect_equal(render(list(documentmode = "man"), widths()), c(page = 6.5, landscape = 9, column = 3.36, default = 6.5))
+  # Nothing about the layout: the package defaults
+  expect_equal(render(list(title = "A"), widths()), c(page = 6.5, landscape = 9, column = 3.36, default = 6.5))
+  # Settings made with apa7_defaults() win over the document
+  apa7_defaults(page_width = 6.5, table_width = 1)
+  expect_equal(render(list(documentmode = "jou", papersize = "a4"), widths())[c("page", "default")], c(page = 6.5, default = 6.5))
+  apa7_defaults(reset = TRUE)
+  # Outside a render, the document is not consulted
+  info <- withr::local_tempfile(fileext = ".json")
+  jsonlite::write_json(list(format = list(metadata = list(documentmode = "jou"))), info, auto_unbox = TRUE)
+  withr::local_envvar(QUARTO_EXECUTE_INFO = info)
+  expect_equal(apa7:::resolve_table_width()$inches, 6.5)
+})

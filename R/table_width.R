@@ -1,10 +1,30 @@
-#' The paper size named by the page_width setting
-#' @returns the paper's name, or `NULL` if `page_width` is a number of inches
+#' The paper size of the page
+#' @returns the name of the paper set with `apa7_defaults(page_width = )`,
+#'   or, if it is not set, of the paper of the document being rendered;
+#'   `NULL` if `page_width` is a number of inches or no paper is known
 #' @keywords internal
 #' @noRd
 page_paper <- function() {
   stored <- getOption("apa7.page_width")
+  if (is.null(stored)) {
+    return(document_layout()$paper)
+  }
   if (is.character(stored) && length(stored) == 1) tolower(trimws(stored)) else NULL
+}
+
+#' Default table width
+#'
+#' Set with `apa7_defaults(table_width = )`. Otherwise, `"column"` in a
+#' document in apaquarto's two-column journal mode (`documentmode: jou`), and
+#' 1 (the full width of the page) in other documents.
+#' @keywords internal
+#' @noRd
+default_table_width <- function() {
+  stored <- getOption("apa7.table_width")
+  if (!is.null(stored)) {
+    return(stored)
+  }
+  if (identical(document_layout()$mode, "jou")) "column" else 1
 }
 
 #' Width of the text area of a landscape page, in inches
@@ -118,7 +138,7 @@ resolve_table_width <- function(table_width = NULL, unit = "in", arg = "table_wi
   }
   if (is.null(table_width)) {
     from_setting <- TRUE
-    table_width <- getOption("apa7.table_width", 1)
+    table_width <- default_table_width()
     arg <- "table_width"
   }
   # The default container: the one that the table_width setting names

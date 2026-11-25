@@ -50,7 +50,9 @@ single-spaced.}
 fill with \code{table_width = "page"} (or \code{1}, by default): a number (in
 inches) or the name of a paper size, whose width less APA's 1-inch
 margins on each side is used (e.g., \code{"us-letter"} gives 6.5 inches, the
-default, and \code{"a4"} gives 6.27 inches). Paper sizes are those of Typst's
+default, and \code{"a4"} gives 6.27 inches). If not set, the width comes
+from the paper and margins of the document being rendered, if any (see
+Details). Paper sizes are those of Typst's
 \code{page} function (e.g., \code{"a4"}, \code{"a5"}, \code{"us-letter"}, \code{"us-legal"},
 \code{"jis-b5"}); see \url{https://typst.app/docs/reference/layout/page/#parameters-paper}.}
 
@@ -75,7 +77,9 @@ full width of a portrait page, a proportion of it (e.g., \code{.8}),
 \code{"page"}, \code{"landscape"}, \code{"column"}, or a named number (e.g.,
 \code{c(column = 1)}). In a two-column document, \code{table_width = "column"}
 makes tables as wide as a column, and a proportion given to a table
-function is then a proportion of the column.}
+function is then a proportion of the column. If not set, tables in a
+document in apaquarto's journal mode (\code{documentmode: jou}) are as wide as
+a column.}
 
 \item{print}{how tables made by apa7 functions (see \link{apa7_tbl}) are
 displayed: \code{"auto"} (default) as tables in Quarto and R Markdown
@@ -121,6 +125,14 @@ that runs at the start of every R session, before apa7 is loaded:\tabular{lll}{
 \code{column_formats}, \code{number_formatter}, and \code{trim_leading_zero} are objects
 that need apa7 to be loaded, so they are set only with \code{apa7_defaults()}
 and last for the R session.
+
+When \code{page_width} and \code{table_width} are not set, a Quarto or R Markdown
+document being rendered supplies them: its \code{papersize} sets the paper, and
+apaquarto's \code{documentmode} sets the margins (0.75 inches on each side in
+journal mode, \code{jou}, and 1.5 inches on the left in thesis mode). In
+journal mode, which sets the text in two columns, tables are as wide as a
+column by default. A setting made with \code{apa7_defaults()} or \code{\link[=options]{options()}}
+overrides the document.
 
 The default column formats follow \code{accuracy}: changing it (with
 \code{apa7_defaults()} or the \code{apa7.accuracy} option) changes the number of

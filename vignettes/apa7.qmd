@@ -243,9 +243,13 @@ apa_parameters(fit)
 
 A named number is written as a YAML map (e.g., `#| apa7-width: {landscape: .8}`). In R Markdown, the option is `apa7.width` (e.g., `{r, apa7.width = "landscape"}`). A `table_width` given to a function overrides the chunk option.
 
+## Widths From the Document
+
+You may not need to set any widths at all. When `page_width` and `table_width` are not set with `apa7_defaults`, apa7 reads them from the document being rendered: its `papersize` (e.g., `papersize: a4`) sets the paper, and [apaquarto](https://wjschne.github.io/apaquarto/)'s `documentmode` sets the margins. In journal mode (`documentmode: jou`), which sets the text in two columns with 0.75-inch margins, every table is as wide as a column unless it asks for another width, and a table in a chunk with `apa-twocolumn: true` spans both columns.
+
 ## Two-Column Documents
 
-In a two-column document, make the column the default width for every table:
+In a two-column document that is not in apaquarto's journal mode, make the column the default width for every table:
 
 ```{r}
 #| label: two-column
