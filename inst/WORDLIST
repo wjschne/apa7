@@ -1,3 +1,4 @@
+AER
 afex
 afex's
 al
@@ -7,10 +8,12 @@ apa
 APA
 APA's
 apaquarto
+apaquarto's
 ascorbic
 asis
 autofit
 BCG
+Bdi
 Begg
 Belenky
 Benjamini
@@ -33,6 +36,7 @@ bsicons
 bslib
 carData
 Caron
+CBT
 CFA
 CFI
 Cheung
@@ -46,6 +50,7 @@ configural
 Configural
 corTest
 Cov
+Cramer's
 Cramér's
 Cran
 Cronbach's
@@ -69,13 +74,18 @@ effectsize
 Egger
 Egger's
 et
+Eurosceptic
+extraversion
+Extraversion
 Fabiano
 Feldt
 Feldt's
 flextable
 Flextable
+flextable's
 formatter
 formatters
+ftExtra
 Geisser
 getter
 ggdiagram
@@ -95,12 +105,14 @@ Holm's
 Holzinger
 Huynh
 intraclass
+IQs
 IRR
 Jusko
 kableExtra
 Kenward
 knitr
 Kuder
+Labour
 Lakens
 lavaan
 lavaan's
@@ -111,6 +123,7 @@ lmer
 lmerTest
 lmerTest's
 Lupas
+marginaleffects
 Mazumdar
 Mazumdar's
 Mdn
@@ -142,6 +155,7 @@ Piscitello
 pmatrix
 Polychoric
 pscl
+psychTools
 purrr
 ragg
 rb
@@ -150,6 +164,8 @@ readr
 reformats
 relevel
 Rensvold
+reoffended
+reoffending
 Revelle
 RMSEA
 Rothstein
@@ -162,6 +178,7 @@ setosa
 shinyWidgets
 Sikov
 snakecase
+Speeded
 sphericity
 SRMR
 Steiger
