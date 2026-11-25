@@ -149,3 +149,44 @@ test_that("every table function takes table_width in the same forms", {
   expect_equal(total_width(apa_flextable(apa_parameters(fit))), col, tolerance = 1e-6)
   expect_equal(total_width(apa_flextable(apa_parameters(fit), table_width = "page")), 6.5, tolerance = 1e-6)
 })
+
+test_that("the code chunk's apa7-width option sets the width of its tables", {
+  withr::defer(apa7_defaults(reset = TRUE))
+  w <- function(x = NULL) {
+    r <- apa7:::resolve_table_width(x)
+    c(inches = r$inches, proportion = r$proportion)
+  }
+  in_chunk <- function(opts, code) {
+    withr::local_options(knitr.in.progress = TRUE)
+    old <- knitr::opts_current$get()
+    withr::defer(knitr::opts_current$restore(old))
+    knitr::opts_current$set(opts)
+    code
+  }
+  col <- (8.5 - 1.5) * .48
+  # Outside knitr, chunk options are ignored
+  knitr::opts_current$set(`apa7-width` = "landscape")
+  expect_equal(w(), c(inches = 6.5, proportion = 1))
+  knitr::opts_current$restore()
+
+  expect_equal(in_chunk(list(`apa7-width` = "landscape"), w()), c(inches = 9, proportion = 1))
+  expect_equal(in_chunk(list(apa7.width = "column"), w()), c(inches = col, proportion = 1))
+  # A YAML map arrives as a list
+  expect_equal(in_chunk(list(`apa7-width` = list(landscape = .8)), w()), c(inches = 7.2, proportion = .8))
+  expect_equal(in_chunk(list(`apa7-width` = .5), w()), c(inches = 3.25, proportion = .5))
+  # An argument given to the function wins
+  expect_equal(in_chunk(list(`apa7-width` = "landscape"), w("column")), c(inches = col, proportion = 1))
+  # apaquarto's apa-twocolumn spans the page in a two-column document
+  apa7_defaults(table_width = "column")
+  expect_equal(in_chunk(list(`apa-twocolumn` = TRUE), w()), c(inches = 6.5, proportion = 1))
+  expect_equal(in_chunk(list(`apa-twocolumn` = FALSE), w()), c(inches = col, proportion = 1))
+  # A proportion in the chunk option is of the default width
+  expect_equal(in_chunk(list(`apa7-width` = .5), w()), c(inches = col / 2, proportion = .5))
+  expect_error(in_chunk(list(`apa7-width` = "wide"), w()), "apa7-width")
+
+  # Tables printed automatically use it too
+  skip_on_cran()
+  fit <- lm(mpg ~ wt + hp, data = mtcars)
+  ft <- in_chunk(list(`apa7-width` = "landscape"), apa_flextable(apa_parameters(fit)))
+  expect_equal(total_width(ft), 9, tolerance = 1e-6)
+})

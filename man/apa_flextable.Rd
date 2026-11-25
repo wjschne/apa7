@@ -99,8 +99,12 @@ of a portrait page unless changed with \code{apa7_defaults(table_width = )}),
 two-column page, or a named number: a proportion of one of these widths
 (e.g., \code{c(landscape = .8)}) or a width in \code{inches}, \code{cm}, or \code{mm} (e.g.,
 \code{c(inches = 5)}). With 0, the columns are only as wide as their contents
-need. If \code{NULL} (default), the \code{table_width} set with \code{\link[=apa7_defaults]{apa7_defaults()}}
-(1 unless changed). The widths of the pages and the column are set with
+need. If \code{NULL} (default), the width set by the code chunk's
+\code{apa7-width} option in Quarto (e.g., \verb{#| apa7-width: landscape}, or
+\verb{#| apa7-width: \{landscape: .8\}} for a named number) or \code{apa7.width}
+option in R Markdown, or \code{"page"} for a chunk with apaquarto's
+\code{apa-twocolumn: true}; otherwise, the \code{table_width} set with
+\code{\link[=apa7_defaults]{apa7_defaults()}} (1 unless changed). The widths of the pages and the column are set with
 the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments of
 \code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
 warning to write it as \code{c(inches = )}.}

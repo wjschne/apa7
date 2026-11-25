@@ -73,6 +73,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 - [x] `glmmTMB` methods for `apa_parameters()` and `apa_performance()` (zero-inflation and dispersion parts under their own headings; only the conditional model exponentiated)
 - [x] `nlme::lme` methods (nlme's df; residual correlation and variance structures as rows, named in the note)
 - [x] Tests (`test-glmmtmb.R`, `test-nlme.R`)
+- [ ] For lists comparing models, allow for summaries like R2 and change in R2 to be reported in rows below random effects rather than as separate columns.
 
 ### 5. After CRAN
 
@@ -133,6 +134,25 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
 - [ ] Make a better contingency table article.
 - [ ] Use examples and data sets relevant to psychology in all articles (e.g., data from `psych`, `psychTools`, `carData`, or simulated psychological variables), replacing general-purpose data sets like `mtcars`, `iris`, and `ToothGrowth`. Process the data so that variable names and factor levels are whole words and phrases that read well in tables.
   - [x] `anova.qmd`: `carData::Friendly` (one-way) and `carData::Adler` (factorial) replace `ToothGrowth`
+  - [x] `correlations.qmd`: `psychTools::epi.bfi`
+  - [x] `htest.qmd`: `psych::sat.act`, `psychTools::epi.bfi`, and `MASS::survey` replace `iris`, `ToothGrowth`, and `mtcars`
+  - [x] `regression.qmd`: `carData::Cowles`, `MASS::quine`, and `carData::Wong` replace `mtcars` and `airquality`
+  - [x] `summarize.qmd`: `psychTools::bfi` replaces `ggplot2::diamonds`
+  - [x] `marginal-means.qmd`: `carData::Moore`, `psychTools::globalWarm`, `psych::Garcia`, and `MASS::anorexia` replace `ToothGrowth`, `mtcars`, and `MASS::birthwt`
+  - Clearly not psychology (replace first):
+    - [ ] `chisquare.qmd`: `mtcars` (gears by transmission and by engine shape, 4 tables) and `warpbreaks` (warp breaks by wool and tension, 2 tables). The whole article needs new data; consider combining with the "better contingency table article" item above.
+    - [x] `multilevel.qmd`: simulated daily-diary counts of drinks (intervention vs. control, weekday vs. weekend) replace `glmmTMB::Salamanders` in the count-outcome section
+    - [x] `meta-analysis.qmd`: `metadat::dat.landenberger2005` (CBT and reoffending; odds ratios, sessions per week, and program purpose) replaces `metadat::dat.bcg`
+    - [x] `lavaan.qmd`: `PoliticalDemocracy` is kept as is (decided 2026-11-25)
+    - [ ] `apa7.qmd` (the getting-started vignette, not an article): `mtcars` in the opening regression example and the tour of table functions.
+  - Borderline (decide whether to keep):
+    - [ ] `htest.qmd`: `sleep` (extra sleep under two hypnotic drugs, 10 patients) in the paired and signed-rank tests. Psychopharmacology, but a drug trial rather than a psychological study.
+    - [ ] `regression.qmd`: `carData::Womenlf` (labor-force participation of married Canadian women) in the multinomial section. Sociology.
+    - [ ] `regression.qmd`: `pscl::bioChemists` (publications of biochemistry graduate students) in the zero-inflated and hurdle section. Research productivity rather than psychology.
+    - [ ] `descriptives.qmd` and `htest.qmd`: `MASS::survey` (statistics students' height, pulse, handedness, exercise, and smoking). Student data, but mostly physical measures.
+  - Already psychology (no change needed): `factor-analysis.qmd` (`bfi`, `Harman74`), `reliability.qmd` (`bfi`), `lavaan.qmd` CFA (`HolzingerSwineford1939`), `multilevel.qmd` (`sleepstudy`, `VerbAgg`), `meta-analysis.qmd` (`dat.molloy2014`, `dat.konstantopoulos2011`), and `anova.qmd` (`Moore`, `obk.long`).
+  - [ ] Check the references added from memory against their sources: Cowles and Davis (1987), Wong et al. (2001), Hayes (2022), Garcia et al. (2010), Moore and Krupat (1971), and Hand et al. (1994).
+  - [ ] Use new landscape mode for tables that do not currently fit in 6.5 inches. For example, tbl-contrasts-sd in marginal-means.qmd.
 
 ## Done
 

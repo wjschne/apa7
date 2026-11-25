@@ -11,6 +11,7 @@ library(lme4)
 library(apa7)
 library(performance)
 library(parameters)
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -238,65 +239,82 @@ Each point of trait anger multiplies the odds of endorsing an item by about 1.06
 
 Counts often vary more than a Poisson model allows (overdispersion) or have more zeros than it predicts. The [glmmTMB](https://glmmtmb.github.io/glmmTMB/) package fits mixed models for such data, including negative binomial models and models with a separate zero-inflation part. `apa_parameters` displays them like `glmer` models.
 
-The `Salamanders` data set from the glmmTMB package has 644 counts of salamanders at 23 stream sites, some of which were affected by mountaintop removal coal mining. Each site was surveyed for seven species (or life stages). Do mined sites have fewer salamanders?
+In this made-up daily-diary study, 120 adults who drink heavily recorded the number of alcoholic drinks they had each day for 2 weeks. Half of them had been assigned to a brief intervention and half to a control condition. Do people in the intervention drink less, and do they drink more on weekends?
 
 ```{r}
-#| label: salamander-data
-data(Salamanders, package = "glmmTMB")
-d_sal <- Salamanders |>
+#| label: drinks-data
+set.seed(12)
+n_people <- 120
+people <- tibble(
+  Person = factor(1:n_people),
+  Condition = factor(rep(c("Control", "Intervention"), each = n_people / 2)),
+  person_effect = rnorm(n_people, mean = 0, sd = .6)
+)
+
+d_drinks <- tidyr::expand_grid(people, `Diary Day` = 1:14) |>
   mutate(
-    Mined = factor(mined, levels = c("no", "yes"), labels = c("No", "Yes"))
+    Day = factor(`Diary Day` %% 7 %in% c(6, 0), labels = c("Weekday", "Weekend")),
+    intervention = Condition == "Intervention",
+    # Expected drinks on a drinking day
+    mu = exp(log(2.5) - .5 * intervention + .6 * (Day == "Weekend") + person_effect),
+    # Some days are abstinent days, more often in the intervention
+    abstinent = rbinom(n(), 1, plogis(-1.2 + intervention)),
+    Drinks = ifelse(
+      abstinent == 1,
+      0,
+      rnbinom(n(), size = ifelse(intervention, 1, 3), mu = mu)
+    )
   ) |>
-  rename(Count = count, Site = site, Species = spp)
+  select(Person, Condition, `Diary Day`, Day, Drinks)
 ```
 
-The counts have a mean of 1.32 but a variance of 6.95, and 60% of them are zeros, far more variability than a Poisson model allows.
+The counts have a mean of `r round(mean(d_drinks$Drinks), 2)` but a variance of `r round(var(d_drinks$Drinks), 2)`, and `r round(100 * mean(d_drinks$Drinks == 0))`% of them are zeros, far more variability than a Poisson model allows.
 
 ## Negative binomial models
 
-A negative binomial model adds a dispersion parameter that lets the variance grow faster than the mean. Sites are a random effect, because each site was surveyed for every species.
+A negative binomial model adds a dispersion parameter that lets the variance grow faster than the mean. People are a random effect, because each person reported on many days.
 
 ```{r}
-#| label: tbl-salamander-nb
-#| tbl-cap: "Negative Binomial Mixed Model of Salamander Counts"
+#| label: tbl-drinks-nb
+#| tbl-cap: "Negative Binomial Mixed Model of Daily Drinks"
 tmb_nb <- glmmTMB::glmmTMB(
-  Count ~ Mined + Species + (1 | Site),
+  Drinks ~ Condition + Day + (1 | Person),
   family = glmmTMB::nbinom2,
-  data = d_sal
+  data = d_drinks
 )
 apa_parameters(tmb_nb)
 ```
 
-As with `glmer`, coefficients are tested with *z* tests, and coefficients of models with a log link are exponentiated. For count models, the exponentiated coefficients are incidence rate ratios (*IRR*): mined sites have about one tenth as many salamanders as unmined sites of the same species. The site *SD* is on the log scale. The dispersion parameter itself is not displayed, because it is not tested.
+As with `glmer`, coefficients are tested with *z* tests, and coefficients of models with a log link are exponentiated. For count models, the exponentiated coefficients are incidence rate ratios (*IRR*): people in the intervention had about half as many drinks as people in the control condition, and people had almost twice as many drinks on weekends as on weekdays. The person *SD* is on the log scale. The dispersion parameter itself is not displayed, because it is not tested.
 
 ## Zero-inflated models
 
-Another account of the many zeros is that some surveys could not have found any salamanders (e.g., because the stream was buried by mining), while the others produced counts as usual. A zero-inflated model has two parts: a conditional model of the counts, and a logistic model of whether a zero is one of these excess zeros. Here a zero-inflated Poisson model lets the probability of an excess zero differ between mined and unmined sites:
+Another account of the many zeros is that some days are abstinent days, on which a person would not drink at all, while on the other days the number of drinks varies as usual. A zero-inflated model has two parts: a conditional model of the counts, and a logistic model of whether a zero is one of these excess zeros. Here a zero-inflated Poisson model lets the probability of an excess zero differ between the conditions:
 
 ```{r}
-#| label: tbl-salamander-zip
-#| tbl-cap: "Zero-Inflated Poisson Mixed Model of Salamander Counts"
+#| label: tbl-drinks-zip
+#| tbl-cap: "Zero-Inflated Poisson Mixed Model of Daily Drinks"
 tmb_zip <- glmmTMB::glmmTMB(
-  Count ~ Mined + Species + (1 | Site),
-  ziformula = ~ Mined,
+  Drinks ~ Condition + Day + (1 | Person),
+  ziformula = ~ Condition,
   family = poisson,
-  data = d_sal
+  data = d_drinks
 )
 tbl_zip <- apa_parameters(tmb_zip)
 tbl_zip
 ```
 
-Each part of the model has its own heading, with its fixed and random effects under subheadings. Only the conditional model's coefficients are exponentiated, because the zero-inflation coefficients are log odds: the probability of an excess zero is about .26 at unmined sites (the inverse logit of −1.05) and .69 at mined sites (the inverse logit of −1.05 + 1.84). Mined sites have both more excess zeros and fewer salamanders otherwise. The table note says what the zero-inflation coefficients are:
+Each part of the model has its own heading, with its fixed and random effects under subheadings. Only the conditional model's coefficients are exponentiated, because the zero-inflation coefficients are log odds: the probability of an excess zero is about `r zi <- glmmTMB::fixef(tmb_zip)$zi; sub("^0", "", sprintf("%.2f", plogis(zi[1])))` in the control condition (the inverse logit of `r sub("-", "−", sprintf("%.2f", zi[1]))`) and `r sub("^0", "", sprintf("%.2f", plogis(sum(zi))))` in the intervention (the inverse logit of `r sub("-", "−", sprintf("%.2f", zi[1]))` + `r sprintf("%.2f", zi[2])`). People in the intervention had more abstinent days and somewhat fewer drinks on the other days. The table note says what the zero-inflation coefficients are:
 
 ```{r}
-#| label: salamander-zip-note
+#| label: drinks-zip-note
 apa_note(tbl_zip)
 ```
 
 The two models explain the zeros differently, and their *AIC*s can be compared with `apa_performance`. Here the negative binomial model fits better:
 
 ```{r}
-#| label: tbl-salamander-aic
+#| label: tbl-drinks-aic
 #| tbl-cap: "Information Criteria of the Negative Binomial and Zero-Inflated Poisson Models"
 apa_performance(
   list(`Negative binomial` = tmb_nb, `Zero-inflated Poisson` = tmb_zip),
@@ -306,16 +324,16 @@ apa_performance(
 
 ## Dispersion models
 
-With `dispformula`, the dispersion parameter itself is modeled, and the table has a "Dispersion model" part. For negative binomial models, a larger dispersion parameter means less overdispersion, so the negative coefficient here means that counts at mined sites are more overdispersed. As the note says, dispersion coefficients are on the log scale.
+With `dispformula`, the dispersion parameter itself is modeled, and the table has a "Dispersion model" part. For negative binomial models, a larger dispersion parameter means less overdispersion, so the negative coefficient here means that the counts of people in the intervention are more overdispersed: many of their days have no drinks, but some have many. As the note says, dispersion coefficients are on the log scale.
 
 ```{r}
-#| label: tbl-salamander-disp
-#| tbl-cap: "Negative Binomial Mixed Model With Dispersion Depending on Mining"
+#| label: tbl-drinks-disp
+#| tbl-cap: "Negative Binomial Mixed Model With Dispersion Depending on Condition"
 glmmTMB::glmmTMB(
-  Count ~ Mined + Species + (1 | Site),
-  dispformula = ~ Mined,
+  Drinks ~ Condition + Day + (1 | Person),
+  dispformula = ~ Condition,
   family = glmmTMB::nbinom2,
-  data = d_sal
+  data = d_drinks
 ) |>
   apa_parameters()
 ```
@@ -325,15 +343,15 @@ glmmTMB::glmmTMB(
 `apa_performance` reports the marginal and conditional *R*^2^ and the ICC of glmmTMB models, and nested models are compared with likelihood ratio tests, as for lme4 models:
 
 ```{r}
-#| label: tbl-salamander-compare
-#| tbl-cap: "Comparison of Salamander Models With and Without Species"
+#| label: tbl-drinks-compare
+#| tbl-cap: "Comparison of Models of Daily Drinks With and Without Day of the Week"
 tmb_nb0 <- glmmTMB::glmmTMB(
-  Count ~ Mined + (1 | Site),
+  Drinks ~ Condition + (1 | Person),
   family = glmmTMB::nbinom2,
-  data = d_sal
+  data = d_drinks
 )
 apa_performance_comparison(
-  list(`Mining` = tmb_nb0, `Mining and species` = tmb_nb)
+  list(`Condition` = tmb_nb0, `Condition and day` = tmb_nb)
 )
 ```
 

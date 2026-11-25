@@ -34,39 +34,44 @@ Each function takes either a model or the output of the modelbased function. Wit
 ```{r}
 #| label: equivalent
 #| eval: false
-apa_contrasts(fit, contrast = "dose", p_adjust = "holm")
+apa_contrasts(fit, contrast = "Authoritarianism", p_adjust = "holm")
 
-estimate_contrasts(fit, contrast = "dose", p_adjust = "holm") |>
+estimate_contrasts(fit, contrast = "Authoritarianism", p_adjust = "holm") |>
   apa_contrasts()
 ```
 
-With a model, variable names in `by`, `contrast`, and `trend` can be quoted or unquoted, so `apa_contrasts(fit, contrast = dose)` works, too, as does `by = c(supplement, dose)`. Values, such as `"hp=[sd]"`, can be specified in a list (e.g., `list(hp = "[sd]"`).
+With a model, variable names in `by`, `contrast`, and `trend` can be quoted or unquoted, so `apa_contrasts(fit, contrast = Authoritarianism)` works, too, as does ``by = c(`Partner Status`, Authoritarianism)``. Values, such as `"Age=[sd]"`, can be specified in a list (e.g., `list(Age = "[sd]")`).
 
 # Estimated Marginal Means
 
-The `ToothGrowth` data set has the tooth length of 60 guinea pigs given one of three doses of vitamin C (0.5, 1, or 2 mg/day) by one of two delivery methods (orange juice or ascorbic acid). Here is a two-way ANOVA:
+In the `Moore` data set in the carData package [@mooreRelationshipSourceStatus1971], 45 participants made judgments with a partner of high or low status, and the number of times they conformed to their partner's judgments was recorded. Their authoritarianism was classified as low, medium, or high. Here is a two-way ANOVA:
 
 ```{r}
 #| label: tbl-fit
-#| tbl-cap: "Analysis of Variance of Tooth Length by Supplement and Dose"
-d_tooth <- ToothGrowth |> 
-  rename(length = len,
-         supplement = supp) |> 
-  mutate(dose = factor(dose),
-         supplement = factor(supplement, labels = c("Orange juice", "Ascorbic acid")))
+#| tbl-cap: "Analysis of Variance of Conformity by Partner Status and Authoritarianism"
+d_moore <- carData::Moore |>
+  transmute(
+    Conformity = conformity,
+    `Partner Status` = factor(partner.status,
+                              levels = c("low", "high"),
+                              labels = c("Low", "High")),
+    Authoritarianism = factor(fcategory,
+                              levels = c("low", "medium", "high"),
+                              labels = c("Low", "Medium", "High"))
+  )
 
-fit <- lm(length ~ supplement * dose, data = d_tooth)
+fit <- lm(Conformity ~ `Partner Status` * Authoritarianism, data = d_moore)
 
 apa_anova(fit) |>
   apa_flextable(note = TRUE)
 ```
 
-The means of each dose, averaged over the two delivery methods:
+The means of each level of authoritarianism, averaged over the two partner statuses:
 
 ```{r}
-#| label: tbl-means-dose
-#| tbl-cap: "Estimated Marginal Means of Tooth Length by Dose"
-apa_means(fit, by = dose) |>
+#| label: tbl-means-authoritarianism
+#| tbl-cap: "Estimated Marginal Means of Conformity by Authoritarianism"
+apa_means(fit, by = Authoritarianism) |>
   apa_flextable(note = TRUE)
 ```
 
@@ -74,32 +79,32 @@ With more than one variable in `by`, the last variable labels the rows, and each
 
 ```{r}
 #| label: tbl-means-both
-#| tbl-cap: "Estimated Marginal Means of Tooth Length by Supplement and Dose"
-apa_means(fit, by = c(supplement, dose)) |>
+#| tbl-cap: "Estimated Marginal Means of Conformity by Partner Status and Authoritarianism"
+apa_means(fit, by = c(`Partner Status`, Authoritarianism)) |>
   apa_flextable(note = TRUE)
 ```
 
 # Contrasts
 
-Pairwise comparisons of the doses, with *p*-values adjusted by Holm's method:
+Pairwise comparisons of the levels of authoritarianism, with *p*-values adjusted by Holm's method:
 
 ```{r}
-#| label: tbl-contrasts-dose
-#| tbl-cap: "Pairwise Comparisons of Doses"
+#| label: tbl-contrasts-authoritarianism
+#| tbl-cap: "Pairwise Comparisons of Levels of Authoritarianism"
 apa_contrasts(fit, 
-              contrast = dose, 
+              contrast = Authoritarianism, 
               p_adjust = "holm") |>
   apa_flextable(note = TRUE)
 ```
 
-Each row is the first level minus the second (e.g., 1 − 0.5), and the note says so. To follow up the interaction, compare the doses separately for each delivery method with `by`:
+Each row is the first level minus the second (e.g., Medium − Low), and the note says so. Averaged over partner status, the levels of authoritarianism hardly differ. To follow up the interaction, compare them separately for each partner status with `by`:
 
 ```{r}
 #| label: tbl-contrasts-by
-#| tbl-cap: "Pairwise Comparisons of Doses Within Each Supplement"
+#| tbl-cap: "Pairwise Comparisons of Levels of Authoritarianism Within Each Partner Status"
 apa_contrasts(fit,
-              contrast = dose,
-              by = supplement,
+              contrast = Authoritarianism,
+              by = `Partner Status`,
               p_adjust = "holm") |>
   apa_flextable(note = TRUE)
 ```
@@ -122,23 +127,19 @@ apa_contrasts(fit_mixed, contrast = condition, sd = 12.5)
 
 # Simple Slopes
 
-A moderation analysis asks whether the effect of one predictor depends on another. In the `mtcars` data, the effect of a car's weight on its fuel efficiency (miles per gallon) may depend on its horsepower:
+A moderation analysis asks whether the effect of one predictor depends on another. The `globalWarm` data set in the psychTools package, from @hayesIntroductionMediationModeration2022, has survey answers from 815 U.S. adults. Does the effect of negative emotions about climate change on support for government action to address it depend on age?
 
 ```{r}
 #| label: tbl-moderation
-#| tbl-cap: "Regression of Fuel Economy on Weight, Horsepower, and Their Interaction"
+#| tbl-cap: "Regression of Support for Government Action on Negative Emotions, Age, and Their Interaction"
+d_climate <- psychTools::globalWarm |>
+  transmute(
+    Support = as.numeric(govact),
+    `Negative Emotions` = as.numeric(negemot),
+    Age = as.numeric(age)
+  )
 
-d_mtcars <- mtcars |> 
-  mutate(am = factor(am, 
-                     levels = c(0,1), 
-                     labels = c("Automatic", "Manual"))) |> 
-  rename(MPG = mpg,
-         Horsepower = hp,
-         Weight = wt,
-         Transmission = am)
-
-
-fit_mod <- lm(MPG ~ Weight * Horsepower, data = d_mtcars)
+fit_mod <- lm(Support ~ `Negative Emotions` * Age, data = d_climate)
 
 apa_parameters(fit_mod) |>
   apa_flextable(note = TRUE)
@@ -148,83 +149,95 @@ Without `by`, `apa_slopes` gives the average slope of the predictor:
 
 ```{r}
 #| label: tbl-slope-average
-#| tbl-cap: "Average Slope of Weight"
-apa_slopes(fit_mod, trend = Weight) |>
+#| tbl-cap: "Average Slope of Negative Emotions"
+apa_slopes(fit_mod, trend = `Negative Emotions`) |>
   apa_flextable(note = TRUE)
 ```
 
-Simple slopes show the effect of weight at chosen values of horsepower (here, 100, 150, and 200):
+Simple slopes show the effect of negative emotions at chosen ages (here, 30, 50, and 70):
 
 ```{r}
 #| label: tbl-slopes
-#| tbl-cap: "Simple Slopes of Weight at Selected Values of Horsepower"
+#| tbl-cap: "Simple Slopes of Negative Emotions at Selected Ages"
 apa_slopes(fit_mod, 
-           trend = Weight, 
-           by = list(Horsepower = c(100, 150, 200))) |>
+           trend = `Negative Emotions`, 
+           by = list(Age = c(30, 50, 70))) |>
   apa_flextable(note = TRUE)
 ```
 
-Weight lowers fuel efficiency less in more powerful cars.
+Negative emotions about climate change go with more support for government action at every age, and more so among older people.
 
-The notes of the simple-slopes tables above also give the Johnson–Neyman intervals: the values of horsepower, within its observed range, at which the slope of weight is significant. Rather than testing the slope at a few chosen values of the moderator, the Johnson–Neyman technique finds the values at which the slope's test becomes significant, so readers can see where the effect holds. apa7 computes the boundaries exactly from the model's coefficients and adds the intervals to the note whenever the slope depends on a single continuous moderator through a two-way interaction. Use `johnson_neyman = FALSE` to leave them out.
+The notes of the simple-slopes tables above also give the Johnson–Neyman intervals: the values of age, within its observed range, at which the slope of negative emotions is significant (here, the whole range). Rather than testing the slope at a few chosen values of the moderator, the Johnson–Neyman technique finds the values at which the slope's test becomes significant, so readers can see where the effect holds. apa7 computes the boundaries exactly from the model's coefficients and adds the intervals to the note whenever the slope depends on a single continuous moderator through a two-way interaction. Use `johnson_neyman = FALSE` to leave them out.
 
-modelbased has shortcuts for common moderator values, and `apa_slopes` names the values they give. A numeric moderator named without values (`by = "hp"`) is set to its mean and 1 standard deviation above and below it, as with `by = "hp=[sd]"`:
+modelbased has shortcuts for common moderator values, and `apa_slopes` names the values they give. A numeric moderator named without values (`by = "Age"`) is set to its mean and 1 standard deviation above and below it, as with `by = "Age=[sd]"`:
 
 ```{r}
 #| label: tbl-slopes-sd
-#| tbl-cap: "Simple Slopes of Weight at the Mean of Horsepower and 1 *SD* Above and Below It"
-apa_slopes(fit_mod, trend = Weight, by = Horsepower) |>
+#| tbl-cap: "Simple Slopes of Negative Emotions at the Mean Age and 1 *SD* Above and Below It"
+apa_slopes(fit_mod, trend = `Negative Emotions`, by = Age) |>
   apa_flextable(note = TRUE)
 ```
 
-With `by = "hp=[fivenum]"`, the slopes are at the minimum, lower quartile, median, upper quartile, and maximum:
+With `by = "Age=[fivenum]"`, the slopes are at the minimum, lower quartile, median, upper quartile, and maximum:
 
 ```{r}
 #| label: tbl-slopes-fivenum
-#| tbl-cap: "Simple Slopes of Weight at the Five-Number Summary of Horsepower"
-apa_slopes(fit_mod, trend = Weight, 
-           by = list(Horsepower = "[fivenum]")) |>
+#| tbl-cap: "Simple Slopes of Negative Emotions at the Five-Number Summary of Age"
+apa_slopes(fit_mod, trend = `Negative Emotions`, 
+           by = list(Age = "[fivenum]")) |>
   apa_flextable(note = TRUE)
 ```
 
-Other named shortcuts are `"[quartiles]"`, `"[minmax]"`, and `"[mad]"` (the median and 1 median absolute deviation above and below it). The shortcuts, and the default for a numeric variable named without values, work the same way in `apa_means` and `apa_contrasts`. For example, the difference between manual and automatic transmissions at three values of horsepower:
+Other named shortcuts are `"[quartiles]"`, `"[minmax]"`, and `"[mad]"` (the median and 1 median absolute deviation above and below it). The shortcuts, and the default for a numeric variable named without values, work the same way in `apa_means` and `apa_contrasts`. For example, in the `Garcia` data set in the psych package [@garciaWomensReactionsIngroup2010], 129 women read about a female lawyer who was denied a promotion because of sex discrimination and who either did not protest, protested on her own behalf, or protested on behalf of women in general. How much the women liked the lawyer depended on how pervasive they believed sexism to be. Here are the differences between the protest conditions at the mean of perceived sexism and 1 *SD* above and below it:
 
 ```{r}
 #| label: tbl-contrasts-sd
-#| tbl-cap: "Differences Between Transmission Types at Three Levels of Horsepower"
-fit_am <- lm(MPG ~ Transmission * Horsepower, data = d_mtcars)
+#| tbl-cap: "Differences in Liking Between Protest Conditions at Three Levels of Perceived Sexism"
+d_protest <- psych::Garcia |>
+  transmute(
+    Liking = liking,
+    Sexism = sexism,
+    Protest = factor(protest, levels = 0:2, labels = c("None", "Individual", "Collective"))
+  )
 
-apa_contrasts(fit_am, contrast = Transmission, by = Horsepower) |>
+fit_protest <- lm(Liking ~ Protest * Sexism, data = d_protest)
+
+apa_contrasts(fit_protest, contrast = Protest, by = Sexism) |>
   apa_flextable(note = TRUE)
 ```
 
+Women who saw sexism as pervasive liked the lawyer more when she protested than when she did not, but for women who saw little sexism, protesting made no difference.
+
 # Logistic Regression
 
-For models with a link function, modelbased reports estimates on the response scale by default. For logistic regression, the estimates are probabilities, which have no leading zero in APA style, and the contrasts are differences in probabilities. The `birthwt` data set in the MASS package has the birth weights of 189 babies. Here, the probability of a low birth weight (under 2.5 kg) depends on the mother's race, holding her weight at its mean and averaging over whether she smoked during pregnancy:
+For models with a link function, modelbased reports estimates on the response scale by default. For logistic regression, the estimates are probabilities, which have no leading zero in APA style, and the contrasts are differences in probabilities. The `anorexia` data set in the MASS package [@handHandbookSmallData1994] has the weights of 72 young women with anorexia before and after treatment with cognitive behavioral therapy, family therapy, or no therapy (control). Here, the probability of gaining weight depends on the treatment, holding the weight before treatment at its mean:
 
 ```{r}
 #| label: tbl-logistic-means
-#| tbl-cap: "Estimated Probabilities of Low Birth Weight by Race"
-d_birth <- MASS::birthwt |> 
-  mutate(race = factor(race, labels = c("White", "Black", "Other")),
-         smoke = factor(smoke, labels = c("No", "Yes"))) |> 
-  rename(low_birth_weight = low,
-         mother_weight = lwt)
+#| tbl-cap: "Estimated Probabilities of Gaining Weight by Treatment"
+d_anorexia <- MASS::anorexia |>
+  transmute(
+    `Weight Gain` = as.integer(Postwt > Prewt),
+    Treatment = factor(Treat,
+                       levels = c("Cont", "CBT", "FT"),
+                       labels = c("Control", "Cognitive behavioral", "Family")),
+    Baseline = Prewt
+  )
 
 fit_logistic <- glm(
-  low_birth_weight ~ race + smoke + mother_weight,
-  data = d_birth,
+  `Weight Gain` ~ Treatment + Baseline,
+  data = d_anorexia,
   family = binomial
 )
 
-apa_means(fit_logistic, by = race) |>
+apa_means(fit_logistic, by = Treatment) |>
   apa_flextable(note = TRUE)
 ```
 
 ```{r}
 #| label: tbl-logistic-contrasts
-#| tbl-cap: "Differences in the Probability of Low Birth Weight Between Races"
-apa_contrasts(fit_logistic, contrast = race, p_adjust = "holm") |>
+#| tbl-cap: "Differences in the Probability of Gaining Weight Between Treatments"
+apa_contrasts(fit_logistic, contrast = Treatment, p_adjust = "holm") |>
   apa_flextable(note = TRUE)
 ```
 
@@ -232,9 +245,9 @@ With `predict = "link"`, modelbased gives estimates on the link scale (here, log
 
 ```{r}
 #| label: tbl-logistic-link
-#| tbl-cap: "Differences in the Log Odds of Low Birth Weight Between Races"
+#| tbl-cap: "Differences in the Log Odds of Gaining Weight Between Treatments"
 apa_contrasts(fit_logistic, 
-              contrast = race, 
+              contrast = Treatment, 
               p_adjust = "holm", 
               predict = "link") |>
   apa_flextable(note = TRUE)

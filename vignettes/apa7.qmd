@@ -181,10 +181,14 @@ Each of these settings is also an R option
 |:--------------------|:-------------------------|:------------------|
 | accuracy            | apa7.accuracy            | .01               |
 | font_family         | apa7.font_family         | "Times New Roman" |
-| font_size           | apa7.font_size           | 2                 |
+| font_size           | apa7.font_size           | 12                |
+| line_spacing        | apa7.line_spacing        | 2                 |
 | intercept_text      | apa7.intercept_text      | "Constant"        |
 | width_aware_padding | apa7.width_aware_padding | TRUE              |
 | page_width          | apa7.page_width          | 6.5               |
+| landscape_width     | apa7.landscape_width     | NA                |
+| column_width        | apa7.column_width        | NA                |
+| table_width         | apa7.table_width         | 1                 |
 | print               | apa7.print               | "auto"            |
 | citations           | apa7.citations           | "auto"            |
 
@@ -194,9 +198,62 @@ For example, to set the default font family:
 #| label: fontdefault
 #| eval: false
 
-options(apa.font_family = "Arial")
+options(apa7.font_family = "Arial")
 ```
 
+# Table Widths
+
+A manuscript can have tables of three widths: the text area of a portrait page, the text area of a landscape page, and one column of a two-column page. Every apa7 function that makes a table has a `table_width` argument that can name any of them:
+
+```{r}
+#| label: table-widths
+#| eval: false
+fit <- lm(mpg ~ wt + hp, data = mtcars)
+apa_flextable(apa_parameters(fit), table_width = "page")      # 6.5 in (the default)
+apa_flextable(apa_parameters(fit), table_width = "landscape") # 9 in
+apa_flextable(apa_parameters(fit), table_width = "column")    # 3.36 in
+```
+
+The widths in the comments are for letter-size paper. They follow the `page_width` setting: with `apa7_defaults(page_width = "a4")`, they are 6.27, 9.69, and 3.25 inches. A landscape page's text width is the paper's height less 1-inch margins, and a column's width is that of a column in apaquarto's two-column journal mode (`documentmode: jou`), which has 0.75-inch side margins and a gutter of 4% of the text width between the columns. To set either one yourself, use the `landscape_width` and `column_width` arguments of `apa7_defaults` (in inches).
+
+A table can also be a proportion of one of these widths, or have a width in inches, centimeters, or millimeters:
+
+| `table_width`          | Width                                            |
+|:-----------------------|:-------------------------------------------------|
+| `1`                    | The default width (the portrait page, unless changed) |
+| `.5`                   | Half the default width                           |
+| `"page"` or `"portrait"` | The text area of a portrait page              |
+| `"landscape"`          | The text area of a landscape page                |
+| `"column"`             | One column of a two-column page                  |
+| `c(landscape = .8)`    | 80% of the landscape width                       |
+| `c(cm = 10)`           | 10 centimeters (also `inches` and `mm`)          |
+| `0`                    | Only as wide as the contents                     |
+
+## One Table at a Time
+
+In a Quarto document, the width of one table can be set in its code chunk with the `apa7-width` option, so that a table printed automatically (without `apa_flextable`) gets that width, and no other table is affected:
+
+````markdown
+```{{r}}
+#| label: tbl-landscape
+#| apa7-width: landscape
+apa_parameters(fit)
+```
+````
+
+A named number is written as a YAML map (e.g., `#| apa7-width: {landscape: .8}`). In R Markdown, the option is `apa7.width` (e.g., `{r, apa7.width = "landscape"}`). A `table_width` given to a function overrides the chunk option.
+
+## Two-Column Documents
+
+In a two-column document, make the column the default width for every table:
+
+```{r}
+#| label: two-column
+#| eval: false
+apa7_defaults(table_width = "column")
+```
+
+Proportions are then proportions of the column (e.g., `table_width = .5` is half a column). A table that spans both columns, which apaquarto makes with the `apa-twocolumn: true` chunk option, is as wide as the page without any other setting.
 
 # Writing a Paper with apaquarto
 

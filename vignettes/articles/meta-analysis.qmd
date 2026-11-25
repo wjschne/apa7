@@ -70,62 +70,68 @@ With `metrics = "all"`, the table adds *&tau;*, *H*^2^, and confidence intervals
 
 # Ratio Measures
 
-In the `dat.bcg` data set, 13 trials compared the risk of tuberculosis in people who were and were not vaccinated with BCG. The effect sizes are risk ratios, which are analyzed on the log scale and exponentiated for the table:
+In the `dat.landenberger2005` data set [@landenbergerPositiveEffectsCognitivebehavioral2005], 58 studies compared the number of juvenile and adult offenders who reoffended after a cognitive behavioral therapy (CBT) program and after no program. The effect sizes are odds ratios (the odds of reoffending after CBT divided by the odds without it), which are analyzed on the log scale and exponentiated for the table:
 
 ```{r}
-#| label: tbl-bcg
-#| tbl-cap: "Effectiveness of the BCG Vaccine Against Tuberculosis"
-d_bcg <- escalc(
-  measure = "RR",
-  ai = tpos, bi = tneg, ci = cpos, di = cneg,
-  data = metadat::dat.bcg,
-  slab = paste(author, year)
-) |> 
-  rename(Latitude = ablat,
-         Allocation = alloc) |> 
-  mutate(Allocation = factor(stringr::str_to_title(Allocation)))
+#| label: tbl-recidivism
+#| tbl-cap: "Effects of Cognitive Behavioral Therapy on the Odds of Reoffending"
+d_recidivism <- escalc(
+  measure = "OR",
+  ai = n.cbt.rec, bi = n.cbt.non, ci = n.ctrl.rec, di = n.ctrl.non,
+  data = metadat::dat.landenberger2005,
+  slab = study
+) |>
+  mutate(
+    Sessions = sessions,
+    Program = factor(program,
+                     levels = c("demo", "practice", "research"),
+                     labels = c("Demonstration", "Practice", "Research"))
+  )
 
+fit_recidivism <- rma(yi, vi, data = d_recidivism)
 
-fit_bcg <- rma(yi, vi, data = d_bcg)
-
-apa_parameters(fit_bcg) |>
+apa_parameters(fit_recidivism) |>
   apa_flextable(note = TRUE)
 ```
+
+Odds ratios below 1 mean that fewer offenders reoffended after CBT. Across the studies, CBT reduced the odds of reoffending by about a third.
 
 # Meta-Regression
 
-Moderators are added with `mods`. The vaccine appeared to work better in trials farther from the equator, so here the absolute latitude of each trial is a moderator:
+Moderators are added with `mods`. Programs differed in how often they met, so here the number of CBT sessions per week is a moderator:
 
 ```{r}
-#| label: tbl-bcg-metareg
-#| tbl-cap: "Meta-Regression of BCG Vaccine Effectiveness on Latitude"
-fit_latitude <- rma(yi, vi, mods = ~ Latitude, data = d_bcg)
+#| label: tbl-recidivism-metareg
+#| tbl-cap: "Meta-Regression of the Effects of Cognitive Behavioral Therapy on Sessions per Week"
+fit_sessions <- rma(yi, vi, mods = ~ Sessions, data = d_recidivism)
 
-apa_parameters(fit_latitude) |>
+apa_parameters(fit_sessions) |>
   apa_flextable(note = TRUE)
 ```
 
 ```{r}
-#| label: tbl-bcg-metareg-fit
-#| tbl-cap: "Heterogeneity in the Meta-Regression on Latitude"
-apa_performance(fit_latitude) |>
+#| label: tbl-recidivism-metareg-fit
+#| tbl-cap: "Heterogeneity in the Meta-Regression on Sessions per Week"
+apa_performance(fit_sessions) |>
   apa_flextable(note = TRUE)
 ```
 
-For a meta-regression, `apa_parameters` shows the intercept and moderators, as for other regression models. Coefficients (*B*) are on the scale on which the effect sizes were analyzed (here, log risk ratios), and for ratio measures, the exponentiated coefficients are added (here, *RR*): each degree of latitude multiplies the risk ratio by about 0.97. `apa_performance` adds the omnibus test of the moderators (*Q*~M~) and the percentage of heterogeneity they explain (*R*^2^), and *Q*~E~ is the test of the heterogeneity that remains.
+For a meta-regression, `apa_parameters` shows the intercept and moderators, as for other regression models. Coefficients (*B*) are on the scale on which the effect sizes were analyzed (here, log odds ratios), and for ratio measures, the exponentiated coefficients are added (here, *OR*): each additional session per week multiplies the odds ratio by about `r sprintf("%.2f", exp(coef(fit_sessions)[["Sessions"]]))`, so programs that met more often reduced reoffending more. `apa_performance` adds the omnibus test of the moderators (*Q*~M~) and the percentage of heterogeneity they explain (*R*^2^), and *Q*~E~ is the test of the heterogeneity that remains.
 
 # Subgroup Analysis
 
-A subgroup analysis compares the pooled estimates of groups of studies. In the BCG trials, participants were assigned to the vaccine at random, alternately, or systematically. `apa_subgroups` pools each group of trials and compares them:
+A subgroup analysis compares the pooled estimates of groups of studies. The CBT programs had been set up for demonstration, for research, or as routine practice. `apa_subgroups` pools each group of studies and compares them:
 
 ```{r}
 #| label: tbl-subgroups
-#| tbl-cap: "BCG Vaccine Effectiveness by Method of Treatment Allocation"
-apa_subgroups(fit_bcg, Allocation) |>
+#| tbl-cap: "Effects of Cognitive Behavioral Therapy by Purpose of the Program"
+apa_subgroups(fit_recidivism, Program) |>
   apa_flextable(note = TRUE)
 ```
 
-By default, each subgroup has its own *&tau;*^2^, and the subgroups are compared with *Q*~between~, the heterogeneity of the subgroup estimates. With `tau2 = "common"`, the subgroups share one *&tau;*^2^, which is estimated more precisely when subgroups have few studies: the estimates come from a meta-regression with the subgroup as a categorical moderator, and the subgroups are compared with its omnibus test (*Q*~M~). The subgroup variable can be a column of the data (quoted or unquoted) or a vector (e.g., `d_bcg$Latititude > 30`).
+Programs set up for demonstration or research reduced reoffending more than programs in routine practice.
+
+By default, each subgroup has its own *&tau;*^2^, and the subgroups are compared with *Q*~between~, the heterogeneity of the subgroup estimates. With `tau2 = "common"`, the subgroups share one *&tau;*^2^, which is estimated more precisely when subgroups have few studies: the estimates come from a meta-regression with the subgroup as a categorical moderator, and the subgroups are compared with its omnibus test (*Q*~M~). The subgroup variable can be a column of the data (quoted or unquoted) or a vector (e.g., `d_recidivism$Sessions > 1`).
 
 # Publication Bias
 

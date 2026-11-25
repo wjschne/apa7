@@ -75,8 +75,10 @@ container_width_in <- function(container) {
 #' Every table function that takes `table_width` resolves it here, so that it
 #' means the same thing everywhere:
 #'
-#' * `NULL`: the `table_width` setting of [apa7_defaults()] (1 unless
-#'   changed).
+#' * `NULL`: the width asked for by the code chunk (its `apa7-width` or
+#'   `apa7.width` option, or `"page"` with apaquarto's `apa-twocolumn:
+#'   true`; see `chunk_table_width()`), or else the `table_width` setting of
+#'   [apa7_defaults()] (1 unless changed).
 #' * A number from 0 to 1: that proportion of the default width (the width
 #'   named by the `table_width` setting: the portrait page unless changed).
 #'   0 keeps the column widths that fit the contents.
@@ -93,18 +95,29 @@ container_width_in <- function(container) {
 #' @param unit unit of an unnamed number greater than 1 (`"in"`, `"cm"`, or
 #'   `"mm"`)
 #' @param arg,call argument name and calling environment for messages
+#' @param chunk if `TRUE`, a `NULL` `table_width` is first looked for in the
+#'   options of the code chunk
 #' @returns list of class `apa7_table_width` with `inches` (the width in
 #'   inches, or 0 to fit the contents), `proportion` (the proportion of its
 #'   container that the table fills, from 0 to 1), and `container` (`"page"`,
 #'   `"landscape"`, or `"column"`)
 #' @keywords internal
 #' @noRd
-resolve_table_width <- function(table_width = NULL, unit = "in", arg = "table_width", call = rlang::caller_env()) {
+resolve_table_width <- function(table_width = NULL, unit = "in", arg = "table_width", chunk = TRUE, call = rlang::caller_env()) {
   if (inherits(table_width, "apa7_table_width")) {
     return(table_width)
   }
-  from_setting <- is.null(table_width)
-  if (from_setting) {
+  from_setting <- FALSE
+  if (is.null(table_width) && chunk) {
+    # The width asked for by the code chunk that makes the table
+    from_chunk <- chunk_table_width()
+    if (!is.null(from_chunk)) {
+      table_width <- from_chunk$value
+      arg <- from_chunk$option
+    }
+  }
+  if (is.null(table_width)) {
+    from_setting <- TRUE
     table_width <- getOption("apa7.table_width", 1)
     arg <- "table_width"
   }
@@ -113,7 +126,7 @@ resolve_table_width <- function(table_width = NULL, unit = "in", arg = "table_wi
     if (from_setting) {
       return("page")
     }
-    resolve_table_width(NULL, call = call)$container
+    resolve_table_width(NULL, chunk = FALSE, call = call)$container
   }
   make <- function(inches, proportion, container) {
     structure(
@@ -193,4 +206,36 @@ resolve_table_width <- function(table_width = NULL, unit = "in", arg = "table_wi
     return(make(min(inches, available), min(inches / available, 1), container))
   }
   bad("names an unknown width or unit: {.val {name}}.")
+}
+
+#' Table width asked for by the current code chunk
+#'
+#' While knitr runs a code chunk, its `apa7-width` option (`apa7.width` in R
+#' Markdown) sets the width of the tables the chunk makes, in any form that
+#' `table_width` takes. In YAML, a named number is written as a map (e.g.,
+#' `#| apa7-width: {landscape: .8}`). apaquarto's `apa-twocolumn: true`,
+#' which spans a table across both columns of a two-column page, makes the
+#' table as wide as the page.
+#' @returns `NULL`, or a list with the `value` and the name of the `option`
+#'   that gave it
+#' @keywords internal
+#' @noRd
+chunk_table_width <- function() {
+  if (!isNamespaceLoaded("knitr") || !isTRUE(getOption("knitr.in.progress"))) {
+    return(NULL)
+  }
+  for (option in c("apa7-width", "apa7.width")) {
+    value <- knitr::opts_current$get(option)
+    if (!is.null(value)) {
+      # A YAML map such as {landscape: .8} arrives as a list
+      if (is.list(value)) {
+        value <- unlist(value)
+      }
+      return(list(value = value, option = option))
+    }
+  }
+  if (isTRUE(knitr::opts_current$get("apa-twocolumn"))) {
+    return(list(value = "page", option = "apa-twocolumn"))
+  }
+  NULL
 }
