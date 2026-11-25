@@ -513,6 +513,61 @@ test_that("mixed-model fit and comparisons", {
   expect_false("*R*^2^~conditional~" %in% colnames(result))
 })
 
+# Remove spaces, including the figure, em, and thin spaces used for alignment
+strip_spaces <- function(x) gsub("[[:space:]     ]", "", x)
+
+test_that("performance_layout = 'rows' puts R2 and its change below each model", {
+  m1 <- lm(mpg ~ wt, data = mtcars)
+  m2 <- lm(mpg ~ wt + hp, data = mtcars)
+  m3 <- lm(mpg ~ wt + hp + qsec, data = mtcars)
+  columns <- apa_parameters(list(m1, m2, m3))
+  rows <- apa_parameters(list(m1, m2, m3), performance_layout = "rows")
+  # No metric columns
+  expect_false(any(c("*R*^2^", "&Delta;*R*^2^") %in% colnames(rows)))
+  expect_identical(colnames(rows), setdiff(colnames(columns), c("*R*^2^", "&Delta;*R*^2^")))
+  labels <- rows$Variable
+  # Model 1 has R2 but no change; later models have both, after their
+  # parameters
+  expect_equal(sum(labels == "*R*^2^"), 3)
+  expect_equal(sum(labels == "&Delta;*R*^2^"), 2)
+  heading <- which(rows$Model != "")
+  block2 <- labels[heading[2]:(heading[3] - 1)]
+  expect_equal(utils::tail(block2, 2), c("*R*^2^", "&Delta;*R*^2^"))
+  # Values are those of the columns layout, in the first value column
+  r2_rows <- strip_spaces(rows[["*B*"]][labels == "*R*^2^"])
+  expect_equal(r2_rows, strip_spaces(columns[["*R*^2^"]][columns$Model != ""]))
+  delta <- strip_spaces(rows[["*B*"]][labels == "&Delta;*R*^2^"])
+  expect_true(all(grepl("^\\.\\d\\d", delta)))
+  # Parameter labels are formatted when the table is made, so the metric
+  # labels are not formatted as variable names
+  expect_identical(attr(rows, "no_format_columns"), "Variable")
+  expect_true("Wt" %in% strip_spaces(labels))
+  # The note defines the change in R2
+  expect_match(apa_note(rows), "change in \\*R\\*\\^2\\^")
+  expect_s3_class(apa_flextable(rows), "flextable")
+  expect_error(apa_parameters(list(m1, m2), performance_layout = "side"), "should be one of")
+})
+
+test_that("performance_layout = 'rows' puts metrics after random effects", {
+  skip_if_not_installed("lme4")
+  skip_on_cran()
+  d <- lme4::sleepstudy
+  m0 <- lme4::lmer(Reaction ~ 1 + (1 | Subject), data = d, REML = FALSE)
+  m1 <- lme4::lmer(Reaction ~ Days + (1 | Subject), data = d, REML = FALSE)
+  result <- suppressMessages(
+    apa_parameters(list(m0, m1), performance_layout = "rows", ci_method = "wald")
+  )
+  labels <- strip_spaces(result$Variable)
+  heading <- which(result$Model != "")
+  block2 <- labels[heading[2]:length(labels)]
+  residual <- which(block2 == "Residual")
+  expect_equal(
+    block2[(residual + 1):length(block2)],
+    c("*R*^2^~marginal~", "&Delta;*R*^2^~marginal~", "*R*^2^~conditional~", "&Delta;*R*^2^~conditional~")
+  )
+  expect_no_error(apa_flextable(result))
+})
+
 # Confidence intervals ----
 
 # Parse "[LL, UL]" strings into a two-column matrix

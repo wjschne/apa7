@@ -1303,6 +1303,7 @@ align_padded_columns <- function(
 #' @param t_with_df if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.
 #' @param ... arguments passed to methods. For `lm`, `glm`, `polr`, and `clm` models, further arguments are passed to [parameters::model_parameters()]. For example, `vcov = "HC3"` gives heteroskedasticity-consistent (robust) standard errors, and the test statistics, *p*-values, and confidence intervals are based on them. `ci = .90` sets the confidence level.
 #' @param performance_parameters for lists of models, model comparison metrics passed to [apa_performance_comparison()]. If `NULL`, no metrics are added. By default, `R2` and `deltaR2`; for lists of mixed models (`lme4`), the default also includes the conditional *R*^2^ and its change (`R2_conditional`, `deltaR2_conditional`), and `R2` is the marginal *R*^2^.
+#' @param performance_layout for lists of models, where the model comparison metrics go: `"columns"` (default) adds a column for each metric, with its value on the model's heading row; `"rows"` adds a row for each metric below the model's parameters (and random effects), labeled in the variable column (e.g., *R*^2^ and &Delta;*R*^2^) with its value in the first value column, as in many hierarchical regression tables. Metrics without a value (e.g., the change in *R*^2^ of the first model) are left out.
 #'
 #' @return tibble
 #' @export
@@ -2623,10 +2624,12 @@ apa_parameters.list <- function(
   column_formats = NULL,
   t_with_df = TRUE,
   performance_parameters = c("R2", "deltaR2"),
+  performance_layout = c("columns", "rows"),
   ...
 ) {
   # Prevent warnings
   Model <- NULL
+  performance_layout <- match.arg(performance_layout)
 
   # Mixed models also show the conditional R2 and its change by default
   if (
@@ -2699,17 +2702,37 @@ apa_parameters.list <- function(
       starred = starred
     )
     note_formats <- attr(comparison, "column_formats", exact = TRUE) %||% column_formats
-    d_fit <- d_fit |>
-      flextable::as_grouped_data(groups = "Model") |>
-      dplyr::left_join(
-        comparison,
-        by = dplyr::join_by(Model)
-      ) |>
-      dplyr::mutate(dplyr::across(.cols = dplyr::where(is.character), \(x) dplyr::replace_values(x, from = NA, to = "")))
+    if (performance_layout == "rows") {
+      # The labels of the parameters are formatted here, so that the labels
+      # of the statistics (e.g., "*R*^2^") are not formatted as variable names
+      if (is.null(attr(d_fit, "no_format_columns", exact = TRUE))) {
+        label_format <- (column_formats %||% the$column_formats)[[colnames(d_fit)[2]]]
+        if (!is.null(label_format)) {
+          labels <- d_fit[[2]]
+          filled <- !is.na(labels) & labels != ""
+          labels[filled] <- label_format@formatter(labels[filled])
+          d_fit[[2]] <- labels
+        }
+      }
+      d_fit <- performance_rows(d_fit, comparison) |>
+        flextable::as_grouped_data(groups = "Model") |>
+        dplyr::mutate(dplyr::across(.cols = dplyr::where(is.character), \(x) dplyr::replace_values(x, from = NA, to = "")))
+    } else {
+      d_fit <- d_fit |>
+        flextable::as_grouped_data(groups = "Model") |>
+        dplyr::left_join(
+          comparison,
+          by = dplyr::join_by(Model)
+        ) |>
+        dplyr::mutate(dplyr::across(.cols = dplyr::where(is.character), \(x) dplyr::replace_values(x, from = NA, to = "")))
+    }
   }
 
   # Labels of each model's table were formatted when it was made
-  if (any(purrr::map_lgl(model_tables, \(x) !is.null(attr(x, "no_format_columns", exact = TRUE))))) {
+  if (
+    (show_performance && performance_layout == "rows") ||
+      any(purrr::map_lgl(model_tables, \(x) !is.null(attr(x, "no_format_columns", exact = TRUE))))
+  ) {
     attr(d_fit, "no_format_columns") <- colnames(d_fit)[2]
   }
 
@@ -2720,6 +2743,48 @@ apa_parameters.list <- function(
     column_formats = note_formats
   )
   as_apa7_tbl(d_fit)
+}
+
+#' Model comparison statistics as rows below each model's parameters
+#'
+#' For `apa_parameters(performance_layout = "rows")`. Each statistic of
+#' `comparison` (e.g., *R*^2^ and its change) becomes a row after the model's
+#' parameters (and random effects), labeled with its header in the label
+#' column and with its value in the first value column. Statistics without a
+#' value (e.g., the change in *R*^2^ of the first model) are left out.
+#' @param d_fit stacked parameter tables, with `Model` first and the labels
+#'   second
+#' @param comparison output of [apa_performance_comparison()]
+#' @returns `d_fit` with the rows added, in the order of the models
+#' @keywords internal
+#' @noRd
+performance_rows <- function(d_fit, comparison) {
+  label_column <- colnames(d_fit)[2]
+  value_column <- colnames(d_fit)[3]
+  statistics <- setdiff(colnames(comparison), "Model")
+  models <- unique(d_fit$Model)
+  pieces <- purrr::map(models, \(model) {
+    values <- comparison[comparison$Model == model, statistics, drop = FALSE]
+    values <- if (nrow(values) == 1) unlist(values[1, ], use.names = TRUE) else character()
+    values <- values[!is.na(values) & trimws(values) != ""]
+    rows <- tibble::tibble(
+      Model = rep(model, length(values)),
+      label = names(values),
+      value = unname(as.character(values))
+    )
+    names(rows) <- c("Model", label_column, value_column)
+    dplyr::bind_rows(d_fit[d_fit$Model == model, , drop = FALSE], rows)
+  })
+  d <- dplyr::bind_rows(pieces)
+  # The statistics share the column with the parameter estimates, so the
+  # column is aligned again (but a column of confidence intervals is left as
+  # it is)
+  if (!is_ci_md(d_fit[[value_column]])) {
+    blank <- is.na(d[[value_column]]) | d[[value_column]] == ""
+    d[[value_column]][!blank] <- align_chr(d[[value_column]][!blank])
+  }
+  d[] <- lapply(d, \(x) if (is.character(x)) dplyr::replace_values(x, from = NA, to = "") else x)
+  d
 }
 
 #' format model performance metrics in APA style

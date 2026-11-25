@@ -156,7 +156,16 @@ apa_parameters(list(sleep0, sleep1, sleep2)) |>
   
 ```
 
-The random slope does not change the marginal *R*^2^, because the fixed effects are the same in both models, but the likelihood ratio test shows that the slopes vary across participants. 
+The random slope does not change the marginal *R*^2^, because the fixed effects are the same in both models, but the likelihood ratio test shows that the slopes vary across participants.
+
+With `performance_layout = "rows"`, the *R*^2^ values and their changes go in rows below each model's random effects instead, and the table fits in portrait:
+
+```{r}
+#| label: tbl-sleep-list-rows
+#| tbl-cap: "Three Multilevel Models of Reaction Time With Model Fit in Rows"
+#| message: false
+apa_parameters(list(sleep0, sleep1, sleep2), performance_layout = "rows")
+```
 
 The comparison can also be displayed on its own with `apa_performance_comparison`, here including the model with no predictors:
 

@@ -73,6 +73,7 @@ These change the output of code that worked with apa7 0.2.0.
 
 ## Other improvements and bug fixes
 
+* New `performance_layout` argument for lists of models in `apa_parameters()`: `"rows"` puts the model comparison metrics (e.g., *R*^2^ and &Delta;*R*^2^) in rows below each model's parameters (and random effects), with their values in the first value column, as in many hierarchical regression tables. The default, `"columns"`, keeps them in columns as before.
 * New `random_scale` argument for mixed models in `apa_parameters()`: `"sd"` (default) for standard deviations and correlations, or `"variance"` for variances and covariances. `apa_note()` defines the symbols.
 * `apa_flextable()` keeps the table width set by `table_width` when `pretty_widths = TRUE`. Before, `pretty_widths()` reset it to the full width, so in HTML a table could be stretched wider than its columns.
 * Decimal-aligned columns in `apa_flextable()` tables are centered in HTML as well as in Word.

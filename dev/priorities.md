@@ -73,7 +73,7 @@ Decision (2026-11-21): `apa_htest(data, formula, test)` runs the tests itself, b
 - [x] `glmmTMB` methods for `apa_parameters()` and `apa_performance()` (zero-inflation and dispersion parts under their own headings; only the conditional model exponentiated)
 - [x] `nlme::lme` methods (nlme's df; residual correlation and variance structures as rows, named in the note)
 - [x] Tests (`test-glmmtmb.R`, `test-nlme.R`)
-- [ ] For lists comparing models, allow for summaries like R2 and change in R2 to be reported in rows below random effects rather than as separate columns.
+- [x] For lists comparing models, allow for summaries like R2 and change in R2 to be reported in rows below random effects rather than as separate columns. `apa_parameters(performance_layout = "rows")`: a row per metric below each model's parameters (and random effects), with the value in the first value column; examples in the regression and multilevel articles.
 
 ### 5. After CRAN
 

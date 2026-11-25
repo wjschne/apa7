@@ -251,6 +251,7 @@ apa_parameters(
   column_formats = NULL,
   t_with_df = TRUE,
   performance_parameters = c("R2", "deltaR2"),
+  performance_layout = c("columns", "rows"),
   ...
 )
 }
@@ -316,6 +317,8 @@ category and predictor (e.g., "Part time: Children").}
 \item{random_scale}{for mixed models, \code{"sd"} (default) displays random effects as standard deviations (\emph{SD}) and correlations (\emph{r}), and \code{"variance"} displays them as variances (\emph{Var}) and covariances (\emph{Cov}).}
 
 \item{performance_parameters}{for lists of models, model comparison metrics passed to \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}. If \code{NULL}, no metrics are added. By default, \code{R2} and \code{deltaR2}; for lists of mixed models (\code{lme4}), the default also includes the conditional \emph{R}^2^ and its change (\code{R2_conditional}, \code{deltaR2_conditional}), and \code{R2} is the marginal \emph{R}^2^.}
+
+\item{performance_layout}{for lists of models, where the model comparison metrics go: \code{"columns"} (default) adds a column for each metric, with its value on the model's heading row; \code{"rows"} adds a row for each metric below the model's parameters (and random effects), labeled in the variable column (e.g., \emph{R}^2^ and Δ\emph{R}^2^) with its value in the first value column, as in many hierarchical regression tables. Metrics without a value (e.g., the change in \emph{R}^2^ of the first model) are left out.}
 }
 \value{
 tibble

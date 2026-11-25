@@ -100,6 +100,14 @@ To compare nested models, pass a list. Model fit statistics (*R*^2^, change in *
 apa_parameters(list(lm1, lm2, lm3))
 ```
 
+Many hierarchical regression tables instead put *R*^2^ and its change in rows below each model's coefficients. Use `performance_layout = "rows"`:
+
+```{r}
+#| label: tbl-lm-list-rows
+#| tbl-cap: "Hierarchical Regression of ACT Scores With Model Fit in Rows"
+apa_parameters(list(lm1, lm2, lm3), performance_layout = "rows")
+```
+
 # Binary Logistic Regression
 
 `apa_parameters` also accepts `glm` objects. The table reports coefficients on the link scale (*B*), their standard errors, the exponentiated coefficient, and the test statistic. For logistic regression, the exponentiated coefficient is the odds ratio (*OR*), and the test statistic is *z*.
