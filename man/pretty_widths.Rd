@@ -16,11 +16,22 @@ pretty_widths(
 
 \item{min_width}{minimum width of columns}
 
-\item{unit}{Can be \verb{in}, \code{cm}, or \code{mm}}
+\item{unit}{unit of the column widths: \verb{in}, \code{cm}, or \code{mm}. A
+\code{table_width} greater than 1 (without a name) is read in this unit.}
 
-\item{table_width}{width of table, in \code{unit}. If \code{NULL} (default), the
-width of the text area set with \code{apa7_defaults(page_width = )} (6.5
-inches unless changed). Use 0 to keep the widths that fit the contents.}
+\item{table_width}{width of the table, in the same forms in every apa7
+function: a proportion from 0 to 1 of the default width (the full width
+of a portrait page unless changed with \code{apa7_defaults(table_width = )}),
+\code{"page"} (or \code{"portrait"}) for the full width of a portrait page,
+\code{"landscape"} for a landscape page, \code{"column"} for one column of a
+two-column page, or a named number: a proportion of one of these widths
+(e.g., \code{c(landscape = .8)}) or a width in \code{inches}, \code{cm}, or \code{mm} (e.g.,
+\code{c(inches = 5)}). With 0, the columns are only as wide as their contents
+need. If \code{NULL} (default), the \code{table_width} set with \code{\link[=apa7_defaults]{apa7_defaults()}}
+(1 unless changed). The widths of the pages and the column are set with
+the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments of
+\code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
+warning to write it as \code{c(inches = )}.}
 }
 \value{
 flextable::flextable

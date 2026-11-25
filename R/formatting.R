@@ -1880,6 +1880,9 @@ the$column_formats <- column_formats()
 #' | `intercept_text` | `apa7.intercept_text` | `"Constant"` |
 #' | `width_aware_padding` | `apa7.width_aware_padding` | `TRUE` |
 #' | `page_width` | `apa7.page_width` | `6.5` |
+#' | `landscape_width` | `apa7.landscape_width` | `NA` (from `page_width`) |
+#' | `column_width` | `apa7.column_width` | `NA` (from `page_width`) |
+#' | `table_width` | `apa7.table_width` | `1` |
 #' | `print` | `apa7.print` | `"auto"` |
 #' | `citations` | `apa7.citations` | `"auto"` |
 #'
@@ -1905,13 +1908,33 @@ the$column_formats <- column_formats()
 #' @param number_formatter default function to format numbers
 #' @param trim_leading_zero default function to trim leading zeros from numbers
 #' @param width_aware_padding if `TRUE` (default), [align_chr()] pads text to equal rendered width in `font_family` (when the font is installed). If `FALSE`, text is padded with one figure space per missing character.
-#' @param page_width width of the text area of the page, which tables fill
-#'   when `table_width = 1` in [apa_flextable()] and [apa_cor()]: a number (in
+#' @param page_width width of the text area of a portrait page, which tables
+#'   fill with `table_width = "page"` (or `1`, by default): a number (in
 #'   inches) or the name of a paper size, whose width less APA's 1-inch
 #'   margins on each side is used (e.g., `"us-letter"` gives 6.5 inches, the
 #'   default, and `"a4"` gives 6.27 inches). Paper sizes are those of Typst's
 #'   `page` function (e.g., `"a4"`, `"a5"`, `"us-letter"`, `"us-legal"`,
 #'   `"jis-b5"`); see <https://typst.app/docs/reference/layout/page/#parameters-paper>.
+#' @param landscape_width width of the text area of a landscape page, in
+#'   inches, which tables fill with `table_width = "landscape"`. If `NA`
+#'   (default), the height of the paper named by `page_width` less 1-inch
+#'   margins (9 inches for `"us-letter"` and 9.69 inches for `"a4"`). When
+#'   `page_width` is a number, the paper is taken to have the proportions of
+#'   letter-size paper.
+#' @param column_width width of one column of a two-column page, in inches,
+#'   which tables fill with `table_width = "column"`. If `NA` (default),
+#'   the width of a column in apaquarto's two-column journal mode
+#'   (`documentmode: jou`): the paper width less 0.75-inch margins, less a
+#'   gutter of 4% between the columns, divided by 2 (3.36 inches for
+#'   `"us-letter"` and 3.25 inches for `"a4"`). When `page_width` is a
+#'   number, the paper is taken to be that number plus 1-inch margins.
+#' @param table_width default width of tables, in any of the forms that the
+#'   `table_width` argument of [apa_flextable()] takes: `1` (default) for the
+#'   full width of a portrait page, a proportion of it (e.g., `.8`),
+#'   `"page"`, `"landscape"`, `"column"`, or a named number (e.g.,
+#'   `c(column = 1)`). In a two-column document, `table_width = "column"`
+#'   makes tables as wide as a column, and a proportion given to a table
+#'   function is then a proportion of the column.
 #' @param print how tables made by apa7 functions (see [apa7_tbl]) are
 #'   displayed: `"auto"` (default) as tables in Quarto and R Markdown
 #'   documents and as tibbles in the console, `"flextable"` as tables
@@ -1931,6 +1954,10 @@ the$column_formats <- column_formats()
 #' # Tables as wide as the text on A4 paper with 1-inch margins
 #' apa7_defaults(page_width = "a4")
 #'
+#' # A two-column document: tables are as wide as a column unless a table
+#' # asks for another width (e.g., table_width = "page" in apa_flextable())
+#' apa7_defaults(table_width = "column")
+#'
 #' # Restore the earlier accuracy
 #' do.call(apa7_defaults, old)
 #'
@@ -1947,6 +1974,9 @@ apa7_defaults <- function(
   trim_leading_zero = NULL,
   width_aware_padding = NULL,
   page_width = NULL,
+  landscape_width = NULL,
+  column_width = NULL,
+  table_width = NULL,
   print = NULL,
   citations = NULL,
   reset = FALSE
@@ -1975,6 +2005,15 @@ apa7_defaults <- function(
   if (!is.null(page_width)) {
     page_text_width(page_width)
   }
+  for (arg in c("landscape_width", "column_width")) {
+    value <- get(arg)
+    if (!is.null(value) && !(length(value) == 1 && (is.na(value) || (is.numeric(value) && value > 0)))) {
+      cli::cli_abort("{.arg {arg}} must be a single positive number (inches), or {.code NA} to compute it from {.arg page_width}.")
+    }
+  }
+  if (!is.null(table_width)) {
+    resolve_table_width(table_width)
+  }
   if (!is.null(print) && !(is.character(print) && length(print) == 1 && print %in% c("auto", "flextable", "tibble"))) {
     cli::cli_abort("{.arg print} must be {.val auto}, {.val flextable}, or {.val tibble}.")
   }
@@ -2001,6 +2040,9 @@ apa7_defaults <- function(
     intercept_text = intercept_text,
     width_aware_padding = width_aware_padding,
     page_width = page_width,
+    landscape_width = landscape_width,
+    column_width = column_width,
+    table_width = table_width,
     print = print,
     citations = citations
   )
@@ -2030,7 +2072,9 @@ apa7_defaults <- function(
       line_spacing = line_spacing, intercept_text = intercept_text,
       column_formats = column_formats, number_formatter = number_formatter,
       trim_leading_zero = trim_leading_zero, width_aware_padding = width_aware_padding,
-      page_width = page_width, print = print, citations = citations
+      page_width = page_width, landscape_width = landscape_width,
+      column_width = column_width, table_width = table_width,
+      print = print, citations = citations
     )[names(previous)],
     is.null,
     logical(1)
@@ -2053,6 +2097,9 @@ apa7_option_settings <- list(
   intercept_text = list(option = "apa7.intercept_text", default = "Constant"),
   width_aware_padding = list(option = "apa7.width_aware_padding", default = TRUE),
   page_width = list(option = "apa7.page_width", default = 6.5, read = function(x) page_text_width(x)),
+  landscape_width = list(option = "apa7.landscape_width", default = NA),
+  column_width = list(option = "apa7.column_width", default = NA),
+  table_width = list(option = "apa7.table_width", default = 1),
   print = list(option = "apa7.print", default = "auto"),
   citations = list(option = "apa7.citations", default = "auto")
 )
@@ -2069,7 +2116,7 @@ apa7_current_defaults <- function() {
       number_formatter = the$number_formatter,
       trim_leading_zero = the$trim_leading_zero
     ),
-    options_now[c("width_aware_padding", "page_width", "print", "citations")]
+    options_now[c("width_aware_padding", "page_width", "landscape_width", "column_width", "table_width", "print", "citations")]
   )
 }
 

@@ -15,6 +15,9 @@ apa7_defaults(
   trim_leading_zero = NULL,
   width_aware_padding = NULL,
   page_width = NULL,
+  landscape_width = NULL,
+  column_width = NULL,
+  table_width = NULL,
   print = NULL,
   citations = NULL,
   reset = FALSE
@@ -43,13 +46,36 @@ single-spaced.}
 
 \item{width_aware_padding}{if \code{TRUE} (default), \code{\link[=align_chr]{align_chr()}} pads text to equal rendered width in \code{font_family} (when the font is installed). If \code{FALSE}, text is padded with one figure space per missing character.}
 
-\item{page_width}{width of the text area of the page, which tables fill
-when \code{table_width = 1} in \code{\link[=apa_flextable]{apa_flextable()}} and \code{\link[=apa_cor]{apa_cor()}}: a number (in
+\item{page_width}{width of the text area of a portrait page, which tables
+fill with \code{table_width = "page"} (or \code{1}, by default): a number (in
 inches) or the name of a paper size, whose width less APA's 1-inch
 margins on each side is used (e.g., \code{"us-letter"} gives 6.5 inches, the
 default, and \code{"a4"} gives 6.27 inches). Paper sizes are those of Typst's
 \code{page} function (e.g., \code{"a4"}, \code{"a5"}, \code{"us-letter"}, \code{"us-legal"},
 \code{"jis-b5"}); see \url{https://typst.app/docs/reference/layout/page/#parameters-paper}.}
+
+\item{landscape_width}{width of the text area of a landscape page, in
+inches, which tables fill with \code{table_width = "landscape"}. If \code{NA}
+(default), the height of the paper named by \code{page_width} less 1-inch
+margins (9 inches for \code{"us-letter"} and 9.69 inches for \code{"a4"}). When
+\code{page_width} is a number, the paper is taken to have the proportions of
+letter-size paper.}
+
+\item{column_width}{width of one column of a two-column page, in inches,
+which tables fill with \code{table_width = "column"}. If \code{NA} (default),
+the width of a column in apaquarto's two-column journal mode
+(\code{documentmode: jou}): the paper width less 0.75-inch margins, less a
+gutter of 4\% between the columns, divided by 2 (3.36 inches for
+\code{"us-letter"} and 3.25 inches for \code{"a4"}). When \code{page_width} is a
+number, the paper is taken to be that number plus 1-inch margins.}
+
+\item{table_width}{default width of tables, in any of the forms that the
+\code{table_width} argument of \code{\link[=apa_flextable]{apa_flextable()}} takes: \code{1} (default) for the
+full width of a portrait page, a proportion of it (e.g., \code{.8}),
+\code{"page"}, \code{"landscape"}, \code{"column"}, or a named number (e.g.,
+\code{c(column = 1)}). In a two-column document, \code{table_width = "column"}
+makes tables as wide as a column, and a proportion given to a table
+function is then a proportion of the column.}
 
 \item{print}{how tables made by apa7 functions (see \link{apa7_tbl}) are
 displayed: \code{"auto"} (default) as tables in Quarto and R Markdown
@@ -84,6 +110,9 @@ that runs at the start of every R session, before apa7 is loaded:\tabular{lll}{
    \code{intercept_text} \tab \code{apa7.intercept_text} \tab \code{"Constant"} \cr
    \code{width_aware_padding} \tab \code{apa7.width_aware_padding} \tab \code{TRUE} \cr
    \code{page_width} \tab \code{apa7.page_width} \tab \code{6.5} \cr
+   \code{landscape_width} \tab \code{apa7.landscape_width} \tab \code{NA} (from \code{page_width}) \cr
+   \code{column_width} \tab \code{apa7.column_width} \tab \code{NA} (from \code{page_width}) \cr
+   \code{table_width} \tab \code{apa7.table_width} \tab \code{1} \cr
    \code{print} \tab \code{apa7.print} \tab \code{"auto"} \cr
    \code{citations} \tab \code{apa7.citations} \tab \code{"auto"} \cr
 }
@@ -103,6 +132,10 @@ old <- apa7_defaults(accuracy = .001)
 
 # Tables as wide as the text on A4 paper with 1-inch margins
 apa7_defaults(page_width = "a4")
+
+# A two-column document: tables are as wide as a column unless a table
+# asks for another width (e.g., table_width = "page" in apa_flextable())
+apa7_defaults(table_width = "column")
 
 # Restore the earlier accuracy
 do.call(apa7_defaults, old)

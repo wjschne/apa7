@@ -27,7 +27,7 @@ apa_flextable(
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
-  table_width = 1,
+  table_width = NULL,
   markdown = TRUE,
   markdown_header = markdown,
   markdown_body = markdown,
@@ -91,13 +91,19 @@ notes are single-spaced.}
 
 \item{layout}{table layout ("autofit", "fixed")}
 
-\item{table_width}{proportion of the width of the container (e.g., the
-page or text column) that the table occupies, from 0 to 1: 1 (default)
-is the full width, and .5 is half the width. With \code{pretty_widths = TRUE},
-the column widths are also set to fill the same proportion of the width
-of the text area, which is 6.5 inches (letter-size paper with 1-inch
-margins) unless changed with \code{apa7_defaults(page_width = )} (e.g.,
-\code{apa7_defaults(page_width = "a4")}).}
+\item{table_width}{width of the table, in the same forms in every apa7
+function: a proportion from 0 to 1 of the default width (the full width
+of a portrait page unless changed with \code{apa7_defaults(table_width = )}),
+\code{"page"} (or \code{"portrait"}) for the full width of a portrait page,
+\code{"landscape"} for a landscape page, \code{"column"} for one column of a
+two-column page, or a named number: a proportion of one of these widths
+(e.g., \code{c(landscape = .8)}) or a width in \code{inches}, \code{cm}, or \code{mm} (e.g.,
+\code{c(inches = 5)}). With 0, the columns are only as wide as their contents
+need. If \code{NULL} (default), the \code{table_width} set with \code{\link[=apa7_defaults]{apa7_defaults()}}
+(1 unless changed). The widths of the pages and the column are set with
+the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments of
+\code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
+warning to write it as \code{c(inches = )}.}
 
 \item{markdown}{apply markdown formatting to header and body}
 
@@ -154,4 +160,10 @@ mtcars \%>\%
   dplyr::mutate(vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))) |>
   apa_flextable(row_title_column= vs,  row_title_align = "center") |>
   align(j = 2:3, align = "center")
+
+# Widths for a landscape page, one column of a two-column page, and 10 cm
+fit <- lm(mpg ~ wt + hp, data = mtcars)
+apa_flextable(apa_parameters(fit), table_width = "landscape")
+apa_flextable(apa_parameters(fit), table_width = "column")
+apa_flextable(apa_parameters(fit), table_width = c(cm = 10))
 }

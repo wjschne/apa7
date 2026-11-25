@@ -380,7 +380,8 @@ test_that("apa7_defaults() returns the previous values, which restore them", {
   expect_setequal(
     names(all_old),
     c("accuracy", "font_family", "font_size", "line_spacing", "intercept_text", "column_formats", "number_formatter",
-      "trim_leading_zero", "width_aware_padding", "page_width", "print", "citations")
+      "trim_leading_zero", "width_aware_padding", "page_width", "landscape_width", "column_width",
+      "table_width", "print", "citations")
   )
   expect_true(S7::S7_inherits(all_old$column_formats, column_formats))
 })

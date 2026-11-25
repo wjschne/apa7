@@ -19,7 +19,7 @@ apa_cor(
   border_color = "black",
   border_width = 0.5,
   line_spacing = NULL,
-  table_width = 1,
+  table_width = NULL,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
@@ -63,14 +63,19 @@ for double spacing or 1 for single spacing). If \code{NULL} (default), the
 spacing set with \code{apa7_defaults(line_spacing = )} (2 unless changed). Table
 notes are single-spaced.}
 
-\item{table_width}{proportion of the width of the page that the table
-occupies, from 0 to 1: 1 (default) is the full width, and .5 is half the
-width. The column widths are scaled to fill this proportion of the width
-of the text area, which is 6.5 inches (letter-size paper with 1-inch
-margins) unless changed with \code{apa7_defaults(page_width = )}. With
-0, the column widths are left as they are. In apa7 0.2.0 and earlier,
-\code{table_width} was a width in inches; values greater than 1 are still
-read as inches, with a warning.}
+\item{table_width}{width of the table, in the same forms in every apa7
+function: a proportion from 0 to 1 of the default width (the full width
+of a portrait page unless changed with \code{apa7_defaults(table_width = )}),
+\code{"page"} (or \code{"portrait"}) for the full width of a portrait page,
+\code{"landscape"} for a landscape page, \code{"column"} for one column of a
+two-column page, or a named number: a proportion of one of these widths
+(e.g., \code{c(landscape = .8)}) or a width in \code{inches}, \code{cm}, or \code{mm} (e.g.,
+\code{c(inches = 5)}). With 0, the columns are only as wide as their contents
+need. If \code{NULL} (default), the \code{table_width} set with \code{\link[=apa7_defaults]{apa7_defaults()}}
+(1 unless changed). The widths of the pages and the column are set with
+the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments of
+\code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
+warning to write it as \code{c(inches = )}.}
 
 \item{keep_empty_star_columns}{Keep remove empty star columns (Default: \code{TRUE})}
 

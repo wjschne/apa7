@@ -1070,7 +1070,7 @@ test_that("apa_cor() table_width is a proportion, with inches still accepted", {
   expect_equal(half$properties$width, .5)
 
   # Values above 1 are read as inches, with a warning
-  expect_warning(inches <- apa_cor(d, table_width = 5), "now a proportion")
+  expect_warning(inches <- apa_cor(d, table_width = 5), "read as a width in inches")
   expect_equal(total_width(inches), 5, tolerance = 1e-6)
   expect_equal(inches$properties$width, 5 / 6.5)
 
@@ -1079,15 +1079,4 @@ test_that("apa_cor() table_width is a proportion, with inches still accepted", {
 
   expect_error(apa_cor(d, table_width = -1), "proportion")
   expect_error(apa_cor(d, table_width = "wide"), "proportion")
-})
-
-test_that("table_width outside 0 to 1 gives a clear error in apa_flextable(), apa_style(), and apa_chisq()", {
-  d <- head(mtcars[1:3])
-  expect_error(apa_flextable(d, table_width = 4), "use `table_width = 0.62`")
-  expect_error(apa_flextable(d, table_width = -1), "from 0 to 1")
-  expect_error(apa_flextable(d, table_width = "wide"), "from 0 to 1")
-  expect_error(apa_style(flextable::flextable(d), table_width = 8), "proportion of the page width")
-  expect_error(apa_chisq(table(mtcars$am, mtcars$vs), table_width = 8), "proportion of the page width")
-  expect_no_error(apa_flextable(d, table_width = .5))
-  expect_no_error(apa_flextable(d, table_width = 0))
 })
