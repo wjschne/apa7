@@ -10,9 +10,8 @@ knitr:
 #| label: setup
 #| include: false
 library(dplyr)
-library(forcats)
-library(stringr)
 library(apa7)
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -39,34 +38,38 @@ Several outcomes on the left side of the formula, joined with `+`, give one row 
 
 ## Welch's *t* test
 
-In the `iris` data, do setosa and versicolor irises differ in the size of their flowers? The grouping variable must have exactly two values, so first drop the third species.
+The `sat.act` data in the psych package [@revellePsychProceduresPsychological2026] has self-reported ACT and SAT scores from 700 people. Do men and women differ in their scores? The grouping variable must have exactly two values. Make it a factor with readable labels, and give the test scores names that read well in a table.
 
 ```{r}
-#| label: data-iris
-d_iris <- iris |>
-  filter(Species != "virginica") |>
-  mutate(Species = fct_relabel(droplevels(Species), 
-                               str_to_title)) |>
-  rename(
-    `Sepal Length` = Sepal.Length,
-    `Sepal Width` = Sepal.Width,
-    `Petal Length` = Petal.Length,
-    `Petal Width` = Petal.Width
+#| label: data-sat
+d_sat <- psych::sat.act |>
+  as_tibble() |>
+  mutate(
+    Gender = factor(gender, levels = 1:2, labels = c("Men", "Women")),
+    ACT,
+    `SAT Verbal` = SATV,
+    `SAT Quantitative` = SATQ
   )
 ```
 
 ```{r}
 #| label: tbl-welch
-#| tbl-cap: "Welch's *t* Tests Comparing Setosa and Versicolor Irises"
-apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` + `Petal Length` + `Petal Width` ~ Species
+#| tbl-cap: "Welch's *t* Tests Comparing Test Scores of Men and Women"
+
+apa7_defaults(
+  page_width = 6.5,
 )
+apa_htest(
+  d_sat,
+  ACT + `SAT Verbal` + `SAT Quantitative` ~ Gender
+) |> 
+  mutate(`*df*` = as.integer(`*df*`)) |> 
+  apa_flextable(table_width)
 ```
 
-By default, the table shows each group's mean (*M*) and standard deviation (*SD*) under a spanner with the group's name. Then come Welch's *t* test, its *p*-value, and Cohen's *d* with its 95% confidence interval. Welch's test does not assume equal variances, so its degrees of freedom are not whole numbers and differ from row to row. They get their own column (*df*). When all rows have the same degrees of freedom, as in Student's *t* test below, they appear in the column header instead (e.g., *t*(98)).
+By default, the table shows each group's mean (*M*) and standard deviation (*SD*) under a spanner with the group's name. Then come Welch's *t* test, its *p*-value, and Cohen's *d* with its 95% confidence interval. Welch's test does not assume equal variances, so its degrees of freedom are not whole numbers and differ from row to row. They get their own column (*df*). When all rows have the same degrees of freedom, as in Student's *t* test below, they appear in the column header instead (e.g., *t*(698)).
 
-Differences are the first group (in factor level order) minus the second, so a positive *d* means setosa irises have the larger mean. To flip the direction, reorder the factor levels (e.g., with `forcats::fct_rev`).
+Differences are the first group (in factor level order) minus the second, so a positive *d* means that men have the larger mean. To flip the direction, reorder the factor levels (e.g., with `forcats::fct_rev`).
 
 ## Student's *t* test and Hedges' *g*
 
@@ -74,10 +77,10 @@ With `var_equal = TRUE`, the table shows Student's *t* test, which assumes equal
 
 ```{r}
 #| label: tbl-student
-#| tbl-cap: "Student's *t* Tests Comparing Setosa and Versicolor Irises With Hedges' *g*"
+#| tbl-cap: "Student's *t* Tests Comparing ACT and SAT Verbal Scores of Men and Women With Hedges' *g*"
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  ACT + `SAT Verbal` ~ Gender,
   var_equal = TRUE,
   effect_size = "hedges_g"
 )
@@ -85,14 +88,14 @@ apa_htest(
 
 ## One-sided tests and other test options
 
-Other arguments are passed to the test function. For example, `alternative = "greater"` makes a one-sided test. Effect size intervals stay two-sided, and the table note says that the *p*-values are one-sided.
+Other arguments are passed to the test function. For example, `alternative = "greater"` makes a one-sided test, here of whether men have higher SAT Quantitative scores than women. Effect size intervals stay two-sided, and the table note says that the *p*-values are one-sided.
 
 ```{r}
 #| label: tbl-one-sided
-#| tbl-cap: "One-Sided Welch's *t* Test of Sepal Width"
+#| tbl-cap: "One-Sided Welch's *t* Test of SAT Quantitative Scores"
 tbl_greater <- apa_htest(
-  d_iris,
-  `Sepal Width` ~ Species,
+  d_sat,
+  `SAT Quantitative` ~ Gender,
   alternative = "greater"
 )
 tbl_greater
@@ -105,15 +108,12 @@ apa_note(tbl_greater)
 
 # One-Sample Tests
 
-To compare a mean with a fixed value, put `1` on the right side of the formula and give the value as `mu`. In `ToothGrowth`, is the mean tooth length different from 20?
+To compare a mean with a fixed value, put `1` on the right side of the formula and give the value as `mu`. SAT section scores were scaled to have a mean of 500. Is the mean SAT Verbal score in `sat.act` different from 500?
 
 ```{r}
 #| label: tbl-one-sample
-#| tbl-cap: "One-Sample *t* Test of Tooth Length Against 20"
-d_tooth <- ToothGrowth |>
-  rename(Length = len)
-
-apa_htest(d_tooth, Length ~ 1, mu = 20)
+#| tbl-cap: "One-Sample *t* Test of SAT Verbal Scores Against 500"
+apa_htest(d_sat, `SAT Verbal` ~ 1, mu = 500)
 ```
 
 # Paired Tests
@@ -198,15 +198,15 @@ With `test = "wilcoxon"`, the table shows each group's median (*Mdn*), the Wilco
 
 ```{r}
 #| label: tbl-wilcoxon
-#| tbl-cap: "Wilcoxon Rank-Sum Tests Comparing Setosa and Versicolor Irises"
+#| tbl-cap: "Wilcoxon Rank-Sum Tests Comparing SAT Scores of Men and Women"
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  `SAT Verbal` + `SAT Quantitative` ~ Gender,
   test = "wilcoxon",
   exact = FALSE
 ) |> 
-  rename(`*Mdn*_Setosa` = `Setosa_*Mdn*`,
-         `*Mdn*_Versicolor` = `Versicolor_*Mdn*`)
+  rename(`*Mdn*_Men` = `Men_*Mdn*`,
+         `*Mdn*_Women` = `Women_*Mdn*`)
 ```
 
 With ties in the data, `wilcox.test` cannot compute exact *p*-values and warns about it. `exact = FALSE` asks for the normal approximation without the warning.
@@ -230,22 +230,23 @@ Every patient slept more with Drug 2 (or the same with both), so *r*~rb~ is −1
 
 # Correlation Tests
 
-With `test = "cor"`, each variable on the left is correlated with the variable on the right. The table shows the sample size, the correlation with its confidence interval, and the *t* test of the correlation.
+With `test = "cor"`, each variable on the left is correlated with the variable on the right. The table shows the sample size, the correlation with its confidence interval, and the *t* test of the correlation. The `epi.bfi` data in the psychTools package [@revellePsychToolsToolsAccompany2019] has personality, depression, and anxiety scores from 231 undergraduates. How strongly do depression, anxiety, and extraversion correlate with neuroticism?
 
 ```{r}
 #| label: tbl-cor
-#| tbl-cap: "Pearson Correlations of Car Characteristics With Weight"
-d_cars <- mtcars |>
-  rename(
-    `Miles per Gallon` = mpg,
-    Horsepower = hp,
-    `Quarter Mile Time` = qsec,
-    Weight = wt
+#| tbl-cap: "Pearson Correlations of Depression, Anxiety, and Extraversion With Neuroticism"
+d_personality <- psychTools::epi.bfi |>
+  as_tibble() |>
+  select(
+    Neuroticism = bfneur,
+    Extraversion = bfext,
+    Depression = bdi,
+    Anxiety = traitanx
   )
 
 apa_htest(
-  d_cars,
-  `Miles per Gallon` + Horsepower + `Quarter Mile Time` ~ Weight,
+  d_personality,
+  Depression + Anxiety + Extraversion ~ Neuroticism,
   test = "cor"
 )
 ```
@@ -254,10 +255,10 @@ apa_htest(
 
 ```{r}
 #| label: tbl-spearman
-#| tbl-cap: "Spearman Correlations of Fuel Economy and Horsepower With Weight"
+#| tbl-cap: "Spearman Correlations of Depression and Anxiety With Neuroticism"
 apa_htest(
-  d_cars,
-  `Miles per Gallon` + Horsepower ~ Weight,
+  d_personality,
+  Depression + Anxiety ~ Neuroticism,
   test = "cor",
   method = "spearman",
   exact = FALSE
@@ -270,29 +271,32 @@ To display all the correlations among a set of variables, use `apa_cor` (see the
 
 With `test = "chisq"`, each variable on the left is cross-tabulated with the variable on the right and tested for independence. The default effect size is Cramér's *V*. For 2 × 2 tables, `effect_size = "phi"` gives *φ*.
 
+The `survey` data in the MASS package [@ripleyModernApplied2002] has the answers of 237 statistics students to questions about themselves. Do women and men differ in how often they exercise or in which hand they write with?
+
 ```{r}
 #| label: chisq
-#| warning: false
-d_cars <- d_cars |>
-  mutate(
-    Transmission = factor(am, labels = c("Automatic", "Manual")),
-    Cylinders = factor(cyl),
-    Engine = factor(vs, labels = c("V-shaped", "Straight"))
+d_survey <- MASS::survey |>
+  as_tibble() |>
+  transmute(
+    Sex,
+    Exercise = factor(Exer, levels = c("None", "Some", "Freq"),
+                      labels = c("None", "Some", "Frequent")),
+    `Writing Hand` = W.Hnd
   )
 
-tbl_chisq <- apa_htest(d_cars, Cylinders + Engine ~ Transmission, test = "chisq")
+tbl_chisq <- apa_htest(d_survey, Exercise + `Writing Hand` ~ Sex, test = "chisq")
 ```
 
 ```{r}
 #| label: tbl-chisq
-#| tbl-cap: Chi-Square Test of Independence
+#| tbl-cap: Chi-Square Tests of Exercise and Writing Hand by Sex
 #| apa-note: !expr 'apa7::apa_note(tbl_chisq)'
 #| echo: fenced
 tbl_chisq
 ```
 
 
-`chisq.test` warns that the chi-square approximation may be incorrect because some expected counts in the Cylinders × Transmission table are small (only 32 cars). As in `chisq.test`, 2 × 2 tables use Yates's continuity correction, and the note says so. Use `correct = FALSE` to turn it off. To display the cell counts of one contingency table, use `apa_chisq` (see the [contingency tables article](chisquare.html)).
+As in `chisq.test`, 2 × 2 tables (here, Writing Hand × Sex) use Yates's continuity correction, and the note says so. Use `correct = FALSE` to turn it off. If some expected counts are small, `chisq.test` warns that the chi-square approximation may be incorrect. To display the cell counts of one contingency table, use `apa_chisq` (see the [contingency tables article](chisquare.html)).
 
 # Customizing Hypothesis Test Tables
 
@@ -302,30 +306,30 @@ tbl_chisq
 
 ```{r}
 #| label: note-welch
-tbl_iris <- apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+tbl_sat <- apa_htest(
+  d_sat,
+  `SAT Verbal` + `SAT Quantitative` ~ Gender,
   starred = "t"
 )
-apa_note(tbl_iris)
+apa_note(tbl_sat)
 ```
 
-With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option with `!expr`. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_iris` was made above) and display it in the chunk with the note:
+With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option with `!expr`. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_sat` was made above) and display it in the chunk with the note:
 
 ```{r}
-#| label: tbl-iris
-#| tbl-cap: Welch's *t* Tests of Setosa and Versicolor Irises
-#| apa-note: !expr apa7::apa_note(tbl_iris)
+#| label: tbl-sat-note
+#| tbl-cap: Welch's *t* Tests Comparing SAT Scores of Men and Women
+#| apa-note: !expr apa7::apa_note(tbl_sat)
 #| echo: fenced
-tbl_iris
+tbl_sat
 ```
 
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the same note below the table. Do not combine it with the `apa-note` chunk option, or the note will appear twice.
 
 ```{r}
 #| label: tbl-note-flextable
-#| tbl-cap: "Welch's *t* Tests of Setosa and Versicolor Irises With a Generated Note"
-apa_flextable(tbl_iris, note = TRUE)
+#| tbl-cap: "Welch's *t* Tests Comparing SAT Scores of Men and Women With a Generated Note"
+apa_flextable(tbl_sat, note = TRUE)
 ```
 
 The generated note is a starting point. With `collapse = NULL`, `apa_note` returns one sentence per element, so you can drop, reword, or add sentences.
@@ -338,8 +342,8 @@ The generated note is a starting point. With `collapse = NULL`, `apa_note` retur
 #| label: tbl-bolded
 #| tbl-cap: "Welch's *t* Tests With Significant *p*-Values in Bold"
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  `SAT Verbal` + `SAT Quantitative` ~ Gender,
   bolded = "p"
 )
 ```
@@ -352,8 +356,8 @@ apa_htest(
 #| label: tbl-fewer
 #| tbl-cap: "Welch's *t* Tests Without Descriptive Statistics or Effect Sizes"
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  `SAT Verbal` + `SAT Quantitative` ~ Gender,
   descriptives = FALSE,
   effect_size = "none"
 )
@@ -361,11 +365,11 @@ apa_htest(
 
 ## Labels
 
-Variable names are converted to title case (e.g., `len` becomes Len). For better labels, rename the variables before calling `apa_htest`, as was done throughout this article. Because the output is a tibble, you can also change the labels afterward.
+Variable names are converted to title case (e.g., `bdi` becomes Bdi). For better labels, rename the variables before calling `apa_htest`, as was done throughout this article. Because the output is a tibble, you can also change the labels afterward.
 
 ## Missing data
 
-Each test uses the rows in which the outcome and the grouping (or predictor) variable are observed, so rows can have different sample sizes. Paired tests use the rows in which both variables of the pair are observed.
+Each test uses the rows in which the outcome and the grouping (or predictor) variable are observed, so rows can have different sample sizes. In `sat.act`, for example, 13 people did not report an SAT Quantitative score, so the SAT Quantitative tests above use fewer people than the ACT and SAT Verbal tests. Paired tests use the rows in which both variables of the pair are observed.
 
 # Test Results Already Computed
 
@@ -373,13 +377,13 @@ Functions like `t.test` return `htest` objects, which have the test statistic an
 
 ```{r}
 #| label: tbl-htest-objects
-#| tbl-cap: "Correlations of Fuel Economy With Weight, Displacement, and Horsepower"
-car_tests <- list(
-  Weight = cor.test(mtcars$mpg, mtcars$wt),
-  Displacement = cor.test(mtcars$mpg, mtcars$disp),
-  Horsepower = cor.test(mtcars$mpg, mtcars$hp)
+#| tbl-cap: "Correlations of Neuroticism With Depression, Anxiety, and Extraversion"
+neuroticism_tests <- list(
+  Depression = cor.test(d_personality$Neuroticism, d_personality$Depression),
+  Anxiety = cor.test(d_personality$Neuroticism, d_personality$Anxiety),
+  Extraversion = cor.test(d_personality$Neuroticism, d_personality$Extraversion)
 )
-apa_htest(car_tests) |>
+apa_htest(neuroticism_tests) |>
   apa_flextable(note = TRUE)
 ```
 
@@ -394,12 +398,12 @@ Effect sizes, however, are computed from what the objects keep, and that is not 
 | Chi-square test of independence | Cramér's *V* (or *&phi;*, or Cohen's *w*), exactly, from the observed table |
 | Wilcoxon tests | None, because the group sizes are not kept |
 
-For two groups, the approximation can be noticeably off when the groups differ in size or variance, and the note says that it is an approximation:
+For two groups, the approximation can be noticeably off when the groups differ in size or variance, as men (247) and women (453) do in `sat.act`. The note says that it is an approximation:
 
 ```{r}
 #| label: tbl-htest-object-welch
-#| tbl-cap: "Welch's *t* Test of Fuel Economy by Transmission Type"
-t.test(mpg ~ am, data = mtcars) |>
+#| tbl-cap: "Welch's *t* Test of SAT Quantitative Scores by Gender"
+t.test(`SAT Quantitative` ~ Gender, data = d_sat) |>
   apa_htest() |>
   apa_flextable(note = TRUE)
 ```

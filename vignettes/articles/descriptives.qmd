@@ -90,7 +90,8 @@ apa_descriptives(
   d_survey,
   by = Sex,
   continuous = c(Age = "median_iqr"),
-  test = TRUE
+  test = TRUE, 
+  format_variable_names = FALSE
 ) |>
   apa_flextable(note = TRUE)
 ```
@@ -104,15 +105,9 @@ By default, the note lists the missing values. With `missing = "row"`, each vari
 #| tbl-cap: "Characteristics of Students by Sex With Ranges and Missing Values"
 apa_descriptives(
   d_survey,
-  variables = c("Height", "Pulse", "Smoke"),
-  by = "Sex",
+  by = Sex,
   missing = "row",
-  range = TRUE,
-  labels = c(
-    Height = "Height (cm)",
-    Pulse = "Pulse (beats per minute)",
-    Smoke = "Smoking"
-  )
+  format_variable_names = FALSE
 ) |>
   apa_flextable(note = TRUE)
 ```
