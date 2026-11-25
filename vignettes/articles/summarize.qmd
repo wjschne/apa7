@@ -352,6 +352,7 @@ To use the formats in every table, set them with `apa7_defaults(column_formats =
 
 ```{r}
 #| label: tbl-formattibble
+#| apa7-width: landscape
 #| tbl-cap: "Default Column Formats in apa7"
 column_formats()@get_tibble |>
   select(-formatter) |>

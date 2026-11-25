@@ -164,24 +164,21 @@ apa_performance_comparison(list(glm0, glm1))
 
 # Multinomial Logistic Regression
 
-When the outcome has more than two unordered categories, multinomial logistic regression (`nnet::multinom`) compares each category with a reference category, which is the first level of the outcome. The `Womenlf` data set in the carData package has the work participation of 263 married Canadian women (not working, working part time, or working full time), their husbands' income (in $1,000s), and whether they had children at home. Here, not working is the reference category:
+When the outcome has more than two unordered categories, multinomial logistic regression (`nnet::multinom`) compares each category with a reference category, which is the first level of the outcome. The `BEPS` data set in the carData package [@foxEffectDisplaysMultinomial2006] has the votes of 1,525 people in the British Election Panel Study of 1997–2001 (Conservative, Labour, or Liberal Democrat), their attitudes toward European integration (from 1 to 11, with higher scores for more Eurosceptic attitudes), and their knowledge of the parties' positions on European integration (from 0 to 3). Here, Conservative is the reference category:
 
 ```{r}
 #| label: tbl-multinom
-#| tbl-cap: "Multinomial Logistic Regression of Women's Labor-Force Participation"
-d_work <- carData::Womenlf |>
-  mutate(
-    participation = factor(
-      partic,
-      levels = c("not.work", "parttime", "fulltime"),
-      labels = c("Not working", "Part time", "Full time")
-    ),
-    husband_income = hincome
+#| tbl-cap: "Multinomial Logistic Regression of Vote on Euroscepticism and Political Knowledge"
+d_vote <- carData::BEPS |>
+  transmute(
+    Vote = vote,
+    Euroscepticism = Europe,
+    Knowledge = political.knowledge
   )
 
 multinom1 <- nnet::multinom(
-  participation ~ husband_income + children,
-  data = d_work,
+  Vote ~ Euroscepticism + Knowledge,
+  data = d_vote,
   trace = FALSE
 )
 
@@ -189,14 +186,14 @@ apa_parameters(multinom1) |>
   apa_flextable(note = TRUE)
 ```
 
-Each comparison gets a heading row with its coefficients indented below it, and the exponentiated coefficients are odds ratios relative to the reference category. Women with children at home had much lower odds of working full time than of not working, but children made little difference to the odds of working part time. To compare the categories with another reference, reorder the levels of the outcome (e.g., with `relevel`) before fitting the model. With `category_headings = FALSE`, each row is labeled with its category instead (e.g., "Part time: Constant").
+Each comparison gets a heading row with its coefficients indented below it, and the exponentiated coefficients are odds ratios relative to the reference category. More Eurosceptic voters had lower odds of voting Labour or Liberal Democrat rather than Conservative, and so did voters who knew more about the parties' positions on Europe. To compare the categories with another reference, reorder the levels of the outcome (e.g., with `relevel`) before fitting the model. With `category_headings = FALSE`, each row is labeled with its category instead (e.g., "Labour: Constant").
 
 Lists of multinomial models are compared with McFadden's pseudo-*R*^2^ and likelihood ratio tests:
 
 ```{r}
 #| label: tbl-multinom-list
-#| tbl-cap: "Comparison of Multinomial Models of Labor-Force Participation"
-multinom0 <- nnet::multinom(participation ~ husband_income, data = d_work, trace = FALSE)
+#| tbl-cap: "Comparison of Multinomial Models of Vote"
+multinom0 <- nnet::multinom(Vote ~ Euroscepticism, data = d_vote, trace = FALSE)
 apa_performance_comparison(list(multinom0, multinom1))
 ```
 
@@ -229,22 +226,22 @@ apa_parameters(glm_qpois)
 
 ## Zero-inflated and hurdle models
 
-Counts often have more zeros than a Poisson or negative binomial model expects. A zero-inflated model (`pscl::zeroinfl`) adds a logistic model of *excess* zeros, which come from cases that could only be zero (e.g., scientists who were not publishing at all). A hurdle model (`pscl::hurdle`) instead has a logistic model of whether the count is zero or positive, and a zero-truncated count model of the positive counts. Either way, `apa_parameters` puts each part under its own heading. Only the count model's coefficients are exponentiated (*IRR*), because the zero model's coefficients are log odds. The `bioChemists` data set in the pscl package has the number of articles 915 biochemistry graduate students published in the last 3 years of their PhD programs, which depends here on their mentors' numbers of articles (`mentor_articles`) and their number of young children (`young_children`). The zero-inflation part has only the mentor's articles:
+Counts often have more zeros than a Poisson or negative binomial model expects. A zero-inflated model (`pscl::zeroinfl`) adds a logistic model of *excess* zeros, which come from cases that could only be zero (e.g., people who would not have an affair under any circumstances). A hurdle model (`pscl::hurdle`) instead has a logistic model of whether the count is zero or positive, and a zero-truncated count model of the positive counts. Either way, `apa_parameters` puts each part under its own heading. Only the count model's coefficients are exponentiated (*IRR*), because the zero model's coefficients are log odds. The `Affairs` data set in the AER package, from a magazine survey analyzed by @fairTheoryExtramaritalAffairs1978, has the number of extramarital affairs that 601 married people reported having in the past year. The counts were coded from response categories (0, 1, 2, and 3 times; 7 for 4 to 10 times; and 12 for monthly or more often), and 75% of them are zeros. Here, the number of affairs depends on how happy people rated their marriages (from 1, very unhappy, to 5, very happy) and how religious they were (from 1, anti-religious, to 5, very religious), and so does the probability of an excess zero:
 
 ```{r}
 #| label: tbl-zeroinfl
-#| tbl-cap: "Zero-Inflated Negative Binomial Regression of Biochemists' Publications"
-data("bioChemists", package = "pscl")
-d_articles <- bioChemists |>
-  rename(
-    articles = art,
-    mentor_articles = ment,
-    young_children = kid5
+#| tbl-cap: "Zero-Inflated Negative Binomial Regression of Extramarital Affairs"
+data("Affairs", package = "AER")
+d_affairs <- Affairs |>
+  transmute(
+    Affairs = affairs,
+    Happiness = rating,
+    Religiousness = religiousness
   )
 
 zinb <- pscl::zeroinfl(
-  articles ~ mentor_articles + young_children | mentor_articles,
-  data = d_articles,
+  Affairs ~ Happiness + Religiousness | Happiness + Religiousness,
+  data = d_affairs,
   dist = "negbin"
 )
 
@@ -252,13 +249,13 @@ apa_parameters(zinb) |>
   apa_flextable(note = TRUE)
 ```
 
-Students with productive mentors published more, and they were less likely to be among those who did not publish at all. The note names the count distribution, gives the negative binomial dispersion parameter (*&theta;*), and explains the zero model. For a hurdle model, the zero model's heading is "Zero hurdle model", and its coefficients are the log odds of a count greater than zero:
+People who were happier in their marriages or more religious were more likely to be among those who would not have an affair at all, and happier people who did have affairs had fewer of them. The note names the count distribution, gives the negative binomial dispersion parameter (*&theta;*), and explains the zero model. For a hurdle model, the zero model's heading is "Zero hurdle model", and its coefficients are the log odds of a count greater than zero:
 
 ```{r}
 #| label: hurdle
 pscl::hurdle(
-  articles ~ mentor_articles + young_children | mentor_articles,
-  data = d_articles,
+  Affairs ~ Happiness + Religiousness | Happiness + Religiousness,
+  data = d_affairs,
   dist = "negbin"
 ) |>
   apa_parameters() |>

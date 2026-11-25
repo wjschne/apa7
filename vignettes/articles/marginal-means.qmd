@@ -101,6 +101,7 @@ Each row is the first level minus the second (e.g., Medium − Low), and the not
 
 ```{r}
 #| label: tbl-contrasts-by
+#| apa7-width: landscape
 #| tbl-cap: "Pairwise Comparisons of Levels of Authoritarianism Within Each Partner Status"
 apa_contrasts(fit,
               contrast = Authoritarianism,
@@ -192,6 +193,7 @@ Other named shortcuts are `"[quartiles]"`, `"[minmax]"`, and `"[mad]"` (the medi
 
 ```{r}
 #| label: tbl-contrasts-sd
+#| apa7-width: landscape
 #| tbl-cap: "Differences in Liking Between Protest Conditions at Three Levels of Perceived Sexism"
 d_protest <- psych::Garcia |>
   transmute(

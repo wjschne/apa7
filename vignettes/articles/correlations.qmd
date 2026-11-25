@@ -85,6 +85,7 @@ You can also use a plain vector of descriptive functions from these options: `"I
 
 ```{r}
 #| label: tbl-summaries
+#| apa7-width: landscape
 #| tbl-cap: "Correlations Among Personality and Depression With Additional Summary Statistics"
 my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
 

@@ -86,6 +86,7 @@ psych names factors by the fitting method and a number (e.g., PA1 for the first 
 
 ```{r}
 #| label: tbl-named
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings of Big Five Personality Items
 big5 <- c("Neuroticism",
           "Extraversion",
@@ -106,6 +107,7 @@ The `min_loading` argument sets the smallest absolute loading that is displayed.
 
 ```{r}
 #| label: tbl-min30
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings of .30 or Higher
 apa_loadings(fit_bfi,
              factor_names = big5,
@@ -121,6 +123,7 @@ When some items load on more than one factor, readers need to see which factor e
 
 ```{r}
 #| label: tbl-bold
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings With Primary Loadings in Bold
 apa_loadings(fit_bfi,
              factor_names = big5,
@@ -140,6 +143,7 @@ Three optional columns describe each item:
 
 ```{r}
 #| label: tbl-columns
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings, Communalities, and Complexity
 apa_loadings(fit_bfi,
              factor_names = big5,
@@ -155,6 +159,7 @@ With `variance = TRUE`, three rows are added below the loadings: the sum of squa
 
 ```{r}
 #| label: tbl-variance
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings and Variance Explained
 apa_loadings(fit_bfi,
              factor_names = big5,
@@ -190,6 +195,7 @@ fit_pca <- principal(d_bfi, nfactors = 5, rotate = "varimax")
 
 ```{r}
 #| label: tbl-pca
+#| apa7-width: landscape
 #| tbl-cap: Varimax-Rotated Principal Components of Big Five Personality Items
 apa_loadings(fit_pca,
              factor_names = big5,
@@ -204,6 +210,7 @@ apa_loadings(fit_pca,
 
 ```{r}
 #| label: tbl-parameters-efa
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings From parameters::factor_analysis
 efa_bfi <- parameters::factor_analysis(d_bfi, n = 5, rotation = "oblimin")
 
@@ -276,6 +283,7 @@ With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `a
 
 ```{r}
 #| label: tbl-note
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings of Big Five Personality Items
 #| apa-note: !expr apa7::apa_note(tbl_bfi)
 #| echo: fenced
@@ -315,6 +323,7 @@ Pass the table to `apa_flextable` for more options (e.g., `table_width`) and the
 
 ```{r}
 #| label: tbl-flextable
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings and Variance Explained
 apa_loadings(fit_bfi,
              factor_names = big5,

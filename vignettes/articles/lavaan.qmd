@@ -246,6 +246,7 @@ fit_scalar <- cfa(model_3, data = d_mi, group = "school",
 
 ```{r}
 #| label: tbl-hs-invariance
+#| apa7-width: landscape
 #| tbl-cap: "Measurement Invariance of the Three-Factor Model Across Schools"
 apa_performance_comparison(
   Configural = fit_configural,

@@ -146,13 +146,16 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
     - [x] `lavaan.qmd`: `PoliticalDemocracy` is kept as is (decided 2026-11-25)
     - [x] `apa7.qmd` (the getting-started vignette): `psych::sat.act` replaces `mtcars`
   - Borderline (decide whether to keep):
-    - [ ] `htest.qmd`: `sleep` (extra sleep under two hypnotic drugs, 10 patients) in the paired and signed-rank tests. Psychopharmacology, but a drug trial rather than a psychological study.
-    - [ ] `regression.qmd`: `carData::Womenlf` (labor-force participation of married Canadian women) in the multinomial section. Sociology.
-    - [ ] `regression.qmd`: `pscl::bioChemists` (publications of biochemistry graduate students) in the zero-inflated and hurdle section. Research productivity rather than psychology.
-    - [ ] `descriptives.qmd` and `htest.qmd`: `MASS::survey` (statistics students' height, pulse, handedness, exercise, and smoking). Student data, but mostly physical measures.
+    - [x] `htest.qmd`: `sleep` (extra sleep under two hypnotic drugs, 10 patients) in the paired and signed-rank tests. Psychopharmacology, but a drug trial rather than a psychological study. Kept as is (decided 2026-11-25)
+    - [x] `regression.qmd`: `carData::BEPS` (vote by Euroscepticism and political knowledge) replaces `carData::Womenlf` in the multinomial section
+    - [x] `regression.qmd`: `AER::Affairs` (extramarital affairs by marital happiness and religiousness) replaces `pscl::bioChemists` in the zero-inflated and hurdle section
+    - [x] `descriptives.qmd` and `htest.qmd`: `MASS::survey` (statistics students' height, pulse, handedness, exercise, and smoking). Student data, but mostly physical measures. Kept as is (decided 2026-11-25)
   - Already psychology (no change needed): `factor-analysis.qmd` (`bfi`, `Harman74`), `reliability.qmd` (`bfi`), `lavaan.qmd` CFA (`HolzingerSwineford1939`), `multilevel.qmd` (`sleepstudy`, `VerbAgg`), `meta-analysis.qmd` (`dat.molloy2014`, `dat.konstantopoulos2011`), and `anova.qmd` (`Moore`, `obk.long`).
-  - [ ] Check the references added from memory against their sources: Hayes (2022), Garcia et al. (2010), Moore and Krupat (1971), and Hand et al. (1994).
-  - [ ] Use new landscape mode for tables that do not currently fit in 6.5 inches. For example, tbl-contrasts-sd in marginal-means.qmd.
+  - [x] Check the references added from memory against their sources: Cowles and Davis (1987), Wong et al. (2001), Hayes (2022), Garcia et al. (2010), Moore and Krupat (1971), and Hand et al. (1994).
+  - [ ] Check the references added from memory against their sources: Fox and Andersen (2006) and Fair (1978).
+  - [x] Use new landscape mode for tables that do not currently fit in 6.5 inches (`#| apa7-width: landscape` on the 20 tables whose natural width is over 6.5 inches; `tbl-numberedlist` in summarize.qmd is left in portrait because only its quotation column, which wraps, is wide)
+  - [ ] Add AI acknowledgement to all articles.
+  - [ ] Add `apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)` to `setup` chunk in all articles that do not have it already.
 
 ## Done
 

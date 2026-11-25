@@ -134,6 +134,7 @@ A list of mixed models is compared with likelihood ratio tests, and the change i
 
 ```{r}
 #| label: tbl-sleep-list
+#| apa7-width: landscape
 #| tbl-cap: "Three Multilevel Models of Reaction Time"
 #| message: false
 apa_parameters(list(sleep0, sleep1, sleep2)) |> 

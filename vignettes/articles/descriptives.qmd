@@ -86,6 +86,7 @@ With `test = TRUE`, a *p* column tests the group differences: Welch's *t* test (
 
 ```{r}
 #| label: tbl-survey-tests
+#| apa7-width: landscape
 #| tbl-cap: "Characteristics of Students by Sex With Tests of Group Differences"
 apa_descriptives(
   d_survey,
