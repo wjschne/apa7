@@ -12,6 +12,7 @@ knitr:
 library(apa7)
 library(modelbased)
 library(dplyr)
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}

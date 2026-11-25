@@ -16,6 +16,7 @@ library(dplyr)
 library(tidyr)
 library(forcats)
 library(stringr)
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}

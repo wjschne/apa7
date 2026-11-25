@@ -11,6 +11,7 @@ library(parameters)
 library(performance)
 library(apa7)
 library(psych)
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}

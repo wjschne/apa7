@@ -19,10 +19,11 @@ library(tidyr)
 library(stringr)
 set_flextable_defaults(
   theme_fun = theme_apa,
-  font.family = "Times New Roman",
+  font.family = "Segoe UI",
   text.align = "center",
   table_align = "left"
 )
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -39,31 +40,44 @@ Functions that automate your descriptive statistics tables for you (e.g., the am
 
 The flextable package helper functions for automating summary tables. The `tabulator`, `summarizor`, and `proc_freq` functions are particularly powerful ways of summarizing and describing data. However, I am going to compute my summaries with standard base R and tidyverse functions. Here I create a table of means, standard deviations, and sample sizes for several variables across groups. The particulars are not so important here, just that apa7 and flextable can do most of the rest after that. 
 
+The `bfi` data set in the psychTools package [@revellePsychToolsToolsAccompany2019] has the answers of 2,800 people to 25 personality items, along with their education. `psych::scoreFast` averages the items of each Big Five scale (reversing the reverse-keyed items), and the summaries are computed by education:
+
 ```{r dataprocessing}
-d <- ggplot2::diamonds %>% 
-  select(cut, price, carat, depth, table) %>% 
-  arrange(cut) %>% 
-  rename_with(str_to_title) %>% 
-  pivot_longer(where(is.numeric), names_to = "Variable") %>% 
+bfi_scales <- psych::scoreFast(psychTools::bfi.keys, psychTools::bfi)
+
+d_bfi <- psychTools::bfi |>
+  transmute(
+    Education = factor(
+      education,
+      levels = 1:5,
+      labels = c("Some high school", "High school graduate", "Some college",
+                 "College graduate", "Graduate degree")
+    ),
+    Conscientiousness = bfi_scales[, "conscientious-A"],
+    Neuroticism = bfi_scales[, "neuroticism-A"],
+    Openness = bfi_scales[, "openness-A"]
+  ) |>
+  filter(!is.na(Education))
+
+d_summary <- d_bfi |>
+  arrange(Education) |>
+  pivot_longer(where(is.numeric), names_to = "Variable") |>
   summarise(
     M = mean(value, na.rm = TRUE),
     SD = sd(value, na.rm = TRUE),
     n = n(),
-    .by = c(Variable, Cut)) %>% 
-  pivot_longer(c(M, SD)) %>% 
-  unite(Variable, Variable, name) %>%
-  pivot_wider(names_from = Variable) 
+    .by = c(Variable, Education)) |>
+  pivot_longer(c(M, SD)) |>
+  unite(Variable, Variable, name) |>
+  pivot_wider(names_from = Variable)
 ```
 
-The `apa_flextable` function handles most of the formatting automatically except for the dollar signs, which flextable can add later. @tbl-apaflextable also decimal aligns all the numbers, though this is apparent in column `n` only.
+The `apa_flextable` function handles the formatting automatically. @tbl-apaflextable decimal aligns all the numbers, though this is apparent in column `n` only.
 
 ```{r}
 #| label: tbl-apaflextable
-#| tbl-cap: Price, Carat, Depth, Table Using `apa_flextable`
-d |> 
-  apa_flextable() |> 
-  colformat_char(j = 3:4, prefix = "$") 
-
+#| tbl-cap: Conscientiousness, Neuroticism, and Openness by Education Using `apa_flextable`
+apa_flextable(d_summary)
 ```
 
 
@@ -148,31 +162,20 @@ d |>
 
 ## Column spanners and deckered heads
 
-`apa_flextable` treats underscores in column names as header levels: in `Carat_M`, "Carat" is a column spanner (a label over several columns) and "M" is a deckered head (the label of one column under it). Here are the means and standard deviations of several variables in the `diamonds` data set, by cut:
+`apa_flextable` treats underscores in column names as header levels: in `Openness_M`, "Openness" is a column spanner (a label over several columns) and "M" is a deckered head (the label of one column under it). Here are the means and standard deviations of the personality scales from above, by education, without the sample sizes:
 
 ```{r}
-#| label: diamonds
-d_diamonds <- ggplot2::diamonds |>
-  select(cut, carat, depth, table) |>
-  arrange(cut) |>
-  rename_with(str_to_title) |>
-  pivot_longer(where(is.numeric), names_to = "Variable") |>
-  summarise(
-    M = mean(value, na.rm = TRUE),
-    SD = sd(value, na.rm = TRUE),
-    .by = c(Variable, Cut)
-  ) |>
-  pivot_longer(c(M, SD)) |>
-  unite(Variable, Variable, name) |>
-  pivot_wider(names_from = Variable)
+#| label: personality
+d_personality <- d_summary |>
+  select(-n)
 
-d_diamonds
+d_personality
 ```
 
 ```{r}
-#| label: tbl-diamonds
-#| tbl-cap: "Descriptive Statistics of Diamond Characteristics by Cut"
-apa_flextable(d_diamonds)
+#| label: tbl-personality
+#| tbl-cap: "Descriptive Statistics of Personality Scales by Education"
+apa_flextable(d_personality)
 ```
 
 `separate_headers = FALSE` turns this off. `column_spanner_label` adds the same spanner to several columns, selected by name or with tidyselect functions such as `starts_with`. The selected columns are moved next to the first one (`relocate = FALSE` keeps them in place):
@@ -193,9 +196,9 @@ d |>
 By default, a narrow blank column separates groups of columns under different spanners. `add_break_columns` inserts break columns yourself, after any column selected by name or with a tidyselect function:
 
 ```{r}
-#| label: tbl-breakdiamonds
-#| tbl-cap: "Descriptive Statistics of Diamond Characteristics With Break Columns"
-d_diamonds |>
+#| label: tbl-breakpersonality
+#| tbl-cap: "Descriptive Statistics of Personality Scales With Break Columns"
+d_personality |>
   add_break_columns(ends_with("SD"), omit_last = TRUE) |>
   apa_flextable()
 ```
