@@ -155,9 +155,9 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
   - [x] Check the references added from memory against their sources: Fox and Andersen (2006) and Fair (1978).
   - [x] `reliability.qmd`: `psychTools::bfi` with item wording from `bfi.dictionary` as row labels replaces `psych::bfi` item codes; data and methods cited
   - [x] Check the references added from memory against their sources: Cronbach (1951) and Kuder and Richardson (1937).
-  - [x] Use new landscape mode for tables that do not currently fit in 6.5 inches (`#| apa7-width: landscape` on the 20 tables whose natural width is over 6.5 inches; `tbl-numberedlist` in summarize.qmd is left in portrait because only its quotation column, which wraps, is wide)
-  - [ ] Add AI acknowledgement to all articles.
-  - [ ] Add `apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)` to `setup` chunk in all articles that do not have it already.
+  - [x] Use new landscape mode for tables that do not currently fit in 6.5 inches (`#| apa7-width: landscape` on the 20 tables whose natural width is over 6.5 inches, and 10 more that went over 6.5 inches in Open Sans; `tbl-numberedlist` in summarize.qmd is left in portrait because only its quotation column, which wraps, is wide)
+  - [x] Add AI acknowledgement to all articles. Done site-wide instead, as a pkgdown footer component (`ai` in `_pkgdown.yml`) on every page.
+  - [x] Add `apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)` to `setup` chunk in all articles that do not have it already. Changed to Open Sans, embedded from Google Fonts by a hidden `web-font` chunk (`gdtools::register_gfont()` for width measurement on the build machine, `gdtools::gfontHtmlDependency()` for the page), because Segoe UI is Windows-only and the tables declare no fallback font.
 
 ## Done
 

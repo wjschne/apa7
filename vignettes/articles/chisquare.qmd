@@ -4,11 +4,19 @@ format: html
 ---
 
 ```{r}
+#| label: web-font
+#| include: false
+# Open Sans, from Google Fonts, so that tables look the same in every browser
+gdtools::register_gfont("Open Sans", subset = c("latin", "latin-ext", "greek"))
+knitr::knit_meta_add(list(gdtools::gfontHtmlDependency("Open Sans", subset = c("latin", "latin-ext", "greek"))))
+```
+
+```{r}
 #| label: setup
 #| include: false
 library(apa7)
 library(dplyr)
-apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -49,6 +57,7 @@ d_survey <- MASS::survey |>
 
 ```{r}
 #| label: tbl-exercise
+#| apa7-width: landscape
 #| tbl-cap: "Exercise by Sex"
 tbl_exercise <- apa_chisq(d_survey, Exercise, by = Sex)
 tbl_exercise
@@ -71,6 +80,7 @@ With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `a
 
 ```{r}
 #| label: tbl-exercise-note
+#| apa7-width: landscape
 #| tbl-cap: "Exercise by Sex With a Note"
 #| apa-note: !expr apa7::apa_note(tbl_exercise)
 #| echo: fenced
@@ -81,6 +91,7 @@ Without apaquarto, `apa_flextable(note = TRUE)` puts the same note below the tab
 
 ```{r}
 #| label: tbl-exercise-flextable
+#| apa7-width: landscape
 #| tbl-cap: "Exercise by Sex With a Generated Note"
 apa_flextable(tbl_exercise, note = TRUE)
 ```
@@ -130,6 +141,7 @@ The chi-square test is an approximation that can be poor when some expected coun
 
 ```{r}
 #| label: tbl-smoking-chisq
+#| apa7-width: landscape
 #| tbl-cap: "Smoking by Exercise"
 apa_chisq(d_survey, Smoking, by = Exercise) |>
   apa_flextable(note = TRUE)
@@ -139,6 +151,7 @@ Fisher's exact test does not depend on this approximation. With `test = "fisher"
 
 ```{r}
 #| label: tbl-smoking-fisher
+#| apa7-width: landscape
 #| tbl-cap: "Smoking by Exercise With Fisher's Exact Test"
 apa_chisq(d_survey, Smoking, by = Exercise, test = "fisher") |>
   apa_flextable(note = TRUE)

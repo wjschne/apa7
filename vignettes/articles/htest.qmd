@@ -7,11 +7,19 @@ knitr:
 ---
 
 ```{r}
+#| label: web-font
+#| include: false
+# Open Sans, from Google Fonts, so that tables look the same in every browser
+gdtools::register_gfont("Open Sans", subset = c("latin", "latin-ext", "greek"))
+knitr::knit_meta_add(list(gdtools::gfontHtmlDependency("Open Sans", subset = c("latin", "latin-ext", "greek"))))
+```
+
+```{r}
 #| label: setup
 #| include: false
 library(dplyr)
 library(apa7)
-apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -90,6 +98,7 @@ Other arguments are passed to the test function. For example, `alternative = "gr
 
 ```{r}
 #| label: tbl-one-sided
+#| apa7-width: landscape
 #| tbl-cap: "One-Sided Welch's *t* Test of SAT Quantitative Scores"
 tbl_greater <- apa_htest(
   d_sat,
@@ -169,6 +178,7 @@ Join several pairs with `+` to get one row per pair. Their descriptive statistic
 
 ```{r}
 #| label: tbl-several-pairs
+#| apa7-width: landscape
 #| tbl-cap: "Paired-Samples *t* Tests of Anxiety and Depression Before and After Treatment"
 set.seed(1)
 d_prepost <- tibble(

@@ -2,6 +2,12 @@ url: https://wjschne.github.io/apa7/
 template:
   bootstrap: 5
   bootswatch: journal
+footer:
+  structure:
+    left: [developed_by, built_with]
+    right: [ai]
+  components:
+    ai: "Code and documentation drafted with AI assistance (Claude, Anthropic). Reviewed and edited by W. Joel Schneider."
 reference:
   - title: Create flextables
     desc: "Convert objects to flextables"

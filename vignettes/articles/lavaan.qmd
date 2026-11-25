@@ -8,13 +8,21 @@ knitr:
 ---
 
 ```{r}
+#| label: web-font
+#| include: false
+# Open Sans, from Google Fonts, so that tables look the same in every browser
+gdtools::register_gfont("Open Sans", subset = c("latin", "latin-ext", "greek"))
+knitr::knit_meta_add(list(gdtools::gfontHtmlDependency("Open Sans", subset = c("latin", "latin-ext", "greek"))))
+```
+
+```{r}
 #| label: setup
 #| include: false
 library(dplyr)
 library(apa7)
 library(lavaan)
 library(ggdiagram)
-apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 ```{r}

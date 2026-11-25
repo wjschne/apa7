@@ -4,6 +4,14 @@ format: html
 ---
 
 ```{r}
+#| label: web-font
+#| include: false
+# Open Sans, from Google Fonts, so that tables look the same in every browser
+gdtools::register_gfont("Open Sans", subset = c("latin", "latin-ext", "greek"))
+knitr::knit_meta_add(list(gdtools::gfontHtmlDependency("Open Sans", subset = c("latin", "latin-ext", "greek"))))
+```
+
+```{r}
 #| label: setup
 #| include: false
 library(dplyr)
@@ -11,7 +19,7 @@ library(parameters)
 library(performance)
 library(apa7)
 library(psych)
-apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -87,6 +95,7 @@ To compare nested models, pass a list. Model fit statistics (*R*^2^, change in *
 
 ```{r}
 #| label: tbl-lm-list
+#| apa7-width: landscape
 #| tbl-cap: "Hierarchical Regression of ACT Scores"
 apa_parameters(list(lm1, lm2, lm3))
 ```
@@ -370,6 +379,7 @@ The text is in markdown and does not start with "*Note*." because apaquarto adds
 
 ```{r}
 #| label: tbl-lm-note
+#| apa7-width: landscape
 #| tbl-cap: Hierarchical Regression Predicting ACT Scores
 #| apa-note: !expr apa7::apa_note(tbl_lm)
 #| echo: fenced
