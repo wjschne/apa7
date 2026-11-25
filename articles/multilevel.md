@@ -298,6 +298,57 @@ The random slope does not change the marginal *R*², because the fixed
 effects are the same in both models, but the likelihood ratio test shows
 that the slopes vary across participants.
 
+With `performance_layout = "rows"`, the *R*² values and their changes go
+in rows below each model’s random effects instead, and the table fits in
+portrait:
+
+``` r
+
+apa_parameters(list(sleep0, sleep1, sleep2), performance_layout = "rows")
+```
+
+| Model   | Variable             | B            | SE    | t     | df     | p      |
+|---------|----------------------|--------------|-------|-------|--------|--------|
+| Model 1 |                      |              |       |       |        |        |
+|         | Fixed effects        |              |       |       |        |        |
+|         |  Constant            | 307.99       | 10.17 | 30.29 |  17.00 | \<.001 |
+|         | Random effects (SD)  |              |       |       |        |        |
+|         |  Participant         |              |       |       |        |        |
+|         |   Constant           |  40.62       |       |       |        |        |
+|         |  Residual            |  41.11       |       |       |        |        |
+|         | R2marginal           |    .00       |       |       |        |        |
+|         | R2conditional        |    .49       |       |       |        |        |
+| Model 2 |                      |              |       |       |        |        |
+|         | Fixed effects        |              |       |       |        |        |
+|         |  Constant            | 267.97       | 10.87 | 24.65 |  22.15 | \<.001 |
+|         |  Days                |  11.44       |  1.10 | 10.41 | 125.00 | \<.001 |
+|         | Random effects (SD)  |              |       |       |        |        |
+|         |  Participant         |              |       |       |        |        |
+|         |   Constant           |  41.80       |       |       |        |        |
+|         |  Residual            |  30.22       |       |       |        |        |
+|         | R2marginal           |    .21       |       |       |        |        |
+|         | ΔR2marginal          |    .21\*\*\* |       |       |        |        |
+|         | R2conditional        |    .73       |       |       |        |        |
+|         | ΔR2conditional       |    .23       |       |       |        |        |
+| Model 3 |                      |              |       |       |        |        |
+|         | Fixed effects        |              |       |       |        |        |
+|         |  Constant            | 267.97       |  8.27 | 32.42 |  17.00 | \<.001 |
+|         |  Days                |  11.44       |  1.85 |  6.20 |  17.00 | \<.001 |
+|         | Random effects (SD)  |              |       |       |        |        |
+|         |  Participant         |              |       |       |        |        |
+|         |   Constant           |  30.96       |       |       |        |        |
+|         |   Days               |   6.77       |       |       |        |        |
+|         |   r (Constant, Days) |    .18       |       |       |        |        |
+|         |  Residual            |  25.53       |       |       |        |        |
+|         | R2marginal           |    .21       |       |       |        |        |
+|         | ΔR2marginal          |    .00\*\*\* |       |       |        |        |
+|         | R2conditional        |    .81       |       |       |        |        |
+|         | ΔR2conditional       |    .08       |       |       |        |        |
+
+Table 8
+
+Three Multilevel Models of Reaction Time With Model Fit in Rows
+
 The comparison can also be displayed on its own with
 `apa_performance_comparison`, here including the model with no
 predictors:
@@ -314,7 +365,7 @@ apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>
 | Model 2 | .21        | .21         | .73           | .23            | 78.62 | 1   | \<.001 |
 | Model 3 | .21        | .00         | .81           | .08            | 25.31 | 2   | \<.001 |
 
-Table 8
+Table 9
 
 Comparison of Three Multilevel Models of Reaction Time
 
@@ -353,7 +404,7 @@ tbl_sleep_lme
 |  Residual                     |  30.91 |      |        |        |
 |  Residual autocorrelation (φ) |    .45 |      |        |        |
 
-Table 9
+Table 10
 
 Random-Slope Model With First-Order Autoregressive Residuals
 
@@ -394,7 +445,7 @@ apa_performance_comparison(
 | Independent residuals | .21 | .21 | .81 |  .81 |  |  |  |
 | AR(1) residuals | .22 | .01 | .72 | −.09 | 9.64 | 1 | .002 |
 
-Table 10
+Table 11
 
 Comparison of Models With Independent and Autoregressive Residuals
 
@@ -460,7 +511,7 @@ apa_parameters(glmer_va)
 |  Item               |       |      |      |        |        |
 |   Constant          |  0.34 |      |      |        |        |
 
-Table 11
+Table 12
 
 Logistic Mixed Model of Endorsing Verbally Aggressive Reactions
 
@@ -543,7 +594,7 @@ apa_parameters(tmb_nb)
 |  Person                 |       |      |      |       |        |
 |   Constant              |  0.49 |      |      |       |        |
 
-Table 12
+Table 13
 
 Negative Binomial Mixed Model of Daily Drinks
 
@@ -592,7 +643,7 @@ tbl_zip
 |   Constant               | −0.95 | 0.09 |      | −10.54 | \<.001 |
 |   Condition–Intervention |  1.18 | 0.12 |      |   9.74 | \<.001 |
 
-Table 13
+Table 14
 
 Zero-Inflated Poisson Mixed Model of Daily Drinks
 
@@ -629,7 +680,7 @@ apa_performance(
 | Negative binomial     | 5,989.98 | 6,017.12 |
 | Zero-inflated Poisson | 6,300.71 | 6,333.27 |
 
-Table 14
+Table 15
 
 Information Criteria of the Negative Binomial and Zero-Inflated Poisson
 Models
@@ -669,7 +720,7 @@ glmmTMB::glmmTMB(
 |   Constant               |  0.05 | 0.09 |      |  0.55 |  .58   |
 |   Condition–Intervention | −1.16 | 0.13 |      | −9.13 | \<.001 |
 
-Table 15
+Table 16
 
 Negative Binomial Mixed Model With Dispersion Depending on Condition
 
@@ -696,7 +747,7 @@ apa_performance_comparison(
 | Condition | .09 | .09 | .24 | .24 |  |  |  |
 | Condition and day | .14 | .05 | .29 | .04 | 62.11 | 1 | \<.001 |
 
-Table 16
+Table 17
 
 Comparison of Models of Daily Drinks With and Without Day of the Week
 

@@ -966,14 +966,365 @@
 <div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
 <p>The random slope does not change the marginal <em>R</em><sup>2</sup>, because the fixed effects are the same in both models, but the likelihood ratio test shows that the slopes vary across participants.</p>
 </div>
-<p>The comparison can also be displayed on its own with <code>apa_performance_comparison</code>, here including the model with no predictors:</p>
+<p>With <code>performance_layout = "rows"</code>, the <em>R</em><sup>2</sup> values and their changes go in rows below each model’s random effects instead, and the table fits in portrait:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
 <div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">sleep0</span>, <span class="va">sleep1</span>, <span class="va">sleep2</span><span class="op">)</span>, performance_layout <span class="op">=</span> <span class="st">"rows"</span><span class="op">)</span></span></code></pre></div>
+<div id="tbl-sleep-list-rows" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sleep-list-rows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
+<p>Table 8</p>
+</div>
+<div class="Caption" data-custom-style="Caption">
+<p>Three Multilevel Models of Reaction Time With Model Fit in Rows</p>
+</div>
+</figcaption><div aria-describedby="tbl-sleep-list-rows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid tabwid_left">
+<style>.cl-d8bad469{}.cl-cbf2dfd9{font-family:'Open Sans';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a9d4540c{font-family:'Open Sans';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-fe4be2bd{font-family:'Open Sans';font-size:7.8pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;vertical-align:4.08pt;}.cl-c9730fb2{font-family:'Open Sans';font-size:7.8pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;vertical-align:-0.84pt;}.cl-7f4fbc6f{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-8d7f0425{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-56e889f7{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:14.3pt;padding-right:11.3pt;line-height: 1.442;background-color:transparent;}.cl-dc557537{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:8.7pt;padding-right:5.7pt;line-height: 1.442;background-color:transparent;}.cl-d5a86eb3{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:7.1pt;padding-right:4.1pt;line-height: 1.442;background-color:transparent;}.cl-17ea1150{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:7.6pt;padding-right:4.6pt;line-height: 1.442;background-color:transparent;}.cl-9c21ddbe{width:0.855in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-866d1051{width:2.104in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-01146d91{width:0.945in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52361cfb{width:0.621in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d1c27638{width:0.732in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d292e8bd{width:0.855in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c7d0b7a4{width:2.104in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-75a67d42{width:0.945in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dce5e515{width:0.621in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-00ec6b8e{width:0.732in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8ef273b0{width:0.621in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-01edea3b{width:0.855in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-31a4d40f{width:2.104in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8871e966{width:0.945in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1f4c9a2b{width:0.621in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c36456b7{width:0.732in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5f1098f8{width:0.621in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-9c21ddbe"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Model</span></p></th>
+<th class="cl-866d1051"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Variable</span></p></th>
+<th class="cl-01146d91"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">B</span></p></th>
+<th class="cl-52361cfb"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">SE</span></p></th>
+<th class="cl-52361cfb"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">t</span></p></th>
+<th class="cl-d1c27638"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">df</span></p></th>
+<th class="cl-52361cfb"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">p</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Model</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">1</span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Fixed</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">effects</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Constant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">307.99    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9">10.17</span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9">30.29</span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"> 17.00</span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Random</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">effects</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">SD</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Participant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">  Constant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 40.62    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Residual</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 41.11    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">marginal</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .00    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">conditional</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .49    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Model</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">2</span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Fixed</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">effects</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Constant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">267.97    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9">10.87</span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9">24.65</span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"> 22.15</span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Days</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 11.44    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"> 1.10</span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9">10.41</span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9">125.00</span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Random</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">effects</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">SD</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Participant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">  Constant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 41.80    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Residual</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 30.22    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">marginal</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .21    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Δ</span><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">marginal</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .21</span><span class="cl-fe4be2bd">***</span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">conditional</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .73    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Δ</span><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">conditional</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .23    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Model</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">3</span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Fixed</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">effects</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Constant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">267.97    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"> 8.27</span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9">32.42</span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"> 17.00</span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Days</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 11.44    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"> 1.85</span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"> 6.20</span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"> 17.00</span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Random</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">effects</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">SD</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Participant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">  Constant</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 30.96    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">  Days</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">  6.77    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">  </span><span class="cl-a9d4540c">r</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(Constant,</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">Days)</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .18    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9"> Residual</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9"> 25.53    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">marginal</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .21    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Δ</span><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">marginal</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .00</span><span class="cl-fe4be2bd">***</span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-d292e8bd"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c7d0b7a4"><p class="cl-56e889f7"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">conditional</span></p></td>
+<td class="cl-75a67d42"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .81    </span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-dce5e515"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-00ec6b8e"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-8ef273b0"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-01edea3b"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-31a4d40f"><p class="cl-56e889f7"><span class="cl-cbf2dfd9">Δ</span><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-c9730fb2">conditional</span></p></td>
+<td class="cl-8871e966"><p class="cl-dc557537"><span class="cl-cbf2dfd9">   .08    </span></p></td>
+<td class="cl-1f4c9a2b"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1f4c9a2b"><p class="cl-d5a86eb3"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-c36456b7"><p class="cl-17ea1150"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5f1098f8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
+<p>The comparison can also be displayed on its own with <code>apa_performance_comparison</code>, here including the model with no predictors:</p>
+</div>
+<div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_performance_comparison.html">apa_performance_comparison</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">sleep0</span>, <span class="va">sleep1</span>, <span class="va">sleep2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-sleep-compare" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sleep-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 8</p>
+<p>Table 9</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Comparison of Three Multilevel Models of Reaction Time</p>
@@ -1036,7 +1387,7 @@
 </h3>
 <p>lme4 assumes that, after the random effects are taken into account, a participant’s residuals are independent. In daily measurements, though, a participant who is unusually slow on one day is often unusually slow the next day too. The nlme package can model such residual correlation. Here the random-slope model is refit with <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">nlme::lme</a></code> and a first-order autoregressive (AR(1)) correlation among each participant’s residuals:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sleep_lme</span> <span class="op">&lt;-</span> <span class="fu">nlme</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme</a></span><span class="op">(</span></span>
 <span>  <span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span>,</span>
 <span>  random <span class="op">=</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">|</span> <span class="va">Participant</span>,</span>
@@ -1047,7 +1398,7 @@
 <span><span class="va">tbl_sleep_lme</span></span></code></pre></div>
 <div id="tbl-sleep-lme" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sleep-lme-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 9</p>
+<p>Table 10</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Random-Slope Model With First-Order Autoregressive Residuals</p>
@@ -1147,7 +1498,7 @@
 <p>The fixed effects are tested with <em>t</em> tests whose degrees of freedom are computed by nlme from the grouping levels at which each effect varies, rather than with Kenward–Roger degrees of freedom. The parameters of the residual structure are shown below the residual <em>SD</em>: residuals on adjacent days correlate about .45. The table note names the structure:</p>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_sleep_lme</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Degrees of freedom are computed by nlme from the grouping levels at which each effect varies. Residuals within Participant have a first-order autoregressive (AR(1)) correlation structure. *SD* = standard deviation; *r* = correlation."</code></pre>
@@ -1155,7 +1506,7 @@
 </div>
 <p>Because the AR(1) structure and the random slopes both describe how a participant’s reaction times hang together over days, they compete with each other: with correlated residuals, the intercept <em>SD</em> is smaller and the correlation between intercepts and slopes is nearly 1, a sign that these data cannot fully separate the two. A likelihood ratio test compares the model with and without correlated residuals:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sleep_lme0</span> <span class="op">&lt;-</span> <span class="fu">nlme</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme</a></span><span class="op">(</span></span>
 <span>  <span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span>,</span>
 <span>  random <span class="op">=</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">|</span> <span class="va">Participant</span>,</span>
@@ -1166,7 +1517,7 @@
 <span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-sleep-lme-compare" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sleep-lme-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 10</p>
+<p>Table 11</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Comparison of Models With Independent and Autoregressive Residuals</p>
@@ -1224,7 +1575,7 @@
 <p>The <code>VerbAgg</code> data set from the lme4 package contains 316 people’s responses to 24 items describing verbally aggressive reactions to frustrating situations. Each item describes a behavior (cursing, scolding, or shouting) in a situation in which someone else is to blame or in which the respondent is to blame, and asks whether the respondent would <em>want</em> to react that way or would actually <em>do</em> so. Do people with higher trait anger endorse more verbally aggressive reactions, and are people less willing to say that they would act aggressively than that they would want to?</p>
 <p>Because every person responds to every item, people and items are crossed random effects.</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_va</span> <span class="op">&lt;-</span> <span class="va">VerbAgg</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    Response <span class="op">=</span> <span class="va">r2</span> <span class="op">==</span> <span class="st">"Y"</span>,</span>
@@ -1246,7 +1597,7 @@
 <span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glmer_va</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-verbagg" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-verbagg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 11</p>
+<p>Table 12</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Logistic Mixed Model of Endorsing Verbally Aggressive Reactions</p>
@@ -1385,7 +1736,7 @@
 <p>Counts often vary more than a Poisson model allows (overdispersion) or have more zeros than it predicts. The <a href="https://glmmtmb.github.io/glmmTMB/" class="external-link">glmmTMB</a> package fits mixed models for such data, including negative binomial models and models with a separate zero-inflation part. <code>apa_parameters</code> displays them like <code>glmer</code> models.</p>
 <p>In this made-up daily-diary study, 120 adults who drink heavily recorded the number of alcoholic drinks they had each day for 2 weeks. Half of them had been assigned to a brief intervention and half to a control condition. Do people in the intervention drink less, and do they drink more on weekends?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="va">n_people</span> <span class="op">&lt;-</span> <span class="fl">120</span></span>
 <span><span class="va">people</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
@@ -1415,7 +1766,7 @@
 </h3>
 <p>A negative binomial model adds a dispersion parameter that lets the variance grow faster than the mean. People are a random effect, because each person reported on many days.</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tmb_nb</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
 <span>  <span class="va">Drinks</span> <span class="op">~</span> <span class="va">Condition</span> <span class="op">+</span> <span class="va">Day</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Person</span><span class="op">)</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/glmmTMB/man/nbinom2.html" class="external-link">nbinom2</a></span>,</span>
@@ -1424,7 +1775,7 @@
 <span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">tmb_nb</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-drinks-nb" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-drinks-nb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 12</p>
+<p>Table 13</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Negative Binomial Mixed Model of Daily Drinks</p>
@@ -1514,7 +1865,7 @@
 </h3>
 <p>Another account of the many zeros is that some days are abstinent days, on which a person would not drink at all, while on the other days the number of drinks varies as usual. A zero-inflated model has two parts: a conditional model of the counts, and a logistic model of whether a zero is one of these excess zeros. Here a zero-inflated Poisson model lets the probability of an excess zero differ between the conditions:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tmb_zip</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
 <span>  <span class="va">Drinks</span> <span class="op">~</span> <span class="va">Condition</span> <span class="op">+</span> <span class="va">Day</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Person</span><span class="op">)</span>,</span>
 <span>  ziformula <span class="op">=</span> <span class="op">~</span> <span class="va">Condition</span>,</span>
@@ -1525,7 +1876,7 @@
 <span><span class="va">tbl_zip</span></span></code></pre></div>
 <div id="tbl-drinks-zip" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-drinks-zip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 13</p>
+<p>Table 14</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Zero-Inflated Poisson Mixed Model of Daily Drinks</p>
@@ -1652,7 +2003,7 @@
 <p>Each part of the model has its own heading, with its fixed and random effects under subheadings. Only the conditional model’s coefficients are exponentiated, because the zero-inflation coefficients are log odds: the probability of an excess zero is about .28 in the control condition (the inverse logit of −0.95) and .56 in the intervention (the inverse logit of −0.95 + 1.18). People in the intervention had more abstinent days and somewhat fewer drinks on the other days. The table note says what the zero-inflation coefficients are:</p>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_zip</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the conditional model). *IRR* = incidence rate ratio; *SD* = standard deviation."</code></pre>
@@ -1660,14 +2011,14 @@
 </div>
 <p>The two models explain the zeros differently, and their <em>AIC</em>s can be compared with <code>apa_performance</code>. Here the negative binomial model fits better:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_performance.html">apa_performance</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>`Negative binomial` <span class="op">=</span> <span class="va">tmb_nb</span>, `Zero-inflated Poisson` <span class="op">=</span> <span class="va">tmb_zip</span><span class="op">)</span>,</span>
 <span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AIC"</span>, <span class="st">"BIC"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-drinks-aic" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-drinks-aic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 14</p>
+<p>Table 15</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Information Criteria of the Negative Binomial and Zero-Inflated Poisson Models</p>
@@ -1705,7 +2056,7 @@
 </h3>
 <p>With <code>dispformula</code>, the dispersion parameter itself is modeled, and the table has a “Dispersion model” part. For negative binomial models, a larger dispersion parameter means less overdispersion, so the negative coefficient here means that the counts of people in the intervention are more overdispersed: many of their days have no drinks, but some have many. As the note says, dispersion coefficients are on the log scale.</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
 <span>  <span class="va">Drinks</span> <span class="op">~</span> <span class="va">Condition</span> <span class="op">+</span> <span class="va">Day</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Person</span><span class="op">)</span>,</span>
 <span>  dispformula <span class="op">=</span> <span class="op">~</span> <span class="va">Condition</span>,</span>
@@ -1715,7 +2066,7 @@
 <span>  <span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-drinks-disp" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-drinks-disp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 15</p>
+<p>Table 16</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Negative Binomial Mixed Model With Dispersion Depending on Condition</p>
@@ -1842,7 +2193,7 @@
 </h3>
 <p><code>apa_performance</code> reports the marginal and conditional <em>R</em><sup>2</sup> and the ICC of glmmTMB models, and nested models are compared with likelihood ratio tests, as for lme4 models:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tmb_nb0</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
 <span>  <span class="va">Drinks</span> <span class="op">~</span> <span class="va">Condition</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Person</span><span class="op">)</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/glmmTMB/man/nbinom2.html" class="external-link">nbinom2</a></span>,</span>
@@ -1853,7 +2204,7 @@
 <span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-drinks-compare" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-drinks-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 16</p>
+<p>Table 17</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Comparison of Models of Daily Drinks With and Without Day of the Week</p>

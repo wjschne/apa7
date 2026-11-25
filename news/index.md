@@ -583,6 +583,12 @@ These change the output of code that worked with apa7 0.2.0.
 
 ### Other improvements and bug fixes
 
+- New `performance_layout` argument for lists of models in
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md):
+  `"rows"` puts the model comparison metrics (e.g., *R*² and Δ*R*²) in
+  rows below each model’s parameters (and random effects), with their
+  values in the first value column, as in many hierarchical regression
+  tables. The default, `"columns"`, keeps them in columns as before.
 - New `random_scale` argument for mixed models in
   [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md):
   `"sd"` (default) for standard deviations and correlations, or

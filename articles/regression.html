@@ -586,12 +586,339 @@
 </figure>
 </div>
 </div>
+<div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
+<p>Many hierarchical regression tables instead put <em>R</em><sup>2</sup> and its change in rows below each model’s coefficients. Use <code>performance_layout = "rows"</code>:</p>
+</div>
+<div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">lm1</span>, <span class="va">lm2</span>, <span class="va">lm3</span><span class="op">)</span>, performance_layout <span class="op">=</span> <span class="st">"rows"</span><span class="op">)</span></span></code></pre></div>
+<div id="tbl-lm-list-rows" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lm-list-rows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
+<p>Table 5</p>
+</div>
+<div class="Caption" data-custom-style="Caption">
+<p>Hierarchical Regression of ACT Scores With Model Fit in Rows</p>
+</div>
+</figcaption><div aria-describedby="tbl-lm-list-rows-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid tabwid_left">
+<style>.cl-d8bad469{}.cl-cbf2dfd9{font-family:'Open Sans';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a9d4540c{font-family:'Open Sans';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-fe4be2bd{font-family:'Open Sans';font-size:7.8pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;vertical-align:4.08pt;}.cl-7f4fbc6f{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-8d7f0425{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-717b0e05{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:7pt;padding-right:4pt;line-height: 1.442;background-color:transparent;}.cl-6c450c99{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:5.8pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-c0f28b05{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:6.2pt;padding-right:3.2pt;line-height: 1.442;background-color:transparent;}.cl-1fb7ab26{width:0.823in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-199af08d{width:2.251in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bf06b5dd{width:0.803in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-0307d3f7{width:0.492in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c4e129e4{width:0.598in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f5f50f50{width:0.443in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-11b2af20{width:0.823in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6b77e09a{width:2.251in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a65e4644{width:0.803in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a57093a2{width:0.492in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1d934257{width:0.492in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-11b42086{width:0.598in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5ad54e2c{width:0.443in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ebfc8247{width:0.823in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ff9e3525{width:2.251in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98fe2b49{width:0.803in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-fef4ef1c{width:0.492in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bbe4d015{width:0.492in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-0f3ded0f{width:0.598in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f2e4fec8{width:0.443in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-1fb7ab26"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Model</span></p></th>
+<th class="cl-199af08d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Variable</span></p></th>
+<th class="cl-bf06b5dd"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">B</span></p></th>
+<th class="cl-0307d3f7"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">SE</span></p></th>
+<th class="cl-0307d3f7"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">β</span></p></th>
+<th class="cl-c4e129e4"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">t</span></p></th>
+<th class="cl-f5f50f50"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">df</span></p></th>
+<th class="cl-c4e129e4"><p class="cl-7f4fbc6f"><span class="cl-a9d4540c">p</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Model</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">1</span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Constant</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">27.35    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.59</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .00</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">46.55</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">684</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Age</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.06    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.02</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .11</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 2.93</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">684</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .004</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Gender–Female</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">−0.40    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.38</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9">−.04</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">−1.03</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">684</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .30 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">  .01    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Model</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">2</span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Constant</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">27.54    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.80</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .00</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">34.47</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Age</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.02    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.03</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .03</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 0.60</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .55 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Gender–Female</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">−0.57    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.38</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9">−.06</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">−1.49</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .14 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–High</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">School</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">−0.24    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.97</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9">−.01</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">−0.25</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .81 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Some</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">College</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">−0.78    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">1.00</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9">−.04</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">−0.78</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .44 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Bachelor</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.86    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.71</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .09</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 1.20</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .23 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Master</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 1.57    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.83</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .13</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 1.89</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .06 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Doctorate</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 1.99    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.89</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .17</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 2.25</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">679</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .03 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">  .04    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Δ</span><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">  .02</span><span class="cl-fe4be2bd">***</span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Model</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">3</span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Constant</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 8.15    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">1.09</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .00</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 7.46</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Age</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.05    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.02</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .11</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 2.77</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .006</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Gender–Female</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.23    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.30</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .02</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 0.75</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .45 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–High</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">School</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.08    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.75</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .00</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 0.10</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .92 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Some</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">College</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.14    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.77</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .01</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 0.18</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .85 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Bachelor</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.86    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.55</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .09</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 1.57</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .12 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Master</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 1.12    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.64</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .09</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 1.75</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .08 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Education–Doctorate</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 1.05    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.69</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .09</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 1.52</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> .13 </span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">SATV</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.01    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.00</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .31</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"> 8.01</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">SATQ</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9"> 0.02    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">0.00</span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"> .39</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">10.12</span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">677</span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9">&lt;.001</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-11b2af20"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-6b77e09a"><p class="cl-8d7f0425"><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span></p></td>
+<td class="cl-a65e4644"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">  .43    </span></p></td>
+<td class="cl-a57093a2"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-1d934257"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-5ad54e2c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-11b42086"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-ebfc8247"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-ff9e3525"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Δ</span><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span></p></td>
+<td class="cl-98fe2b49"><p class="cl-717b0e05"><span class="cl-cbf2dfd9">  .39</span><span class="cl-fe4be2bd">***</span></p></td>
+<td class="cl-fef4ef1c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-bbe4d015"><p class="cl-6c450c99"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-0f3ded0f"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-f2e4fec8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9"></span></p></td>
+<td class="cl-0f3ded0f"><p class="cl-c0f28b05"><span class="cl-cbf2dfd9"></span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
 </section><section class="section level2"><h2 id="binary-logistic-regression">Binary Logistic Regression<a class="anchor" aria-label="anchor" href="#binary-logistic-regression"></a>
 </h2>
 <p><code>apa_parameters</code> also accepts <code>glm</code> objects. The table reports coefficients on the link scale (<em>B</em>), their standard errors, the exponentiated coefficient, and the test statistic. For logistic regression, the exponentiated coefficient is the odds ratio (<em>OR</em>), and the test statistic is <em>z</em>.</p>
 <p>The <code>Cowles</code> data set in the carData package <span class="citation" data-cites="cowlesSubjectMatterPsychology1987">(<a href="#ref-cowlesSubjectMatterPsychology1987" role="doc-biblioref">Cowles &amp; Davis, 1987</a>)</span> has the neuroticism and extraversion scores of 1,421 introductory psychology students and whether they volunteered to take part in psychological research. Here, the odds of volunteering depend on extraversion, neuroticism, and sex:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_volunteer</span> <span class="op">&lt;-</span> <span class="fu">carData</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/carData/man/Cowles.html" class="external-link">Cowles</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    Volunteered <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">volunteer</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"yes"</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"No"</span>, <span class="st">"Yes"</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -608,7 +935,7 @@
 <span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm1</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-glm1" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-glm1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 5</p>
+<p>Table 6</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Logistic Regression of Volunteering on Personality and Sex</p>
@@ -671,11 +998,11 @@
 <p>Exponentiated coefficients are added whenever the link function is logit or log. They are labeled <em>OR</em> for logit links, <em>IRR</em> (incidence rate ratio) for log links in count models, and <em>RR</em> (risk ratio) for log links in binomial models. Set <code>exponentiate = FALSE</code> to leave them out, or <code>exponentiate = TRUE</code> to add them for other links such as probit.</p>
 </div>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm1</span>, exponentiate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-glm-noexp" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-glm-noexp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 6</p>
+<p>Table 7</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Logistic Regression Coefficients on the Log-Odds Scale</p>
@@ -733,14 +1060,14 @@
 <p>To choose and order the columns, use <code>predictor_parameters</code>. Columns that the model does not report (for example, <em>t</em> for a model tested with <em>z</em>) are dropped silently.</p>
 </div>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span></span>
 <span>  <span class="va">glm1</span>,</span>
 <span>  predictor_parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Parameter"</span>, <span class="st">"Exp_Coefficient"</span>, <span class="st">"z"</span>, <span class="st">"p"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-glm-columns" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-glm-columns-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 7</p>
+<p>Table 8</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Logistic Regression With Selected Columns</p>
@@ -793,11 +1120,11 @@
 <p>As with <code>lm</code>, <code>starred</code> and <code>bolded</code> mark significant coefficients.</p>
 </div>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm1</span>, starred <span class="op">=</span> <span class="st">"Coefficient"</span>, bolded <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-glm-starred" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-glm-starred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 8</p>
+<p>Table 9</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Logistic Regression With Significance Stars and Bold <em>p</em>-Values</p>
@@ -860,12 +1187,12 @@
 </h3>
 <p>A list of <code>glm</code> models is displayed with a pseudo-<em>R</em><sup>2</sup> (Tjur’s for logistic regression, as chosen by <code><a href="https://easystats.github.io/performance/reference/r2.html" class="external-link">performance::r2</a></code>) and a likelihood ratio test of the change, because the binomial family has a fixed dispersion parameter.</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glm0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">Volunteered</span> <span class="op">~</span> <span class="va">Extraversion</span>, data <span class="op">=</span> <span class="va">d_volunteer</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">glm0</span>, <span class="va">glm1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-glm-list" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-glm-list-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 9</p>
+<p>Table 10</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Two Logistic Regression Models of Volunteering</p>
@@ -987,11 +1314,11 @@
 <p>The model comparison can also be displayed separately with <code>apa_performance_comparison</code>.</p>
 </div>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_performance_comparison.html">apa_performance_comparison</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">glm0</span>, <span class="va">glm1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-glm-compare" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-glm-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 10</p>
+<p>Table 11</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Comparison of Two Logistic Regression Models of Volunteering</p>
@@ -1038,7 +1365,7 @@
 </h2>
 <p>When the outcome has more than two unordered categories, multinomial logistic regression (<code><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">nnet::multinom</a></code>) compares each category with a reference category, which is the first level of the outcome. The <code>BEPS</code> data set in the carData package <span class="citation" data-cites="foxEffectDisplaysMultinomial2006">(<a href="#ref-foxEffectDisplaysMultinomial2006" role="doc-biblioref">Fox &amp; Andersen, 2006</a>)</span> has the votes of 1,525 people in the British Election Panel Study of 1997–2001 (Conservative, Labour, or Liberal Democrat), their attitudes toward European integration (from 1 to 11, with higher scores for more Eurosceptic attitudes), and their knowledge of the parties’ positions on European integration (from 0 to 3). Here, Conservative is the reference category:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_vote</span> <span class="op">&lt;-</span> <span class="fu">carData</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/carData/man/BEPS.html" class="external-link">BEPS</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    Vote <span class="op">=</span> <span class="va">vote</span>,</span>
@@ -1056,7 +1383,7 @@
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-multinom" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-multinom-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 11</p>
+<p>Table 12</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Multinomial Logistic Regression of Vote on Euroscepticism and Political Knowledge</p>
@@ -1153,12 +1480,12 @@
 </div>
 <p>Lists of multinomial models are compared with McFadden’s pseudo-<em>R</em><sup>2</sup> and likelihood ratio tests:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">multinom0</span> <span class="op">&lt;-</span> <span class="fu">nnet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom</a></span><span class="op">(</span><span class="va">Vote</span> <span class="op">~</span> <span class="va">Euroscepticism</span>, data <span class="op">=</span> <span class="va">d_vote</span>, trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_performance_comparison.html">apa_performance_comparison</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">multinom0</span>, <span class="va">multinom1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-multinom-list" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-multinom-list-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 12</p>
+<p>Table 13</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Comparison of Multinomial Models of Vote</p>
@@ -1205,7 +1532,7 @@
 </h2>
 <p>For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (<em>IRR</em>). The <code>quine</code> data set in the MASS package <span class="citation" data-cites="ripleyModernApplied2002">(<a href="#ref-ripleyModernApplied2002" role="doc-biblioref">Venables &amp; Ripley, 2002</a>)</span> has the number of days that 146 children in New South Wales, Australia, were absent from school in a year. Here, absences depend on the child’s sex and on whether the child was classified as an average or a slow learner:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_absences</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/quine.html" class="external-link">quine</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    Absences <span class="op">=</span> <span class="va">Days</span>,</span>
@@ -1217,7 +1544,7 @@
 <span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm_pois</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-poisson" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-poisson-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 13</p>
+<p>Table 14</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Poisson Regression of School Absences on Sex and Learner Status</p>
@@ -1272,12 +1599,12 @@
 <p>Quasi-families and other families with an estimated dispersion parameter are tested with <em>t</em> instead of <em>z</em>, and the degrees of freedom are shown in the column header. Nested models are compared with <em>F</em> tests instead of likelihood ratio tests. The absences vary much more than a Poisson model expects, so the quasi-Poisson standard errors are about four times as large, and neither predictor is significant.</p>
 </div>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glm_qpois</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">Absences</span> <span class="op">~</span> <span class="va">Sex</span> <span class="op">+</span> <span class="va">Learner</span>, data <span class="op">=</span> <span class="va">d_absences</span>, family <span class="op">=</span> <span class="va">quasipoisson</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm_qpois</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-quasipoisson" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-quasipoisson-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 14</p>
+<p>Table 15</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Quasi-Poisson Regression of School Absences on Sex and Learner Status</p>
@@ -1332,7 +1659,7 @@
 </h3>
 <p>Counts often have more zeros than a Poisson or negative binomial model expects. A zero-inflated model (<code><a href="https://rdrr.io/pkg/pscl/man/zeroinfl.html" class="external-link">pscl::zeroinfl</a></code>) adds a logistic model of <em>excess</em> zeros, which come from cases that could only be zero (e.g., people who would not have an affair under any circumstances). A hurdle model (<code><a href="https://rdrr.io/pkg/pscl/man/hurdle.html" class="external-link">pscl::hurdle</a></code>) instead has a logistic model of whether the count is zero or positive, and a zero-truncated count model of the positive counts. Either way, <code>apa_parameters</code> puts each part under its own heading. Only the count model’s coefficients are exponentiated (<em>IRR</em>), because the zero model’s coefficients are log odds. The <code>Affairs</code> data set in the AER package, from a magazine survey analyzed by <span class="citation" data-cites="fairTheoryExtramaritalAffairs1978">Fair (<a href="#ref-fairTheoryExtramaritalAffairs1978" role="doc-biblioref">1978</a>)</span>, has the number of extramarital affairs that 601 married people reported having in the past year. The counts were coded from response categories (0, 1, 2, and 3 times; 7 for 4 to 10 times; and 12 for monthly or more often), and 75% of them are zeros. Here, the number of affairs depends on how happy people rated their marriages (from 1, very unhappy, to 5, very happy) and how religious they were (from 1, anti-religious, to 5, very religious), and so does the probability of an excess zero:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Affairs"</span>, package <span class="op">=</span> <span class="st">"AER"</span><span class="op">)</span></span>
 <span><span class="va">d_affairs</span> <span class="op">&lt;-</span> <span class="va">Affairs</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
@@ -1351,7 +1678,7 @@
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-zeroinfl" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-zeroinfl-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 15</p>
+<p>Table 16</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Zero-Inflated Negative Binomial Regression of Extramarital Affairs</p>
@@ -1447,7 +1774,7 @@
 <p>People who were happier in their marriages or more religious were more likely to be among those who would not have an affair at all, and happier people who did have affairs had fewer of them. The note names the count distribution, gives the negative binomial dispersion parameter (<em>θ</em>), and explains the zero model. For a hurdle model, the zero model’s heading is “Zero hurdle model”, and its coefficients are the log odds of a count greater than zero:</p>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">pscl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pscl/man/hurdle.html" class="external-link">hurdle</a></span><span class="op">(</span></span>
 <span>  <span class="va">Affairs</span> <span class="op">~</span> <span class="va">Happiness</span> <span class="op">+</span> <span class="va">Religiousness</span> <span class="op">|</span> <span class="va">Happiness</span> <span class="op">+</span> <span class="va">Religiousness</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">d_affairs</span>,</span>
@@ -1465,7 +1792,7 @@
 </h2>
 <p>Generalized additive models (GAMs), fit with <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam</a></code>, let a predictor’s effect be a smooth curve instead of a straight line. The <code>Wong</code> data set in the carData package <span class="citation" data-cites="wongMathematicalModelsCognitive2001">(<a href="#ref-wongMathematicalModelsCognitive2001" role="doc-biblioref">Wong et al., 2001</a>)</span> has the performance IQ of 200 patients tested after they woke from a coma caused by a traumatic brain injury, with the number of days in the coma and the number of days between waking and testing. Some patients were tested more than once, so only each patient’s first test is kept. Here, performance IQ depends on smooth functions of the length of the coma and the time since waking:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_coma</span> <span class="op">&lt;-</span> <span class="fu">carData</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/carData/man/Wong.html" class="external-link">Wong</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">id</span>, <span class="va">days</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">id</span>, .keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1485,7 +1812,7 @@
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-gam" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-gam-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 16</p>
+<p>Table 17</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Generalized Additive Model of Performance IQ After a Coma</p>
@@ -1564,11 +1891,11 @@
 </div>
 <p><code>apa_performance</code> gives the adjusted <em>R</em><sup>2</sup> and the percentage of the deviance explained:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_performance.html">apa_performance</a></span><span class="op">(</span><span class="va">fit_gam</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-gam-performance" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-gam-performance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 17</p>
+<p>Table 18</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Fit of the Generalized Additive Model</p>
@@ -1602,12 +1929,12 @@
 </h2>
 <p><code>apa_collinearity</code> reports the variance inflation factor (<em>VIF</em>) and tolerance of each predictor, as computed by <code><a href="https://easystats.github.io/performance/reference/check_collinearity.html" class="external-link">performance::check_collinearity</a></code>. In the third ACT model above, the two SAT scores are correlated, but not enough to inflate their standard errors much:</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_collinearity.html">apa_collinearity</a></span><span class="op">(</span><span class="va">lm3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-collinearity" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-collinearity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 18</p>
+<p>Table 19</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Collinearity Diagnostics of the Full Model of ACT Scores</p>
@@ -1667,13 +1994,13 @@
 <p>Education has more than 1 degree of freedom, so its <em>VIF</em> is the generalized <em>VIF</em>, and the note says so. Add <code>"SE_factor"</code> to <code>columns</code> for <em>VIF</em><sup>1/(2<em>df</em>)</sup>, which can be compared across terms with different degrees of freedom. To bold large <em>VIF</em>s, set <code>flag</code> to your cutoff (e.g., <code>flag = 5</code> or <code>flag = 10</code>). In models with interactions, the <em>VIF</em>s of the interaction and its components are high in part because product terms are correlated with their components, and the note explains that this does not affect the test of the interaction.</p>
 </div>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">ACT</span> <span class="op">~</span> <span class="va">SATV</span> <span class="op">*</span> <span class="va">SATQ</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_collinearity.html">apa_collinearity</a></span><span class="op">(</span>flag <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-collinearity-interaction" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-collinearity-interaction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 19</p>
+<p>Table 20</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Collinearity Diagnostics With an Uncentered Interaction</p>
@@ -1721,13 +2048,13 @@
 <p>With centered predictors, these <em>VIF</em>s are small, and the note leaves this out.</p>
 </div>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">ACT</span> <span class="op">~</span> <span class="va">SATV</span> <span class="op">*</span> <span class="va">SATQ</span>, data <span class="op">=</span> <span class="fu">datawizard</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/datawizard/reference/center.html" class="external-link">center</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_collinearity.html">apa_collinearity</a></span><span class="op">(</span>flag <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-collinearity-centered" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-collinearity-centered-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 20</p>
+<p>Table 21</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Collinearity Diagnostics With a Centered Interaction</p>
@@ -1775,7 +2102,7 @@
 </h2>
 <p>A regression table often needs a note that defines its symbols and explains its stars. <code>apa_parameters</code> records how each table was made, and <code>apa_note</code> turns that record into note text. For the hierarchical regression above, the note defines the standardized coefficient and the change in <em>R</em><sup>2</sup> and explains the stars on the change in <em>R</em><sup>2</sup>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tbl_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">lm1</span>, <span class="va">lm2</span>, <span class="va">lm3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_lm</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1784,7 +2111,7 @@
 </div>
 <p>The note changes with the table. With robust standard errors (<code>vcov</code>) and confidence intervals, it says which standard errors were used and defines CI:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span></span>
 <span>  <span class="va">lm3</span>,</span>
 <span>  predictor_parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Parameter"</span>, <span class="st">"Coefficient"</span>, <span class="st">"SE"</span>, <span class="st">"CI"</span>, <span class="st">"t"</span>, <span class="st">"df_error"</span>, <span class="st">"p"</span><span class="op">)</span>,</span>
@@ -1797,7 +2124,7 @@
 </div>
 <p>For logistic regression, it defines the odds ratio. For count models, it defines the incidence rate ratio, and for ordinal models, it says that thresholds are not tested. For mixed models (<code>lme4</code>), it gives the method used to approximate the degrees of freedom of the <em>t</em> tests (Kenward–Roger by default).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm1</span>, starred <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1806,16 +2133,16 @@
 </div>
 <p>The text is in markdown and does not start with “<em>Note</em>.” because apaquarto adds that. With <a href="https://wjschne.github.io/apaquarto/" class="external-link">apaquarto</a>, use <code>apa_note</code> in the <code>apa-note</code> chunk option with <code>!expr</code>. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as <code>tbl_lm</code> was made above) and display it in the chunk with the note. Write it as <code><a href="../reference/apa_note.html">apa7::apa_note</a></code>, because in documents with cached chunks, chunk options can be evaluated before <code><a href="https://github.com/wjschne/apa7" class="external-link">library(apa7)</a></code> takes effect:</p>
 <div class="cell FigureWithNote" data-apa7-width="landscape" data-apa-note="β = standardized coefficient; Δ*R*^2^ = change in *R*^2^. ^* ^*p* &lt; .05. ^** ^*p* &lt; .01. ^*** ^*p* &lt; .001." data-custom-style="FigureWithNote">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-lm-note</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa7-width: landscape</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Hierarchical Regression Predicting ACT Scores</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_lm)</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>tbl_lm</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-lm-note</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa7-width: landscape</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Hierarchical Regression Predicting ACT Scores</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_lm)</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>tbl_lm</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
 <div id="tbl-lm-note" class="cell quarto-float quarto-figure quarto-figure-center" data-apa-note="β = standardized coefficient; Δ*R*^2^ = change in *R*^2^. ^* ^*p* &lt; .05. ^** ^*p* &lt; .01. ^*** ^*p* &lt; .001." data-apa7-width="landscape" data-apa-note-written="58cec7ca">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lm-note-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 21</p>
+<p>Table 22</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Hierarchical Regression Predicting ACT Scores</p>
@@ -2140,12 +2467,12 @@
 </div>
 <p>Without apaquarto (e.g., in a plain Quarto or R Markdown document, or a table saved to Word with <code><a href="https://davidgohel.github.io/flextable/reference/save_as_docx.html" class="external-link">flextable::save_as_docx</a></code>), <code>apa_flextable</code> can put the note below the table itself. With <code>note = TRUE</code>, it uses the note from <code>apa_note</code>; a character string is used as the note instead. The note is added after the column widths are set, so a long note does not stretch the table.</p>
 <div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm1</span>, starred <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-lm-flextable-note" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lm-flextable-note-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 22</p>
+<p>Table 23</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Logistic Regression With a Generated Note</p>
@@ -2210,7 +2537,7 @@
 </div>
 <p>The definitions come from the <code>abbreviation</code> slot of each column’s format, so any column with a definition is defined in the note. Symbols such as <em>SE</em> and <em>t</em> have no definition by default. To add one, or to reword a definition, change the slot in the <code>column_formats</code> passed to <code>apa_parameters</code> (or set it for every table with <code>apa7_defaults(column_formats = cf)</code>):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/column_formats.html">column_formats</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">cf</span><span class="op">$</span><span class="va">SE</span><span class="op">@</span><span class="va">abbreviation</span> <span class="op">&lt;-</span> <span class="st">"standard error"</span></span>
 <span><span class="va">cf</span><span class="op">$</span><span class="va">Std_Coefficient</span><span class="op">@</span><span class="va">abbreviation</span> <span class="op">&lt;-</span> <span class="st">"standardized regression coefficient"</span></span>
@@ -2226,10 +2553,10 @@
 <p>Some notes cite the articles that describe a method: for example, the notes of meta-analysis tables cite the articles on trim and fill and the multilevel <em>I</em><sup>2</sup>, and the notes of <code>lavaan</code> model comparisons cite the article on the scaled <em>χ</em><sup>2</sup> difference test. In the console, and in documents without the references, the citations are written as text (e.g., “(Duval &amp; Tweedie, 2000)”), which you would add to the reference list by hand.</p>
 <p>To have the citations formatted and added to the reference list automatically, write the references that come with apa7 to the document’s folder in the setup chunk and list the file in the YAML header:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">apa7</span><span class="fu">::</span><span class="fu"><a href="../reference/apa7_write_bib.html">apa7_write_bib</a></span><span class="op">(</span><span class="st">"apa7.bib"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="sourceCode" id="cb37"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">references.bib</span><span class="kw">,</span><span class="at"> apa7.bib</span><span class="kw">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">references.bib</span><span class="kw">,</span><span class="at"> apa7.bib</span><span class="kw">]</span></span></code></pre></div>
 <p>In a Quarto project, the bibliography can also be set for the whole project in <code>_quarto.yml</code> or for a folder in <code>_metadata.yml</code>, and apa7 finds it there.</p>
 <p>When the document is rendered, <code>apa_note</code> writes each citation whose reference is in the document’s bibliography as a Pandoc citation key (e.g., <code>[@duvalTrimFillSimple2000]</code>), which Pandoc (or <a href="https://wjschne.github.io/apaquarto/" class="external-link">apaquarto</a>) turns into a citation such as “(Duval &amp; Tweedie, 2000)” and an entry in the reference list. This works for notes in the <code>apa-note</code> chunk option and from <code>apa_flextable(note = TRUE)</code>. The keys are those that the Better BibTeX extension for Zotero makes, so references exported from Zotero work, too.</p>
 <p>To choose the form yourself, use <code>apa_note(tbl, citations = "keys")</code> or <code>citations = "text"</code>, or set it for all notes with <code>options(apa7.citations = "keys")</code>. Text is the right choice for tables saved directly to Word (e.g., with <code><a href="https://davidgohel.github.io/flextable/reference/save_as_docx.html" class="external-link">flextable::save_as_docx</a></code>), because Pandoc never sees them.</p>
@@ -2245,7 +2572,7 @@
 <code>"tibble"</code>: tibble everywhere.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>apa7.print <span class="op">=</span> <span class="st">"flextable"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>To get the table with non-default settings, pass the output to <code>apa_flextable</code>, which always returns a flextable.</p>

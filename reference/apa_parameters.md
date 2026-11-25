@@ -251,6 +251,7 @@ apa_parameters(
   column_formats = NULL,
   t_with_df = TRUE,
   performance_parameters = c("R2", "deltaR2"),
+  performance_layout = c("columns", "rows"),
   ...
 )
 ```
@@ -410,6 +411,16 @@ apa_parameters(
   lists of mixed models (`lme4`), the default also includes the
   conditional *R*^2^ and its change (`R2_conditional`,
   `deltaR2_conditional`), and `R2` is the marginal *R*^2^.
+
+- performance_layout:
+
+  for lists of models, where the model comparison metrics go:
+  `"columns"` (default) adds a column for each metric, with its value on
+  the model's heading row; `"rows"` adds a row for each metric below the
+  model's parameters (and random effects), labeled in the variable
+  column (e.g., *R*^2^ and Δ*R*^2^) with its value in the first value
+  column, as in many hierarchical regression tables. Metrics without a
+  value (e.g., the change in *R*^2^ of the first model) are left out.
 
 ## Value
 

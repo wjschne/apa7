@@ -302,6 +302,7 @@
 <span>  column_formats <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  t_with_df <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  performance_parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R2"</span>, <span class="st">"deltaR2"</span><span class="op">)</span>,</span>
+<span>  performance_layout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"columns"</span>, <span class="st">"rows"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -414,6 +415,10 @@ category and predictor (e.g., "Part time: Children").</p></dd>
 
 <dt id="arg-performance-parameters">performance_parameters<a class="anchor" aria-label="anchor" href="#arg-performance-parameters"></a></dt>
 <dd><p>for lists of models, model comparison metrics passed to <code><a href="apa_performance_comparison.html">apa_performance_comparison()</a></code>. If <code>NULL</code>, no metrics are added. By default, <code>R2</code> and <code>deltaR2</code>; for lists of mixed models (<code>lme4</code>), the default also includes the conditional <em>R</em>^2^ and its change (<code>R2_conditional</code>, <code>deltaR2_conditional</code>), and <code>R2</code> is the marginal <em>R</em>^2^.</p></dd>
+
+
+<dt id="arg-performance-layout">performance_layout<a class="anchor" aria-label="anchor" href="#arg-performance-layout"></a></dt>
+<dd><p>for lists of models, where the model comparison metrics go: <code>"columns"</code> (default) adds a column for each metric, with its value on the model's heading row; <code>"rows"</code> adds a row for each metric below the model's parameters (and random effects), labeled in the variable column (e.g., <em>R</em>^2^ and Δ<em>R</em>^2^) with its value in the first value column, as in many hierarchical regression tables. Metrics without a value (e.g., the change in <em>R</em>^2^ of the first model) are left out.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -154,6 +154,50 @@ Table 4
 
 Hierarchical Regression of ACT Scores
 
+Many hierarchical regression tables instead put *R*² and its change in
+rows below each model’s coefficients. Use `performance_layout = "rows"`:
+
+``` r
+
+apa_parameters(list(lm1, lm2, lm3), performance_layout = "rows")
+```
+
+| Model   | Variable               | B           | SE   | β    | t     | df  | p      |
+|---------|------------------------|-------------|------|------|-------|-----|--------|
+| Model 1 |                        |             |      |      |       |     |        |
+|         | Constant               | 27.35       | 0.59 |  .00 | 46.55 | 684 | \<.001 |
+|         | Age                    |  0.06       | 0.02 |  .11 |  2.93 | 684 |  .004  |
+|         | Gender–Female          | −0.40       | 0.38 | −.04 | −1.03 | 684 |  .30   |
+|         | R2                     |   .01       |      |      |       |     |        |
+| Model 2 |                        |             |      |      |       |     |        |
+|         | Constant               | 27.54       | 0.80 |  .00 | 34.47 | 679 | \<.001 |
+|         | Age                    |  0.02       | 0.03 |  .03 |  0.60 | 679 |  .55   |
+|         | Gender–Female          | −0.57       | 0.38 | −.06 | −1.49 | 679 |  .14   |
+|         | Education–High School  | −0.24       | 0.97 | −.01 | −0.25 | 679 |  .81   |
+|         | Education–Some College | −0.78       | 1.00 | −.04 | −0.78 | 679 |  .44   |
+|         | Education–Bachelor     |  0.86       | 0.71 |  .09 |  1.20 | 679 |  .23   |
+|         | Education–Master       |  1.57       | 0.83 |  .13 |  1.89 | 679 |  .06   |
+|         | Education–Doctorate    |  1.99       | 0.89 |  .17 |  2.25 | 679 |  .03   |
+|         | R2                     |   .04       |      |      |       |     |        |
+|         | ΔR2                    |   .02\*\*\* |      |      |       |     |        |
+| Model 3 |                        |             |      |      |       |     |        |
+|         | Constant               |  8.15       | 1.09 |  .00 |  7.46 | 677 | \<.001 |
+|         | Age                    |  0.05       | 0.02 |  .11 |  2.77 | 677 |  .006  |
+|         | Gender–Female          |  0.23       | 0.30 |  .02 |  0.75 | 677 |  .45   |
+|         | Education–High School  |  0.08       | 0.75 |  .00 |  0.10 | 677 |  .92   |
+|         | Education–Some College |  0.14       | 0.77 |  .01 |  0.18 | 677 |  .85   |
+|         | Education–Bachelor     |  0.86       | 0.55 |  .09 |  1.57 | 677 |  .12   |
+|         | Education–Master       |  1.12       | 0.64 |  .09 |  1.75 | 677 |  .08   |
+|         | Education–Doctorate    |  1.05       | 0.69 |  .09 |  1.52 | 677 |  .13   |
+|         | SATV                   |  0.01       | 0.00 |  .31 |  8.01 | 677 | \<.001 |
+|         | SATQ                   |  0.02       | 0.00 |  .39 | 10.12 | 677 | \<.001 |
+|         | R2                     |   .43       |      |      |       |     |        |
+|         | ΔR2                    |   .39\*\*\* |      |      |       |     |        |
+
+Table 5
+
+Hierarchical Regression of ACT Scores With Model Fit in Rows
+
 ## Binary Logistic Regression
 
 `apa_parameters` also accepts `glm` objects. The table reports
@@ -193,7 +237,7 @@ apa_parameters(glm1)
 | Neuroticism  |  0.01 | 0.01 | 1.01 |  0.56 |  .57   |
 | Sex–Male     | −0.24 | 0.11 | 0.79 | −2.12 |  .03   |
 
-Table 5
+Table 6
 
 Logistic Regression of Volunteering on Personality and Sex
 
@@ -215,7 +259,7 @@ apa_parameters(glm1, exponentiate = FALSE)
 | Neuroticism  |  0.01 | 0.01 |  0.56 |  .57   |
 | Sex–Male     | −0.24 | 0.11 | −2.12 |  .03   |
 
-Table 6
+Table 7
 
 Logistic Regression Coefficients on the Log-Odds Scale
 
@@ -238,7 +282,7 @@ apa_parameters(
 | Neuroticism  | 1.01 |  0.56 |  .57   |
 | Sex–Male     | 0.79 | −2.12 |  .03   |
 
-Table 7
+Table 8
 
 Logistic Regression With Selected Columns
 
@@ -256,7 +300,7 @@ apa_parameters(glm1, starred = "Coefficient", bolded = "p")
 | Neuroticism  |  0.01       | 0.01 | 1.01 |  0.56 |  .57   |
 | Sex–Male     | −0.24\*     | 0.11 | 0.79 | −2.12 |  .03   |
 
-Table 8
+Table 9
 
 Logistic Regression With Significance Stars and Bold *p*-Values
 
@@ -285,7 +329,7 @@ apa_parameters(list(glm0, glm1))
 |         | Neuroticism  |  0.01 | 0.01 | 1.01 |  0.56 |  .57   |        |         |
 |         | Sex–Male     | −0.24 | 0.11 | 0.79 | −2.12 |  .03   |        |         |
 
-Table 9
+Table 10
 
 Two Logistic Regression Models of Volunteering
 
@@ -302,7 +346,7 @@ apa_performance_comparison(list(glm0, glm1))
 | Model 1 | .02    | .02     |      |     |     |
 | Model 2 | .02    | .00     | 5.42 | 2   | .07 |
 
-Table 10
+Table 11
 
 Comparison of Two Logistic Regression Models of Volunteering
 
@@ -352,7 +396,7 @@ apa_parameters(multinom1) |>
 |  Knowledge | −0.23 | 0.07 |  0.79 |  −3.12 |  .002 |
 | Note. Coefficients compare each category of Vote with the reference category (Conservative). OR = odds ratio (relative to the reference category). |  |  |  |  |  |
 
-Table 11
+Table 12
 
 Multinomial Logistic Regression of Vote on Euroscepticism and Political
 Knowledge
@@ -381,7 +425,7 @@ apa_performance_comparison(list(multinom0, multinom1))
 | Model 1 | .08        | .08         |       |     |        |
 | Model 2 | .10        | .02         | 75.16 | 2   | \<.001 |
 
-Table 12
+Table 13
 
 Comparison of Multinomial Models of Vote
 
@@ -414,7 +458,7 @@ apa_parameters(glm_pois)
 | Sex–Male     | 0.18 | 0.04 |  1.20 |  4.43 | \<.001 |
 | Learner–Slow | 0.12 | 0.04 |  1.12 |  2.84 |  .004  |
 
-Table 13
+Table 14
 
 Poisson Regression of School Absences on Sex and Learner Status
 
@@ -437,7 +481,7 @@ apa_parameters(glm_qpois)
 | Sex–Male     | 0.18 | 0.16 |  1.20 |  1.11  |  .27   |
 | Learner–Slow | 0.12 | 0.17 |  1.12 |  0.71  |  .48   |
 
-Table 14
+Table 15
 
 Quasi-Poisson Regression of School Absences on Sex and Learner Status
 
@@ -497,7 +541,7 @@ apa_parameters(zinb) |>
 |  Religiousness |  0.25 | 0.09 |  |  2.74 |  .006 |
 | Note. The count model is negative binomial with dispersion parameter θ = 1.34, and its coefficients are on the log scale. Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the count model). IRR = incidence rate ratio. |  |  |  |  |  |
 
-Table 15
+Table 16
 
 Zero-Inflated Negative Binomial Regression of Extramarital Affairs
 
@@ -573,7 +617,7 @@ apa_parameters(fit_gam) |>
 |  s(Recovery) |  |  |  | 1.00 | 1.27 |  .26  |
 | Note. Smoothing parameters were estimated by restricted maximum likelihood (REML). Smooth terms are tested with approximate F tests. edf = effective degrees of freedom. |  |  |  |  |  |  |
 
-Table 16
+Table 17
 
 Generalized Additive Model of Performance IQ After a Coma
 
@@ -603,7 +647,7 @@ apa_performance(fit_gam)
 |-------|------------------------|----------|
 | .08   | 9.8                    | 1,612.78 |
 
-Table 17
+Table 18
 
 Fit of the Generalized Additive Model
 
@@ -634,7 +678,7 @@ apa_collinearity(lm3) |>
 | SATQ | 1.79 | \[1.62, 1.93\] | .56 |
 | Note. For Education, which has more than 1 df, VIF is the generalized VIF ([Fox](#ref-foxGeneralizedCollinearityDiagnostics1992)[ ](#ref-foxGeneralizedCollinearityDiagnostics1992)[&](#ref-foxGeneralizedCollinearityDiagnostics1992)[ ](#ref-foxGeneralizedCollinearityDiagnostics1992)[Monette,](#ref-foxGeneralizedCollinearityDiagnostics1992)[ ](#ref-foxGeneralizedCollinearityDiagnostics1992)[1992](#ref-foxGeneralizedCollinearityDiagnostics1992)). Tolerance = 1/VIF, the proportion of a predictor’s variance not explained by the other predictors. VIF = variance inflation factor; CI = confidence interval. |  |  |  |
 
-Table 18
+Table 19
 
 Collinearity Diagnostics of the Full Model of ACT Scores
 
@@ -661,7 +705,7 @@ lm(ACT ~ SATV * SATQ, data = d) |>
 | SATV × SATQ | 57.17 | \[51.06, 63.12\] | .02 |
 | Note. The VIFs of interaction terms and their components are high partly because product terms are correlated with their components; this does not affect the tests of the interactions. Tolerance = 1/VIF, the proportion of a predictor’s variance not explained by the other predictors. VIF = variance inflation factor; CI = confidence interval. VIFs of 10 or more are bolded. |  |  |  |
 
-Table 19
+Table 20
 
 Collinearity Diagnostics With an Uncentered Interaction
 
@@ -682,7 +726,7 @@ lm(ACT ~ SATV * SATQ, data = datawizard::center(d)) |>
 | SATV × SATQ | 1.20 | \[1.13, 1.27\] | .84 |
 | Note. Tolerance = 1/VIF, the proportion of a predictor’s variance not explained by the other predictors. VIF = variance inflation factor; CI = confidence interval. |  |  |  |
 
-Table 20
+Table 21
 
 Collinearity Diagnostics With a Centered Interaction
 
@@ -779,7 +823,7 @@ tbl_lm
 |         | SATV                   |  0.01 | 0.00 |  .31 |  8.01 | 677 | \<.001 |     |           |
 |         | SATQ                   |  0.02 | 0.00 |  .39 | 10.12 | 677 | \<.001 |     |           |
 
-Table 21
+Table 22
 
 Hierarchical Regression Predicting ACT Scores
 
@@ -808,7 +852,7 @@ apa_parameters(glm1, starred = "p") |>
 | Sex–Male | −0.24 | 0.11 | 0.79 | −2.12 |  .03 \*   |
 | Note. OR = odds ratio. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |
 
-Table 22
+Table 23
 
 Logistic Regression With a Generated Note
 
