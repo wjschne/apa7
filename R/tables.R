@@ -2928,7 +2928,7 @@ apa_performance.lm <- function(
 
   names(metrics) <- NULL
 
-  d <- performance::model_performance(fit, metrics = "all") |>
+  d <- muffle_backtick_warning(performance::model_performance(fit, metrics = "all")) |>
     tibble::as_tibble()
   # Multinomial models report McFadden's R2 as R2
   if (inherits(fit, "multinom") && "R2" %in% colnames(d)) {
@@ -3242,7 +3242,7 @@ apa_performance_comparison <- function(
 
   if (length(.dots[[1]]) > 1) {
 
-    cp <- performance::compare_performance(..., metrics = "all") |>
+    cp <- muffle_backtick_warning(performance::compare_performance(..., metrics = "all")) |>
       tibble::as_tibble()
     # Multinomial models report McFadden's R2 as R2
     if (all(purrr::map_lgl(models, \(m) inherits(m, "multinom"))) && "R2" %in% colnames(cp)) {
@@ -3258,9 +3258,9 @@ apa_performance_comparison <- function(
     t_nested <- if (is_gam) {
       tibble::tibble(Name = cp$Name, Model = cp$Model)
     } else if (use_lrt) {
-      performance::test_likelihoodratio(...)
+      muffle_backtick_warning(performance::test_likelihoodratio(...))
     } else {
-      performance::test_wald(...)
+      muffle_backtick_warning(performance::test_wald(...))
     }
     t_nested <- tibble::as_tibble(t_nested) |>
       dplyr::select(-dplyr::any_of("Criterion"))
@@ -3283,7 +3283,7 @@ apa_performance_comparison <- function(
     cp <- cp |>
       dplyr::left_join(t_nested, by = dplyr::join_by(Name, Model))
   } else {
-    cp <- performance::performance(.dots[[1]], metrics = "all")
+    cp <- muffle_backtick_warning(performance::performance(.dots[[1]], metrics = "all"))
   }
 
   starred <- starred[starred %in% colnames(cp)]
@@ -3855,3 +3855,24 @@ pivot_wider_name_first <- function(
   )
 }
 
+#' Evaluate an expression without insight's warning about backticked names
+#'
+#' insight warns about variable names that must be quoted in backticks (e.g.,
+#' `` `SAT-V` ``) whenever performance checks a model's formula. Tables are
+#' easier to read with such names, and the performance metrics and tests
+#' that apa7 uses give the same results with them, so this warning (and only
+#' this one) is muffled. Other warnings pass through.
+#' @param expr expression to evaluate
+#' @returns the value of `expr`
+#' @keywords internal
+#' @noRd
+muffle_backtick_warning <- function(expr) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl("syntactically invalid variable names", conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}

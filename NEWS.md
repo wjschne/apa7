@@ -69,6 +69,7 @@ These change the output of code that worked with apa7 0.2.0.
 * New `random_scale` argument for mixed models in `apa_parameters()`: `"sd"` (default) for standard deviations and correlations, or `"variance"` for variances and covariances. `apa_note()` defines the symbols.
 * `apa_flextable()` keeps the table width set by `table_width` when `pretty_widths = TRUE`. Before, `pretty_widths()` reset it to the full width, so in HTML a table could be stretched wider than its columns.
 * Decimal-aligned columns in `apa_flextable()` tables are centered in HTML as well as in Word.
+* `apa_performance()`, `apa_performance_comparison()`, and `apa_parameters()` with a list of models no longer pass on insight's warning about variable names quoted in backticks (e.g., `` `SAT-V` ``), which read well in tables and give the same results as other names. Other warnings are passed on as before.
 * `apa_cor()` centers every summary column (e.g., *SD*, which was off-center when its values had different numbers of digits).
 * `apa_cor()` lines up correlations on the decimal point when there are no star columns (`star_significant = FALSE` or `bold_significant = TRUE`), and lines up the summary columns (e.g., *M*, Skewness, and Kurtosis) on the decimal point.
 * `apa_flextable()` no longer re-formats row labels that `apa_parameters()` (for `lme4` and `glmmTMB` models) and `apa_htest()` have already formatted. Before, random-effect labels such as "Subject: *r* (Constant, Days)" lost their spacing and commas in flextables.

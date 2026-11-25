@@ -144,14 +144,14 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
     - [x] `multilevel.qmd`: simulated daily-diary counts of drinks (intervention vs. control, weekday vs. weekend) replace `glmmTMB::Salamanders` in the count-outcome section
     - [x] `meta-analysis.qmd`: `metadat::dat.landenberger2005` (CBT and reoffending; odds ratios, sessions per week, and program purpose) replaces `metadat::dat.bcg`
     - [x] `lavaan.qmd`: `PoliticalDemocracy` is kept as is (decided 2026-11-25)
-    - [ ] `apa7.qmd` (the getting-started vignette, not an article): `mtcars` in the opening regression example and the tour of table functions.
+    - [x] `apa7.qmd` (the getting-started vignette): `psych::sat.act` replaces `mtcars`
   - Borderline (decide whether to keep):
     - [ ] `htest.qmd`: `sleep` (extra sleep under two hypnotic drugs, 10 patients) in the paired and signed-rank tests. Psychopharmacology, but a drug trial rather than a psychological study.
     - [ ] `regression.qmd`: `carData::Womenlf` (labor-force participation of married Canadian women) in the multinomial section. Sociology.
     - [ ] `regression.qmd`: `pscl::bioChemists` (publications of biochemistry graduate students) in the zero-inflated and hurdle section. Research productivity rather than psychology.
     - [ ] `descriptives.qmd` and `htest.qmd`: `MASS::survey` (statistics students' height, pulse, handedness, exercise, and smoking). Student data, but mostly physical measures.
   - Already psychology (no change needed): `factor-analysis.qmd` (`bfi`, `Harman74`), `reliability.qmd` (`bfi`), `lavaan.qmd` CFA (`HolzingerSwineford1939`), `multilevel.qmd` (`sleepstudy`, `VerbAgg`), `meta-analysis.qmd` (`dat.molloy2014`, `dat.konstantopoulos2011`), and `anova.qmd` (`Moore`, `obk.long`).
-  - [ ] Check the references added from memory against their sources: Cowles and Davis (1987), Wong et al. (2001), Hayes (2022), Garcia et al. (2010), Moore and Krupat (1971), and Hand et al. (1994).
+  - [ ] Check the references added from memory against their sources: Hayes (2022), Garcia et al. (2010), Moore and Krupat (1971), and Hand et al. (1994).
   - [ ] Use new landscape mode for tables that do not currently fit in 6.5 inches. For example, tbl-contrasts-sd in marginal-means.qmd.
 
 ## Done

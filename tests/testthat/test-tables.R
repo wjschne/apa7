@@ -1080,3 +1080,33 @@ test_that("apa_cor() table_width is a proportion, with inches still accepted", {
   expect_error(apa_cor(d, table_width = -1), "proportion")
   expect_error(apa_cor(d, table_width = "wide"), "proportion")
 })
+
+test_that("backticked variable names give no insight warning and the same results", {
+  d <- na.omit(psych::sat.act)
+  d_bt <- d
+  names(d_bt)[names(d_bt) %in% c("SATV", "SATQ")] <- c("SAT-V", "SAT-Q")
+  m1 <- lm(ACT ~ SATV, data = d)
+  m2 <- lm(ACT ~ SATV + SATQ, data = d)
+  b1 <- lm(ACT ~ `SAT-V`, data = d_bt)
+  b2 <- lm(ACT ~ `SAT-V` + `SAT-Q`, data = d_bt)
+
+  expect_no_warning(tbl_list <- apa_parameters(list(b1, b2)))
+  expect_no_warning(tbl_perf <- apa_performance(b2))
+  expect_no_warning(tbl_comp <- apa_performance_comparison(list(b1, b2)))
+
+  syntactic_list <- tibble::as_tibble(apa_parameters(list(m1, m2)))
+  tbl_list <- tibble::as_tibble(tbl_list)
+  tbl_list$Variable <- sub("SAT-", "SAT", tbl_list$Variable)
+  expect_identical(tbl_list, syntactic_list)
+  expect_identical(tibble::as_tibble(tbl_perf), tibble::as_tibble(apa_performance(m2)))
+  expect_identical(
+    tibble::as_tibble(tbl_comp),
+    tibble::as_tibble(apa_performance_comparison(list(m1, m2)))
+  )
+})
+
+test_that("muffle_backtick_warning() lets other warnings through", {
+  expect_warning(muffle_backtick_warning(warning("something else")), "something else")
+  expect_no_warning(muffle_backtick_warning(warning("using syntactically invalid variable names")))
+  expect_identical(muffle_backtick_warning(1 + 1), 2)
+})

@@ -31,11 +31,26 @@ library(apa7)
 
 # Example: Report a Regression Analysis
 
-Fit a model as you usually would, and pass it to `apa_parameters`:
+The `sat.act` data set in the psych package has the self-reported ACT and SAT scores of 700 people. Give the variables names that will read well in a table, and keep the people with all of their scores:
+
+```{r}
+#| label: data
+d_sat <- psych::sat.act |>
+  na.omit() |>
+  dplyr::transmute(
+    Gender = factor(gender, levels = 1:2, labels = c("Men", "Women")),
+    Age = age,
+    ACT,
+    Verbal = SATV,
+    Quantitative = SATQ
+  )
+```
+
+Fit a model as you usually would, and pass it to `apa_parameters`. Here, ACT scores are predicted from SAT Verbal and SAT Quantitative scores:
 
 ```{r}
 #| label: first-table
-fit <- lm(mpg ~ wt + hp, data = mtcars)
+fit <- lm(ACT ~ Verbal + Quantitative, data = d_sat)
 apa_parameters(fit)
 ```
 
@@ -93,18 +108,14 @@ Here are a few more. A descriptive statistics table, with a column for each grou
 
 ```{r}
 #| label: tour-descriptives
-d <- mtcars
-d$am <- factor(d$am, labels = c("Automatic", "Manual"))
-d$cyl <- factor(d$cyl)
-
-apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am")
+apa_descriptives(d_sat, by = Gender)
 ```
 
 A correlation matrix, with means and standard deviations:
 
 ```{r}
 #| label: tour-cor
-apa_cor(mtcars[, c("mpg", "wt", "hp", "qsec")])
+apa_cor(d_sat[, c("Age", "ACT", "Verbal", "Quantitative")])
 ```
 
 A list of nested models gives one table, with the change in *R*^2^:
@@ -112,8 +123,8 @@ A list of nested models gives one table, with the change in *R*^2^:
 ```{r}
 #| label: tour-list
 apa_parameters(list(
-  lm(mpg ~ wt, data = mtcars),
-  lm(mpg ~ wt + hp, data = mtcars)
+  lm(ACT ~ Verbal, data = d_sat),
+  lm(ACT ~ Verbal + Quantitative, data = d_sat)
 ))
 ```
 
@@ -208,7 +219,6 @@ A manuscript can have tables of three widths: the text area of a portrait page, 
 ```{r}
 #| label: table-widths
 #| eval: false
-fit <- lm(mpg ~ wt + hp, data = mtcars)
 apa_flextable(apa_parameters(fit), table_width = "page")      # 6.5 in (the default)
 apa_flextable(apa_parameters(fit), table_width = "landscape") # 9 in
 apa_flextable(apa_parameters(fit), table_width = "column")    # 3.36 in
