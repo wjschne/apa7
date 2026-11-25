@@ -152,7 +152,9 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
     - [x] `descriptives.qmd` and `htest.qmd`: `MASS::survey` (statistics students' height, pulse, handedness, exercise, and smoking). Student data, but mostly physical measures. Kept as is (decided 2026-11-25)
   - Already psychology (no change needed): `factor-analysis.qmd` (`bfi`, `Harman74`), `reliability.qmd` (`bfi`), `lavaan.qmd` CFA (`HolzingerSwineford1939`), `multilevel.qmd` (`sleepstudy`, `VerbAgg`), `meta-analysis.qmd` (`dat.molloy2014`, `dat.konstantopoulos2011`), and `anova.qmd` (`Moore`, `obk.long`).
   - [x] Check the references added from memory against their sources: Cowles and Davis (1987), Wong et al. (2001), Hayes (2022), Garcia et al. (2010), Moore and Krupat (1971), and Hand et al. (1994).
-  - [ ] Check the references added from memory against their sources: Fox and Andersen (2006) and Fair (1978).
+  - [x] Check the references added from memory against their sources: Fox and Andersen (2006) and Fair (1978).
+  - [x] `reliability.qmd`: `psychTools::bfi` with item wording from `bfi.dictionary` as row labels replaces `psych::bfi` item codes; data and methods cited
+  - [x] Check the references added from memory against their sources: Cronbach (1951) and Kuder and Richardson (1937).
   - [x] Use new landscape mode for tables that do not currently fit in 6.5 inches (`#| apa7-width: landscape` on the 20 tables whose natural width is over 6.5 inches; `tbl-numberedlist` in summarize.qmd is left in portrait because only its quotation column, which wraps, is wide)
   - [ ] Add AI acknowledgement to all articles.
   - [ ] Add `apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)` to `setup` chunk in all articles that do not have it already.

@@ -153,3 +153,21 @@ test_that("scales and reverse take unquoted names and tidyselect helpers", {
   expect_error(apa_reliability(d, scales = list(X = c(A1, Z9))), "Z9")
   expect_error(apa_reliability(d, scales = list(X = A1:A5), reverse = Z9), "Z9")
 })
+
+test_that("named character vectors select items by their values", {
+  d <- psych::bfi[, paste0("A", 1:5)]
+  labels <- c(A1 = "Indifferent", A2 = "Inquire", A3 = "Comfort", A4 = "Children", A5 = "Ease")
+  names(d) <- labels
+  named <- apa_reliability(d, scales = list(Agreeableness = labels), reverse = labels["A1"], item_range = c(1, 6))
+  plain <- apa_reliability(d, scales = list(Agreeableness = unname(labels)), reverse = "Indifferent", item_range = c(1, 6))
+  expect_identical(named, plain)
+  expect_true(any(grepl("Indifferent (R)", named$Item, fixed = TRUE)))
+})
+
+test_that("select_names() ignores the names of a selection", {
+  d <- data.frame(a = 1, b = 2, c = 3)
+  vars <- c(first = "a", second = "c")
+  expect_equal(select_names(rlang::quo(vars), d), c("a", "c"))
+  expect_equal(select_names(rlang::quo(c(x = a, y = b)), d), c("a", "b"))
+  expect_equal(select_names(rlang::quo(starts_with("b")), d), "b")
+})
