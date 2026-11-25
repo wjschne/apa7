@@ -273,3 +273,8 @@ apa_contrasts(fit_logistic,
 * `format_variable_names = FALSE` keeps variable names exactly as they are.
 * `effect_size = FALSE` leaves Cohen's *d* out of contrast tables, and `sd` sets the standard deviation it is computed with.
 * Bayesian models are not yet supported.
+
+# References
+
+::: {#refs}
+:::

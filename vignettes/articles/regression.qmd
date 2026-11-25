@@ -448,3 +448,7 @@ options(apa7.print = "flextable")
 
 To get the table with non-default settings, pass the output to `apa_flextable`, which always returns a flextable.
 
+# References
+
+::: {#refs}
+:::

@@ -129,3 +129,8 @@ apa_descriptives(
 * `format_variable_names = FALSE` keeps unlabeled variable names exactly as they are.
 
 For tables with other layouts, see [Building tables by hand](summarize.html), which shows how to make any data frame into an APA-style table.
+
+# References
+
+::: {#refs}
+:::

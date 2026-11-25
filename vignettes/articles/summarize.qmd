@@ -537,3 +537,8 @@ d |>
 # Speed
 
 By default, `apa_flextable` converts markdown in every cell (with `ftExtra::colformat_md`). This makes formatting easy and consistent, but it is a little slow, and a document with many tables can take a while to render. `markdown_body = FALSE` skips the conversion in the body of a table whose cells have no markdown, and caching the chunks of finished tables (with the `cache` chunk option) avoids remaking them each time the document is rendered.
+
+# References
+
+::: {#refs}
+:::
