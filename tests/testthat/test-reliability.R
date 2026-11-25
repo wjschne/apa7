@@ -113,3 +113,43 @@ test_that("apa_reliability() checks its arguments", {
     "must be numeric"
   )
 })
+
+test_that("scales and reverse take unquoted names and tidyselect helpers", {
+  d <- psych::bfi
+  quoted <- apa_reliability(d, scales = bfi_scales, reverse = bfi_reverse, item_range = c(1, 6))
+  expect_identical(
+    apa_reliability(
+      d,
+      scales = list(Agreeableness = A1:A5, Conscientiousness = c(C1, C2, C3, C4, C5)),
+      reverse = c(A1, C4, C5),
+      item_range = c(1, 6)
+    ),
+    quoted
+  )
+  expect_identical(
+    apa_reliability(
+      d,
+      scales = base::list(Agreeableness = starts_with("A", ignore.case = FALSE), Conscientiousness = num_range("C", 1:5)),
+      reverse = tidyselect::all_of(bfi_reverse),
+      item_range = c(1, 6)
+    ),
+    quoted
+  )
+  # Quoted names inside list(), and character vectors computed there
+  expect_identical(
+    apa_reliability(
+      d,
+      scales = list(Agreeableness = paste0("A", 1:5), Conscientiousness = c("C1", "C2", "C3", "C4", "C5")),
+      reverse = c("A1", "C4", "C5"),
+      item_range = c(1, 6)
+    ),
+    quoted
+  )
+  # Through a wrapper function with {{ }}
+  wrapper <- function(data, s, r) apa_reliability(data, scales = {{ s }}, reverse = {{ r }}, item_range = c(1, 6))
+  expect_identical(wrapper(d, bfi_scales, c(A1, C4, C5)), quoted)
+  expect_error(apa_reliability(d, scales = list(A1:A5)), "named list")
+  expect_error(apa_reliability(d, scales = c("A1", "A2")), "named list")
+  expect_error(apa_reliability(d, scales = list(X = c(A1, Z9))), "Z9")
+  expect_error(apa_reliability(d, scales = list(X = A1:A5), reverse = Z9), "Z9")
+})

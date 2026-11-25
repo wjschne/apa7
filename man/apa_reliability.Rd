@@ -22,13 +22,15 @@ apa_reliability(
 \arguments{
 \item{data}{data frame of item responses}
 
-\item{scales}{named list of character vectors of item names, one for each
-scale (e.g., \code{list(Agreeableness = c("A1", "A2", "A3"))}). If \code{NULL}
-(default), all columns of \code{data} form one scale.}
+\item{scales}{named list of the items of each scale, given as unquoted or
+quoted names or tidyselect helpers (e.g., \code{list(Agreeableness = c(A1, A2, A3), Conscientiousness = starts_with("C"))}). A named list of character
+vectors stored in a variable works too. If \code{NULL} (default), all columns
+of \code{data} form one scale.}
 
-\item{reverse}{names of items to reverse-score before the analysis. Items
-are reversed within their scale's range of responses (\code{item_range}), and
-they are marked "(R)" in the table.}
+\item{reverse}{items to reverse-score before the analysis, selected like
+the items in \code{scales} (e.g., \code{c(A1, C4, C5)}). Items are reversed within
+their scale's range of responses (\code{item_range}), and they are marked "(R)"
+in the table.}
 
 \item{item_range}{lowest and highest possible responses, used to reverse
 items. If \code{NULL} (default), the lowest and highest responses observed in
@@ -104,14 +106,14 @@ apa_reliability(
   item_range = c(1, 6)
 )
 
-# One row per scale
+# One row per scale, with items selected by tidyselect helpers
 apa_reliability(
   d,
   scales = list(
-    Agreeableness = paste0("A", 1:5),
-    Conscientiousness = paste0("C", 1:5)
+    Agreeableness = A1:A5,
+    Conscientiousness = starts_with("C")
   ),
-  reverse = c("A1", "C4", "C5"),
+  reverse = c(A1, C4, C5),
   item_range = c(1, 6),
   level = "scales"
 )

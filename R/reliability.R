@@ -31,12 +31,15 @@
 #' KR-20. The note says so.
 #'
 #' @param data data frame of item responses
-#' @param scales named list of character vectors of item names, one for each
-#'   scale (e.g., `list(Agreeableness = c("A1", "A2", "A3"))`). If `NULL`
-#'   (default), all columns of `data` form one scale.
-#' @param reverse names of items to reverse-score before the analysis. Items
-#'   are reversed within their scale's range of responses (`item_range`), and
-#'   they are marked "(R)" in the table.
+#' @param scales named list of the items of each scale, given as unquoted or
+#'   quoted names or tidyselect helpers (e.g., `list(Agreeableness = c(A1, A2,
+#'   A3), Conscientiousness = starts_with("C"))`). A named list of character
+#'   vectors stored in a variable works too. If `NULL` (default), all columns
+#'   of `data` form one scale.
+#' @param reverse items to reverse-score before the analysis, selected like
+#'   the items in `scales` (e.g., `c(A1, C4, C5)`). Items are reversed within
+#'   their scale's range of responses (`item_range`), and they are marked "(R)"
+#'   in the table.
 #' @param item_range lowest and highest possible responses, used to reverse
 #'   items. If `NULL` (default), the lowest and highest responses observed in
 #'   each scale are used.
@@ -70,14 +73,14 @@
 #'   item_range = c(1, 6)
 #' )
 #'
-#' # One row per scale
+#' # One row per scale, with items selected by tidyselect helpers
 #' apa_reliability(
 #'   d,
 #'   scales = list(
-#'     Agreeableness = paste0("A", 1:5),
-#'     Conscientiousness = paste0("C", 1:5)
+#'     Agreeableness = A1:A5,
+#'     Conscientiousness = starts_with("C")
 #'   ),
-#'   reverse = c("A1", "C4", "C5"),
+#'   reverse = c(A1, C4, C5),
 #'   item_range = c(1, 6),
 #'   level = "scales"
 #' )
@@ -103,22 +106,14 @@ apa_reliability <- function(
   if (!is.numeric(ci) || length(ci) != 1 || is.na(ci) || ci <= 0 || ci >= 1) {
     cli::cli_abort("{.arg ci} must be a number between 0 and 1.")
   }
-  if (is.null(scales)) {
+  # Items can be given unquoted, quoted, or with tidyselect helpers
+  scales <- reliability_scales(rlang::enquo(scales), data)
+  one_scale <- is.null(scales)
+  if (one_scale) {
     scales <- list(Scale = colnames(data))
-    one_scale <- TRUE
-  } else {
-    one_scale <- FALSE
-    if (!is.list(scales) || is.null(names(scales)) || any(names(scales) == "")) {
-      cli::cli_abort(
-        "{.arg scales} must be a named list of item names, e.g., {.code list(Anxiety = c(\"a1\", \"a2\", \"a3\"))}."
-      )
-    }
   }
+  reverse <- select_names(rlang::enquo(reverse), data)
   items <- unlist(scales, use.names = FALSE)
-  unknown <- setdiff(c(items, reverse), colnames(data))
-  if (length(unknown) > 0) {
-    cli::cli_abort("{.arg data} has no {cli::qty(unknown)} column{?s} {.val {unknown}}.")
-  }
   not_numeric <- items[!purrr::map_lgl(data[items], is.numeric)]
   if (length(not_numeric) > 0) {
     cli::cli_abort("Items must be numeric: {.val {not_numeric}} {?is/are} not.")
@@ -239,6 +234,40 @@ apa_reliability <- function(
     min_item_total = min_item_total
   )
   as_apa7_tbl(d)
+}
+
+#' Item names of each scale
+#'
+#' `scales` is either a call to `list()` whose elements are selections (e.g.,
+#' `list(A = starts_with("A"), B = c(B1, B2))`), evaluated one at a time with
+#' tidyselect, or a named list of character vectors stored in a variable.
+#' @param quo quosure of `scales`
+#' @param data data frame
+#' @returns named list of character vectors, or `NULL` if `scales` is `NULL`
+#' @keywords internal
+#' @noRd
+reliability_scales <- function(quo, data, call = rlang::caller_env()) {
+  if (rlang::quo_is_null(quo)) {
+    return(NULL)
+  }
+  expr <- rlang::quo_get_expr(quo)
+  env <- rlang::quo_get_env(quo)
+  if (rlang::is_call(expr, "list", ns = c("", "base"))) {
+    selections <- purrr::map(rlang::call_args(expr), \(e) rlang::new_quosure(e, env))
+  } else {
+    value <- rlang::eval_tidy(quo)
+    if (!is.list(value)) {
+      value <- NA
+    }
+    selections <- purrr::map(value, \(v) rlang::quo(!!v))
+  }
+  if (length(selections) == 0 || is.null(names(selections)) || any(names(selections) == "")) {
+    cli::cli_abort(
+      "{.arg scales} must be a named list of items, e.g., {.code list(Anxiety = c(a1, a2, a3))} or {.code list(Anxiety = starts_with(\"a\"))}.",
+      call = call
+    )
+  }
+  purrr::map(selections, \(s) select_names(s, data, call = call))
 }
 
 #' Reliability statistics of one scale

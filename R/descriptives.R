@@ -34,16 +34,20 @@
 #' trials, so tests are not shown by default.
 #'
 #' @param data data frame
-#' @param variables names of the variables to describe, in order. If `NULL`
-#'   (default), all columns except `by`.
-#' @param by name of a grouping variable. If given, each group gets a column.
+#' @param variables variables to describe, in order: unquoted or quoted names
+#'   (e.g., `c(age, income)` or `c("age", "income")`) or tidyselect helpers
+#'   (e.g., `starts_with("item")` or `where(is.numeric)`). If `NULL`
+#'   (default), all columns. The `by` variable is never described.
+#' @param by grouping variable, unquoted or quoted (e.g., `group` or
+#'   `"group"`). If given, each group gets a column.
 #' @param total if `TRUE` (default), a column for the whole sample is added
 #'   when there are groups
 #' @param continuous how continuous variables are described: `"mean_sd"`
 #'   (default) for *M* (*SD*), or `"median_iqr"` for *Mdn* (*IQR*). A named
 #'   vector sets it for particular variables (e.g., `c(income =
 #'   "median_iqr")`), and other variables use `"mean_sd"`.
-#' @param categorical names of numeric variables to treat as categorical
+#' @param categorical numeric variables to treat as categorical, selected
+#'   like `variables`
 #' @param labels named character vector of variable labels (e.g., `c(age =
 #'   "Age (years)")`). Variables without a label are named by their formatted
 #'   names.
@@ -77,11 +81,14 @@
 #' apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am",
 #'                  range = TRUE, missing = "row")
 #'
+#' # Unquoted names and tidyselect helpers work too
+#' apa_descriptives(d, variables = c(mpg, starts_with("c")), by = am)
+#'
 #' # Medians for skewed variables, and tests of group differences
 #' apa_descriptives(
 #'   d,
-#'   variables = c("mpg", "hp", "cyl"),
-#'   by = "am",
+#'   variables = c(mpg, hp, cyl),
+#'   by = am,
 #'   continuous = c(hp = "median_iqr"),
 #'   test = TRUE
 #' )
@@ -107,18 +114,30 @@ apa_descriptives <- function(
     cli::cli_abort("{.arg data} must be a data frame, not {.obj_type_friendly {data}}.")
   }
   data <- as.data.frame(data)
-  if (!is.null(by)) {
-    if (!is.character(by) || length(by) != 1 || !(by %in% colnames(data))) {
-      cli::cli_abort("{.arg by} must be the name of a column of {.arg data}.")
+  # Columns can be given unquoted, quoted, or with tidyselect helpers
+  by <- tryCatch(
+    select_names(rlang::enquo(by), data),
+    error = function(e) {
+      cli::cli_abort("{.arg by} must be the name of a column of {.arg data}.", parent = e)
     }
+  )
+  if (length(by) == 0) {
+    by <- NULL
+  } else if (length(by) > 1) {
+    cli::cli_abort("{.arg by} must be the name of one column of {.arg data}, not {length(by)}.")
   }
-  if (is.null(variables)) {
-    variables <- setdiff(colnames(data), by)
+  variables_quo <- rlang::enquo(variables)
+  variables <- if (rlang::quo_is_null(variables_quo)) {
+    colnames(data)
+  } else {
+    select_names(variables_quo, data)
   }
-  unknown <- setdiff(c(variables, categorical), colnames(data))
-  if (length(unknown) > 0) {
-    cli::cli_abort("{.arg data} has no {cli::qty(unknown)} column{?s} {.val {unknown}}.")
+  # The grouping variable is not also described
+  variables <- setdiff(variables, by)
+  if (length(variables) == 0) {
+    cli::cli_abort("{.arg variables} must select at least one column of {.arg data} other than {.arg by}.")
   }
+  categorical <- select_names(rlang::enquo(categorical), data)
   if (isTRUE(test) && is.null(by)) {
     cli::cli_abort("{.code test = TRUE} needs groups to compare. Give {.arg by}.")
   }

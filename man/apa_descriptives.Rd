@@ -24,10 +24,13 @@ apa_descriptives(
 \arguments{
 \item{data}{data frame}
 
-\item{variables}{names of the variables to describe, in order. If \code{NULL}
-(default), all columns except \code{by}.}
+\item{variables}{variables to describe, in order: unquoted or quoted names
+(e.g., \code{c(age, income)} or \code{c("age", "income")}) or tidyselect helpers
+(e.g., \code{starts_with("item")} or \code{where(is.numeric)}). If \code{NULL}
+(default), all columns. The \code{by} variable is never described.}
 
-\item{by}{name of a grouping variable. If given, each group gets a column.}
+\item{by}{grouping variable, unquoted or quoted (e.g., \code{group} or
+\code{"group"}). If given, each group gets a column.}
 
 \item{total}{if \code{TRUE} (default), a column for the whole sample is added
 when there are groups}
@@ -36,7 +39,8 @@ when there are groups}
 (default) for \emph{M} (\emph{SD}), or \code{"median_iqr"} for \emph{Mdn} (\emph{IQR}). A named
 vector sets it for particular variables (e.g., \code{c(income = "median_iqr")}), and other variables use \code{"mean_sd"}.}
 
-\item{categorical}{names of numeric variables to treat as categorical}
+\item{categorical}{numeric variables to treat as categorical, selected
+like \code{variables}}
 
 \item{labels}{named character vector of variable labels (e.g., \code{c(age = "Age (years)")}). Variables without a label are named by their formatted
 names.}
@@ -112,11 +116,14 @@ d$hp[c(3, 8)] <- NA
 apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am",
                  range = TRUE, missing = "row")
 
+# Unquoted names and tidyselect helpers work too
+apa_descriptives(d, variables = c(mpg, starts_with("c")), by = am)
+
 # Medians for skewed variables, and tests of group differences
 apa_descriptives(
   d,
-  variables = c("mpg", "hp", "cyl"),
-  by = "am",
+  variables = c(mpg, hp, cyl),
+  by = am,
   continuous = c(hp = "median_iqr"),
   test = TRUE
 )

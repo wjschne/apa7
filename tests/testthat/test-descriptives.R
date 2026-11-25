@@ -162,3 +162,35 @@ test_that("missing values can be shown in rows, and ranges added", {
   tested <- apa_descriptives(d, variables = "hp", by = "am", test = TRUE, missing = "row", range = TRUE)
   expect_equal(tested$`*p*`[2:3], c("", ""))
 })
+
+test_that("variables, by, and categorical take unquoted names and tidyselect helpers", {
+  d <- desc_data()
+  quoted <- apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am")
+  expect_identical(apa_descriptives(d, variables = c(mpg, hp, cyl), by = am), quoted)
+  expect_identical(
+    apa_descriptives(d, variables = c(mpg, hp, starts_with("cy")), by = am),
+    quoted
+  )
+  # A character vector stored in a variable, without a deprecation message
+  vars <- c("mpg", "hp", "cyl")
+  expect_no_warning(expect_identical(apa_descriptives(d, variables = vars, by = am), quoted))
+  expect_identical(apa_descriptives(d, variables = tidyselect::all_of(vars), by = "am"), quoted)
+  # Passing a column through a wrapper function with {{ }}
+  wrapper <- function(data, v, g) apa_descriptives(data, variables = {{ v }}, by = {{ g }})
+  expect_identical(wrapper(d, c(mpg, hp, cyl), am), quoted)
+  # The grouping variable is not described, even when selected
+  expect_identical(apa_descriptives(d, variables = c(mpg, hp, cyl, am), by = am), quoted)
+  all_but_by <- apa_descriptives(d[c("mpg", "cyl", "am")], by = am)
+  expect_false(any(grepl("^Am", all_but_by$Variable)))
+  # Numeric columns selected as categorical
+  expect_identical(
+    apa_descriptives(d, variables = c(mpg, gear), categorical = gear),
+    apa_descriptives(d, variables = c("mpg", "gear"), categorical = "gear")
+  )
+  expect_true(any(grepl("Gear, *n*", fixed = TRUE, apa_descriptives(d, variables = gear, categorical = where(is.numeric))$Variable)))
+  # Errors
+  expect_error(apa_descriptives(d, by = c(am, vs)), "one column")
+  expect_error(apa_descriptives(d, by = zzz), "name of a column")
+  expect_error(apa_descriptives(d, variables = zzz), "zzz")
+  expect_error(apa_descriptives(d, variables = am, by = am), "at least one column")
+})

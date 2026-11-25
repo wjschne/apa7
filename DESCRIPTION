@@ -42,7 +42,7 @@ Imports:
     systemfonts,
     tibble,
     tidyr,
-    tidyselect
+    tidyselect (>= 1.2.0)
 Suggests: 
     afex,
     bsicons,
