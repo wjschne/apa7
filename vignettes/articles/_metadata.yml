@@ -6,6 +6,7 @@
 bibliography:
   - ../../inst/apa7.bib
   - refs.bib
+  - apa_more.bib
 csl: apa.csl
 link-citations: true
 # Table and figure notes (apa-note), captions, and citations are processed by
@@ -15,6 +16,7 @@ link-citations: true
 # "and" instead of "&" (e.g., "Friendly and Franklin (1980)") and possessive
 # citations work (@key ['s] gives "Hofmann's (1978)").
 citeproc: false
+meta-analysis: false
 filters:
   - at: post-render
     path: _extensions/wjschne/apaquarto/apaextractfigure.lua

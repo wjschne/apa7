@@ -283,6 +283,135 @@ resolve_citations <- function(sentences, citations = "auto") {
   }, character(1), USE.NAMES = FALSE)
 }
 
+#' Citation keys in Pandoc markdown text
+#'
+#' Finds keys written as Pandoc citations (e.g., `[@holm1979]`,
+#' `@cheung2014`, `[-@key]`), but not e-mail addresses.
+#' @param text character vector
+#' @returns unique keys, without the `@`
+#' @keywords internal
+#' @noRd
+citation_keys <- function(text) {
+  text <- text[!is.na(text)]
+  if (length(text) == 0) {
+    return(character(0))
+  }
+  m <- regmatches(
+    text,
+    gregexpr("(?<![[:alnum:]_.])@[[:alnum:]_][[:alnum:]_:.#$%&+?<>~/-]*", text, perl = TRUE)
+  )
+  keys <- sub("^@", "", unlist(m))
+  # Punctuation that ends a sentence is not part of the key
+  keys <- sub("[.:]+$", "", keys)
+  unique(keys[nzchar(keys)])
+}
+
+#' Record the citations in a flextable's note
+#'
+#' A note inside a flextable is formatted by ftExtra, which resolves its
+#' citations on its own, so the document's citeproc never sees them and the
+#' references are missing from the reference list. The keys are recorded on
+#' the table, and `knit_print.apa7_cited()` adds them to the document's
+#' `nocite` field when the table is printed.
+#' @param ft a flextable (anything else is returned unchanged)
+#' @param text note text
+#' @keywords internal
+#' @noRd
+add_note_citations <- function(ft, text) {
+  if (!inherits(ft, "flextable")) {
+    return(ft)
+  }
+  keys <- citation_keys(text)
+  if (length(keys) == 0) {
+    return(ft)
+  }
+  attr(ft, "apa7_citations") <- unique(c(attr(ft, "apa7_citations", exact = TRUE), keys))
+  class(ft) <- unique(c("apa7_cited", class(ft)))
+  ft
+}
+
+#' Print a flextable whose note cites references
+#'
+#' Prints the flextable, followed by a Pandoc metadata block that lists the
+#' references cited in its note under `nocite`, so that they are added to the
+#' document's reference list. Pandoc takes `nocite` from the last block that
+#' sets it, so each block lists all of the keys cited in the notes of the
+#' tables printed so far, along with the document's own `nocite`.
+#' @param x a flextable made by apa7 whose note cites references
+#' @param ... passed to [knitr::knit_print()]
+#' @returns the printed flextable, followed by the metadata block
+#' @keywords internal
+#' @noRd
+#' @exportS3Method knitr::knit_print
+knit_print.apa7_cited <- function(x, ...) {
+  keys <- attr(x, "apa7_citations", exact = TRUE)
+  attr(x, "apa7_citations") <- NULL
+  class(x) <- setdiff(class(x), "apa7_cited")
+  out <- knitr::knit_print(x, ...)
+  block <- nocite_block(keys)
+  if (is.null(block) || !is.character(out)) {
+    return(out)
+  }
+  knitr::asis_output(
+    paste0(out, block),
+    meta = attr(out, "knit_meta", exact = TRUE),
+    cacheable = attr(out, "knit_cacheable", exact = TRUE) %||% NA
+  )
+}
+
+#' A Pandoc metadata block with the citations of all table notes so far
+#' @param keys keys cited in the note of the table being printed
+#' @returns the block, or NULL when no Pandoc document is being rendered
+#' @keywords internal
+#' @noRd
+nocite_block <- function(keys) {
+  if (length(keys) == 0 || is.null(knitr::pandoc_to())) {
+    return(NULL)
+  }
+  input <- tryCatch(knitr::current_input(dir = TRUE), error = function(e) NULL) %||% ""
+  # Keys are collected anew for each document
+  if (!identical(the$note_citations$input, input)) {
+    the$note_citations <- list(input = input, keys = character(0))
+  }
+  the$note_citations$keys <- unique(c(the$note_citations$keys, keys))
+  lines <- c(
+    document_nocite(),
+    paste0("@", the$note_citations$keys, collapse = ", ")
+  )
+  paste0(
+    "\n\n---\nnocite: |\n",
+    paste0("  ", lines, collapse = "\n"),
+    "\n---\n\n"
+  )
+}
+
+#' The document's own nocite field, as lines of text
+#'
+#' Quarto passes the document's full metadata (including `_quarto.yml` and
+#' `_metadata.yml`) in `QUARTO_EXECUTE_INFO`; R Markdown gives the YAML
+#' header in `rmarkdown::metadata`.
+#' @keywords internal
+#' @noRd
+document_nocite <- function() {
+  nocite <- NULL
+  info <- Sys.getenv("QUARTO_EXECUTE_INFO", "")
+  if (nzchar(info) && file.exists(info) && requireNamespace("jsonlite", quietly = TRUE)) {
+    nocite <- tryCatch(
+      jsonlite::read_json(info)$format$metadata$nocite,
+      error = function(e) NULL
+    )
+  }
+  if (is.null(nocite) && requireNamespace("rmarkdown", quietly = TRUE)) {
+    nocite <- tryCatch(rmarkdown::metadata$nocite, error = function(e) NULL)
+  }
+  nocite <- unlist(nocite)
+  if (length(nocite) == 0) {
+    return(character(0))
+  }
+  lines <- unlist(strsplit(as.character(nocite), "\n", fixed = TRUE))
+  lines[nzchar(trimws(lines))]
+}
+
 #' The citations setting
 #' @keywords internal
 #' @noRd

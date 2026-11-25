@@ -494,8 +494,13 @@ apa_chisq <- function(
         )
       )
   }
-  dd |>
+  dd <- dd |>
     flextable::align(part = "footer")
+  # References cited in a custom note go in the document's reference list
+  if (!is.null(note) && !is.na(note)) {
+    dd <- add_note_citations(dd, note)
+  }
+  dd
 }
 
 #' APA-formatted correlation table
@@ -1002,7 +1007,8 @@ apa_cor <- function(
     d_R$properties$width <- table_width
   }
 
-  d_R
+  # References cited in the note go in the document's reference list
+  add_note_citations(d_R, if (is.null(note)) cor_sentences else note)
 }
 
 #' Convert data to flextable consistent with APA style
@@ -1385,14 +1391,17 @@ apa_flextable <- function(
   )
 
   # Added last so that the note does not affect column widths
+  text <- note_text(data, note)
   ft <- add_note_footer(
     ft,
-    note_text(data, note),
+    text,
     font_family = font_family,
     font_size = font_size,
     text_color = text_color,
     horizontal_padding = horizontal_padding
   )
+  # References cited in the note go in the document's reference list
+  ft <- add_note_citations(ft, text)
 
   class(ft) <- unique(c("apaflextable", class(ft)))
 

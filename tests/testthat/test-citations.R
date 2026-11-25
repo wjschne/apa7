@@ -194,3 +194,65 @@ test_that("named procedures are cited as keys in keys mode", {
     fixed = TRUE
   )
 })
+
+test_that("citation keys are found in Pandoc citations but not e-mail addresses", {
+  expect_equal(
+    apa7:::citation_keys(c(
+      "Holm's method [@holmSimpleSequentiallyRejective1979].",
+      "As @cheungModelingDependentEffect2014 showed; see [-@a; @b:2020].",
+      "Write to someone@example.com."
+    )),
+    c("holmSimpleSequentiallyRejective1979", "cheungModelingDependentEffect2014", "a", "b:2020")
+  )
+  expect_equal(apa7:::citation_keys(c(NA, "No citations.")), character(0))
+})
+
+test_that("flextables whose notes cite references record the keys", {
+  ft <- flextable::flextable(head(cars, 2))
+  expect_identical(apa7:::add_note_citations(ft, "No citations."), ft)
+  cited <- apa7:::add_note_citations(ft, "Holm's method [@holmSimpleSequentiallyRejective1979].")
+  expect_s3_class(cited, "apa7_cited")
+  expect_s3_class(cited, "flextable")
+  expect_equal(attr(cited, "apa7_citations"), "holmSimpleSequentiallyRejective1979")
+  # Not a flextable: unchanged
+  expect_identical(apa7:::add_note_citations(head(cars, 2), "[@x]"), head(cars, 2))
+
+  # apa_flextable(note = TRUE) and apa_cor() record the keys of their notes
+  withr::local_options(apa7.citations = "keys")
+  skip_if_not_installed("correlation")
+  tbl <- apa_cor(correlation::correlation(mtcars[, c("mpg", "wt", "hp")]))
+  expect_equal(attr(tbl, "apa7_citations"), "holmSimpleSequentiallyRejective1979")
+  tbl_text <- apa_cor(mtcars[, c("mpg", "wt")], note = "Custom note.")
+  expect_false(inherits(tbl_text, "apa7_cited"))
+  ft_note <- apa_flextable(head(cars, 2), note = "As in [@lakensCalculatingReportingEffect2013].")
+  expect_equal(attr(ft_note, "apa7_citations"), "lakensCalculatingReportingEffect2013")
+})
+
+test_that("note citations are added to nocite when the table is printed", {
+  ft <- apa7:::add_note_citations(
+    flextable::flextable(head(cars, 2)),
+    "[@holmSimpleSequentiallyRejective1979]"
+  )
+  # Outside a Pandoc document, the table prints as usual
+  local_mocked_bindings(pandoc_to = function(...) NULL, .package = "knitr")
+  expect_false(grepl("nocite", paste(knitr::knit_print(ft), collapse = "")))
+
+  local_mocked_bindings(
+    pandoc_to = function(...) "html",
+    current_input = function(...) "doc.qmd",
+    .package = "knitr"
+  )
+  local_mocked_bindings(document_nocite = function() "@olejnikGeneralizedEtaOmega2003")
+  withr::defer(rm("note_citations", envir = apa7:::the))
+  out <- paste(knitr::knit_print(ft), collapse = "")
+  expect_match(out, "<table", fixed = TRUE)
+  expect_match(
+    out,
+    "---\nnocite: |\n  @olejnikGeneralizedEtaOmega2003\n  @holmSimpleSequentiallyRejective1979\n---",
+    fixed = TRUE
+  )
+  # Each block lists the keys of all tables printed so far in the document
+  ft2 <- apa7:::add_note_citations(flextable::flextable(head(cars, 2)), "[@a]")
+  out2 <- paste(knitr::knit_print(ft2), collapse = "")
+  expect_match(out2, "  @holmSimpleSequentiallyRejective1979, @a\n---", fixed = TRUE)
+})

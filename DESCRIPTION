@@ -55,6 +55,7 @@ Suggests:
     ggbeeswarm,
     ggplot2,
     glmmTMB,
+    jsonlite,
     lavaan,
     lme4,
     lmerTest,

@@ -4,7 +4,7 @@ knitr:
   opts_chunk: 
     dev: "ragg_png"
 execute: 
-  cache: true
+  cache: false
 format: html
 ---
 
@@ -28,7 +28,7 @@ apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 
 Correlation matrices look simple enough...until you try to make one by hand in MS Word. The `apa_cor` function can remove most of the tedium by formatting most of what can automated, and any finishing touches can be added with a styling function.
 
-The examples use the `epi.bfi` data set from the psychTools package, which has personality, depression, and anxiety scores for 231 participants in studies at Northwestern University's Personality, Motivation, and Cognition Laboratory. Openness, conscientiousness, extraversion, agreeableness, and neuroticism are Big Five scale scores, and depression is the Beck Depression Inventory score. 
+The examples use the `epi.bfi` data set from the psychTools package [@revellePsychToolsToolsAccompany2019], which has personality, depression, and anxiety scores for 231 participants in studies at Northwestern University's Personality, Motivation, and Cognition Laboratory. Openness, conscientiousness, extraversion, agreeableness, and neuroticism are Big Five scale scores, and depression is the Beck Depression Inventory score. 
 
 ```{r}
 #| label: data
