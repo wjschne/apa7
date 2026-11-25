@@ -21,6 +21,7 @@ reference:
       - apa_factor_cor
       - apa_htest
       - apa_loadings
+      - apa_n_factors
       - apa_means
       - apa_parameters
       - apa_performance

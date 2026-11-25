@@ -156,7 +156,7 @@ apa_note <- function(x, collapse = " ", citations = NULL) {
   if (is.null(record)) {
     cli::cli_abort(c(
       "{.arg x} has no table note information.",
-      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_reliability}, {.fn apa_collinearity}, {.fn apa_publication_bias}, {.fn apa_descriptives}, {.fn apa_chisq}, {.fn apa_means}, {.fn apa_contrasts}, {.fn apa_slopes}, and {.fn apa_performance} (for lavaan models).",
+      i = "{.fn apa_note} works with tables made by {.fn apa_anova}, {.fn apa_htest}, {.fn apa_parameters}, {.fn apa_loadings}, {.fn apa_factor_cor}, {.fn apa_n_factors}, {.fn apa_reliability}, {.fn apa_collinearity}, {.fn apa_publication_bias}, {.fn apa_descriptives}, {.fn apa_chisq}, {.fn apa_means}, {.fn apa_contrasts}, {.fn apa_slopes}, and {.fn apa_performance} (for lavaan models).",
       i = "The information is stored in an attribute that some operations (e.g., {.fn dplyr::bind_rows} and joins) drop. Call {.fn apa_note} on the table before changing it."
     ))
   }
@@ -168,6 +168,7 @@ apa_note <- function(x, collapse = " ", citations = NULL) {
     factor_cor = factor_cor_note_sentences(record),
     reliability = reliability_note_sentences(record),
     collinearity = collinearity_note_sentences(record),
+    n_factors = n_factors_note_sentences(record),
     meta = meta_note_sentences(record),
     meta_fit = meta_fit_note_sentences(record),
     publication_bias = publication_bias_note_sentences(record),

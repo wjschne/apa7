@@ -31,8 +31,9 @@ apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 <<setup>>
 ```
 
-Two functions make APA-style tables from exploratory factor analyses and principal components analyses run with the [psych](https://personality-project.org/r/psych/) package [@revellePsychProceduresPsychological2026]:
+Three functions make APA-style tables for exploratory factor analyses and principal components analyses run with the [psych](https://personality-project.org/r/psych/) package [@revellePsychProceduresPsychological2026]:
 
+* `apa_n_factors` makes a table of how many factors each of several methods suggests retaining, from `parameters::n_factors`.
 * `apa_loadings` makes a table of factor loadings, with optional columns for communalities, uniquenesses, and complexity, and optional rows for variance explained.
 * `apa_factor_cor` makes a table of the correlations among factors after an oblique rotation.
 
@@ -60,6 +61,30 @@ item_text <- bfi.dictionary |>
 d_bfi <- bfi |>
   select(A1:O5) |>
   rename(all_of(item_text))
+```
+
+# How Many Factors?
+
+Before the loadings, papers usually report how the number of factors was chosen. `parameters::n_factors` applies many methods at once (e.g., parallel analysis, Velicer's minimum average partial test, and the Kaiser criterion), and `apa_n_factors` makes a table of the number of factors each suggests. It can run `parameters::n_factors` itself, with any of its arguments, or format its output. Parallel analysis uses random data, so set a seed to get the same results each time:
+
+```{r}
+#| label: tbl-n-factors
+#| tbl-cap: Number of Factors Suggested by Each Method
+#| message: false
+#| warning: false
+set.seed(1)
+nf_bfi <- parameters::n_factors(na.omit(d_bfi))
+apa_n_factors(nf_bfi)
+```
+
+The numbers of factors supported by the most methods are bolded, and the note names them. The methods often disagree, as they do here, and they are not equally good: parallel analysis and Velicer's MAP test are generally recommended, while the Kaiser criterion and the chi-square tests (Bartlett's, Anderson's, and Lawley's) tend to suggest too many factors. The theory behind the items matters too. The bfi items were written to measure five traits. Velicer's MAP test suggests five factors and parallel analysis six, so the five-factor solution below is a reasonable choice, though a six-factor solution would be worth a look.
+
+With `table = "agreement"`, there is a row for each suggested number of factors, with the number of methods that suggest it and the cumulative proportion of variance explained by that many factors:
+
+```{r}
+#| label: tbl-n-factors-agreement
+#| tbl-cap: Agreement Among Methods for the Number of Factors
+apa_n_factors(nf_bfi, table = "agreement")
 ```
 
 # Factor Loadings

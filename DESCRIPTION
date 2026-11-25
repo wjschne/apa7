@@ -65,6 +65,7 @@ Suggests:
     metafor,
     mgcv,
     modelbased,
+    nFactors,
     nlme,
     nnet,
     ordinal,
