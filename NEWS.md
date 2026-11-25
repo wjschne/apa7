@@ -61,7 +61,7 @@ These change the output of code that worked with apa7 0.2.0.
 * `apa_cor()` centers every summary column (e.g., *SD*, which was off-center when its values had different numbers of digits).
 * `apa_cor()` lines up correlations on the decimal point when there are no star columns (`star_significant = FALSE` or `bold_significant = TRUE`), and lines up the summary columns (e.g., *M*, Skewness, and Kurtosis) on the decimal point.
 * `apa_flextable()` no longer re-formats row labels that `apa_parameters()` (for `lme4` and `glmmTMB` models) and `apa_htest()` have already formatted. Before, random-effect labels such as "Subject: *r* (Constant, Days)" lost their spacing and commas in flextables.
-* The documentation of `table_width` in `apa_flextable()`, `apa_style()`, and `apa_chisq()` now says that it is a proportion of the container's width (from 0 to 1), not a width in pixels.
+* The documentation of `table_width` in `apa_flextable()`, `apa_style()`, and `apa_chisq()` now says that it is a proportion of the container's width (from 0 to 1), not a width in pixels. A `table_width` outside 0 to 1 now gives a clear error instead of flextable's "width is > 1", and a value above 1 gets a hint with the proportion for that many inches (e.g., `table_width = 4` suggests `table_width = 0.62`).
 
 # apa7 0.2.0 _2026-10-18_
 

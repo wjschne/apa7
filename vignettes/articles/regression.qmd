@@ -94,12 +94,25 @@ apa_parameters(list(lm1, lm2, lm3))
 
 `apa_parameters` also accepts `glm` objects. The table reports coefficients on the link scale (*B*), their standard errors, the exponentiated coefficient, and the test statistic. For logistic regression, the exponentiated coefficient is the odds ratio (*OR*), and the test statistic is *z*.
 
+The `Cowles` data set in the carData package [@cowlesSubjectMatterPsychology1987] has the neuroticism and extraversion scores of 1,421 introductory psychology students and whether they volunteered to take part in psychological research. Here, the odds of volunteering depend on extraversion, neuroticism, and sex:
+
 ```{r}
 #| label: tbl-glm1
-#| tbl-cap: "Logistic Regression of Transmission Type on Weight and Horsepower"
-glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
-apa_parameters(glm1)
+#| tbl-cap: "Logistic Regression of Volunteering on Personality and Sex"
+d_volunteer <- carData::Cowles |>
+  transmute(
+    Volunteered = factor(volunteer, levels = c("no", "yes"), labels = c("No", "Yes")),
+    Extraversion = extraversion,
+    Neuroticism = neuroticism,
+    Sex = factor(sex, levels = c("female", "male"), labels = c("Female", "Male"))
+  )
 
+glm1 <- glm(
+  Volunteered ~ Extraversion + Neuroticism + Sex,
+  data = d_volunteer,
+  family = binomial
+)
+apa_parameters(glm1)
 ```
 
 Exponentiated coefficients are added whenever the link function is logit or log. They are labeled *OR* for logit links, *IRR* (incidence rate ratio) for log links in count models, and *RR* (risk ratio) for log links in binomial models. Set `exponentiate = FALSE` to leave them out, or `exponentiate = TRUE` to add them for other links such as probit.
@@ -135,8 +148,8 @@ A list of `glm` models is displayed with a pseudo-*R*^2^ (Tjur's for logistic re
 
 ```{r}
 #| label: tbl-glm-list
-#| tbl-cap: "Two Logistic Regression Models of Transmission Type"
-glm0 <- glm(am ~ wt, data = mtcars, family = binomial)
+#| tbl-cap: "Two Logistic Regression Models of Volunteering"
+glm0 <- glm(Volunteered ~ Extraversion, data = d_volunteer, family = binomial)
 apa_parameters(list(glm0, glm1))
 ```
 
@@ -144,7 +157,7 @@ The model comparison can also be displayed separately with `apa_performance_comp
 
 ```{r}
 #| label: tbl-glm-compare
-#| tbl-cap: "Comparison of Two Logistic Regression Models of Transmission Type"
+#| tbl-cap: "Comparison of Two Logistic Regression Models of Volunteering"
 apa_performance_comparison(list(glm0, glm1))
 ```
 
@@ -188,21 +201,28 @@ apa_performance_comparison(list(multinom0, multinom1))
 
 # Count Regression
 
-For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*).
+For Poisson and negative binomial regression, the exponentiated coefficients are incidence rate ratios (*IRR*). The `quine` data set in the MASS package [@ripleyModernApplied2002] has the number of days that 146 children in New South Wales, Australia, were absent from school in a year. Here, absences depend on the child's sex and on whether the child was classified as an average or a slow learner:
 
 ```{r}
 #| label: tbl-poisson
-#| tbl-cap: "Poisson Regression of the Number of Carburetors"
-glm_pois <- glm(carb ~ wt + hp, data = mtcars, family = poisson)
+#| tbl-cap: "Poisson Regression of School Absences on Sex and Learner Status"
+d_absences <- MASS::quine |>
+  transmute(
+    Absences = Days,
+    Sex = factor(Sex, levels = c("F", "M"), labels = c("Female", "Male")),
+    Learner = factor(Lrn, levels = c("AL", "SL"), labels = c("Average", "Slow"))
+  )
+
+glm_pois <- glm(Absences ~ Sex + Learner, data = d_absences, family = poisson)
 apa_parameters(glm_pois)
 ```
 
-Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests.
+Quasi-families and other families with an estimated dispersion parameter are tested with *t* instead of *z*, and the degrees of freedom are shown in the column header. Nested models are compared with *F* tests instead of likelihood ratio tests. The absences vary much more than a Poisson model expects, so the quasi-Poisson standard errors are about four times as large, and neither predictor is significant.
 
 ```{r}
 #| label: tbl-quasipoisson
-#| tbl-cap: "Quasi-Poisson Regression of the Number of Carburetors"
-glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
+#| tbl-cap: "Quasi-Poisson Regression of School Absences on Sex and Learner Status"
+glm_qpois <- glm(Absences ~ Sex + Learner, data = d_absences, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
 
@@ -250,14 +270,23 @@ For nested counts, or counts with many zeros, negative binomial and zero-inflate
 
 # Generalized Additive Models
 
-Generalized additive models (GAMs), fit with `mgcv::gam`, let a predictor's effect be a smooth curve instead of a straight line. Here, ozone concentration in New York (from the `airquality` data set) depends on smooth functions of temperature and wind speed:
+Generalized additive models (GAMs), fit with `mgcv::gam`, let a predictor's effect be a smooth curve instead of a straight line. The `Wong` data set in the carData package [@wongMathematicalModelsCognitive2001] has the performance IQ of 200 patients tested after they woke from a coma caused by a traumatic brain injury, with the number of days in the coma and the number of days between waking and testing. Some patients were tested more than once, so only each patient's first test is kept. Here, performance IQ depends on smooth functions of the length of the coma and the time since waking:
 
 ```{r}
 #| label: tbl-gam
-#| tbl-cap: "Generalized Additive Model of Ozone by Temperature and Wind"
+#| tbl-cap: "Generalized Additive Model of Performance IQ After a Coma"
+d_coma <- carData::Wong |>
+  arrange(id, days) |>
+  distinct(id, .keep_all = TRUE) |>
+  transmute(
+    IQ = piq,
+    Coma = duration,
+    Recovery = days
+  )
+
 fit_gam <- mgcv::gam(
-  Ozone ~ s(Temp) + s(Wind),
-  data = airquality,
+  IQ ~ s(Coma) + s(Recovery),
+  data = d_coma,
   method = "REML"
 )
 
@@ -265,7 +294,7 @@ apa_parameters(fit_gam) |>
   apa_flextable(note = TRUE)
 ```
 
-The parametric terms (here, only the constant) have coefficients and *t* tests, as in other regression models. Each smooth term has its effective degrees of freedom (*edf*: 1 for a straight line, more for a curvier shape) and an approximate *F* test of whether the smooth differs from zero. For non-Gaussian families (e.g., `family = binomial`), the parametric terms are tested with *z*, the smooth terms with *&chi;*^2^, and exponentiated coefficients (e.g., *OR*) are added. Use `terms = "parametric"` or `terms = "smooth"` to show only one kind of term. Smooths of a factor-`by` variable (e.g., `s(Temp, by = Month)`) get a row for each level.
+The parametric terms (here, only the constant) have coefficients and *t* tests, as in other regression models. Each smooth term has its effective degrees of freedom (*edf*: 1 for a straight line, more for a curvier shape) and an approximate *F* test of whether the smooth differs from zero. Here, the smooth of the time since waking is nearly a straight line (*edf* close to 1), and the smooth of the coma's length is curved: patients in longer comas had lower IQs, but the decline levels off after about two or three months of coma. For non-Gaussian families (e.g., `family = binomial`), the parametric terms are tested with *z*, the smooth terms with *&chi;*^2^, and exponentiated coefficients (e.g., *OR*) are added. Use `terms = "parametric"` or `terms = "smooth"` to show only one kind of term. Smooths of a factor-`by` variable (e.g., `s(Coma, by = Sex)`) get a row for each level.
 
 `apa_performance` gives the adjusted *R*^2^ and the percentage of the deviance explained:
 

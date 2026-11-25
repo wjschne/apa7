@@ -387,6 +387,7 @@ apa_chisq <- function(
   suppress_warnings = TRUE,
   ...
 ) {
+  check_table_width(table_width)
   if (is.null(line_spacing)) {
     line_spacing <- the$line_spacing
   }
@@ -1110,6 +1111,7 @@ apa_flextable <- function(
   note = NULL,
   ...
 ) {
+  check_table_width(table_width)
   if (is.null(line_spacing)) {
     line_spacing <- the$line_spacing
   }
@@ -3562,6 +3564,7 @@ apa_style <- function(
   no_markdown_columns_header = no_markdown_columns,
   separate_headers = TRUE
 ) {
+  check_table_width(table_width)
   if (is.null(line_spacing)) {
     line_spacing <- the$line_spacing
   }
@@ -3863,4 +3866,25 @@ pivot_wider_name_first <- function(
     values_fn = values_fn,
     unused_fn = unused_fn
   )
+}
+
+#' Check that table_width is a proportion of the page width
+#' @param table_width value given to `table_width`
+#' @param call environment of the calling function, for error messages
+#' @keywords internal
+#' @noRd
+check_table_width <- function(table_width, call = rlang::caller_env()) {
+  if (!is.numeric(table_width) || length(table_width) != 1 || is.na(table_width) ||
+    table_width < 0 || table_width > 1) {
+    msg <- "{.arg table_width} must be a proportion of the page width, from 0 to 1 (e.g., {.code table_width = .5} for half the width)."
+    if (is.numeric(table_width) && length(table_width) == 1 && isTRUE(table_width > 1)) {
+      proportion <- min(table_width / page_width_in(), 1)
+      msg <- c(
+        msg,
+        i = "For a width of {table_width} inches, use {.code table_width = {signif(proportion, 2)}} (the page is {page_width_in()} inches wide; see {.arg page_width} in {.fn apa7_defaults})."
+      )
+    }
+    cli::cli_abort(msg, call = call)
+  }
+  invisible(table_width)
 }

@@ -47,8 +47,8 @@ d_sat <- psych::sat.act |>
   mutate(
     Gender = factor(gender, levels = 1:2, labels = c("Men", "Women")),
     ACT,
-    `SAT Verbal` = SATV,
-    `SAT Quantitative` = SATQ
+    `SAT-V` = SATV,
+    `SAT-Q` = SATQ
   )
 ```
 
@@ -56,15 +56,12 @@ d_sat <- psych::sat.act |>
 #| label: tbl-welch
 #| tbl-cap: "Welch's *t* Tests Comparing Test Scores of Men and Women"
 
-apa7_defaults(
-  page_width = 6.5,
-)
 apa_htest(
   d_sat,
-  ACT + `SAT Verbal` + `SAT Quantitative` ~ Gender
+  ACT + `SAT-V` + `SAT-Q` ~ Gender
 ) |> 
   mutate(`*df*` = as.integer(`*df*`)) |> 
-  apa_flextable(table_width)
+  apa_flextable()
 ```
 
 By default, the table shows each group's mean (*M*) and standard deviation (*SD*) under a spanner with the group's name. Then come Welch's *t* test, its *p*-value, and Cohen's *d* with its 95% confidence interval. Welch's test does not assume equal variances, so its degrees of freedom are not whole numbers and differ from row to row. They get their own column (*df*). When all rows have the same degrees of freedom, as in Student's *t* test below, they appear in the column header instead (e.g., *t*(698)).
@@ -80,7 +77,7 @@ With `var_equal = TRUE`, the table shows Student's *t* test, which assumes equal
 #| tbl-cap: "Student's *t* Tests Comparing ACT and SAT Verbal Scores of Men and Women With Hedges' *g*"
 apa_htest(
   d_sat,
-  ACT + `SAT Verbal` ~ Gender,
+  ACT + `SAT-V` ~ Gender,
   var_equal = TRUE,
   effect_size = "hedges_g"
 )
@@ -95,7 +92,7 @@ Other arguments are passed to the test function. For example, `alternative = "gr
 #| tbl-cap: "One-Sided Welch's *t* Test of SAT Quantitative Scores"
 tbl_greater <- apa_htest(
   d_sat,
-  `SAT Quantitative` ~ Gender,
+  `SAT-Q` ~ Gender,
   alternative = "greater"
 )
 tbl_greater
@@ -113,7 +110,7 @@ To compare a mean with a fixed value, put `1` on the right side of the formula a
 ```{r}
 #| label: tbl-one-sample
 #| tbl-cap: "One-Sample *t* Test of SAT Verbal Scores Against 500"
-apa_htest(d_sat, `SAT Verbal` ~ 1, mu = 500)
+apa_htest(d_sat, `SAT-V` ~ 1, mu = 500)
 ```
 
 # Paired Tests
@@ -201,7 +198,7 @@ With `test = "wilcoxon"`, the table shows each group's median (*Mdn*), the Wilco
 #| tbl-cap: "Wilcoxon Rank-Sum Tests Comparing SAT Scores of Men and Women"
 apa_htest(
   d_sat,
-  `SAT Verbal` + `SAT Quantitative` ~ Gender,
+  `SAT-V` + `SAT-Q` ~ Gender,
   test = "wilcoxon",
   exact = FALSE
 ) |> 
@@ -308,7 +305,7 @@ As in `chisq.test`, 2 × 2 tables (here, Writing Hand × Sex) use Yates's contin
 #| label: note-welch
 tbl_sat <- apa_htest(
   d_sat,
-  `SAT Verbal` + `SAT Quantitative` ~ Gender,
+  `SAT-V` + `SAT-Q` ~ Gender,
   starred = "t"
 )
 apa_note(tbl_sat)
@@ -343,7 +340,7 @@ The generated note is a starting point. With `collapse = NULL`, `apa_note` retur
 #| tbl-cap: "Welch's *t* Tests With Significant *p*-Values in Bold"
 apa_htest(
   d_sat,
-  `SAT Verbal` + `SAT Quantitative` ~ Gender,
+  `SAT-V` + `SAT-Q` ~ Gender,
   bolded = "p"
 )
 ```
@@ -357,7 +354,7 @@ apa_htest(
 #| tbl-cap: "Welch's *t* Tests Without Descriptive Statistics or Effect Sizes"
 apa_htest(
   d_sat,
-  `SAT Verbal` + `SAT Quantitative` ~ Gender,
+  `SAT-V` + `SAT-Q` ~ Gender,
   descriptives = FALSE,
   effect_size = "none"
 )
@@ -402,8 +399,8 @@ For two groups, the approximation can be noticeably off when the groups differ i
 
 ```{r}
 #| label: tbl-htest-object-welch
-#| tbl-cap: "Welch's *t* Test of SAT Quantitative Scores by Gender"
-t.test(`SAT Quantitative` ~ Gender, data = d_sat) |>
+#| tbl-cap: "Welch's *t* Test of SAT-Q Scores by Gender"
+t.test(`SAT-Q` ~ Gender, data = d_sat) |>
   apa_htest() |>
   apa_flextable(note = TRUE)
 ```
