@@ -37,7 +37,9 @@ jobs:
           needs: website
 
       - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        # quiet = FALSE shows Quarto's output, so a failing article and its
+        # error appear in the log
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE, quiet = FALSE)
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
