@@ -9,13 +9,34 @@ library(ftExtra)
 library(tidyr)
 library(stringr)
 library(correlation)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
-Some tables, like correlation matrices, can be standardized and
-automated. Others are uniquely tied to a specific purpose, and no
-function could anticipate their structure. The apa7 package has a few
-functions to automate what can be automated and a styling function to
-make the final styling of a complex table a little easier.
+Correlation matrices look simple enough…until you try to make one by
+hand in MS Word. The `apa_cor` function can remove most of the tedium by
+formatting most of what can automated, and any finishing touches can be
+added with a styling function.
+
+The examples use the `epi.bfi` data set from the psychTools package
+([Revelle, 2019](#ref-revellePsychToolsToolsAccompany2019)), which has
+personality, depression, and anxiety scores for 231 participants in
+studies at Northwestern University’s Personality, Motivation, and
+Cognition Laboratory. Openness, conscientiousness, extraversion,
+agreeableness, and neuroticism are Big Five scale scores, and depression
+is the Beck Depression Inventory score.
+
+``` r
+
+d_personality <- psychTools::epi.bfi |>
+  select(
+    Openness = bfopen,
+    Conscientiousness = bfcon,
+    Extraversion = bfext,
+    Agreeablness = bfagree,
+    Neuroticism = bfneur,
+    Depression = bdi
+  )
+```
 
 By default, the output of `apa_cor`
 [flextable](https://davidgohel.github.io/flextable/), with significant
@@ -23,35 +44,45 @@ correlations starred.
 
 ``` r
 
-trees |> 
+d_personality |> 
   apa_cor()
 ```
 
-| Variable                        |        | M     | SD    | 1   |        | 2   |        | 3   |     |
-|---------------------------------|--------|-------|-------|-----|--------|-----|--------|-----|-----|
-| 1.                              | Girth  | 13.25 |  3.14 | —   |        |     |        |     |     |
-| 2.                              | Height | 76.00 |  6.37 | .52 | \*\*   | —   |        |     |     |
-| 3.                              | Volume | 30.17 | 16.44 | .97 | \*\*\* | .60 | \*\*\* | —   |     |
-| \*\* p \< .01. \*\*\* p \< .001 |        |       |       |     |        |     |        |     |     |
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 123.43 | 20.51 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness | 113.25 | 21.88 | .31 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | 102.18 | 26.45 | .46 | \*\*\* | .27 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
+| 6.  | Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
+| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 1: Correlation Table
+Table 1
+
+Correlations Among Personality and Depression
 
 Significant correlations can be bolded instead.
 
 ``` r
 
-trees |>
+d_personality |>
   apa_cor(bold_significant = TRUE)
 ```
 
-| Variable |  | M | SD | 1 | 2 | 3 |
-|----|----|----|----|----|----|----|
-| 1.  | Girth | 13.25 |  3.14 | — |  |  |
-| 2.  | Height | 76.00 |  6.37 | .52 | — |  |
-| 3.  | Volume | 30.17 | 16.44 | .97 | .60 | — |
-| Note. Correlations significant at p \< .05 are bolded. |  |  |  |  |  |  |
+| Variable |  | M | SD | 1 | 2 | 3 | 4 | 5 | 6 |
+|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 123.43 | 20.51 |  —     |  |  |  |  |  |
+| 2.  | Conscientiousness | 113.25 | 21.88 |  .31 |  —     |  |  |  |  |
+| 3.  | Extraversion | 102.18 | 26.45 |  .46 |  .27 |  —     |  |  |  |
+| 4.  | Agreeablness | 125.00 | 18.14 |  .39 |  .45 |  .48 |  —     |  |  |
+| 5.  | Neuroticism |  87.97 | 23.34 |  .29 |  .04 |  .04 | −.04 | —     |  |
+| 6.  | Depression |   6.78 |  5.78 | −.08 | −.18 | −.14 | −.14 | .47 | — |
+| Note. Correlations significant at p \< .05 are bolded. |  |  |  |  |  |  |  |  |  |
 
-Table 2: Bolding Significant Correlations
+Table 2
+
+Correlations With Significant Correlations in Bold
 
 ## Summary functions
 
@@ -60,17 +91,26 @@ You can include any named list of summary functions:
 ``` r
 
 # Named list of descriptive functions
-my_summaries <- list(Median = median, "Interquartile Range" = IQR)
+my_summaries <- list(Mdn = median, "*IQR*" = IQR)
 
-apa_cor(trees, summary_functions = my_summaries)
+apa_cor(d_personality, 
+        summary_functions = my_summaries, 
+        star_significant = FALSE)
 ```
 
-| Variable |  | Median | Interquartile Range | 1 |  | 2 |  | 3 |  |
-|----|----|----|----|----|----|----|----|----|----|
-| 1.  | Girth | 12.90 | 4.20 | — |  |  |  |  |  |
-| 2.  | Height | 76.00 | 8.00 | .52 | \*\* | — |  |  |  |
-| 3.  | Volume | 24.20 | 17.90 | .97 | \*\*\* | .60 | \*\*\* | — |  |
-| \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |
+| Variable |                   | Mdn | IQR   | 1      | 2      | 3      | 4      | 5     | 6   |
+|----------|-------------------|-----|-------|--------|--------|--------|--------|-------|-----|
+| 1.       | Openness          | 125 | 26.50 |  —     |        |        |        |       |     |
+| 2.       | Conscientiousness | 114 | 29.50 |  .31   |  —     |        |        |       |     |
+| 3.       | Extraversion      | 104 | 30.50 |  .46   |  .27   |  —     |        |       |     |
+| 4.       | Agreeablness      | 126 | 24.50 |  .39   |  .45   |  .48   |  —     |       |     |
+| 5.       | Neuroticism       |  90 | 34.00 |  .29   |  .04   |  .04   | −.04   | —     |     |
+| 6.       | Depression        |   6 |  6.00 | −.08   | −.18   | −.14   | −.14   | .47   | —   |
+
+Table 3
+
+Correlations Among Personality and Depression With Medians and
+Interquartile Ranges
 
 You can also use a plain vector of descriptive functions from these
 options:
@@ -80,15 +120,23 @@ options:
 
 my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
 
-apa_cor(trees, summary_functions = my_summaries)
+apa_cor(d_personality, summary_functions = my_summaries)
 ```
 
-| Variable |  | n | M | SD | Skewness | Kurtosis | 1 |  | 2 |  | 3 |  |
-|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| 1.  | Girth | 31 | 13.25 |  3.14 | 0.50 | −0.71 | — |  |  |  |  |  |
-| 2.  | Height | 31 | 76.00 |  6.37 | −0.36 | −0.72 | .52 | \*\* | — |  |  |  |
-| 3.  | Volume | 31 | 30.17 | 16.44 | 1.01 | 0.25 | .97 | \*\*\* | .60 | \*\*\* | — |  |
-| \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |
+| Variable |  | n | M | SD | Skewness | Kurtosis | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 231 | 123.43 | 20.51 | −0.16 | −0.16 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness | 231 | 113.25 | 21.88 | −0.02 |  0.23 | .31 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | 231 | 102.18 | 26.45 | −0.41 |  0.51 | .46 | \*\*\* | .27 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | 231 | 125.00 | 18.14 | −0.21 | −0.27 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism | 231 |  87.97 | 23.34 |  0.07 | −0.55 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
+| 6.  | Depression | 231 |   6.78 |  5.78 |  1.29 |  1.50 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
+| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+
+Table 4
+
+Correlations Among Personality and Depression With Additional Summary
+Statistics
 
 ## Styling options
 
@@ -117,7 +165,7 @@ For example,
 
 ``` r
 
-trees |>
+d_personality |>
   apa_cor(
     p_value = 0.001,
     digits = 2,
@@ -133,31 +181,41 @@ trees |>
   )
 ```
 
-| Variable |  | n | M | SD | Skewness | Kurtosis | 1 | 2 | 3 |
-|----|----|----|----|----|----|----|----|----|----|
-| 1.  | Girth | 31 | 13.25 |  3.14 | 0.50 | −0.71 | — |  |  |
-| 2.  | Height | 31 | 76.00 |  6.37 | −0.36 | −0.72 | .52 | — |  |
-| 3.  | Volume | 31 | 30.17 | 16.44 | 1.01 | 0.25 | .97 | .60 | — |
-| Note. Correlations significant at p \< .001 are bolded. |  |  |  |  |  |  |  |  |  |
+| Variable |  | n | M | SD | Skewness | Kurtosis | 1 | 2 | 3 | 4 | 5 | 6 |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 231 | 123.43 | 20.51 | −0.16 | −0.16 |  —     |  |  |  |  |  |
+| 2.  | Conscientiousness | 231 | 113.25 | 21.88 | −0.02 |  0.23 |  .31 |  —     |  |  |  |  |
+| 3.  | Extraversion | 231 | 102.18 | 26.45 | −0.41 |  0.51 |  .46 |  .27 |  —     |  |  |  |
+| 4.  | Agreeablness | 231 | 125.00 | 18.14 | −0.21 | −0.27 |  .39 |  .45 |  .48 |  —     |  |  |
+| 5.  | Neuroticism | 231 |  87.97 | 23.34 |  0.07 | −0.55 |  .29 |  .04 |  .04 | −.04 | —     |  |
+| 6.  | Depression | 231 |   6.78 |  5.78 |  1.29 |  1.50 | −.08 | −.18 | −.14 | −.14 | .47 | — |
+| Note. Correlations significant at p \< .001 are bolded. |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 3: Alternative Styling
+Table 5
+
+Correlations With Alternative Styling
 
 To remove summary statistics entirely, set `summary_functions` to `NA`
 or `NULL`.
 
 ``` r
 
-apa_cor(trees, summary_functions = NA, bold_significant = FALSE)
+apa_cor(d_personality, summary_functions = NA)
 ```
 
-| Variable                        |        | 1   |        | 2   |        | 3   |     |
-|---------------------------------|--------|-----|--------|-----|--------|-----|-----|
-| 1.                              | Girth  | —   |        |     |        |     |     |
-| 2.                              | Height | .52 | \*\*   | —   |        |     |     |
-| 3.                              | Volume | .97 | \*\*\* | .60 | \*\*\* | —   |     |
-| \*\* p \< .01. \*\*\* p \< .001 |        |     |        |     |        |     |     |
+| Variable |  | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness | .31 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | .46 | \*\*\* | .27 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
+| 6.  | Depression | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
+| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 4: Removing Summary Functions
+Table 6
+
+Correlations Without Summary Statistics
 
 ## Customization
 
@@ -169,28 +227,29 @@ body.
 
 ``` r
 
-apa_cor(trees) |>
+apa_cor(d_personality, table_width = .5) |>
   flextable::footnote(
     i = 2,
     j = "Variable",
     value = flextable::as_paragraph("This is a footnote."),
     part = "body"
-  ) |>
-  flextable::set_table_properties(
-    width = .5,
-    align = "left"
   )
 ```
 
-| Variable                        |         | M     | SD    | 1   |        | 2   |        | 3   |     |
-|---------------------------------|---------|-------|-------|-----|--------|-----|--------|-----|-----|
-| 1.                              | Girth   | 13.25 |  3.14 | —   |        |     |        |     |     |
-| 2.                              | Height1 | 76.00 |  6.37 | .52 | \*\*   | —   |        |     |     |
-| 3.                              | Volume  | 30.17 | 16.44 | .97 | \*\*\* | .60 | \*\*\* | —   |     |
-| \*\* p \< .01. \*\*\* p \< .001 |         |       |       |     |        |     |        |     |     |
-| 1This is a footnote.            |         |       |       |     |        |     |        |     |     |
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 123.43 | 20.51 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness1 | 113.25 | 21.88 | .31 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | 102.18 | 26.45 | .46 | \*\*\* | .27 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
+| 6.  | Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
+| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| 1This is a footnote. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 5: Styling a Table with flextable Functions
+Table 7
+
+Correlations Styled With flextable Functions
 
 ## Output to tibble
 
@@ -201,7 +260,7 @@ Here we add a row title.
 
 ``` r
 
-apa_cor(trees, output = "tibble") |>
+apa_cor(d_personality, output = "tibble") |>
   mutate(apa7listcolumn = str_trim(apa7listcolumn)) |>
   unite(col = Variable, 
         apa7listcolumn, 
@@ -209,50 +268,58 @@ apa_cor(trees, output = "tibble") |>
         sep = "&thinsp;") |>
   add_row(Variable = "Row title", .before = 1) |>
   apa_flextable(no_format_columns = "Variable") |>
-  padding(i = 2:4,
+  padding(i = 2:7,
           j = 1,
-          padding.left = 15) 
+          padding.left = 15)
 ```
 
-| Variable  | M     | SD    | 1   |        | 2   |        | 3   |     |
-|-----------|-------|-------|-----|--------|-----|--------|-----|-----|
-| Row title |       |       |     |        |     |        |     |     |
-| 1. Girth  | 13.25 |  3.14 | —   |        |     |        |     |     |
-| 2. Height | 76.00 |  6.37 | .52 | \*\*   | —   |        |     |     |
-| 3. Volume | 30.17 | 16.44 | .97 | \*\*\* | .60 | \*\*\* | —   |     |
+| Variable | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| Row title |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| 1. Openness | 123.43 | 20.51 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2. Conscientiousness | 113.25 | 21.88 | .31 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3. Extraversion | 102.18 | 26.45 | .46 | \*\*\* | .27 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4. Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
+| 5. Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
+| 6. Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
 
-Table 6: Customizing a Table with flextable Functions.
+Table 8
 
-## Correlations from the correlation package
+Correlations With a Row Title
 
-`apa_cor` computes Pearson correlations with
-[`psych::corTest`](https://rdrr.io/pkg/psych/man/corr.test.html). For
-other kinds of correlations, compute them with
+## Other Kinds of Correlations
+
+`apa_cor` computes the correlations with
 [`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
 from the [correlation](https://easystats.github.io/correlation/)
-package, and give the result to `apa_cor`. For example, Spearman rank
-correlations:
+package: by default, Pearson correlations with unadjusted *p*-values.
+Depression scores are skewed, as the skewness in the summary statistics
+above shows, so rank correlations are a reasonable alternative. The
+`method` argument chooses the kind of correlation. For example, Spearman
+rank correlations:
 
 ``` r
 
-correlation(trees, method = "spearman") |>
-  apa_cor()
+apa_cor(d_personality, method = "spearman")
 ```
 
-| Variable |  | M | SD | 1 |  | 2 |  | 3 |  |
-|----|----|----|----|----|----|----|----|----|----|
-| 1.  | Girth | 13.25 |  3.14 | — |  |  |  |  |  |
-| 2.  | Height | 76.00 |  6.37 | .44 | \* | — |  |  |  |
-| 3.  | Volume | 30.17 | 16.44 | .95 | \*\*\* | .58 | \*\* | — |  |
-| Note. Values are Spearman correlations. p-values are adjusted for multiple comparisons with Holm’s method (Holm, 1979). |  |  |  |  |  |  |  |  |  |
-| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 123.43 | 20.51 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness | 113.25 | 21.88 | .32 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | 102.18 | 26.45 | .43 | \*\*\* | .25 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .43 | \*\*\* | .50 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism |  87.97 | 23.34 | .28 | \*\*\* | .04 |  | .05 |  | −.04 |  | — |  |  |  |
+| 6.  | Depression |   6.78 |  5.78 | −.10 |  | −.16 | \* | −.13 | \* | −.11 |  | .47 | \*\*\* | — |  |
+| Note. Values are Spearman correlations. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p \< .05. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 7: Spearman rank correlations from the correlation package
+Table 9
 
-The note says what kind of correlations are shown. Other options from
-the
-[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
-function include:
+Spearman Rank Correlations Among Personality and Depression
+
+The note says what kind of correlations are shown. Other options for
+`method` include:
 
 | Option        | Correlation                     |
 |:--------------|:--------------------------------|
@@ -271,31 +338,86 @@ function include:
 | `gaussian`    | for Gaussian Rank correlation   |
 | `shepherd`    | for Shepherd’s Pi correlation   |
 
-By default,
-[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
-adjusts the *p*-values for multiple comparisons with Holm’s method, so
-the stars are for the adjusted *p*-values, and the note says so (use
-`p_adjust = "none"` for unadjusted *p*-values). Partial correlations,
-each controlling for the other variables in the table, work the same
-way:
+To adjust the *p*-values (and so the stars) for multiple comparisons,
+use `p_adjust` (e.g., `p_adjust = "holm"`), and the note says how they
+were adjusted. Partial correlations, each controlling for the other
+variables in the table, need only `partial = TRUE`:
 
 ``` r
 
-correlation(trees, partial = TRUE, p_adjust = "none") |>
+apa_cor(d_personality, partial = TRUE)
+```
+
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 123.43 | 20.51 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness | 113.25 | 21.88 | .10 |  | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | 102.18 | 26.45 | .31 | \*\*\* | .01 |  | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | 125.00 | 18.14 | .20 | \*\* | .35 | \*\*\* | .33 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism |  87.97 | 23.34 | .37 | \*\*\* | .10 |  | −.02 |  | −.15 | \* | — |  |  |  |
+| 6.  | Depression |   6.78 |  5.78 | −.17 | \* | −.16 | \* | −.06 |  | .05 |  | .51 | \*\*\* | — |  |
+| Note. Values are partial Pearson correlations, each controlling for all other variables in the table. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+
+Table 10
+
+Partial Correlations Among Personality and Depression
+
+Partial correlations can differ considerably from ordinary correlations.
+With zero-order correlations, openness and extraversion correlate at
+.27, but once other personality variables are held constant, the partial
+correlation between them is close to zero.
+
+Other arguments of
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+(e.g., `robust = TRUE`, `winsorize = .2`, or `multilevel = TRUE`) can be
+given to `apa_cor` as well. Variable names with spaces work for every
+kind of correlation, because `apa_cor` gives the variables internal
+names while it computes the correlations. (Called directly,
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+does not accept such names for partial or multilevel correlations.)
+
+The output of
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+can also be given to `apa_cor`:
+
+``` r
+
+correlation(d_personality, method = "spearman") |>
   apa_cor()
 ```
 
-| Variable |  | M | SD | 1 |  | 2 |  | 3 |  |
-|----|----|----|----|----|----|----|----|----|----|
-| 1.  | Girth | 13.25 |  3.14 | — |  |  |  |  |  |
-| 2.  | Height | 76.00 |  6.37 | −.29 |  | — |  |  |  |
-| 3.  | Volume | 30.17 | 16.44 | .96 | \*\*\* | .44 | \* | — |  |
-| Note. Values are partial Pearson correlations, each controlling for all other variables in the table. |  |  |  |  |  |  |  |  |  |
-| \* p \< .05. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 123.43 | 20.51 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness | 113.25 | 21.88 | .32 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | 102.18 | 26.45 | .43 | \*\*\* | .25 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .43 | \*\*\* | .50 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism |  87.97 | 23.34 | .28 | \*\*\* | .04 |  | .05 |  | −.04 |  | — |  |  |  |
+| 6.  | Depression |   6.78 |  5.78 | −.10 |  | −.16 |  | −.13 |  | −.11 |  | .47 | \*\*\* | — |  |
+| Note. Values are Spearman correlations. p-values are adjusted for multiple comparisons with Holm’s method ([Holm,](#ref-holmSimpleSequentiallyRejective1979)[ ](#ref-holmSimpleSequentiallyRejective1979)[1979](#ref-holmSimpleSequentiallyRejective1979)). |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 8: Partial correlations from the correlation package
+Table 11
 
-The means and standard deviations come from the data that
+Spearman Rank Correlations Computed by the correlation Package
+
+Here,
+[`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
+adjusted the *p*-values with Holm’s method, its default, so the stars
+are for the adjusted *p*-values, and the note says so. The means and
+standard deviations come from the data that
 [`correlation::correlation`](https://easystats.github.io/correlation/reference/correlation.html)
 keeps with its results. Correlations computed by group, between two sets
 of variables, or with Bayesian methods are not yet supported.
+
+## References
+
+Holm, S. (1979). A simple sequentially rejective multiple test
+procedure. *Scandinavian Journal of Statistics*, *6*(2), 65–70.
+<https://www.jstor.org/stable/4615733>
+
+Revelle, W. (2019). *psychTools: Tools to accompany the psych package
+for psychological research* (Version 2.6.4) \[Computer software\].
+Comprehensive R Archive Network.
+<https://doi.org/10.32614/CRAN.package.psychTools>

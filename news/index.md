@@ -6,16 +6,37 @@
 
 These change the output of code that worked with apa7 0.2.0.
 
-- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md):
-  `table_width` is now a proportion of the page width (from 0 to 1,
-  default 1), as in
-  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
-  rather than a width in inches. Values greater than 1 are still read as
-  inches, with a warning that gives the proportion to use instead. The
-  table’s width now matches `table_width`: before, the number column’s
-  adjustment made the table wider than requested (e.g., 6.71 rather than
-  6.5 inches), and very narrow tables could get a Variable column of
-  negative width.
+- `table_width` works the same way in every function that takes it
+  ([`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md),
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md),
+  and
+  [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md)):
+  a proportion of the page width from 0 to 1, the name of a width
+  (`"page"`, `"landscape"`, or `"column"`), or a named number (e.g.,
+  `c(landscape = .8)` or `c(cm = 10)`). Its default, `NULL`, is the new
+  `table_width` setting of
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  (1, the full width of the page, unless changed). This changes three
+  functions:
+  - [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md):
+    `table_width` was a width in inches.
+  - [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md):
+    `table_width` was a width in `unit`, with `NULL` for the page width.
+  - [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md):
+    `table_width` defaulted to 0 (only as wide as the contents); use
+    `table_width = 0` for that.
+
+  A number greater than 1 is still read as inches (or in `unit` in
+  [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md)),
+  with a warning to write it with its unit (e.g., `c(inches = 5)`), and
+  a table wider than its page fills the page. In
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  the table’s width now matches `table_width`: before, the number
+  column’s adjustment made the table wider than requested (e.g., 6.71
+  rather than 6.5 inches), and very narrow tables could get a Variable
+  column of negative width.
 - The `accuracy` setting now changes the number of decimals in tables.
   Before, the default column formats kept the accuracy they had when
   apa7 was loaded, so `apa7_defaults(accuracy = .001)` did not change
@@ -35,6 +56,44 @@ These change the output of code that worked with apa7 0.2.0.
   repeated on every row. Correlations name their own statistic (e.g.,
   “*r* (Constant, Days)”), and nested clusters are spelled out (e.g.,
   “Classroom in School”).
+- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
+  passes its other arguments to
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
+  rather than
+  [`psych::corTest()`](https://rdrr.io/pkg/psych/man/corr.test.html).
+  `adjust` is still accepted as `p_adjust`, and `use = "complete"`
+  removes incomplete rows, each with a warning.
+- [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
+  has been rewritten to work like the other table functions. It returns
+  a tibble (an `apa7_tbl`) that is displayed as an APA-style table in
+  documents, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  writes its note instead of the footer it added itself.
+  - The variables are chosen with `variable` (the rows) and `by` (the
+    columns), unquoted or quoted. A data frame with exactly two columns
+    still works without them: the first column gives the columns of the
+    table, and the second gives its rows, as before.
+  - `percent` shows percentages of each column (`"column"`, the default,
+    as before), of each row (`"row"`), or of the whole sample
+    (`"total"`), or counts only (`"none"`), with `percent_digits`
+    decimals. `total = TRUE` (default) adds a “Total” row and column.
+  - `test` chooses the chi-square test of independence (`"chisq"`,
+    default), Fisher’s exact test (`"fisher"`), or no test (`"none"`). 2
+    × 2 tables use Yates’s continuity correction unless
+    `correct = FALSE`, and the note says so. When an expected count is
+    below 5, the note says that the chi-square approximation may be
+    inaccurate.
+  - The effect size is *φ* for 2 × 2 tables and Cramér’s *V* otherwise
+    (`effect_size`). Before, it was the adjusted Cramér’s *V* (labeled
+    “Adj. Cramer’s *V*”) for every table.
+  - The note gives the number of cases left out because of missing
+    values, and `labels` names the variables.
+  - The arguments that styled the flextable (e.g., `note`, `font_size`,
+    and `table_width`) and `suppress_warnings` are deprecated. If any is
+    given, a flextable is returned as before, with a warning. Pass the
+    table to
+    [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+    instead, with `note = TRUE` for the note.
 - Table notes are now single-spaced, even when the table is
   double-spaced. This applies to `apa_flextable(note = TRUE)`,
   [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
@@ -70,6 +129,13 @@ These change the output of code that worked with apa7 0.2.0.
   correlation. It handles several scales, reverse-keyed items, and items
   scored 0 or 1 (difficulty and KR-20), and `level = "scales"` gives one
   row per scale.
+- [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
+  selects `variables`, `by`, and `categorical`, and
+  [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md)
+  selects the items in `scales` and `reverse`, with unquoted or quoted
+  names or tidyselect helpers (e.g.,
+  `variables = c(age, starts_with("item")), by = group` or
+  `scales = list(Anxiety = anx1:anx5), reverse = c(anx2, anx4)`).
 - New
   [`apa_means()`](https://wjschne.github.io/apa7/reference/apa_means.md),
   [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md),
@@ -102,7 +168,11 @@ These change the output of code that worked with apa7 0.2.0.
   and `trend` (in
   [`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md))
   are named arguments, and their variable names can be quoted or
-  unquoted (e.g., `apa_contrasts(fit, contrast = cyl, by = am)`).
+  unquoted (e.g., `apa_contrasts(fit, contrast = cyl, by = am)`). Models
+  with variable names that are not syntactic (e.g.,
+  `` `Partner Status` ``), for which marginaleffects gives standard
+  errors of 0 or `NA`, are refit with syntactic names, and the tables
+  keep the original names.
 - [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md)
   adds Cohen’s *d* with its confidence interval for models of continuous
   outcomes with an identity link (e.g.,
@@ -294,11 +364,24 @@ These change the output of code that worked with apa7 0.2.0.
   [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
   names the difference test.
 - [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
-  accepts the output of
-  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html),
-  so the table can show Spearman, Kendall, robust, or partial
-  correlations. The note says what kind of correlations are shown and
-  how the *p*-values were adjusted for multiple comparisons.
+  computes its correlations with
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
+  (now imported) rather than
+  [`psych::corTest()`](https://rdrr.io/pkg/psych/man/corr.test.html), so
+  the table can show Spearman, Kendall, robust, partial, or multilevel
+  correlations with the new `method`, `p_adjust`, and `partial`
+  arguments, and other arguments are passed to
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html).
+  The defaults (Pearson correlations, pairwise deletion, and unadjusted
+  *p*-values) give the same tables as before. Variable names with spaces
+  work for every kind of correlation, because
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
+  uses internal names while computing them.
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
+  also accepts the output of
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html).
+  The note says what kind of correlations are shown and how the
+  *p*-values were adjusted for multiple comparisons.
 - [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
   and
   [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
@@ -386,17 +469,26 @@ These change the output of code that worked with apa7 0.2.0.
   text (`"text"`, e.g., “(Duval & Tweedie, 2000)”). The default,
   `"auto"`, writes a key when a Quarto or R Markdown document is being
   rendered and its bibliography has that entry, and text otherwise, so
-  listing the file in the document’s `bibliography` is enough. The keys
-  are those of Zotero’s Better BibTeX extension. Notes cite the methods
-  they name: Kenward–Roger and Satterthwaite degrees of freedom,
-  Greenhouse–Geisser and Huynh–Feldt corrections, generalized *η*²,
-  Feldt’s confidence interval for α and McDonald’s *ω*_(total), the
-  generalized *VIF*, paired-samples *d*, Holm and Benjamini–Hochberg
-  adjustments, the DerSimonian–Laird estimator and Knapp–Hartung
-  adjustment, the multilevel *I*², publication-bias methods, the MLM and
-  MLR estimators and scaled *χ*² difference tests of `lavaan`, and
-  pseudo-*R*² (Tjur, Nagelkerke, McFadden, and the marginal *R*² of
-  mixed models), which notes of lists of models now define.
+  listing the file in the document’s `bibliography` is enough. A
+  bibliography set for a whole Quarto project or folder (in
+  `_quarto.yml` or `_metadata.yml`) is found, too. References cited in
+  notes inside flextables (from `apa_flextable(note = TRUE)`,
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  and
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md))
+  are added to the document’s reference list: ftExtra formats such a
+  note on its own, so apa7 adds the keys to the document’s `nocite`
+  field when the table is printed. The keys are those of Zotero’s Better
+  BibTeX extension. Notes cite the methods they name: Kenward–Roger and
+  Satterthwaite degrees of freedom, Greenhouse–Geisser and Huynh–Feldt
+  corrections, generalized *η*², Feldt’s confidence interval for α and
+  McDonald’s *ω*_(total), the generalized *VIF*, paired-samples *d*,
+  Holm and Benjamini–Hochberg adjustments, the DerSimonian–Laird
+  estimator and Knapp–Hartung adjustment, the multilevel *I*²,
+  publication-bias methods, the MLM and MLR estimators and scaled *χ*²
+  difference tests of `lavaan`, and pseudo-*R*² (Tjur, Nagelkerke,
+  McFadden, and the marginal *R*² of mixed models), which notes of lists
+  of models now define.
 
 ### Settings
 
@@ -429,6 +521,44 @@ These change the output of code that worked with apa7 0.2.0.
   [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md)
   use it in place of the fixed 6.5 inches (the width of letter-size
   paper with 1-inch margins, which is still the default).
+- Tables can be made for landscape pages and for two-column documents
+  without changing the page width. `table_width = "landscape"` fills the
+  text area of a landscape page, `table_width = "column"` fills one
+  column of a two-column page, and `table_width = "page"` (or
+  `"portrait"`) fills a portrait page, in every table function. A named
+  number gives a proportion of one of these widths (e.g.,
+  `c(landscape = .8)`) or a width in `inches`, `cm`, or `mm` (e.g.,
+  `c(cm = 10)`).
+  - New `landscape_width` and `column_width` settings in
+    [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+    give these widths in inches. By default, they follow `page_width`:
+    the paper’s height less 1-inch margins (9 inches for letter-size
+    paper), and the width of a column in apaquarto’s two-column journal
+    mode (`documentmode: jou`), which has 0.75-inch margins and a gutter
+    of 4% of the text width (3.36 inches for letter-size paper).
+  - New `table_width` setting in
+    [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+    sets the default width of tables (e.g.,
+    `apa7_defaults(table_width = "column")` in a two-column document).
+    Proportions given to a table function are then proportions of that
+    width.
+  - New `apa7-width` chunk option (`apa7.width` in R Markdown) sets the
+    width of the tables made in one code chunk, including tables printed
+    automatically, without changing any other table (e.g.,
+    `#| apa7-width: landscape`, or `#| apa7-width: {landscape: .8}`). A
+    `table_width` given to a function overrides it. A chunk with
+    apaquarto’s `apa-twocolumn: true`, which spans a table across both
+    columns of a two-column page, makes the table as wide as the page.
+  - When `page_width` and `table_width` are not set with
+    [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md),
+    the document being rendered supplies them: its `papersize` (e.g.,
+    `papersize: a4`) sets the paper, and apaquarto’s `documentmode` sets
+    the margins (0.75 inches on each side in journal mode and 1.5 inches
+    on the left in thesis mode). In journal mode (`documentmode: jou`),
+    which sets the text in two columns, tables are as wide as a column
+    unless a chunk or function asks for another width, and a table with
+    `apa-twocolumn: true` spans both columns.
+  - The Getting Started article has a new section on table widths.
 - New `font_size` setting in
   [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
   (the `apa7.font_size` option) sets the font size of all tables and
@@ -468,9 +598,32 @@ These change the output of code that worked with apa7 0.2.0.
 - Decimal-aligned columns in
   [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
   tables are centered in HTML as well as in Word.
+- Named character vectors can select columns in every argument that
+  takes tidyselect selections (e.g., the items in `scales` and `reverse`
+  of
+  [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md),
+  or `variables` of
+  [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)):
+  the names are ignored. Before, tidyselect read them as new names and
+  gave the error “Can’t rename variables in this context”, so a lookup
+  vector such as `c(A1 = "Am indifferent to the feelings of others")`
+  could not be used.
+- [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md),
+  [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md),
+  and
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  with a list of models no longer pass on insight’s warning about
+  variable names quoted in backticks (e.g., `` `SAT-V` ``), which read
+  well in tables and give the same results as other names. Other
+  warnings are passed on as before.
 - [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
   centers every summary column (e.g., *SD*, which was off-center when
   its values had different numbers of digits).
+- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
+  lines up correlations on the decimal point when there are no star
+  columns (`star_significant = FALSE` or `bold_significant = TRUE`), and
+  lines up the summary columns (e.g., *M*, Skewness, and Kurtosis) on
+  the decimal point.
 - [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
   no longer re-formats row labels that
   [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
@@ -484,7 +637,8 @@ These change the output of code that worked with apa7 0.2.0.
   and
   [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
   now says that it is a proportion of the container’s width (from 0 to
-  1), not a width in pixels.
+  1), not a width in pixels. A `table_width` that is not a valid width
+  now gives a clear error instead of flextable’s “width is \> 1”.
 
 ## apa7 0.2.0 *2026-10-18*
 

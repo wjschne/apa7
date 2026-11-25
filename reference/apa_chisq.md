@@ -1,40 +1,27 @@
-# Make contingency table with chi-square test of independence
+# Contingency table with a test of independence
 
-Make contingency table with chi-square test of independence
+Makes an APA-style contingency table of two categorical variables: a row
+for each level of `variable` and a column (or a pair of columns, with
+percentages) for each level of `by`, with the counts in each cell. The
+variables are tested for independence, and
+[`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+writes the note, with the result of the test and its effect size.
 
 ## Usage
 
 ``` r
 apa_chisq(
   data,
-  note = NULL,
-  row_title_column = NULL,
-  row_title_prefix = "",
-  row_title_sep = " ",
-  row_title_align = "center",
-  row_title_border = list(color = "gray20", style = "solid", width = 1),
-  left_column_padding = 20,
-  cwidth = 0.75,
-  cheight = 0.25,
-  separate_headers = TRUE,
-  apa_style = TRUE,
-  font_family = NULL,
-  font_size = NULL,
-  text_color = "black",
-  border_color = "black",
-  border_width = 0.5,
-  line_spacing = NULL,
-  horizontal_padding = 3,
-  table_align = "left",
-  layout = "autofit",
-  table_width = 1,
-  markdown = TRUE,
-  markdown_header = markdown,
-  markdown_body = markdown,
-  auto_format_columns = TRUE,
-  column_formats = NULL,
-  pretty_widths = TRUE,
-  suppress_warnings = TRUE,
+  variable = NULL,
+  by = NULL,
+  percent = c("column", "row", "total", "none"),
+  total = TRUE,
+  test = c("chisq", "fisher", "none"),
+  correct = TRUE,
+  effect_size = c("auto", "cramers_v", "phi", "none"),
+  percent_digits = 1,
+  labels = NULL,
+  format_variable_names = TRUE,
   ...
 )
 ```
@@ -43,148 +30,142 @@ apa_chisq(
 
 - data:
 
-  A two-column data.frame or tibble
+  data frame
 
-- note:
+- variable:
 
-  Custom note (overrides automatic note.)
+  variable whose levels are the rows of the table, unquoted or quoted
+  (e.g., `smoking` or `"smoking"`)
 
-- row_title_column:
+- by:
 
-  Column name or tidyselect function. column to group rows
+  variable whose levels are the columns of the table, unquoted or
+  quoted. If `data` has exactly two columns, `variable` and `by` can be
+  left out: the first column is then `by`, and the second is `variable`
+  (as in earlier versions of apa7).
 
-- row_title_prefix:
+- percent:
 
-  text to be added to each title
+  percentages shown next to the counts: `"column"` (default) for
+  percentages of each column's total, `"row"` for percentages of each
+  row's total, `"total"` for percentages of the whole sample, or
+  `"none"` for counts only
 
-- row_title_sep:
+- total:
 
-  separator for prefix
+  if `TRUE` (default), a "Total" row and column are added
 
-- row_title_align:
+- test:
 
-  alignment of row title ("left", "center", "right")
+  `"chisq"` (default) for the chi-square test of independence,
+  `"fisher"` for Fisher's exact test, or `"none"` for no test
 
-- row_title_border:
+- correct:
 
-  list of flextable styles
+  if `TRUE` (default), the chi-square test of a 2 × 2 table uses Yates's
+  continuity correction
 
-- left_column_padding:
+- effect_size:
 
-  Number of points the left column is padded (only relevant when there
-  is a `row_title_column` and `row_title_align = "left"`)
+  `"auto"` (default) for \\\phi\\ in 2 × 2 tables and Cramér's *V*
+  otherwise, `"cramers_v"`, `"phi"` (2 × 2 tables only), or `"none"`
 
-- cwidth:
+- percent_digits:
 
-  initial cell width in inches
+  number of decimal places of percentages
 
-- cheight:
+- labels:
 
-  initial cell height in inches
+  named character vector of labels for `variable` and `by` (e.g.,
+  `c(smoke = "Smoking")`). Variables without a label are named by their
+  formatted names.
 
-- separate_headers:
+- format_variable_names:
 
-  separate header rows (default: `TRUE`)
-
-- apa_style:
-
-  apply `apa_style` function (default: `TRUE`)
-
-- font_family:
-
-  font family
-
-- font_size:
-
-  font size, in points. If `NULL` (default), the size set with
-  `apa7_defaults(font_size = )` (12 unless changed).
-
-- text_color:
-
-  text color
-
-- border_color:
-
-  border color
-
-- border_width:
-
-  border width in pixels
-
-- line_spacing:
-
-  spacing between lines of the header and body (e.g., 2 for double
-  spacing or 1 for single spacing). If `NULL` (default), the spacing set
-  with `apa7_defaults(line_spacing = )` (2 unless changed). Table notes
-  are single-spaced.
-
-- horizontal_padding:
-
-  horizontal padding (in pixels)
-
-- table_align:
-
-  table alignment ("left", "center", "right")
-
-- layout:
-
-  table layout ("autofit", "fixed")
-
-- table_width:
-
-  proportion of the width of the container (e.g., the page or text
-  column) that the table occupies, from 0 to 1: 1 (default) is the full
-  width, and .5 is half the width. With `pretty_widths = TRUE`, the
-  column widths are also set to fill the same proportion of the width of
-  the text area, which is 6.5 inches (letter-size paper with 1-inch
-  margins) unless changed with `apa7_defaults(page_width = )` (e.g.,
-  `apa7_defaults(page_width = "a4")`).
-
-- markdown:
-
-  apply markdown formatting to header and body
-
-- markdown_header:
-
-  apply markdown formatting to header
-
-- markdown_body:
-
-  apply markdown formatting to body
-
-- auto_format_columns:
-
-  if true, will attempt to format some columns automatically
-
-- column_formats:
-
-  a column_formats object
-
-- pretty_widths:
-
-  apply `pretty_widths` function
-
-- suppress_warnings:
-
-  Suppress any warnings if true.
+  format the names of variables that have no label with the `Variable`
+  column format
 
 - ...:
 
-  arguments passed to `apa_style`
+  deprecated arguments of earlier versions of `apa_chisq()` (`note`,
+  `suppress_warnings`, and the styling arguments of
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)).
+  If any is given, a flextable is returned, as before, with a warning.
 
 ## Value
 
-flextable::flextable
+`apa7_tbl` (tibble)
+
+## Details
+
+Like the other apa7 tables, the result is a tibble that is displayed as
+an APA-style table in Quarto and R Markdown documents (see
+[apa7_tbl](https://wjschne.github.io/apa7/reference/apa7_tbl.md)). Pass
+it to
+[`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+to change its appearance, or use `apa_flextable(note = TRUE)` to put the
+note below it.
+
+Percentages are of each column's total (`percent = "column"`, the
+default), so each group of `by` can be described on its own; of each
+row's total (`"row"`); or of the whole sample (`"total"`). With
+`total = TRUE` (default), a "Total" row and column give the marginal
+counts.
+
+The test is the chi-square test of independence
+([`stats::chisq.test()`](https://rdrr.io/r/stats/chisq.test.html)) or
+Fisher's exact test
+([`stats::fisher.test()`](https://rdrr.io/r/stats/fisher.test.html)). As
+in [`stats::chisq.test()`](https://rdrr.io/r/stats/chisq.test.html), 2 ×
+2 tables use Yates's continuity correction unless `correct = FALSE`.
+When an expected count is below 5, the chi-square approximation can be
+poor, and the note says so. The effect size is \\\phi\\ for 2 × 2 tables
+and Cramér's *V* otherwise (without the small-sample adjustment), from
+the effectsize package.
+
+Rows with a missing value of either variable are left out, and the note
+gives their number.
 
 ## Examples
 
 ``` r
-apa_chisq(mtcars[, c("am", "gear")])
+d <- data.frame(
+  Sex = factor(psych::sat.act$gender, levels = 1:2, labels = c("Men", "Women")),
+  Education = factor(psych::sat.act$education)
+)
+tbl <- apa_chisq(d, Education, by = Sex)
+tbl
+#> # A tibble: 7 × 7
+#>   Education Men_n `Men_%` Women_n `Women_%` Total_n `Total_%`
+#>   <chr>     <int> <chr>     <int> <chr>       <int> <chr>    
+#> 1 0            27  10.9        30   6.6          57   8.1    
+#> 2 1            20   8.1        25   5.5          45   6.4    
+#> 3 2            23   9.3        21   4.6          44   6.3    
+#> 4 3            80  32.4       195  43.0         275  39.3    
+#> 5 4            51  20.6        87  19.2         138  19.7    
+#> 6 5            46  18.6        95  21.0         141  20.1    
+#> 7 Total       247 100.0       453 100.0         700 100.0    
+apa_note(tbl)
+#> [1] "Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *&chi;*^2^(5, *N* = 700) = 16.09, *p* = .007, Cramér's *V* = .15."
 
+# Percentages of each row, and no totals
+apa_chisq(d, Education, by = Sex, percent = "row", total = FALSE)
+#> # A tibble: 6 × 5
+#>   Education Men_n `Men_%` Women_n `Women_%`
+#>   <chr>     <int> <chr>     <int> <chr>    
+#> 1 0            27 47.4         30 52.6     
+#> 2 1            20 44.4         25 55.6     
+#> 3 2            23 52.3         21 47.7     
+#> 4 3            80 29.1        195 70.9     
+#> 5 4            51 37.0         87 63.0     
+#> 6 5            46 32.6         95 67.4     
 
-.cl-d8bad469{}.cl-fd7caf76{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-f148d26d{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-2c5a1875{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5430bca3{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-56775354{font-family:'DejaVu Sans';font-size:7.2pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;vertical-align:3.74pt;}.cl-7a9068f9{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-8dbfbcff{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-6054d6f2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:27.3pt;padding-right:24.3pt;line-height: 1.15;background-color:transparent;}.cl-0e7c069b{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1.164;background-color:transparent;}.cl-aee05d18{width:1.324in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-21678254{width:0.924in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-674696d8{width:1.802in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b9056ad2{width:0.647in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c9003547{width:1.324in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cd0ec083{width:0.924in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bc6a980d{width:1.802in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-534ea76a{width:0.647in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5dc004b7{width:1.324in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-0fbb37b6{width:0.924in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6f89e66a{width:1.802in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2854efa2{width:0.647in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-921749a8{width:1.324in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9fc98278{width:0.924in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8ce1e06a{width:1.802in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6f13e7eb{width:0.647in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}
-
-
-
-gear
+# Fisher's exact test instead of the chi-square test
+apa_chisq(d[d$Education %in% c("0", "5"), ], Education, by = Sex, test = "fisher")
+#> # A tibble: 3 × 7
+#>   Education Men_n `Men_%` Women_n `Women_%` Total_n `Total_%`
+#>   <chr>     <int> <chr>     <int> <chr>       <int> <chr>    
+#> 1 0            27  37.0        30  24.0          57  28.8    
+#> 2 5            46  63.0        95  76.0         141  71.2    
+#> 3 Total        73 100.0       125 100.0         198 100.0    
 ```

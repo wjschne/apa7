@@ -80,7 +80,7 @@ Convert objects to flextables
 - [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)
   : Format ANOVA tables in APA style
 - [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
-  : Make contingency table with chi-square test of independence
+  : Contingency table with a test of independence
 - [`apa_means()`](https://wjschne.github.io/apa7/reference/apa_means.md)
   [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md)
   [`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md)

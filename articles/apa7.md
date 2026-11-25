@@ -23,19 +23,37 @@ library(apa7)
 
 ## Example: Report a Regression Analysis
 
-Fit a model as you usually would, and pass it to `apa_parameters`:
+The `sat.act` data set in the psych package has the self-reported ACT
+and SAT scores of 700 people. Give the variables names that will read
+well in a table, and keep the people with all of their scores:
 
 ``` r
 
-fit <- lm(mpg ~ wt + hp, data = mtcars)
+d_sat <- psych::sat.act |>
+  na.omit() |>
+  dplyr::transmute(
+    Gender = factor(gender, levels = 1:2, labels = c("Men", "Women")),
+    Age = age,
+    ACT,
+    Verbal = SATV,
+    Quantitative = SATQ
+  )
+```
+
+Fit a model as you usually would, and pass it to `apa_parameters`. Here,
+ACT scores are predicted from SAT Verbal and SAT Quantitative scores:
+
+``` r
+
+fit <- lm(ACT ~ Verbal + Quantitative, data = d_sat)
 apa_parameters(fit)
 ```
 
-| Variable | B     | SE   | β    | t(29) | p      |
-|----------|-------|------|------|-------|--------|
-| Constant | 37.23 | 1.60 |  .00 | 23.28 | \<.001 |
-| Wt       | −3.88 | 0.63 | −.63 | −6.13 | \<.001 |
-| Hp       | −0.03 | 0.01 | −.36 | −3.52 |  .002  |
+| Variable     | B     | SE   | β   | t(684) | p      |
+|--------------|-------|------|-----|--------|--------|
+| Constant     | 10.57 | 0.85 | .00 | 12.37  | \<.001 |
+| Verbal       |  0.01 | 0.00 | .31 |  8.05  | \<.001 |
+| Quantitative |  0.02 | 0.00 | .39 |  9.99  | \<.001 |
 
 In a Quarto or R Markdown document, the result is displayed as an
 APA-style table. In the console, it prints as a tibble, so you can look
@@ -55,11 +73,11 @@ apa_parameters(fit) |>
   apa_flextable(font_size = 10, table_width = .6) 
 ```
 
-| Variable | B     | SE   | β    | t(29) | p      |
-|----------|-------|------|------|-------|--------|
-| Constant | 37.23 | 1.60 |  .00 | 23.28 | \<.001 |
-| Wt       | −3.88 | 0.63 | −.63 | −6.13 | \<.001 |
-| Hp       | −0.03 | 0.01 | −.36 | −3.52 |  .002  |
+| Variable     | B     | SE   | β   | t(684) | p      |
+|--------------|-------|------|-----|--------|--------|
+| Constant     | 10.57 | 0.85 | .00 | 12.37  | \<.001 |
+| Verbal       |  0.01 | 0.00 | .31 |  8.05  | \<.001 |
+| Quantitative |  0.02 | 0.00 | .39 |  9.99  | \<.001 |
 
 ## Table Notes
 
@@ -82,11 +100,11 @@ apa_parameters(fit, starred = "p") |>
   apa_flextable(note = TRUE)
 ```
 
-| Variable | B | SE | β | t(29) | p |
+| Variable | B | SE | β | t(684) | p |
 |----|----|----|----|----|----|
-| Constant | 37.23 | 1.60 |  .00 | 23.28 | \<.001\*\*\* |
-| Wt | −3.88 | 0.63 | −.63 | −6.13 | \<.001\*\*\* |
-| Hp | −0.03 | 0.01 | −.36 | −3.52 |  .002\*\*  |
+| Constant | 10.57 | 0.85 | .00 | 12.37 | \<.001\*\*\* |
+| Verbal |  0.01 | 0.00 | .31 |  8.05 | \<.001\*\*\* |
+| Quantitative |  0.02 | 0.00 | .39 |  9.99 | \<.001\*\*\* |
 | Note. β = standardized coefficient. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |
 
 When using [apaquarto](https://wjschne.github.io/apaquarto/), put the
@@ -123,56 +141,50 @@ each group:
 
 ``` r
 
-d <- mtcars
-d$am <- factor(d$am, labels = c("Automatic", "Manual"))
-d$cyl <- factor(d$cyl)
-
-apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am")
+apa_descriptives(d_sat, by = Gender)
 ```
 
-| Variable    | Automatic (n = 19) | Manual (n = 13) | Total (N = 32) |
-|-------------|--------------------|-----------------|----------------|
-| Mpg, M (SD) | 17.15 (3.83)       | 24.39 (6.17)    | 20.09 (6.03)   |
-| Hp, M (SD)  | 160.26 (53.91)     | 126.85 (84.06)  | 146.69 (68.56) |
-| Cyl, n (%)  |                    |                 |                |
-|  4          | 3 (15.8)           | 8 (61.5)        | 11 (34.4)      |
-|  6          | 4 (21.1)           | 3 (23.1)        | 7 (21.9)       |
-|  8          | 12 (63.2)          | 2 (15.4)        | 14 (43.8)      |
+| Variable             | Men (n = 245)   | Women (n = 442) | Total (N = 687) |
+|----------------------|-----------------|-----------------|-----------------|
+| Age, M (SD)          | 25.92 (9.76)    | 25.49 (9.34)    | 25.64 (9.49)    |
+| ACT, M (SD)          | 28.82 (5.05)    | 28.40 (4.70)    | 28.55 (4.83)    |
+| Verbal, M (SD)       | 615.36 (114.33) | 610.66 (112.81) | 612.33 (113.29) |
+| Quantitative, M (SD) | 635.87 (116.02) | 596.00 (113.07) | 610.22 (115.64) |
 
 A correlation matrix, with means and standard deviations:
 
 ``` r
 
-apa_cor(mtcars[, c("mpg", "wt", "hp", "qsec")])
+apa_cor(d_sat[, c("Age", "ACT", "Verbal", "Quantitative")])
 ```
 
 | Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  |
 |----|----|----|----|----|----|----|----|----|----|----|----|
-| 1.  | mpg |  20.09 |  6.03 | — |  |  |  |  |  |  |  |
-| 2.  | wt |   3.22 |  0.98 | −.87 | \*\*\* | — |  |  |  |  |  |
-| 3.  | hp | 146.69 | 68.56 | −.78 | \*\*\* | .66 | \*\*\* | — |  |  |  |
-| 4.  | qsec |  17.85 |  1.79 | .42 | \* | −.17 |  | −.71 | \*\*\* | — |  |
-| \* p \< .05. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |
+| 1.  | Age |  25.64 |   9.49 | — |  |  |  |  |  |  |  |
+| 2.  | ACT |  28.55 |   4.83 | .11 | \*\* | — |  |  |  |  |  |
+| 3.  | Verbal | 612.33 | 113.29 | −.04 |  | .56 | \*\*\* | — |  |  |  |
+| 4.  | Quantitative | 610.22 | 115.64 | −.03 |  | .59 | \*\*\* | .64 | \*\*\* | — |  |
+| \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |
 
 A list of nested models gives one table, with the change in *R*²:
 
 ``` r
 
 apa_parameters(list(
-  lm(mpg ~ wt, data = mtcars),
-  lm(mpg ~ wt + hp, data = mtcars)
+  lm(ACT ~ Verbal, data = d_sat),
+  lm(ACT ~ Verbal + Quantitative, data = d_sat)
 ))
 ```
 
-| Model   | Variable | B     | SE   | β    | t     | df  | p      | R2  | ΔR2     |
-|---------|----------|-------|------|------|-------|-----|--------|-----|---------|
-| Model 1 |          |       |      |      |       |     |        | .75 |         |
-|         | Constant | 37.29 | 1.88 |  .00 | 19.86 | 30  | \<.001 |     |         |
-|         | Wt       | −5.34 | 0.56 | −.87 | −9.56 | 30  | \<.001 |     |         |
-| Model 2 |          |       |      |      |       |     |        | .83 | .07\*\* |
-|         | Constant | 37.23 | 1.60 |  .00 | 23.28 | 29  | \<.001 |     |         |
-|         | Wt       | −3.88 | 0.63 | −.63 | −6.13 | 29  | \<.001 |     |         |
-|         | Hp       | −0.03 | 0.01 | −.36 | −3.52 | 29  |  .002  |     |         |
+| Model   | Variable     | B     | SE   | β   | t     | df  | p      | R2  | ΔR2       |
+|---------|--------------|-------|------|-----|-------|-----|--------|-----|-----------|
+| Model 1 |              |       |      |     |       |     |        | .31 |           |
+|         | Constant     | 13.92 | 0.84 | .00 | 16.56 | 685 | \<.001 |     |           |
+|         | Verbal       |  0.02 | 0.00 | .56 | 17.71 | 685 | \<.001 |     |           |
+| Model 2 |              |       |      |     |       |     |        | .40 | .09\*\*\* |
+|         | Constant     | 10.57 | 0.85 | .00 | 12.37 | 684 | \<.001 |     |           |
+|         | Verbal       |  0.01 | 0.00 | .31 |  8.05 | 684 | \<.001 |     |           |
+|         | Quantitative |  0.02 | 0.00 | .39 |  9.99 | 684 | \<.001 |     |           |
 
 ## APA Style Outside of Tables
 
@@ -256,10 +268,14 @@ Each of these settings is also an R option
 |:--------------------|:-------------------------|:------------------|
 | accuracy            | apa7.accuracy            | .01               |
 | font_family         | apa7.font_family         | “Times New Roman” |
-| font_size           | apa7.font_size           | 2                 |
+| font_size           | apa7.font_size           | 12                |
+| line_spacing        | apa7.line_spacing        | 2                 |
 | intercept_text      | apa7.intercept_text      | “Constant”        |
 | width_aware_padding | apa7.width_aware_padding | TRUE              |
 | page_width          | apa7.page_width          | 6.5               |
+| landscape_width     | apa7.landscape_width     | NA                |
+| column_width        | apa7.column_width        | NA                |
+| table_width         | apa7.table_width         | 1                 |
 | print               | apa7.print               | “auto”            |
 | citations           | apa7.citations           | “auto”            |
 
@@ -267,8 +283,92 @@ For example, to set the default font family:
 
 ``` r
 
-options(apa.font_family = "Arial")
+options(apa7.font_family = "Arial")
 ```
+
+## Table Widths
+
+A manuscript can have tables of three widths: the text area of a
+portrait page, the text area of a landscape page, and one column of a
+two-column page. Every apa7 function that makes a table has a
+`table_width` argument that can name any of them:
+
+``` r
+
+apa_flextable(apa_parameters(fit), table_width = "page")      # 6.5 in (the default)
+apa_flextable(apa_parameters(fit), table_width = "landscape") # 9 in
+apa_flextable(apa_parameters(fit), table_width = "column")    # 3.36 in
+```
+
+The widths in the comments are for letter-size paper. They follow the
+`page_width` setting: with `apa7_defaults(page_width = "a4")`, they are
+6.27, 9.69, and 3.25 inches. A landscape page’s text width is the
+paper’s height less 1-inch margins, and a column’s width is that of a
+column in apaquarto’s two-column journal mode (`documentmode: jou`),
+which has 0.75-inch side margins and a gutter of 4% of the text width
+between the columns. To set either one yourself, use the
+`landscape_width` and `column_width` arguments of `apa7_defaults` (in
+inches).
+
+A table can also be a proportion of one of these widths, or have a width
+in inches, centimeters, or millimeters:
+
+| `table_width` | Width |
+|:---|:---|
+| `1` | The default width (the portrait page, unless changed) |
+| `.5` | Half the default width |
+| `"page"` or `"portrait"` | The text area of a portrait page |
+| `"landscape"` | The text area of a landscape page |
+| `"column"` | One column of a two-column page |
+| `c(landscape = .8)` | 80% of the landscape width |
+| `c(cm = 10)` | 10 centimeters (also `inches` and `mm`) |
+| `0` | Only as wide as the contents |
+
+### One Table at a Time
+
+In a Quarto document, the width of one table can be set in its code
+chunk with the `apa7-width` option, so that a table printed
+automatically (without `apa_flextable`) gets that width, and no other
+table is affected:
+
+```` markdown
+```{r}
+#| label: tbl-landscape
+#| apa7-width: landscape
+apa_parameters(fit)
+```
+````
+
+A named number is written as a YAML map (e.g.,
+`#| apa7-width: {landscape: .8}`). In R Markdown, the option is
+`apa7.width` (e.g., `{r, apa7.width = "landscape"}`). A `table_width`
+given to a function overrides the chunk option.
+
+### Widths From the Document
+
+You may not need to set any widths at all. When `page_width` and
+`table_width` are not set with `apa7_defaults`, apa7 reads them from the
+document being rendered: its `papersize` (e.g., `papersize: a4`) sets
+the paper, and [apaquarto](https://wjschne.github.io/apaquarto/)’s
+`documentmode` sets the margins. In journal mode (`documentmode: jou`),
+which sets the text in two columns with 0.75-inch margins, every table
+is as wide as a column unless it asks for another width, and a table in
+a chunk with `apa-twocolumn: true` spans both columns.
+
+### Two-Column Documents
+
+In a two-column document that is not in apaquarto’s journal mode, make
+the column the default width for every table:
+
+``` r
+
+apa7_defaults(table_width = "column")
+```
+
+Proportions are then proportions of the column (e.g., `table_width = .5`
+is half a column). A table that spans both columns, which apaquarto
+makes with the `apa-twocolumn: true` chunk option, is as wide as the
+page without any other setting.
 
 ## Writing a Paper with apaquarto
 

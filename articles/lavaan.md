@@ -6,6 +6,7 @@ library(dplyr)
 library(apa7)
 library(lavaan)
 library(ggdiagram)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 Confirmatory factor analyses (CFA) and structural equation models (SEM)
@@ -32,9 +33,10 @@ The code for each diagram can be shown by clicking “Code”.
 
 ## Confirmatory Factor Analysis
 
-In the `HolzingerSwineford1939` data set from the lavaan package, 301
-seventh- and eighth-grade students took nine mental ability tests. The
-tests are thought to measure three abilities: visual (*x*₁ to *x*₃),
+In the `HolzingerSwineford1939` data set from the lavaan package
+([Holzinger & Swineford, 1939](#ref-holzingerStudyFactorAnalysis1939)),
+301 seventh- and eighth-grade students took nine mental ability tests.
+The tests are thought to measure three abilities: visual (*x*₁ to *x*₃),
 textual (*x*₄ to *x*₆), and speed (*x*₇ to *x*₉).
 
 ``` r
@@ -65,29 +67,49 @@ Code
 
 # Standardized estimates without leading zeros
 std <- standardizedSolution(fit_3)
-lbl <- function(x) signs::signs(x, accuracy = .01, trim_leading_zeros = TRUE)
+lbl <- function(x)
+  signs::signs(x, accuracy = .01, trim_leading_zeros = TRUE)
 loadings <- std |> filter(op == "=~")
 correlations <- std |> filter(op == "~~", lhs != rhs)
 residuals <- std |> filter(op == "~~", lhs == rhs, lhs %in% colnames(d_cfa))
 
-my_fills <- viridis::viridis(n = 3, begin = .25, end = .65) |> 
+my_fills <- viridis::viridis(n = 3, begin = .25, end = .65) |>
   class_color(brightness = .75, saturation = .4)
 
-my_cov <- redefault(connect, arrow_fins = arrowhead(), arc_bend = -.75, resect = 2)
+my_cov <- redefault(
+  connect,
+  arrow_fins = arrowhead(),
+  arc_bend = -.75,
+  resect = 2
+)
 
 
 
 ggdiagram(font_family = "Roboto Condensed", font_size = 18) +
   {tests <- ob_ellipse(a = .5, m1 = 16) |>
-  ob_array(k = 9, sep = 0.35, label = ob_label(paste0(rep(c("V", "T", "S"), each = 3), "~", rep(1:3, 3), "~"), color = "white", fill = NA, nudge_y = -.05), 
-           color = NA, fill = rep(my_fills, each = 3))} +
+      ob_array(
+        k = 9,
+        sep = 0.35,
+        label = ob_label(
+          paste0(rep(c("V", "T", "S"), each = 3), "~", rep(1:3, 3), "~"),
+          color = "white",
+          fill = NA,
+          nudge_y = -.05
+        ),
+        color = NA,
+        fill = rep(my_fills, each = 3)
+      )} +
   {abilities <- ob_circle(
-  center = tests[c(2, 5, 8)]@center + ob_point(0, 3),
-  radius = 0.8,
-  label = ob_label(c("Visual", "Textual", "Speed"), color = "white", fill = NA),
-  fill = my_fills,
-  color = NA
-)} +
+      center = tests[c(2, 5, 8)]@center + ob_point(0, 3),
+      radius = 0.8,
+      label = ob_label(
+        c("Visual", "Textual", "Speed"),
+        color = "white",
+        fill = NA
+      ),
+      fill = my_fills,
+      color = NA
+    )} +
   connect(
     abilities[rep(1:3, each = 3)],
     tests,
@@ -128,7 +150,10 @@ ggdiagram(font_family = "Roboto Condensed", font_size = 18) +
 
 ![](lavaan_files/figure-html/fig-hs-1.png)
 
-Figure 1: Three-Factor Model of the Holzinger and Swineford (1939) Tests
+Figure 1
+
+Three-Factor Model of the Holzinger and Swineford
+([1939](#ref-holzingerStudyFactorAnalysis1939)) Tests
 
 ### Model fit
 
@@ -153,6 +178,10 @@ apa_performance(
 | One factor | 312.26 | 27 | \<.001 | .68 | .57 | .19 | \[.17, .21\] | .14 |
 | Three factors |  85.31 | 24 | \<.001 | .93 | .90 | .09 | \[.07, .11\] | .07 |
 | Note. N = 301. Estimation used maximum likelihood (ML). CFI = comparative fit index; TLI = Tucker–Lewis index; RMSEA = root mean square error of approximation; CI = confidence interval for RMSEA; SRMR = standardized root mean square residual. |  |  |  |  |  |  |  |  |
+
+Table 1
+
+Fit of the One-Factor and Three-Factor Models of the Ability Tests
 
 The three-factor model fits much better than the one-factor model,
 though by conventional standards (e.g., CFI ≥ .95, RMSEA ≤ .06) its fit
@@ -197,6 +226,10 @@ apa_parameters(fit_3) |>
 |  Textual ↔ Speed | .28 | 0.07 | \<.001 |
 | Note. N = 301. Estimation used maximum likelihood (ML). Estimates are fully standardized, and their standard errors and p-values are for the standardized estimates. β = standardized coefficient. |  |  |  |
 
+Table 2
+
+Standardized Parameter Estimates of the Three-Factor Model
+
 Unstandardized estimates (*B*) are shown with `standardize = FALSE`.
 Here, the first loading of each factor was fixed at 1 to give the factor
 a scale, so it has no standard error or test, and the note says so.
@@ -208,7 +241,8 @@ can be added with `predictor_parameters`:
 apa_parameters(
   fit_3,
   standardize = FALSE,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "z", "p"), note = TRUE
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "z", "p"), 
+  note = TRUE
 ) |> 
   apa_flextable(note = TRUE)
 ```
@@ -231,6 +265,11 @@ apa_parameters(
 |  Textual ↔ Speed | 0.17 | 0.05 | .28 |  3.52 | \<.001 |
 | Note. N = 301. Estimation used maximum likelihood (ML). To set the scale of each factor, the loadings Visual → V1, Textual → T1, and Speed → S1 were fixed at 1. β = standardized coefficient. |  |  |  |  |  |
 
+Table 3
+
+Unstandardized and Standardized Parameter Estimates of the Three-Factor
+Model
+
 Variances (labeled “residual” for indicators and outcomes), intercepts,
 and thresholds can be added with `variances = TRUE`,
 `intercepts = TRUE`, and `thresholds = TRUE`.
@@ -243,8 +282,9 @@ factor. `apa_loadings` shows the standardized loadings and leaves blank
 the loadings fixed at 0. As in exploratory factor analysis, the rows are
 grouped by the factor with each indicator’s largest loading and sorted
 by the size of that loading (`sort_loading = FALSE` keeps the order of
-the model syntax). Suppose that *S*₃ (counting dots and capital letters)
-loads on Visual as well as on Speed:
+the model syntax). Suppose that Speeded Discrimination (*S*₃,
+distinguishing straight from curved capital letters) loads on Visual as
+well as on Speed:
 
 ``` r
 
@@ -256,21 +296,38 @@ model_3x <- "
 fit_3x <- cfa(model_3x, data = d_cfa)
 
 apa_loadings(fit_3x, communality = TRUE) |>
+  # Recode variable names to test names
+  mutate(Variable = case_match(
+    Variable,
+    "V1" ~ "Visual Perception",
+    "V2" ~ "Cubes",
+    "V3" ~ "Lozenges",
+    "T1" ~ "Paragraph Comprehension",
+    "T2" ~ "Sentence Completion",
+    "T3" ~ "Word Meaning",
+    "S1" ~ "Speeded Addition",
+    "S2" ~ "Speeded Counting of Dots",
+    "S3" ~ "Speeded Discrimination"
+  )) |>
   apa_flextable(note = TRUE)
 ```
 
 | Variable | Visual | Textual | Speed | h2 |
 |----|----|----|----|----|
-| V1 | .76 |  |  | .58 |
-| V3 | .59 |  |  | .35 |
-| V2 | .44 |  |  | .19 |
-| T2 |  | .86 |  | .73 |
-| T1 |  | .85 |  | .72 |
-| T3 |  | .84 |  | .70 |
-| S2 |  |  | .80 | .63 |
-| S1 |  |  | .61 | .37 |
-| S3 | .38 |  | .45 | .45 |
+| Visual Perception | .76 |  |  | .58 |
+| Lozenges | .59 |  |  | .35 |
+| Cubes | .44 |  |  | .19 |
+| Sentence Completion |  | .86 |  | .73 |
+| Paragraph Comprehension |  | .85 |  | .72 |
+| Word Meaning |  | .84 |  | .70 |
+| Speeded Counting of Dots |  |  | .80 | .63 |
+| Speeded Addition |  |  | .61 | .37 |
+| Speeded Discrimination | .38 |  | .45 | .45 |
 | Note. N = 301. Estimation used maximum likelihood (ML). Loadings are fully standardized estimates from a confirmatory factor analysis. Blank cells are loadings fixed at 0. h2 = communality. |  |  |  |  |
+
+Table 4
+
+Loadings of the Three-Factor Model With a Cross-Loading
 
 The communality (*h*²) is the proportion of variance in each indicator
 explained by the factors (*R*²). Rows for the variance explained by each
@@ -289,6 +346,10 @@ apa_factor_cor(fit_3x) |>
 | 2. Textual |  .45 | — |  |
 | 3. Speed |  .30 |  .21 | — |
 | Note. N = 301. Estimation used maximum likelihood (ML). Correlations among the latent variables are from the fully standardized solution. |  |  |  |
+
+Table 5
+
+Correlations Among the Visual, Textual, and Speed Factors
 
 ### Robust estimation and missing data
 
@@ -314,7 +375,11 @@ apa_performance(fit_mlr) |>
 | χ2 | df | p | CFI | TLI | RMSEA | 90% CI | SRMR |
 |----|----|----|----|----|----|----|----|
 | 87.13 | 24 | \<.001 | .93 | .90 | .09 | \[.07, .11\] | .06 |
-| Note. N = 301. Estimation used robust maximum likelihood (MLR), as described by Yuan and Bentler (2000). χ2 is a scaled test statistic, and CFI, TLI, and RMSEA are the robust versions. Missing data were handled with full information maximum likelihood. CFI = comparative fit index; TLI = Tucker–Lewis index; RMSEA = root mean square error of approximation; CI = confidence interval for RMSEA; SRMR = standardized root mean square residual. |  |  |  |  |  |  |  |
+| Note. N = 301. Estimation used robust maximum likelihood (MLR), as described by Yuan & Bentler ([2000](#ref-yuanThreeLikelihoodbasedMethods2000)). χ2 is a scaled test statistic, and CFI, TLI, and RMSEA are the robust versions. Missing data were handled with full information maximum likelihood. CFI = comparative fit index; TLI = Tucker–Lewis index; RMSEA = root mean square error of approximation; CI = confidence interval for RMSEA; SRMR = standardized root mean square residual. |  |  |  |  |  |  |  |
+
+Table 6
+
+Fit of the Three-Factor Model With Robust Maximum Likelihood Estimation
 
 ### Comparing nested models: measurement invariance
 
@@ -366,11 +431,17 @@ apa_performance_comparison(
 | Scalar | 164.10 | 60 | .88 | .11 | \[.09, .13\] | .08 | 40.06 | 6 | \<.001 | −.038 |  .015 |
 | Note. N = 301. Estimation used maximum likelihood (ML). CFI = comparative fit index; RMSEA = root mean square error of approximation; CI = confidence interval for RMSEA; SRMR = standardized root mean square residual. Δ = change from the previous model. Δχ2 is a likelihood ratio (χ2 difference) test. |  |  |  |  |  |  |  |  |  |  |  |
 
+Table 7
+
+Measurement Invariance of the Three-Factor Model Across Schools
+
 Constraining the loadings to be equal did not worsen the fit much, so
 metric invariance is plausible. Constraining the intercepts worsened the
 fit considerably (e.g., a drop in CFI larger than the .01 suggested by
-Cheung & Rensvold, 2002), so scalar invariance does not hold: at least
-some tests have different intercepts at the two schools.
+[Cheung & Rensvold,
+2002](#ref-cheungEvaluatingGoodnessofFitIndexes2002)), so scalar
+invariance does not hold: at least some tests have different intercepts
+at the two schools.
 
 With a robust estimator (e.g., `estimator = "MLR"`), the difference test
 is scaled (e.g., the Satorra–Bentler scaled difference test), and the
@@ -408,6 +479,10 @@ apa_parameters(fit_metric) |>
 |  Textual ↔ Speed | .33 | 0.10 | \<.001 |  | .34 | 0.09 | \<.001 |
 | Note. N = 301 (Pasteur: n = 156; Grant-White: n = 145). Estimation used maximum likelihood (ML). Estimates are fully standardized, and their standard errors and p-values are for the standardized estimates. Loadings were constrained to be equal across groups. Standardized estimates of equal parameters can differ across groups because the groups’ variances differ. β = standardized coefficient. |  |  |  |  |  |  |  |
 
+Table 8
+
+Parameter Estimates of the Metric Invariance Model by School
+
 The note gives the size of each group and says which parameters were
 constrained to be equal. The unstandardized loadings of the metric model
 are equal at the two schools, but the standardized loadings differ,
@@ -417,14 +492,15 @@ stacks the groups, each under a heading.
 
 ## Structural Equation Models
 
-Does industrialization lead to democracy? In Bollen’s (1989) classic
-`PoliticalDemocracy` data set from the lavaan package, industrialization
-in 1960 was measured in 75 developing countries with three indicators
-(*x*₁ to *x*₃), and political democracy was measured in 1960 and in 1965
-with four indicators each (*y*₁ to *y*₄ and *y*₅ to *y*₈). The same
-democracy indicator measured in different years can share specific
-variance, so the residuals of matching indicators are allowed to
-correlate.
+Does industrialization lead to democracy? In the classic
+`PoliticalDemocracy` data set ([Bollen,
+1989](#ref-bollenStructuralEquationsLatent1989)) from the lavaan
+package, industrialization in 1960 was measured in 75 developing
+countries with three indicators (*x*₁ to *x*₃), and political democracy
+was measured in 1960 and in 1965 with four indicators each (*y*₁ to *y*₄
+and *y*₅ to *y*₈). The same democracy indicator measured in different
+years can share specific variance, so the residuals of matching
+indicators are allowed to correlate.
 
 In this model, industrialization affects democracy in 1965 directly
 (*c*′) and indirectly, through democracy in 1960 (*a* × *b*). The labels
@@ -570,7 +646,9 @@ ggdiagram(font_family = "Roboto Condensed", font_size = 16) +
 
 ![](lavaan_files/figure-html/fig-pd-1.png)
 
-Figure 2: Structural Model of Industrialization and Democracy
+Figure 2
+
+Structural Model of Industrialization and Democracy
 
 For clarity, the diagram shows only the structural model. The
 disturbances (the two-headed arrows on the democracy factors) are the
@@ -586,6 +664,10 @@ apa_performance(fit_pd)
 | χ2    | df  | p   | CFI  | TLI | RMSEA | 90% CI       | SRMR |
 |-------|-----|-----|------|-----|-------|--------------|------|
 | 38.13 | 35  | .33 | 1.00 | .99 | .03   | \[.00, .09\] | .04  |
+
+Table 9
+
+Fit of the Political Democracy Model
 
 The model fits well. When the lower bound of the RMSEA interval is 0, it
 is shown as .00.
@@ -620,18 +702,23 @@ tbl_pd
 |  Dem65 → Y8        | .83 | 0.04 | \<.001\*\*\* |
 | Regressions        |     |      |              |
 |  Dem60 ← Ind60     | .45 | 0.10 | \<.001\*\*\* |
-|  Dem65 ← Ind60     | .18 | 0.07 |  .01 \*\*    |
+|  Dem65 ← Ind60     | .18 | 0.07 |  .01 \*\*    |
 |  Dem65 ← Dem60     | .89 | 0.05 | \<.001\*\*\* |
 | Correlations       |     |      |              |
-|  Y1 ↔ Y5           | .30 | 0.14 |  .03 \*      |
-|  Y2 ↔ Y4           | .27 | 0.12 |  .02 \*      |
+|  Y1 ↔ Y5           | .30 | 0.14 |  .03 \*      |
+|  Y2 ↔ Y4           | .27 | 0.12 |  .02 \*      |
 |  Y2 ↔ Y6           | .36 | 0.10 | \<.001\*\*\* |
-|  Y3 ↔ Y7           | .19 | 0.13 |  .15         |
-|  Y4 ↔ Y8           | .11 | 0.13 |  .41         |
-|  Y6 ↔ Y8           | .34 | 0.11 |  .002\*\*    |
+|  Y3 ↔ Y7           | .19 | 0.13 |  .15         |
+|  Y4 ↔ Y8           | .11 | 0.13 |  .41         |
+|  Y6 ↔ Y8           | .34 | 0.11 |  .002\*\*    |
 | Defined parameters |     |      |              |
 |  Indirect          | .40 | 0.09 | \<.001\*\*\* |
 |  Total             | .58 | 0.09 | \<.001\*\*\* |
+
+Table 10
+
+Standardized Parameter Estimates of the Political Democracy Model With
+Significance Stars
 
 Most of industrialization’s effect on democracy in 1965 is indirect:
 industrialization predicts democracy in 1960, which strongly predicts
@@ -692,6 +779,11 @@ apa_parameters(
 |  Total | 1.81 | 0.41 | \[ 1.01, 2.67\] | .58 |
 | Note. N = 75. Estimation used maximum likelihood (ML). Standard errors are based on 500 bootstrap samples, and confidence intervals are bootstrap percentile intervals. To set the scale of each factor, the loadings Ind60 → X1, Dem60 → Y1, and Dem65 → Y5 were fixed at 1. CI = confidence interval; β = standardized coefficient. |  |  |  |  |
 
+Table 11
+
+Parameter Estimates of the Political Democracy Model With Bootstrap
+Confidence Intervals
+
 The interval for the indirect effect excludes 0. The note gives the
 number of bootstrap samples that lavaan used and says that the intervals
 are percentile intervals:
@@ -729,21 +821,22 @@ tbl_pd
 |  Dem65 → Y8        | .83 | 0.04 | \<.001\*\*\* |
 | Regressions        |     |      |              |
 |  Dem60 ← Ind60     | .45 | 0.10 | \<.001\*\*\* |
-|  Dem65 ← Ind60     | .18 | 0.07 |  .01 \*\*    |
+|  Dem65 ← Ind60     | .18 | 0.07 |  .01 \*\*    |
 |  Dem65 ← Dem60     | .89 | 0.05 | \<.001\*\*\* |
 | Correlations       |     |      |              |
-|  Y1 ↔ Y5           | .30 | 0.14 |  .03 \*      |
-|  Y2 ↔ Y4           | .27 | 0.12 |  .02 \*      |
+|  Y1 ↔ Y5           | .30 | 0.14 |  .03 \*      |
+|  Y2 ↔ Y4           | .27 | 0.12 |  .02 \*      |
 |  Y2 ↔ Y6           | .36 | 0.10 | \<.001\*\*\* |
-|  Y3 ↔ Y7           | .19 | 0.13 |  .15         |
-|  Y4 ↔ Y8           | .11 | 0.13 |  .41         |
-|  Y6 ↔ Y8           | .34 | 0.11 |  .002\*\*    |
+|  Y3 ↔ Y7           | .19 | 0.13 |  .15         |
+|  Y4 ↔ Y8           | .11 | 0.13 |  .41         |
+|  Y6 ↔ Y8           | .34 | 0.11 |  .002\*\*    |
 | Defined parameters |     |      |              |
 |  Indirect          | .40 | 0.09 | \<.001\*\*\* |
 |  Total             | .58 | 0.09 | \<.001\*\*\* |
 
-Table 1: Standardized Parameter Estimates of the Political Democracy
-Model
+Table 12
+
+Standardized Parameter Estimates of the Political Democracy Model
 
 *Note*. *N* = 75. Estimation used maximum likelihood (ML). Estimates are
 fully standardized, and their standard errors and *p*-values are for the
@@ -755,13 +848,17 @@ the table.
 
 ## References
 
-Bollen, K. A. (2026). *Elements of structural equation models (SEMs)*.
-Cambridge University Press. <https://doi.org/10.1017/9781009312806>
+Bollen, K. A. (1989). *Structural equations with latent variables*.
+Wiley. <https://doi.org/10.1002/9781118619179>
 
 Cheung, G. W., & Rensvold, R. B. (2002). Evaluating goodness-of-fit
 indexes for testing measurement invariance. *Structural Equation
-Modeling, 9*(2), 233–255. <https://doi.org/10.1207/S15328007SEM0902_5>
+Modeling*, *9*(2), 233–255. <https://doi.org/10.1207/S15328007SEM0902_5>
 
-Holzinger, K. J., & Swineford, F. A. (1939). *A study in factor
-analysis: The stability of a bi-factor solution* (Supplementary
-Educational Monographs, No. 48). University of Chicago Press.
+Holzinger, K. J., & Swineford, F. (1939). *A study in factor analysis:
+The stability of a bi-factor solution*. University of Chicago Press.
+
+Yuan, K.-H., & Bentler, P. M. (2000). Three likelihood-based methods for
+mean and covariance structure analysis with nonnormal missing data.
+*Sociological Methodology*, *30*(1), 165–200.
+<https://doi.org/10.1111/0081-1750.00078>

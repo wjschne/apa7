@@ -19,7 +19,7 @@ apa_style(
   table_align = "left",
   header_align_vertical = c("top", "middle", "bottom"),
   layout = "autofit",
-  table_width = 0,
+  table_width = NULL,
   markdown = TRUE,
   markdown_header = markdown,
   markdown_body = markdown,
@@ -81,10 +81,27 @@ apa_style(
 
 - table_width:
 
-  proportion of the width of the container (e.g., the page or text
-  column) that the table occupies, from 0 to 1: 1 is the full width, and
-  .5 is half the width. With 0, the table is only as wide as its
-  contents need.
+  width of the table, in the same forms in every apa7 function: a
+  proportion from 0 to 1 of the default width (the full width of a
+  portrait page unless changed with `apa7_defaults(table_width = )`),
+  `"page"` (or `"portrait"`) for the full width of a portrait page,
+  `"landscape"` for a landscape page, `"column"` for one column of a
+  two-column page, or a named number: a proportion of one of these
+  widths (e.g., `c(landscape = .8)`) or a width in `inches`, `cm`, or
+  `mm` (e.g., `c(inches = 5)`). With 0, the columns are only as wide as
+  their contents need. If `NULL` (default), the width set by the code
+  chunk's `apa7-width` option in Quarto (e.g.,
+  `#| apa7-width: landscape`, or `#| apa7-width: {landscape: .8}` for a
+  named number) or `apa7.width` option in R Markdown, or `"page"` for a
+  chunk with apaquarto's `apa-twocolumn: true`; otherwise, the
+  `table_width` set with
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  (1 unless changed). The widths of the pages and the column are set
+  with the `page_width`, `landscape_width`, and `column_width` arguments
+  of
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md).
+  A number greater than 1 is read as inches, with a warning to write it
+  as `c(inches = )`.
 
 - markdown:
 
@@ -122,7 +139,7 @@ flextable::flextable(d) |>
   apa_style()
 
 
-.cl-012bb927{table-layout:auto;}.cl-fd7caf76{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7a9068f9{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-6e29b6b7{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-aa2adb3c{background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c16497ad{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-46dbcd25{background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}
+.cl-eefbcfb5{table-layout:auto;width:100%;}.cl-fd7caf76{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7a9068f9{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-6e29b6b7{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-aa2adb3c{background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c16497ad{background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-46dbcd25{background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}
 
 
 x

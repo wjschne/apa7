@@ -35,12 +35,15 @@ apa_descriptives(
 
 - variables:
 
-  names of the variables to describe, in order. If `NULL` (default), all
-  columns except `by`.
+  variables to describe, in order: unquoted or quoted names (e.g.,
+  `c(age, income)` or `c("age", "income")`) or tidyselect helpers (e.g.,
+  `starts_with("item")` or `where(is.numeric)`). If `NULL` (default),
+  all columns. The `by` variable is never described.
 
 - by:
 
-  name of a grouping variable. If given, each group gets a column.
+  grouping variable, unquoted or quoted (e.g., `group` or `"group"`). If
+  given, each group gets a column.
 
 - total:
 
@@ -56,7 +59,7 @@ apa_descriptives(
 
 - categorical:
 
-  names of numeric variables to treat as categorical
+  numeric variables to treat as categorical, selected like `variables`
 
 - labels:
 
@@ -169,11 +172,23 @@ apa_descriptives(d, variables = c("mpg", "hp", "cyl"), by = "am",
 #> 8  6              "4 (21.1)"             "3 (23.1)"          "7 (21.9)"        
 #> 9  8              "12 (63.2)"            "2 (15.4)"          "14 (43.8)"       
 
+# Unquoted names and tidyselect helpers work too
+apa_descriptives(d, variables = c(mpg, starts_with("c")), by = am)
+#> # A tibble: 6 × 4
+#>   Variable         `Automatic (*n* = 19)` `Manual (*n* = 13)` `Total (*N* = 32)`
+#>   <chr>            <chr>                  <chr>               <chr>             
+#> 1 Mpg, *M* (*SD*)  "17.15 (3.83)"         "24.39 (6.17)"      "20.09 (6.03)"    
+#> 2 Cyl, *n* (%)     ""                     ""                  ""                
+#> 3  4               "3 (15.8)"             "8 (61.5)"          "11 (34.4)"       
+#> 4  6               "4 (21.1)"             "3 (23.1)"          "7 (21.9)"        
+#> 5  8               "12 (63.2)"            "2 (15.4)"          "14 (43.8)"       
+#> 6 Carb, *M* (*SD*) "2.74 (1.15)"          "2.92 (2.18)"       "2.81 (1.62)"     
+
 # Medians for skewed variables, and tests of group differences
 apa_descriptives(
   d,
-  variables = c("mpg", "hp", "cyl"),
-  by = "am",
+  variables = c(mpg, hp, cyl),
+  by = am,
   continuous = c(hp = "median_iqr"),
   test = TRUE
 )

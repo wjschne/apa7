@@ -5,6 +5,7 @@
 library(apa7)
 library(metafor)
 library(dplyr)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 `apa_parameters` and `apa_performance` make APA-style tables of
@@ -64,6 +65,10 @@ apa_parameters(fit_adherence) |>
 | Pooled estimate (random effects) |  .15 | \[ .09, .21\] |  |
 | Note. Effect sizes are correlations, analyzed on the Fisher’s z scale and converted back for the table. The 16 studies were pooled with a random-effects model, with τ2 estimated by restricted maximum likelihood. Weights are percentages of the total weight. Test of the pooled estimate: z = 4.75, p \< .001; 95% PI \[−.04, .32\]. Heterogeneity: Q(15) = 38.16, p \< .001, τ2 = 0.01, I2 = 61.7%. CI = confidence interval; PI = prediction interval. |  |  |  |
 
+Table 1
+
+Correlations Between Conscientiousness and Medication Adherence
+
 Each study’s correlation and confidence interval, and the pooled
 estimate below the rule, are converted back from Fisher’s *z* to *r*.
 The weights are each study’s percentage of the total weight in the
@@ -95,113 +100,192 @@ apa_performance(fit_adherence) |>
 | 16 | 38.16 | \<.001 | 0.01 | 61.7 |
 | Note. τ2 was estimated by restricted maximum likelihood. k = number of studies; Q = test of heterogeneity; τ2 = variance of the true effects; I2 = percentage of total variability due to heterogeneity. |  |  |  |  |
 
+Table 2
+
+Heterogeneity of the Correlations Between Conscientiousness and
+Medication Adherence
+
 With `metrics = "all"`, the table adds *τ*, *H*², and confidence
 intervals of *τ*² and *I*².
 
 ## Ratio Measures
 
-In the `dat.bcg` data set, 13 trials compared the risk of tuberculosis
-in people who were and were not vaccinated with BCG. The effect sizes
-are risk ratios, which are analyzed on the log scale and exponentiated
-for the table:
+In the `dat.landenberger2005` data set ([Landenberger & Lipsey,
+2005](#ref-landenbergerPositiveEffectsCognitivebehavioral2005)), 58
+studies compared the number of juvenile and adult offenders who
+reoffended after a cognitive behavioral therapy (CBT) program and after
+no program. The effect sizes are odds ratios (the odds of reoffending
+after CBT divided by the odds without it), which are analyzed on the log
+scale and exponentiated for the table:
 
 ``` r
 
-d_bcg <- escalc(
-  measure = "RR",
-  ai = tpos, bi = tneg, ci = cpos, di = cneg,
-  data = metadat::dat.bcg,
-  slab = paste(author, year)
-) |> 
-  rename(Latitude = ablat,
-         Allocation = alloc) |> 
-  mutate(Allocation = factor(stringr::str_to_title(Allocation)))
+d_recidivism <- escalc(
+  measure = "OR",
+  ai = n.cbt.rec, bi = n.cbt.non, ci = n.ctrl.rec, di = n.ctrl.non,
+  data = metadat::dat.landenberger2005,
+  slab = study
+) |>
+  mutate(
+    Sessions = sessions,
+    Program = factor(program,
+                     levels = c("demo", "practice", "research"),
+                     labels = c("Demonstration", "Practice", "Research"))
+  )
 
+fit_recidivism <- rma(yi, vi, data = d_recidivism)
 
-fit_bcg <- rma(yi, vi, data = d_bcg)
-
-apa_parameters(fit_bcg) |>
+apa_parameters(fit_recidivism) |>
   apa_flextable(note = TRUE)
 ```
 
-| Study | RR | 95% CI | Weight (%) |
+| Study | OR | 95% CI | Weight (%) |
 |----|----|----|----|
-| Aronson 1948 | 0.41 | \[0.13, 1.26\] |  5.1 |
-| Ferguson & Simes 1949 | 0.20 | \[0.09, 0.49\] |  6.4 |
-| Rosenthal et al 1960 | 0.26 | \[0.07, 0.92\] |  4.4 |
-| Hart & Sutherland 1977 | 0.24 | \[0.18, 0.31\] |  9.7 |
-| Frimodt-Moller et al 1973 | 0.80 | \[0.52, 1.25\] |  8.9 |
-| Stein & Aronson 1953 | 0.46 | \[0.39, 0.54\] | 10.1 |
-| Vandiviere et al 1973 | 0.20 | \[0.08, 0.50\] |  6.0 |
-| TPT Madras 1980 | 1.01 | \[0.89, 1.14\] | 10.2 |
-| Coetzee & Berjak 1968 | 0.63 | \[0.39, 1.00\] |  8.7 |
-| Rosenthal et al 1961 | 0.25 | \[0.15, 0.43\] |  8.4 |
-| Comstock et al 1974 | 0.71 | \[0.57, 0.89\] |  9.9 |
-| Comstock & Webster 1969 | 1.56 | \[0.37, 6.53\] |  3.8 |
-| Comstock et al 1976 | 0.98 | \[0.58, 1.66\] |  8.4 |
-| Pooled estimate (random effects) | 0.49 | \[0.34, 0.70\] |  |
-| Note. Effect sizes are risk ratios, analyzed on the log scale and exponentiated for the table. The 13 studies were pooled with a random-effects model, with τ2 estimated by restricted maximum likelihood. Weights are percentages of the total weight. Test of the pooled estimate: z = −3.97, p \< .001; 95% PI \[0.15, 1.55\]. Heterogeneity: Q(12) = 152.23, p \< .001, τ2 = 0.31, I2 = 92.2%. CI = confidence interval; PI = prediction interval. |  |  |  |
+| Guerra (1990) | 0.66 | \[0.26, 1.70\] | 1.1 |
+| Leeman (1993) | 0.26 | \[0.06, 1.04\] | 0.6 |
+| Kownacki (1995) | 0.33 | \[0.05, 2.43\] | 0.3 |
+| Larson (1989) | 0.29 | \[0.04, 1.90\] | 0.4 |
+| Finn (1998) | 0.66 | \[0.32, 1.38\] | 1.5 |
+| Goldstein (1989).1 | 0.23 | \[0.07, 0.75\] | 0.8 |
+| Goldstein (1989).2 | 0.14 | \[0.04, 0.47\] | 0.8 |
+| Ross (1988) | 0.10 | \[0.02, 0.39\] | 0.6 |
+| Pullen (1996) | 1.26 | \[0.33, 4.73\] | 0.7 |
+| Shivrattan (1988) | 0.42 | \[0.09, 1.91\] | 0.5 |
+| Robinson (1995a) | 0.79 | \[0.61, 1.03\] | 3.0 |
+| Robinson (1991) | 0.46 | \[0.28, 0.74\] | 2.2 |
+| Hughey (1996) | 0.88 | \[0.58, 1.34\] | 2.4 |
+| Friendship (2003) | 0.60 | \[0.46, 0.78\] | 3.0 |
+| Little (1993).1 | 0.60 | \[0.45, 0.81\] | 2.9 |
+| Little (1993).2 | 0.73 | \[0.54, 0.99\] | 2.8 |
+| Bush (1995) | 0.56 | \[0.26, 1.20\] | 1.4 |
+| Curulla (1991) | 0.42 | \[0.08, 2.23\] | 0.4 |
+| Porporino (1991) | 0.60 | \[0.18, 2.00\] | 0.8 |
+| Kirkpatrick (1996) | 0.63 | \[0.42, 0.96\] | 2.4 |
+| Bottcher (1985) | 0.40 | \[0.17, 0.93\] | 1.2 |
+| Bonta (2000) | 1.02 | \[0.50, 2.09\] | 1.5 |
+| Walters (1999) | 0.72 | \[0.41, 1.26\] | 2.0 |
+| Henning (1996) | 0.40 | \[0.20, 0.80\] | 1.6 |
+| Dowden (1999) | 0.22 | \[0.11, 0.43\] | 1.6 |
+| Robinson (1995b) | 0.66 | \[0.34, 1.31\] | 1.6 |
+| Knott (1995) | 0.83 | \[0.43, 1.61\] | 1.7 |
+| Motiuk (1996) | 1.24 | \[0.59, 2.60\] | 1.5 |
+| Coughlin (2003) | 0.34 | \[0.06, 1.87\] | 0.4 |
+| Falshaw (2003) | 1.00 | \[0.83, 1.21\] | 3.2 |
+| Johnson (1995) | 0.65 | \[0.30, 1.44\] | 1.4 |
+| Burnett (1997) | 0.44 | \[0.10, 1.97\] | 0.5 |
+| Grandberry (1998) | 1.20 | \[0.69, 2.08\] | 2.0 |
+| Deschamps (1998) | 0.66 | \[0.41, 1.06\] | 2.2 |
+| Armstrong (2003) | 0.75 | \[0.44, 1.29\] | 2.0 |
+| Culver (1993) | 1.58 | \[0.61, 4.05\] | 1.1 |
+| Cann (2003).1 | 0.88 | \[0.73, 1.05\] | 3.2 |
+| Cann (2003).2 | 0.92 | \[0.79, 1.06\] | 3.3 |
+| Van Voorhis (2003) | 0.90 | \[0.69, 1.17\] | 3.0 |
+| Van Voorhis (2004) | 0.84 | \[0.58, 1.21\] | 2.6 |
+| Golden (2003) | 0.71 | \[0.27, 1.83\] | 1.1 |
+| Barnoski (2002a) | 0.78 | \[0.38, 1.58\] | 1.5 |
+| Barnoski (2002b) | 0.74 | \[0.62, 0.90\] | 3.2 |
+| Friedman (2002) | 0.69 | \[0.34, 1.41\] | 1.6 |
+| Thambidurai (1980) | 0.99 | \[0.28, 3.48\] | 0.7 |
+| Arbuthnot (1986) | 0.26 | \[0.05, 1.45\] | 0.4 |
+| Spencer (1986) | 0.52 | \[0.09, 3.19\] | 0.4 |
+| Greenwood (1993) | 0.66 | \[0.45, 0.95\] | 2.6 |
+| Washington DOC (1998) | 0.95 | \[0.71, 1.28\] | 2.9 |
+| T3 Associates (1999) | 0.68 | \[0.52, 0.87\] | 3.0 |
+| Hanson (2000) | 0.56 | \[0.32, 1.01\] | 1.9 |
+| Hall (2004) | 0.34 | \[0.18, 0.64\] | 1.7 |
+| Landenberger (2004) | 1.15 | \[0.60, 2.19\] | 1.7 |
+| Anderson (2002) | 0.23 | \[0.18, 0.28\] | 3.1 |
+| McCracken (2003) | 0.35 | \[0.13, 0.96\] | 1.0 |
+| Berry (1998) | 0.53 | \[0.27, 1.04\] | 1.6 |
+| Pelissier (2001).1 | 0.73 | \[0.60, 0.90\] | 3.2 |
+| Pelissier (2001).2 | 1.00 | \[0.58, 1.72\] | 2.0 |
+| Pooled estimate (random effects) | 0.66 | \[0.58, 0.74\] |  |
+| Note. Effect sizes are odds ratios, analyzed on the log scale and exponentiated for the table. The 58 studies were pooled with a random-effects model, with τ2 estimated by restricted maximum likelihood. Weights are percentages of the total weight. Test of the pooled estimate: z = −6.99, p \< .001; 95% PI \[0.34, 1.25\]. Heterogeneity: Q(57) = 213.69, p \< .001, τ2 = 0.10, I2 = 70.6%. CI = confidence interval; PI = prediction interval. |  |  |  |
+
+Table 3
+
+Effects of Cognitive Behavioral Therapy on the Odds of Reoffending
+
+Odds ratios below 1 mean that fewer offenders reoffended after CBT.
+Across the studies, CBT reduced the odds of reoffending by about a
+third.
 
 ## Meta-Regression
 
-Moderators are added with `mods`. The vaccine appeared to work better in
-trials farther from the equator, so here the absolute latitude of each
-trial is a moderator:
+Moderators are added with `mods`. Programs differed in how often they
+met, so here the number of CBT sessions per week is a moderator:
 
 ``` r
 
-fit_latitude <- rma(yi, vi, mods = ~ Latitude, data = d_bcg)
+fit_sessions <- rma(yi, vi, mods = ~ Sessions, data = d_recidivism)
 
-apa_parameters(fit_latitude) |>
+apa_parameters(fit_sessions) |>
   apa_flextable(note = TRUE)
 ```
 
-| Variable | B | SE | 95% CI | RR | z | p |
+| Variable | B | SE | 95% CI | OR | z | p |
 |----|----|----|----|----|----|----|
-| Constant |  0.25 | 0.25 | \[−0.24,  0.74\] | 1.29 |  1.01 |  .31  |
-| Latitude | −0.03 | 0.01 | \[−0.04, −0.01\] | 0.97 | −4.04 | \<.001 |
-| Note. Effect sizes are risk ratios, analyzed on the log scale, and coefficients are on that scale. The meta-regression of 13 studies used a mixed-effects model, with τ2 estimated by restricted maximum likelihood. CI = confidence interval; RR = risk ratio. |  |  |  |  |  |  |
+| Constant | −0.20 | 0.10 | \[−0.40,  0.00\] | 0.82 | −1.99 | .05 |
+| Sessions | −0.07 | 0.03 | \[−0.12, −0.01\] | 0.93 | −2.46 | .01 |
+| Note. Effect sizes are odds ratios, analyzed on the log scale, and coefficients are on that scale. The meta-regression of 58 studies used a mixed-effects model, with τ2 estimated by restricted maximum likelihood. CI = confidence interval; OR = odds ratio. |  |  |  |  |  |  |
+
+Table 4
+
+Meta-Regression of the Effects of Cognitive Behavioral Therapy on
+Sessions per Week
 
 ``` r
 
-apa_performance(fit_latitude) |>
+apa_performance(fit_sessions) |>
   apa_flextable(note = TRUE)
 ```
 
-| k | QE(11) | pE | τ2 | I2 (%) | QM(1) | pM | R2 (%) |
+| k | QE(56) | pE | τ2 | I2 (%) | QM(1) | pM | R2 (%) |
 |----|----|----|----|----|----|----|----|
-| 13 | 30.73 | .001 | 0.08 | 68.4 | 16.36 | \<.001 | 75.6 |
+| 58 | 146.64 | \<.001 | 0.08 | 62.9 | 6.07 | .01 | 27.3 |
 | Note. τ2 was estimated by restricted maximum likelihood. k = number of studies; QE = test of residual heterogeneity; τ2 = variance of the true effects; I2 = percentage of total variability due to heterogeneity; QM = omnibus test of the moderators; R2 = percentage of heterogeneity explained by the moderators. |  |  |  |  |  |  |  |
+
+Table 5
+
+Heterogeneity in the Meta-Regression on Sessions per Week
 
 For a meta-regression, `apa_parameters` shows the intercept and
 moderators, as for other regression models. Coefficients (*B*) are on
-the scale on which the effect sizes were analyzed (here, log risk
+the scale on which the effect sizes were analyzed (here, log odds
 ratios), and for ratio measures, the exponentiated coefficients are
-added (here, *RR*): each degree of latitude multiplies the risk ratio by
-about 0.97. `apa_performance` adds the omnibus test of the moderators
+added (here, *OR*): each additional session per week multiplies the odds
+ratio by about 0.93, so programs that met more often reduced reoffending
+more. `apa_performance` adds the omnibus test of the moderators
 (*Q*_(M)) and the percentage of heterogeneity they explain (*R*²), and
 *Q*_(E) is the test of the heterogeneity that remains.
 
 ## Subgroup Analysis
 
 A subgroup analysis compares the pooled estimates of groups of studies.
-In the BCG trials, participants were assigned to the vaccine at random,
-alternately, or systematically. `apa_subgroups` pools each group of
-trials and compares them:
+The CBT programs had been set up for demonstration, for research, or as
+routine practice. `apa_subgroups` pools each group of studies and
+compares them:
 
 ``` r
 
-apa_subgroups(fit_bcg, Allocation) |>
+apa_subgroups(fit_recidivism, Program) |>
   apa_flextable(note = TRUE)
 ```
 
-| Allocation | k | RR | 95% CI | p | I2 (%) |
+| Program | k | OR | 95% CI | p | I2 (%) |
 |----|----|----|----|----|----|
-| Alternate | 2 | 0.58 | \[0.34, 1.01\] |  .06  | 82.0 |
-| Random | 7 | 0.38 | \[0.22, 0.65\] | \<.001 | 89.9 |
-| Systematic | 4 | 0.65 | \[0.32, 1.32\] |  .24  | 86.4 |
-| Overall | 13 | 0.49 | \[0.34, 0.70\] | \<.001 | 92.2 |
-| Note. Effect sizes are risk ratios, analyzed on the log scale and exponentiated for the table. Each subgroup of Allocation was pooled with its own random-effects model, with τ2 estimated by restricted maximum likelihood. The overall estimate is from the meta-analysis of all effect sizes. Test of subgroup differences (Borenstein et al., 2009): Qbetween(2) = 1.86, p = .39. k = number of studies; CI = confidence interval; I2 = percentage of total variability due to heterogeneity. |  |  |  |  |  |
+| Demonstration | 18 | 0.53 | \[0.40, 0.69\] | \<.001 | 65.4 |
+| Practice | 31 | 0.75 | \[0.69, 0.83\] | \<.001 | 44.2 |
+| Research | 9 | 0.41 | \[0.22, 0.76\] |  .005 | 55.2 |
+| Overall | 58 | 0.66 | \[0.58, 0.74\] | \<.001 | 70.6 |
+| Note. Effect sizes are odds ratios, analyzed on the log scale and exponentiated for the table. Each subgroup of Program was pooled with its own random-effects model, with τ2 estimated by restricted maximum likelihood. The overall estimate is from the meta-analysis of all effect sizes. Test of subgroup differences ([Borenstein](#ref-borensteinIntroductionMetaanalysis2009)[ ](#ref-borensteinIntroductionMetaanalysis2009)[et](#ref-borensteinIntroductionMetaanalysis2009)[ ](#ref-borensteinIntroductionMetaanalysis2009)[al.,](#ref-borensteinIntroductionMetaanalysis2009)[ ](#ref-borensteinIntroductionMetaanalysis2009)[2009](#ref-borensteinIntroductionMetaanalysis2009)): Qbetween(2) = 9.08, p = .01. k = number of studies; CI = confidence interval; I2 = percentage of total variability due to heterogeneity. |  |  |  |  |  |
+
+Table 6
+
+Effects of Cognitive Behavioral Therapy by Purpose of the Program
+
+Programs set up for demonstration or research reduced reoffending more
+than programs in routine practice.
 
 By default, each subgroup has its own *τ*², and the subgroups are
 compared with *Q*_(between), the heterogeneity of the subgroup
@@ -210,7 +294,7 @@ is estimated more precisely when subgroups have few studies: the
 estimates come from a meta-regression with the subgroup as a categorical
 moderator, and the subgroups are compared with its omnibus test
 (*Q*_(M)). The subgroup variable can be a column of the data (quoted or
-unquoted) or a vector (e.g., `d_bcg$Latititude > 30`).
+unquoted) or a vector (e.g., `d_recidivism$Sessions > 1`).
 
 ## Publication Bias
 
@@ -232,7 +316,12 @@ apa_publication_bias(fit_adherence) |>
 | Egger’s regression test | z | 1.02 | .31 | .08 | \[−.07, .22\] |
 | Rank correlation test | τ |  .16 | .39 |  |  |
 | Trim and fill | k0 | 2   |  | .13 | \[ .06, .19\] |
-| Note. The unadjusted pooled estimate of the 16 studies is r = .15, 95% CI \[.09, .21\]. Egger’s regression test (Egger et al., 1997) is the test of the standard error in a meta-regression of the effect sizes on their standard errors; its adjusted estimate is the predicted effect as the standard error approaches zero. The rank correlation test (Begg & Mazumdar, 1994) is Kendall’s τ between the standardized effect sizes and their sampling variances. Trim and fill (Duval & Tweedie, 2000) with the L0 estimator imputed 2 studies on the left side of the funnel plot; its adjusted estimate includes them. Estimates are correlations, converted from the scale on which they were analyzed. CI = confidence interval; k0 = number of imputed studies. |  |  |  |  |  |
+| Note. The unadjusted pooled estimate of the 16 studies is r = .15, 95% CI \[.09, .21\]. Egger’s regression test ([Egger](#ref-eggerBiasMetaanalysisDetected1997)[ ](#ref-eggerBiasMetaanalysisDetected1997)[et](#ref-eggerBiasMetaanalysisDetected1997)[ ](#ref-eggerBiasMetaanalysisDetected1997)[al.,](#ref-eggerBiasMetaanalysisDetected1997)[ ](#ref-eggerBiasMetaanalysisDetected1997)[1997](#ref-eggerBiasMetaanalysisDetected1997)) is the test of the standard error in a meta-regression of the effect sizes on their standard errors; its adjusted estimate is the predicted effect as the standard error approaches zero. The rank correlation test ([Begg](#ref-beggOperatingCharacteristicsRank1994)[ ](#ref-beggOperatingCharacteristicsRank1994)[&](#ref-beggOperatingCharacteristicsRank1994)[ ](#ref-beggOperatingCharacteristicsRank1994)[Mazumdar,](#ref-beggOperatingCharacteristicsRank1994)[ ](#ref-beggOperatingCharacteristicsRank1994)[1994](#ref-beggOperatingCharacteristicsRank1994)) is Kendall’s τ between the standardized effect sizes and their sampling variances. Trim and fill ([Duval](#ref-duvalTrimFillSimple2000)[ ](#ref-duvalTrimFillSimple2000)[&](#ref-duvalTrimFillSimple2000)[ ](#ref-duvalTrimFillSimple2000)[Tweedie,](#ref-duvalTrimFillSimple2000)[ ](#ref-duvalTrimFillSimple2000)[2000](#ref-duvalTrimFillSimple2000)) with the L0 estimator imputed 2 studies on the left side of the funnel plot; its adjusted estimate includes them. Estimates are correlations, converted from the scale on which they were analyzed. CI = confidence interval; k0 = number of imputed studies. |  |  |  |  |  |
+
+Table 7
+
+Tests of Publication Bias in Studies of Conscientiousness and Medication
+Adherence
 
 The adjusted estimates are on the same scale as the table of studies
 (here, correlations), and the note gives the unadjusted pooled estimate
@@ -268,6 +357,10 @@ apa_parameters(fit_schools, studies = FALSE) |>
 | Pooled estimate (random effects) | 0.18 | 0.08 | \[0.02, 0.35\] | 2.18 | .03 |
 | Note. Effect sizes are Hedges’ g values (standardized mean differences). The 56 effect sizes were pooled with a multilevel random-effects model with random intercepts for district (11 levels) and school in district (56 levels), with variance components estimated by restricted maximum likelihood. CI = confidence interval. |  |  |  |  |  |
 
+Table 8
+
+Multilevel Meta-Analysis of the Effects of Modified School Calendars
+
 ``` r
 
 apa_performance(fit_schools) |>
@@ -277,16 +370,21 @@ apa_performance(fit_schools) |>
 | k | Q(55) | p | σ2District | σ2School in District | I2 (%) |
 |----|----|----|----|----|----|
 | 56 | 578.86 | \<.001 | 0.07 | 0.03 | 95.2 |
-| Note. Variance components were estimated by restricted maximum likelihood. I2 is the multilevel I2 (Cheung, 2014): the percentage of total variability due to heterogeneity at all levels, or at the level in the subscript. k = number of effect sizes; Q = test of heterogeneity; σ2 = variance of the true effects at the level in the subscript. |  |  |  |  |  |
+| Note. Variance components were estimated by restricted maximum likelihood. I2 is the multilevel I2 ([Cheung,](#ref-cheungModelingDependentEffect2014)[ ](#ref-cheungModelingDependentEffect2014)[2014](#ref-cheungModelingDependentEffect2014)): the percentage of total variability due to heterogeneity at all levels, or at the level in the subscript. k = number of effect sizes; Q = test of heterogeneity; σ2 = variance of the true effects at the level in the subscript. |  |  |  |  |  |
+
+Table 9
+
+Heterogeneity at Each Level of the Multilevel Meta-Analysis
 
 `apa_performance` gives the variance of the true effects at each level
-(*σ*², with the level as a subscript) and the multilevel *I*² (Cheung,
-2014), the percentage of the total variability due to heterogeneity at
-all levels. With `metrics = "all"`, the table adds *σ* and confidence
-intervals of *σ*² for each level, and *I*² for each level.
-Meta-regressions of multilevel models work as for `rma`. Random effects
-with an `~ inner | outer` structure (e.g., correlated outcomes within
-studies) are not yet supported.
+(*σ*², with the level as a subscript) and the multilevel *I*²([Cheung,
+2014](#ref-cheungModelingDependentEffect2014)), the percentage of the
+total variability due to heterogeneity at all levels. With
+`metrics = "all"`, the table adds *σ* and confidence intervals of *σ*²
+for each level, and *I*² for each level. Meta-regressions of multilevel
+models work as for `rma`. Random effects with an `~ inner | outer`
+structure (e.g., correlated outcomes within studies) are not yet
+supported.
 
 ## Citations in Notes
 
@@ -309,3 +407,33 @@ in the regression article.
 - Multilevel models with random intercepts (`rma.mv` with
   `random = ~ 1 | study / effect`) are supported; random effects with an
   `~ inner | outer` structure are not yet supported.
+
+## References
+
+Begg, C. B., & Mazumdar, M. (1994). Operating characteristics of a rank
+correlation test for publication bias. *Biometrics*, *50*(4), 1088–1101.
+<https://doi.org/10.2307/2533446>
+
+Borenstein, M., Hedges, L. V., Higgins, J. P. T., & Rothstein, H. R.
+(2009). *Introduction to meta-analysis*. Wiley.
+<https://doi.org/10.1002/9780470743386>
+
+Cheung, M. W.-L. (2014). Modeling dependent effect sizes with
+three-level meta-analyses: A structural equation modeling approach.
+*Psychological Methods*, *19*(2), 211–229.
+<https://doi.org/10.1037/a0032968>
+
+Duval, S., & Tweedie, R. (2000). Trim and fill: A simple
+funnel‐plot–based method of testing and adjusting for publication bias
+in meta‐analysis. *Biometrics*, *56*(2), 455–463.
+<https://doi.org/10.1111/j.0006-341X.2000.00455.x>
+
+Egger, M., Davey Smith, G., Schneider, M., & Minder, C. (1997). Bias in
+meta-analysis detected by a simple, graphical test. *BMJ*, *315*(7109),
+629–634. <https://doi.org/10.1136/bmj.315.7109.629>
+
+Landenberger, N. A., & Lipsey, M. W. (2005). The positive effects of
+cognitive-behavioral programs for offenders: A meta-analysis of factors
+associated with effective treatment. *Journal of Experimental
+Criminology*, *1*(4), 451–476.
+<https://doi.org/10.1007/s11292-005-3541-7>

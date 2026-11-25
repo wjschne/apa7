@@ -20,10 +20,13 @@ apa_cor(
   border_color = "black",
   border_width = 0.5,
   line_spacing = NULL,
-  table_width = 1,
+  table_width = NULL,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
+  method = "pearson",
+  p_adjust = "none",
+  partial = FALSE,
   ...
 )
 ```
@@ -95,14 +98,27 @@ apa_cor(
 
 - table_width:
 
-  proportion of the width of the page that the table occupies, from 0 to
-  1: 1 (default) is the full width, and .5 is half the width. The column
-  widths are scaled to fill this proportion of the width of the text
-  area, which is 6.5 inches (letter-size paper with 1-inch margins)
-  unless changed with `apa7_defaults(page_width = )`. With 0, the column
-  widths are left as they are. In apa7 0.2.0 and earlier, `table_width`
-  was a width in inches; values greater than 1 are still read as inches,
-  with a warning.
+  width of the table, in the same forms in every apa7 function: a
+  proportion from 0 to 1 of the default width (the full width of a
+  portrait page unless changed with `apa7_defaults(table_width = )`),
+  `"page"` (or `"portrait"`) for the full width of a portrait page,
+  `"landscape"` for a landscape page, `"column"` for one column of a
+  two-column page, or a named number: a proportion of one of these
+  widths (e.g., `c(landscape = .8)`) or a width in `inches`, `cm`, or
+  `mm` (e.g., `c(inches = 5)`). With 0, the columns are only as wide as
+  their contents need. If `NULL` (default), the width set by the code
+  chunk's `apa7-width` option in Quarto (e.g.,
+  `#| apa7-width: landscape`, or `#| apa7-width: {landscape: .8}` for a
+  named number) or `apa7.width` option in R Markdown, or `"page"` for a
+  chunk with apaquarto's `apa-twocolumn: true`; otherwise, the
+  `table_width` set with
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  (1 unless changed). The widths of the pages and the column are set
+  with the `page_width`, `landscape_width`, and `column_width` arguments
+  of
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md).
+  A number greater than 1 is read as inches, with a warning to write it
+  as `c(inches = )`.
 
 - keep_empty_star_columns:
 
@@ -121,12 +137,39 @@ apa_cor(
 
   column_formats object
 
+- method:
+
+  kind of correlation (e.g., `"pearson"`, `"spearman"`, `"kendall"`,
+  `"biweight"`, or `"percentage"`), passed to
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html).
+  Not used for
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
+  output.
+
+- p_adjust:
+
+  method of adjusting the *p*-values (and so the stars) for multiple
+  comparisons (e.g., `"holm"`, `"bonferroni"`, or `"fdr"`). Unlike
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html),
+  the default is `"none"`. Not used for
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
+  output.
+
+- partial:
+
+  if `TRUE`, partial correlations, each controlling for all other
+  variables in the table. Not used for
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
+  output.
+
 - ...:
 
-  \<[`data-masking`](https://rlang.r-lib.org/reference/args_data_masking.html)\>
-  parameters passed to psych::corTest (not used for
+  other arguments passed to
   [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
-  output)
+  (e.g., `robust = TRUE`, `winsorize = .2`, or `multilevel = TRUE`). Not
+  used for
+  [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
+  output.
 
 ## Value
 
@@ -134,23 +177,39 @@ flextable::flextable
 
 ## Details
 
-By default, `apa_cor()` computes Pearson correlations with
-[`psych::corTest()`](https://rdrr.io/pkg/psych/man/corr.test.html), and
-the stars are for unadjusted *p*-values.
-
-For other kinds of correlations (e.g., Spearman, Kendall, robust, or
-partial correlations), compute them with
+`apa_cor()` computes the correlations with
+[`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html).
+By default, they are Pearson correlations of all pairwise complete
+observations, and the stars are for unadjusted *p*-values. Use `method`,
+`p_adjust`, `partial`, and the other arguments of
 [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
-and pass the result as `data`. The table shows its correlations and
+for other kinds of correlations. The column names of `data` are the
+variable names in the table, and they can contain spaces and symbols
+(e.g., `"Reading comprehension"`) for every kind of correlation:
+`apa_cor()` gives the variables internal names while the correlations
+are computed. Logical columns are correlated as 0 and 1.
+
+The output of
+[`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
+can also be passed as `data`. The table shows its correlations and
 *p*-values, and the summary columns are computed from the data that
 [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
-keeps with its results. The note says what kind of correlations are
-shown (unless they are ordinary Pearson correlations) and how the
-*p*-values were adjusted for multiple comparisons:
+keeps with its results. Note that
 [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
 uses Holm's method by default, so the stars are for adjusted *p*-values
-unless `p_adjust = "none"`. Correlations computed by group, between two
-sets of variables, or with Bayesian methods are not yet supported.
+unless `p_adjust = "none"`, and that its partial and multilevel
+correlations do not accept variable names with spaces. For those, use
+`apa_cor(data, partial = TRUE)` instead.
+
+The note says what kind of correlations are shown (unless they are
+ordinary Pearson correlations) and how the *p*-values were adjusted for
+multiple comparisons. Correlations computed by group, between two sets
+of variables, or with Bayesian methods are not yet supported.
+
+In apa7 0.2.0 and earlier, `apa_cor()` computed the correlations with
+[`psych::corTest()`](https://rdrr.io/pkg/psych/man/corr.test.html). Its
+`adjust` argument is still accepted as `p_adjust`, with a warning, and
+`use = "complete"` removes incomplete rows, with a warning.
 
 ## Examples
 

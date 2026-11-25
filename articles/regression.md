@@ -7,6 +7,7 @@ library(parameters)
 library(performance)
 library(apa7)
 library(psych)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 The apa7 package is closely aligned with the
@@ -73,6 +74,10 @@ apa_parameters(lm1) |>
     2 Age            0.06 0.02    .11      2.93       .004
     3 Gender–Female −0.40 0.38   −.04     −1.03       .30 
 
+Table 1
+
+Regression of ACT Scores on Age and Gender as a Tibble
+
 In a rendered document, the output of `apa_parameters` is displayed as a
 table without further processing.
 
@@ -86,6 +91,10 @@ apa_parameters(lm1)
 | Constant      | 27.35 | 0.59 |  .00 | 46.55  | \<.001 |
 | Age           |  0.06 | 0.02 |  .11 |  2.93  |  .004  |
 | Gender–Female | −0.40 | 0.38 | −.04 | −1.03  |  .30   |
+
+Table 2
+
+Regression of ACT Scores on Age and Gender
 
 The output is still a tibble, so ordinary dplyr verbs work. Pass the
 result to `apa_flextable` to customize the table. For example, to drop
@@ -101,6 +110,10 @@ apa_parameters(lm1) |>
 |---------------|-------|------|------|--------|-------|
 | Age           |  0.06 | 0.02 |  .11 |  2.93  |  .004 |
 | Gender–Female | −0.40 | 0.38 | −.04 | −1.03  |  .30  |
+
+Table 3
+
+Regression of ACT Scores on Age and Gender Without the Constant
 
 To compare nested models, pass a list. Model fit statistics (*R*²,
 change in *R*², and the *F* test of the change) are added automatically.
@@ -137,6 +150,10 @@ apa_parameters(list(lm1, lm2, lm3))
 |         | SATV                   |  0.01 | 0.00 |  .31 |  8.01 | 677 | \<.001 |     |           |
 |         | SATQ                   |  0.02 | 0.00 |  .39 | 10.12 | 677 | \<.001 |     |           |
 
+Table 4
+
+Hierarchical Regression of ACT Scores
+
 ## Binary Logistic Regression
 
 `apa_parameters` also accepts `glm` objects. The table reports
@@ -145,17 +162,40 @@ exponentiated coefficient, and the test statistic. For logistic
 regression, the exponentiated coefficient is the odds ratio (*OR*), and
 the test statistic is *z*.
 
+The `Cowles` data set in the carData package ([Cowles & Davis,
+1987](#ref-cowlesSubjectMatterPsychology1987)) has the neuroticism and
+extraversion scores of 1,421 introductory psychology students and
+whether they volunteered to take part in psychological research. Here,
+the odds of volunteering depend on extraversion, neuroticism, and sex:
+
 ``` r
 
-glm1 <- glm(am ~ wt + hp, data = mtcars, family = binomial)
+d_volunteer <- carData::Cowles |>
+  transmute(
+    Volunteered = factor(volunteer, levels = c("no", "yes"), labels = c("No", "Yes")),
+    Extraversion = extraversion,
+    Neuroticism = neuroticism,
+    Sex = factor(sex, levels = c("female", "male"), labels = c("Female", "Male"))
+  )
+
+glm1 <- glm(
+  Volunteered ~ Extraversion + Neuroticism + Sex,
+  data = d_volunteer,
+  family = binomial
+)
 apa_parameters(glm1)
 ```
 
-| Variable | B     | SE   | OR        | z     | p    |
-|----------|-------|------|-----------|-------|------|
-| Constant | 18.87 | 7.44 | 1.56×108  |  2.53 | .01  |
-| Wt       | −8.08 | 3.07 | 3.09×10−4 | −2.63 | .008 |
-| Hp       |  0.04 | 0.02 | 1.04      |  2.04 | .04  |
+| Variable     | B     | SE   | OR   | z     | p      |
+|--------------|-------|------|------|-------|--------|
+| Constant     | −1.12 | 0.25 | 0.33 | −4.48 | \<.001 |
+| Extraversion |  0.07 | 0.01 | 1.07 |  4.65 | \<.001 |
+| Neuroticism  |  0.01 | 0.01 | 1.01 |  0.56 |  .57   |
+| Sex–Male     | −0.24 | 0.11 | 0.79 | −2.12 |  .03   |
+
+Table 5
+
+Logistic Regression of Volunteering on Personality and Sex
 
 Exponentiated coefficients are added whenever the link function is logit
 or log. They are labeled *OR* for logit links, *IRR* (incidence rate
@@ -168,11 +208,16 @@ or `exponentiate = TRUE` to add them for other links such as probit.
 apa_parameters(glm1, exponentiate = FALSE)
 ```
 
-| Variable | B     | SE   | z     | p    |
-|----------|-------|------|-------|------|
-| Constant | 18.87 | 7.44 |  2.53 | .01  |
-| Wt       | −8.08 | 3.07 | −2.63 | .008 |
-| Hp       |  0.04 | 0.02 |  2.04 | .04  |
+| Variable     | B     | SE   | z     | p      |
+|--------------|-------|------|-------|--------|
+| Constant     | −1.12 | 0.25 | −4.48 | \<.001 |
+| Extraversion |  0.07 | 0.01 |  4.65 | \<.001 |
+| Neuroticism  |  0.01 | 0.01 |  0.56 |  .57   |
+| Sex–Male     | −0.24 | 0.11 | −2.12 |  .03   |
+
+Table 6
+
+Logistic Regression Coefficients on the Log-Odds Scale
 
 To choose and order the columns, use `predictor_parameters`. Columns
 that the model does not report (for example, *t* for a model tested with
@@ -186,11 +231,16 @@ apa_parameters(
 )
 ```
 
-| Variable | OR        | z     | p    |
-|----------|-----------|-------|------|
-| Constant | 1.56×108  |  2.53 | .01  |
-| Wt       | 3.09×10−4 | −2.63 | .008 |
-| Hp       | 1.04      |  2.04 | .04  |
+| Variable     | OR   | z     | p      |
+|--------------|------|-------|--------|
+| Constant     | 0.33 | −4.48 | \<.001 |
+| Extraversion | 1.07 |  4.65 | \<.001 |
+| Neuroticism  | 1.01 |  0.56 |  .57   |
+| Sex–Male     | 0.79 | −2.12 |  .03   |
+
+Table 7
+
+Logistic Regression With Selected Columns
 
 As with `lm`, `starred` and `bolded` mark significant coefficients.
 
@@ -199,11 +249,16 @@ As with `lm`, `starred` and `bolded` mark significant coefficients.
 apa_parameters(glm1, starred = "Coefficient", bolded = "p")
 ```
 
-| Variable | B         | SE   | OR        | z     | p    |
-|----------|-----------|------|-----------|-------|------|
-| Constant | 18.87\*   | 7.44 | 1.56×108  |  2.53 | .01  |
-| Wt       | −8.08\*\* | 3.07 | 3.09×10−4 | −2.63 | .008 |
-| Hp       |  0.04\*   | 0.02 | 1.04      |  2.04 | .04  |
+| Variable     | B           | SE   | OR   | z     | p      |
+|--------------|-------------|------|------|-------|--------|
+| Constant     | −1.12\*\*\* | 0.25 | 0.33 | −4.48 | \<.001 |
+| Extraversion |  0.07\*\*\* | 0.01 | 1.07 |  4.65 | \<.001 |
+| Neuroticism  |  0.01       | 0.01 | 1.01 |  0.56 |  .57   |
+| Sex–Male     | −0.24\*     | 0.11 | 0.79 | −2.12 |  .03   |
+
+Table 8
+
+Logistic Regression With Significance Stars and Bold *p*-Values
 
 ### Comparing logistic regression models
 
@@ -215,19 +270,24 @@ has a fixed dispersion parameter.
 
 ``` r
 
-glm0 <- glm(am ~ wt, data = mtcars, family = binomial)
+glm0 <- glm(Volunteered ~ Extraversion, data = d_volunteer, family = binomial)
 apa_parameters(list(glm0, glm1))
 ```
 
-| Model   | Variable | B     | SE   | OR        | z     | p    | R2Tjur | ΔR2Tjur |
-|---------|----------|-------|------|-----------|-------|------|--------|---------|
-| Model 1 |          |       |      |           |       |      | .62    |         |
-|         | Constant | 12.04 | 4.51 | 1.69×105  |  2.67 | .008 |        |         |
-|         | Wt       | −4.02 | 1.44 | 0.02      | −2.80 | .005 |        |         |
-| Model 2 |          |       |      |           |       |      | .81    | .19\*\* |
-|         | Constant | 18.87 | 7.44 | 1.56×108  |  2.53 | .01  |        |         |
-|         | Wt       | −8.08 | 3.07 | 3.09×10−4 | −2.63 | .008 |        |         |
-|         | Hp       |  0.04 | 0.02 | 1.04      |  2.04 | .04  |        |         |
+| Model   | Variable     | B     | SE   | OR   | z     | p      | R2Tjur | ΔR2Tjur |
+|---------|--------------|-------|------|------|-------|--------|--------|---------|
+| Model 1 |              |       |      |      |       |        | .02    |         |
+|         | Constant     | −1.14 | 0.19 | 0.32 | −6.15 | \<.001 |        |         |
+|         | Extraversion |  0.07 | 0.01 | 1.07 |  4.64 | \<.001 |        |         |
+| Model 2 |              |       |      |      |       |        | .02    | .00     |
+|         | Constant     | −1.12 | 0.25 | 0.33 | −4.48 | \<.001 |        |         |
+|         | Extraversion |  0.07 | 0.01 | 1.07 |  4.65 | \<.001 |        |         |
+|         | Neuroticism  |  0.01 | 0.01 | 1.01 |  0.56 |  .57   |        |         |
+|         | Sex–Male     | −0.24 | 0.11 | 0.79 | −2.12 |  .03   |        |         |
+
+Table 9
+
+Two Logistic Regression Models of Volunteering
 
 The model comparison can also be displayed separately with
 `apa_performance_comparison`.
@@ -237,10 +297,14 @@ The model comparison can also be displayed separately with
 apa_performance_comparison(list(glm0, glm1))
 ```
 
-| Model   | R2Tjur | ΔR2Tjur | χ2   | df  | p    |
-|---------|--------|---------|------|-----|------|
-| Model 1 | .62    | .62     |      |     |      |
-| Model 2 | .81    | .19     | 9.12 | 1   | .003 |
+| Model   | R2Tjur | ΔR2Tjur | χ2   | df  | p   |
+|---------|--------|---------|------|-----|-----|
+| Model 1 | .02    | .02     |      |     |     |
+| Model 2 | .02    | .00     | 5.42 | 2   | .07 |
+
+Table 10
+
+Comparison of Two Logistic Regression Models of Volunteering
 
 ## Multinomial Logistic Regression
 
@@ -248,27 +312,27 @@ When the outcome has more than two unordered categories, multinomial
 logistic regression
 ([`nnet::multinom`](https://rdrr.io/pkg/nnet/man/multinom.html))
 compares each category with a reference category, which is the first
-level of the outcome. The `Womenlf` data set in the carData package has
-the work participation of 263 married Canadian women (not working,
-working part time, or working full time), their husbands’ income (in
-\$1,000s), and whether they had children at home. Here, not working is
-the reference category:
+level of the outcome. The `BEPS` data set in the carData package ([Fox &
+Andersen, 2006](#ref-foxEffectDisplaysMultinomial2006)) has the votes of
+1,525 people in the British Election Panel Study of 1997–2001
+(Conservative, Labour, or Liberal Democrat), their attitudes toward
+European integration (from 1 to 11, with higher scores for more
+Eurosceptic attitudes), and their knowledge of the parties’ positions on
+European integration (from 0 to 3). Here, Conservative is the reference
+category:
 
 ``` r
 
-d_work <- carData::Womenlf |>
-  mutate(
-    participation = factor(
-      partic,
-      levels = c("not.work", "parttime", "fulltime"),
-      labels = c("Not working", "Part time", "Full time")
-    ),
-    husband_income = hincome
+d_vote <- carData::BEPS |>
+  transmute(
+    Vote = vote,
+    Euroscepticism = Europe,
+    Knowledge = political.knowledge
   )
 
 multinom1 <- nnet::multinom(
-  participation ~ husband_income + children,
-  data = d_work,
+  Vote ~ Euroscepticism + Knowledge,
+  data = d_vote,
   trace = FALSE
 )
 
@@ -278,73 +342,104 @@ apa_parameters(multinom1) |>
 
 | Variable | B | SE | OR | z | p |
 |----|----|----|----|----|----|
-| Part time vs. Not working |  |  |  |  |  |
-|  Constant | −1.43 | 0.59 | 0.24 | −2.42 |  .02  |
-|  Husband Income |  0.01 | 0.02 | 1.01 |  0.29 |  .77  |
-|  Children–Present |  0.02 | 0.47 | 1.02 |  0.05 |  .96  |
-| Full time vs. Not working |  |  |  |  |  |
-|  Constant |  1.98 | 0.48 | 7.26 |  4.10 | \<.001 |
-|  Husband Income | −0.10 | 0.03 | 0.91 | −3.46 | \<.001 |
-|  Children–Present | −2.56 | 0.36 | 0.08 | −7.06 | \<.001 |
-| Note. Coefficients compare each category of Participation with the reference category (Not working). OR = odds ratio (relative to the reference category). |  |  |  |  |  |
+| Labour vs. Conservative |  |  |  |  |  |
+|  Constant |  3.80 | 0.24 | 44.75 |  15.82 | \<.001 |
+|  Euroscepticism | −0.35 | 0.02 |  0.71 | −14.84 | \<.001 |
+|  Knowledge | −0.53 | 0.07 |  0.59 |  −8.13 | \<.001 |
+| Liberal Democrat vs. Conservative |  |  |  |  |  |
+|  Constant |  2.24 | 0.26 |  9.39 |   8.49 | \<.001 |
+|  Euroscepticism | −0.29 | 0.03 |  0.75 | −11.13 | \<.001 |
+|  Knowledge | −0.23 | 0.07 |  0.79 |  −3.12 |  .002 |
+| Note. Coefficients compare each category of Vote with the reference category (Conservative). OR = odds ratio (relative to the reference category). |  |  |  |  |  |
+
+Table 11
+
+Multinomial Logistic Regression of Vote on Euroscepticism and Political
+Knowledge
 
 Each comparison gets a heading row with its coefficients indented below
 it, and the exponentiated coefficients are odds ratios relative to the
-reference category. Women with children at home had much lower odds of
-working full time than of not working, but children made little
-difference to the odds of working part time. To compare the categories
-with another reference, reorder the levels of the outcome (e.g., with
-`relevel`) before fitting the model. With `category_headings = FALSE`,
-each row is labeled with its category instead (e.g., “Part time:
-Constant”).
+reference category. More Eurosceptic voters had lower odds of voting
+Labour or Liberal Democrat rather than Conservative, and so did voters
+who knew more about the parties’ positions on Europe. To compare the
+categories with another reference, reorder the levels of the outcome
+(e.g., with `relevel`) before fitting the model. With
+`category_headings = FALSE`, each row is labeled with its category
+instead (e.g., “Labour: Constant”).
 
 Lists of multinomial models are compared with McFadden’s pseudo-*R*² and
 likelihood ratio tests:
 
 ``` r
 
-multinom0 <- nnet::multinom(participation ~ husband_income, data = d_work, trace = FALSE)
+multinom0 <- nnet::multinom(Vote ~ Euroscepticism, data = d_vote, trace = FALSE)
 apa_performance_comparison(list(multinom0, multinom1))
 ```
 
 | Model   | R2McFadden | ΔR2McFadden | χ2    | df  | p      |
 |---------|------------|-------------|-------|-----|--------|
-| Model 1 | .03        | .03         |       |     |        |
-| Model 2 | .16        | .13         | 63.56 | 2   | \<.001 |
+| Model 1 | .08        | .08         |       |     |        |
+| Model 2 | .10        | .02         | 75.16 | 2   | \<.001 |
+
+Table 12
+
+Comparison of Multinomial Models of Vote
 
 ## Count Regression
 
 For Poisson and negative binomial regression, the exponentiated
-coefficients are incidence rate ratios (*IRR*).
+coefficients are incidence rate ratios (*IRR*). The `quine` data set in
+the MASS package ([Venables & Ripley,
+2002](#ref-ripleyModernApplied2002)) has the number of days that 146
+children in New South Wales, Australia, were absent from school in a
+year. Here, absences depend on the child’s sex and on whether the child
+was classified as an average or a slow learner:
 
 ``` r
 
-glm_pois <- glm(carb ~ wt + hp, data = mtcars, family = poisson)
+d_absences <- MASS::quine |>
+  transmute(
+    Absences = Days,
+    Sex = factor(Sex, levels = c("F", "M"), labels = c("Female", "Male")),
+    Learner = factor(Lrn, levels = c("AL", "SL"), labels = c("Average", "Slow"))
+  )
+
+glm_pois <- glm(Absences ~ Sex + Learner, data = d_absences, family = poisson)
 apa_parameters(glm_pois)
 ```
 
-| Variable | B    | SE   | IRR  | z    | p      |
-|----------|------|------|------|------|--------|
-| Constant | 0.14 | 0.40 | 1.15 | 0.35 |  .73   |
-| Wt       | 0.00 | 0.13 | 1.00 | 0.03 |  .97   |
-| Hp       | 0.01 | 0.00 | 1.01 | 3.34 | \<.001 |
+| Variable     | B    | SE   | IRR   | z     | p      |
+|--------------|------|------|-------|-------|--------|
+| Constant     | 2.66 | 0.04 | 14.33 | 73.75 | \<.001 |
+| Sex–Male     | 0.18 | 0.04 |  1.20 |  4.43 | \<.001 |
+| Learner–Slow | 0.12 | 0.04 |  1.12 |  2.84 |  .004  |
+
+Table 13
+
+Poisson Regression of School Absences on Sex and Learner Status
 
 Quasi-families and other families with an estimated dispersion parameter
 are tested with *t* instead of *z*, and the degrees of freedom are shown
 in the column header. Nested models are compared with *F* tests instead
-of likelihood ratio tests.
+of likelihood ratio tests. The absences vary much more than a Poisson
+model expects, so the quasi-Poisson standard errors are about four times
+as large, and neither predictor is significant.
 
 ``` r
 
-glm_qpois <- glm(carb ~ wt + hp, data = mtcars, family = quasipoisson)
+glm_qpois <- glm(Absences ~ Sex + Learner, data = d_absences, family = quasipoisson)
 apa_parameters(glm_qpois)
 ```
 
-| Variable | B    | SE   | IRR  | t(29) | p      |
-|----------|------|------|------|-------|--------|
-| Constant | 0.14 | 0.27 | 1.15 | 0.51  |  .61   |
-| Wt       | 0.00 | 0.09 | 1.00 | 0.05  |  .96   |
-| Hp       | 0.01 | 0.00 | 1.01 | 4.92  | \<.001 |
+| Variable     | B    | SE   | IRR   | t(143) | p      |
+|--------------|------|------|-------|--------|--------|
+| Constant     | 2.66 | 0.14 | 14.33 | 18.50  | \<.001 |
+| Sex–Male     | 0.18 | 0.16 |  1.20 |  1.11  |  .27   |
+| Learner–Slow | 0.12 | 0.17 |  1.12 |  0.71  |  .48   |
+
+Table 14
+
+Quasi-Poisson Regression of School Absences on Sex and Learner Status
 
 ### Zero-inflated and hurdle models
 
@@ -352,32 +447,37 @@ Counts often have more zeros than a Poisson or negative binomial model
 expects. A zero-inflated model
 ([`pscl::zeroinfl`](https://rdrr.io/pkg/pscl/man/zeroinfl.html)) adds a
 logistic model of *excess* zeros, which come from cases that could only
-be zero (e.g., scientists who were not publishing at all). A hurdle
-model ([`pscl::hurdle`](https://rdrr.io/pkg/pscl/man/hurdle.html))
-instead has a logistic model of whether the count is zero or positive,
-and a zero-truncated count model of the positive counts. Either way,
+be zero (e.g., people who would not have an affair under any
+circumstances). A hurdle model
+([`pscl::hurdle`](https://rdrr.io/pkg/pscl/man/hurdle.html)) instead has
+a logistic model of whether the count is zero or positive, and a
+zero-truncated count model of the positive counts. Either way,
 `apa_parameters` puts each part under its own heading. Only the count
 model’s coefficients are exponentiated (*IRR*), because the zero model’s
-coefficients are log odds. The `bioChemists` data set in the pscl
-package has the number of articles 915 biochemistry graduate students
-published in the last 3 years of their PhD programs, which depends here
-on their mentors’ numbers of articles (`mentor_articles`) and their
-number of young children (`young_children`). The zero-inflation part has
-only the mentor’s articles:
+coefficients are log odds. The `Affairs` data set in the AER package,
+from a magazine survey analyzed by Fair
+([1978](#ref-fairTheoryExtramaritalAffairs1978)), has the number of
+extramarital affairs that 601 married people reported having in the past
+year. The counts were coded from response categories (0, 1, 2, and 3
+times; 7 for 4 to 10 times; and 12 for monthly or more often), and 75%
+of them are zeros. Here, the number of affairs depends on how happy
+people rated their marriages (from 1, very unhappy, to 5, very happy)
+and how religious they were (from 1, anti-religious, to 5, very
+religious), and so does the probability of an excess zero:
 
 ``` r
 
-data("bioChemists", package = "pscl")
-d_articles <- bioChemists |>
-  rename(
-    articles = art,
-    mentor_articles = ment,
-    young_children = kid5
+data("Affairs", package = "AER")
+d_affairs <- Affairs |>
+  transmute(
+    Affairs = affairs,
+    Happiness = rating,
+    Religiousness = religiousness
   )
 
 zinb <- pscl::zeroinfl(
-  articles ~ mentor_articles + young_children | mentor_articles,
-  data = d_articles,
+  Affairs ~ Happiness + Religiousness | Happiness + Religiousness,
+  data = d_affairs,
   dist = "negbin"
 )
 
@@ -388,17 +488,23 @@ apa_parameters(zinb) |>
 | Variable | B | SE | IRR | z | p |
 |----|----|----|----|----|----|
 | Count model |  |  |  |  |  |
-|  Constant |  0.36 | 0.06 | 1.44 |  6.12 | \<.001 |
-|  Mentor Articles |  0.03 | 0.00 | 1.03 |  7.32 | \<.001 |
-|  Young Children | −0.09 | 0.05 | 0.92 | −1.90 |  .06  |
+|  Constant |  2.59 | 0.33 | 13.35 |  7.86 | \<.001 |
+|  Happiness | −0.18 | 0.07 |  0.84 | −2.67 |  .007 |
+|  Religiousness | −0.13 | 0.07 |  0.87 | −1.88 |  .06  |
 | Zero-inflation model |  |  |  |  |  |
-|  Constant | −0.78 | 0.35 |  | −2.24 |  .03  |
-|  Mentor Articles | −0.63 | 0.25 |  | −2.55 |  .01  |
-| Note. The count model is negative binomial with dispersion parameter θ = 2.60, and its coefficients are on the log scale. Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the count model). IRR = incidence rate ratio. |  |  |  |  |  |
+|  Constant | −1.78 | 0.48 |  | −3.75 | \<.001 |
+|  Happiness |  0.50 | 0.09 |  |  5.36 | \<.001 |
+|  Religiousness |  0.25 | 0.09 |  |  2.74 |  .006 |
+| Note. The count model is negative binomial with dispersion parameter θ = 1.34, and its coefficients are on the log scale. Zero-inflation coefficients are log odds of an excess zero (a zero not produced by the count model). IRR = incidence rate ratio. |  |  |  |  |  |
 
-Students with productive mentors published more, and they were less
-likely to be among those who did not publish at all. The note names the
-count distribution, gives the negative binomial dispersion parameter
+Table 15
+
+Zero-Inflated Negative Binomial Regression of Extramarital Affairs
+
+People who were happier in their marriages or more religious were more
+likely to be among those who would not have an affair at all, and
+happier people who did have affairs had fewer of them. The note names
+the count distribution, gives the negative binomial dispersion parameter
 (*θ*), and explains the zero model. For a hurdle model, the zero model’s
 heading is “Zero hurdle model”, and its coefficients are the log odds of
 a count greater than zero:
@@ -406,15 +512,15 @@ a count greater than zero:
 ``` r
 
 pscl::hurdle(
-  articles ~ mentor_articles + young_children | mentor_articles,
-  data = d_articles,
+  Affairs ~ Happiness + Religiousness | Happiness + Religiousness,
+  data = d_affairs,
   dist = "negbin"
 ) |>
   apa_parameters() |>
   apa_note()
 ```
 
-    [1] "The count model is zero-truncated negative binomial with dispersion parameter *θ* = 1.70, and its coefficients are on the log scale. Zero hurdle coefficients are log odds of a count greater than zero. *IRR* = incidence rate ratio."
+    [1] "The count model is zero-truncated negative binomial with dispersion parameter *θ* = 1.35, and its coefficients are on the log scale. Zero hurdle coefficients are log odds of a count greater than zero. *IRR* = incidence rate ratio."
 
 `apa_performance_comparison` compares nested zero-inflated or hurdle
 models with likelihood ratio tests.
@@ -428,15 +534,29 @@ article](https://wjschne.github.io/apa7/articles/multilevel.html#count-outcomes-
 
 Generalized additive models (GAMs), fit with
 [`mgcv::gam`](https://rdrr.io/pkg/mgcv/man/gam.html), let a predictor’s
-effect be a smooth curve instead of a straight line. Here, ozone
-concentration in New York (from the `airquality` data set) depends on
-smooth functions of temperature and wind speed:
+effect be a smooth curve instead of a straight line. The `Wong` data set
+in the carData package ([Wong et al.,
+2001](#ref-wongMathematicalModelsCognitive2001)) has the performance IQ
+of 200 patients tested after they woke from a coma caused by a traumatic
+brain injury, with the number of days in the coma and the number of days
+between waking and testing. Some patients were tested more than once, so
+only each patient’s first test is kept. Here, performance IQ depends on
+smooth functions of the length of the coma and the time since waking:
 
 ``` r
 
+d_coma <- carData::Wong |>
+  arrange(id, days) |>
+  distinct(id, .keep_all = TRUE) |>
+  transmute(
+    IQ = piq,
+    Coma = duration,
+    Recovery = days
+  )
+
 fit_gam <- mgcv::gam(
-  Ozone ~ s(Temp) + s(Wind),
-  data = airquality,
+  IQ ~ s(Coma) + s(Recovery),
+  data = d_coma,
   method = "REML"
 )
 
@@ -444,25 +564,32 @@ apa_parameters(fit_gam) |>
   apa_flextable(note = TRUE)
 ```
 
-| Variable | B | SE | t(108.18) | edf | F | p |
+| Variable | B | SE | t(195.33) | edf | F | p |
 |----|----|----|----|----|----|----|
 | Parametric terms |  |  |  |  |  |  |
-|  Constant | 42.13 | 1.74 | 24.20 |  |  | \<.001 |
+|  Constant | 83.34 | 0.95 | 88.09 |  |  | \<.001 |
 | Smooth terms |  |  |  |  |  |  |
-|  s(Temp) |  |  |  | 3.43 | 15.94 | \<.001 |
-|  s(Wind) |  |  |  | 3.39 | 10.54 | \<.001 |
+|  s(Coma) |  |  |  | 2.67 | 5.88 | \<.001 |
+|  s(Recovery) |  |  |  | 1.00 | 1.27 |  .26  |
 | Note. Smoothing parameters were estimated by restricted maximum likelihood (REML). Smooth terms are tested with approximate F tests. edf = effective degrees of freedom. |  |  |  |  |  |  |
+
+Table 16
+
+Generalized Additive Model of Performance IQ After a Coma
 
 The parametric terms (here, only the constant) have coefficients and *t*
 tests, as in other regression models. Each smooth term has its effective
 degrees of freedom (*edf*: 1 for a straight line, more for a curvier
 shape) and an approximate *F* test of whether the smooth differs from
-zero. For non-Gaussian families (e.g., `family = binomial`), the
-parametric terms are tested with *z*, the smooth terms with *χ*², and
-exponentiated coefficients (e.g., *OR*) are added. Use
-`terms = "parametric"` or `terms = "smooth"` to show only one kind of
-term. Smooths of a factor-`by` variable (e.g., `s(Temp, by = Month)`)
-get a row for each level.
+zero. Here, the smooth of the time since waking is nearly a straight
+line (*edf* close to 1), and the smooth of the coma’s length is curved:
+patients in longer comas had lower IQs, but the decline levels off after
+about two or three months of coma. For non-Gaussian families (e.g.,
+`family = binomial`), the parametric terms are tested with *z*, the
+smooth terms with *χ*², and exponentiated coefficients (e.g., *OR*) are
+added. Use `terms = "parametric"` or `terms = "smooth"` to show only one
+kind of term. Smooths of a factor-`by` variable (e.g.,
+`s(Coma, by = Sex)`) get a row for each level.
 
 `apa_performance` gives the adjusted *R*² and the percentage of the
 deviance explained:
@@ -474,7 +601,11 @@ apa_performance(fit_gam)
 
 | R2adj | Deviance explained (%) | AIC      |
 |-------|------------------------|----------|
-| .68   | 69.6                   | 1,021.89 |
+| .08   | 9.8                    | 1,612.78 |
+
+Table 17
+
+Fit of the Generalized Additive Model
 
 The smooth terms are shrunk toward simpler shapes, so nested GAMs cannot
 be compared with the usual *F* or likelihood ratio tests. Lists of GAMs
@@ -501,7 +632,11 @@ apa_collinearity(lm3) |>
 | Education | 1.84 | \[1.67, 2.00\] | .54 |
 | SATV | 1.74 | \[1.58, 1.88\] | .58 |
 | SATQ | 1.79 | \[1.62, 1.93\] | .56 |
-| Note. For Education, which has more than 1 df, VIF is the generalized VIF (Fox & Monette, 1992). Tolerance = 1/VIF, the proportion of a predictor’s variance not explained by the other predictors. VIF = variance inflation factor; CI = confidence interval. |  |  |  |
+| Note. For Education, which has more than 1 df, VIF is the generalized VIF ([Fox](#ref-foxGeneralizedCollinearityDiagnostics1992)[ ](#ref-foxGeneralizedCollinearityDiagnostics1992)[&](#ref-foxGeneralizedCollinearityDiagnostics1992)[ ](#ref-foxGeneralizedCollinearityDiagnostics1992)[Monette,](#ref-foxGeneralizedCollinearityDiagnostics1992)[ ](#ref-foxGeneralizedCollinearityDiagnostics1992)[1992](#ref-foxGeneralizedCollinearityDiagnostics1992)). Tolerance = 1/VIF, the proportion of a predictor’s variance not explained by the other predictors. VIF = variance inflation factor; CI = confidence interval. |  |  |  |
+
+Table 18
+
+Collinearity Diagnostics of the Full Model of ACT Scores
 
 Education has more than 1 degree of freedom, so its *VIF* is the
 generalized *VIF*, and the note says so. Add `"SE_factor"` to `columns`
@@ -526,6 +661,10 @@ lm(ACT ~ SATV * SATQ, data = d) |>
 | SATV × SATQ | 57.17 | \[51.06, 63.12\] | .02 |
 | Note. The VIFs of interaction terms and their components are high partly because product terms are correlated with their components; this does not affect the tests of the interactions. Tolerance = 1/VIF, the proportion of a predictor’s variance not explained by the other predictors. VIF = variance inflation factor; CI = confidence interval. VIFs of 10 or more are bolded. |  |  |  |
 
+Table 19
+
+Collinearity Diagnostics With an Uncentered Interaction
+
 With centered predictors, these *VIF*s are small, and the note leaves
 this out.
 
@@ -542,6 +681,10 @@ lm(ACT ~ SATV * SATQ, data = datawizard::center(d)) |>
 | SATQ | 1.76 | \[1.61, 1.92\] | .57 |
 | SATV × SATQ | 1.20 | \[1.13, 1.27\] | .84 |
 | Note. Tolerance = 1/VIF, the proportion of a predictor’s variance not explained by the other predictors. VIF = variance inflation factor; CI = confidence interval. |  |  |  |
+
+Table 20
+
+Collinearity Diagnostics With a Centered Interaction
 
 ## Table Notes
 
@@ -602,6 +745,7 @@ before [`library(apa7)`](https://github.com/wjschne/apa7) takes effect:
 ```` markdown
 ```{r}
 #| label: tbl-lm-note
+#| apa7-width: landscape
 #| tbl-cap: Hierarchical Regression Predicting ACT Scores
 #| apa-note: !expr apa7::apa_note(tbl_lm)
 tbl_lm
@@ -635,7 +779,9 @@ tbl_lm
 |         | SATV                   |  0.01 | 0.00 |  .31 |  8.01 | 677 | \<.001 |     |           |
 |         | SATQ                   |  0.02 | 0.00 |  .39 | 10.12 | 677 | \<.001 |     |           |
 
-Table 1: Hierarchical Regression Predicting ACT Scores
+Table 21
+
+Hierarchical Regression Predicting ACT Scores
 
 *Note*. β = standardized coefficient; Δ*R*² = change in *R*².
 ^(\* )*p* \< .05. ^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
@@ -656,10 +802,15 @@ apa_parameters(glm1, starred = "p") |>
 
 | Variable | B | SE | OR | z | p |
 |----|----|----|----|----|----|
-| Constant | 18.87 | 7.44 | 1.56×108  |  2.53 | .01 \*  |
-| Wt | −8.08 | 3.07 | 3.09×10−4 | −2.63 | .008\*\* |
-| Hp |  0.04 | 0.02 | 1.04      |  2.04 | .04 \*  |
+| Constant | −1.12 | 0.25 | 0.33 | −4.48 | \<.001\*\*\* |
+| Extraversion |  0.07 | 0.01 | 1.07 |  4.65 | \<.001\*\*\* |
+| Neuroticism |  0.01 | 0.01 | 1.01 |  0.56 |  .57      |
+| Sex–Male | −0.24 | 0.11 | 0.79 | −2.12 |  .03 \*   |
 | Note. OR = odds ratio. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |
+
+Table 22
+
+Logistic Regression With a Generated Note
 
 Do not use `note` with the `apa-note` chunk option, or the note will
 appear twice.
@@ -714,6 +865,10 @@ apa7::apa7_write_bib("apa7.bib")
 bibliography: [references.bib, apa7.bib]
 ```
 
+In a Quarto project, the bibliography can also be set for the whole
+project in `_quarto.yml` or for a folder in `_metadata.yml`, and apa7
+finds it there.
+
 When the document is rendered, `apa_note` writes each citation whose
 reference is in the document’s bibliography as a Pandoc citation key
 (e.g., `[@duvalTrimFillSimple2000]`), which Pandoc (or
@@ -748,3 +903,27 @@ options(apa7.print = "flextable")
 
 To get the table with non-default settings, pass the output to
 `apa_flextable`, which always returns a flextable.
+
+## References
+
+Cowles, M., & Davis, C. (1987). The subject matter of psychology:
+Volunteers. *British Journal of Social Psychology*, *26*(2), 97–102.
+<https://doi.org/10.1111/j.2044-8309.1987.tb00769.x>
+
+Fair, R. C. (1978). A theory of extramarital affairs. *Journal of
+Political Economy*, *86*(1), 45–61. <https://doi.org/10.1086/260646>
+
+Fox, J., & Andersen, R. (2006). Effect displays for multinomial and
+proportional-odds logit models. *Sociological Methodology*, *36*(1),
+225–255. <https://doi.org/10.1111/j.1467-9531.2006.00180.x>
+
+Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics.
+*Journal of the American Statistical Association*, *87*(417), 178–183.
+<https://doi.org/10.1080/01621459.1992.10475190>
+
+Venables, W. N., & Ripley, B. D. (2002). *Modern applied statistics with
+S* (4th ed.). Springer. <https://www.stats.ox.ac.uk/pub/MASS4/>
+
+Wong, P. P., Monette, G., & Weiner, N. I. (2001). Mathematical models of
+cognitive recovery. *Brain Injury*, *15*(6), 519–530.
+<https://doi.org/10.1080/02699050116774>

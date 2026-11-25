@@ -30,7 +30,7 @@ apa_flextable(
   horizontal_padding = 3,
   table_align = "left",
   layout = "autofit",
-  table_width = 1,
+  table_width = NULL,
   markdown = TRUE,
   markdown_header = markdown,
   markdown_body = markdown,
@@ -143,13 +143,27 @@ apa_flextable(
 
 - table_width:
 
-  proportion of the width of the container (e.g., the page or text
-  column) that the table occupies, from 0 to 1: 1 (default) is the full
-  width, and .5 is half the width. With `pretty_widths = TRUE`, the
-  column widths are also set to fill the same proportion of the width of
-  the text area, which is 6.5 inches (letter-size paper with 1-inch
-  margins) unless changed with `apa7_defaults(page_width = )` (e.g.,
-  `apa7_defaults(page_width = "a4")`).
+  width of the table, in the same forms in every apa7 function: a
+  proportion from 0 to 1 of the default width (the full width of a
+  portrait page unless changed with `apa7_defaults(table_width = )`),
+  `"page"` (or `"portrait"`) for the full width of a portrait page,
+  `"landscape"` for a landscape page, `"column"` for one column of a
+  two-column page, or a named number: a proportion of one of these
+  widths (e.g., `c(landscape = .8)`) or a width in `inches`, `cm`, or
+  `mm` (e.g., `c(inches = 5)`). With 0, the columns are only as wide as
+  their contents need. If `NULL` (default), the width set by the code
+  chunk's `apa7-width` option in Quarto (e.g.,
+  `#| apa7-width: landscape`, or `#| apa7-width: {landscape: .8}` for a
+  named number) or `apa7.width` option in R Markdown, or `"page"` for a
+  chunk with apaquarto's `apa-twocolumn: true`; otherwise, the
+  `table_width` set with
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+  (1 unless changed). The widths of the pages and the column are set
+  with the `page_width`, `landscape_width`, and `column_width` arguments
+  of
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md).
+  A number greater than 1 is read as inches, with a warning to write it
+  as `c(inches = )`.
 
 - markdown:
 

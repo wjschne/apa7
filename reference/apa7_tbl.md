@@ -2,6 +2,7 @@
 
 The tibbles returned by
 [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md),
+[`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md),
 [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md),
 [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md),
 [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),

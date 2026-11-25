@@ -3,9 +3,8 @@
 ``` r
 
 library(dplyr)
-library(forcats)
-library(stringr)
 library(apa7)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 The `apa_htest` function runs common hypothesis tests on the variables
@@ -38,39 +37,45 @@ tibble is displayed as an APA-style table automatically, and
 
 ### Welch’s *t* test
 
-In the `iris` data, do setosa and versicolor irises differ in the size
-of their flowers? The grouping variable must have exactly two values, so
-first drop the third species.
+The `sat.act` data in the psych package ([Revelle,
+2026](#ref-revellePsychProceduresPsychological2026)) has self-reported
+ACT and SAT scores from 700 people. Do men and women differ in their
+scores? The grouping variable must have exactly two values. Make it a
+factor with readable labels, and give the test scores names that read
+well in a table.
 
 ``` r
 
-d_iris <- iris |>
-  filter(Species != "virginica") |>
-  mutate(Species = fct_relabel(droplevels(Species), 
-                               str_to_title)) |>
-  rename(
-    `Sepal Length` = Sepal.Length,
-    `Sepal Width` = Sepal.Width,
-    `Petal Length` = Petal.Length,
-    `Petal Width` = Petal.Width
+d_sat <- psych::sat.act |>
+  as_tibble() |>
+  mutate(
+    Gender = factor(gender, levels = 1:2, labels = c("Men", "Women")),
+    ACT,
+    `SAT-V` = SATV,
+    `SAT-Q` = SATQ
   )
 ```
 
 ``` r
 
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` + `Petal Length` + `Petal Width` ~ Species
-)
+  d_sat,
+  ACT + `SAT-V` + `SAT-Q` ~ Gender
+) |> 
+  mutate(`*df*` = as.integer(`*df*`)) |> 
+  apa_flextable()
 ```
 
-| Variable | Setosa |  |  | Versicolor |  | t | df | p | Cohen’s d | 95% CI |
-|----|----|----|----|----|----|----|----|----|----|----|
-|  | M | SD |  | M | SD |  |  |  |  |  |
-| Sepal Length | 5.01 | 0.35 |  | 5.94 | 0.52 | −10.52 | 86.54 | \<.001 | −2.10 | \[−2.60, −1.60\] |
-| Sepal Width | 3.43 | 0.38 |  | 2.77 | 0.31 |   9.45 | 94.70 | \<.001 |  1.89 | \[ 1.41,  2.36\] |
-| Petal Length | 1.46 | 0.17 |  | 4.26 | 0.47 | −39.49 | 62.14 | \<.001 | −7.90 | \[−9.31, −6.46\] |
-| Petal Width | 0.25 | 0.11 |  | 1.33 | 0.20 | −34.08 | 74.75 | \<.001 | −6.82 | \[−7.95, −5.65\] |
+| Variable | Men    |        |     | Women  |        | t    | df  | p      | Cohen’s d | 95% CI          |
+|----------|--------|--------|-----|--------|--------|------|-----|--------|-----------|-----------------|
+|          | M      | SD     |     | M      | SD     |      |     |        |           |                 |
+| ACT      |  28.79 |   5.06 |     |  28.42 |   4.69 | 0.94 | 473 |  .35   | 0.08      | \[−0.08, 0.23\] |
+| SAT-V    | 615.11 | 114.16 |     | 610.66 | 112.31 | 0.50 | 498 |  .62   | 0.04      | \[−0.12, 0.19\] |
+| SAT-Q    | 635.87 | 116.02 |     | 596.00 | 113.07 | 4.35 | 492 | \<.001 | 0.35      | \[ 0.19, 0.51\] |
+
+Table 1
+
+Welch’s *t* Tests Comparing Test Scores of Men and Women
 
 By default, the table shows each group’s mean (*M*) and standard
 deviation (*SD*) under a spanner with the group’s name. Then come
@@ -79,11 +84,11 @@ interval. Welch’s test does not assume equal variances, so its degrees
 of freedom are not whole numbers and differ from row to row. They get
 their own column (*df*). When all rows have the same degrees of freedom,
 as in Student’s *t* test below, they appear in the column header instead
-(e.g., *t*(98)).
+(e.g., *t*(698)).
 
 Differences are the first group (in factor level order) minus the
-second, so a positive *d* means setosa irises have the larger mean. To
-flip the direction, reorder the factor levels (e.g., with
+second, so a positive *d* means that men have the larger mean. To flip
+the direction, reorder the factor levels (e.g., with
 [`forcats::fct_rev`](https://forcats.tidyverse.org/reference/fct_rev.html)).
 
 ### Student’s *t* test and Hedges’ *g*
@@ -95,40 +100,50 @@ deviation. Hedges’ *g* corrects *d* for its small-sample bias.
 ``` r
 
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  ACT + `SAT-V` ~ Gender,
   var_equal = TRUE,
   effect_size = "hedges_g"
 )
 ```
 
-| Variable | Setosa |  |  | Versicolor |  | t(98) | p | Hedges’ g | 95% CI |
-|----|----|----|----|----|----|----|----|----|----|
-|  | M | SD |  | M | SD |  |  |  |  |
-| Sepal Length | 5.01 | 0.35 |  | 5.94 | 0.52 | −10.52 | \<.001 | −2.09 | \[−2.57, −1.60\] |
-| Sepal Width | 3.43 | 0.38 |  | 2.77 | 0.31 |   9.45 | \<.001 |  1.88 | \[ 1.40,  2.34\] |
+| Variable | Men    |        |     | Women  |        | t(698) | p   | Hedges’ g | 95% CI          |
+|----------|--------|--------|-----|--------|--------|--------|-----|-----------|-----------------|
+|          | M      | SD     |     | M      | SD     |        |     |           |                 |
+| ACT      |  28.79 |   5.06 |     |  28.42 |   4.69 | 0.97   | .34 | 0.08      | \[−0.08, 0.23\] |
+| SAT-V    | 615.11 | 114.16 |     | 610.66 | 112.31 | 0.50   | .62 | 0.04      | \[−0.12, 0.19\] |
+
+Table 2
+
+Student’s *t* Tests Comparing ACT and SAT Verbal Scores of Men and Women
+With Hedges’ *g*
 
 ### One-sided tests and other test options
 
 Other arguments are passed to the test function. For example,
-`alternative = "greater"` makes a one-sided test. Effect size intervals
+`alternative = "greater"` makes a one-sided test, here of whether men
+have higher SAT Quantitative scores than women. Effect size intervals
 stay two-sided, and the table note says that the *p*-values are
 one-sided.
 
 ``` r
 
 tbl_greater <- apa_htest(
-  d_iris,
-  `Sepal Width` ~ Species,
+  d_sat,
+  `SAT-Q` ~ Gender,
   alternative = "greater"
 )
 tbl_greater
 ```
 
-| Variable | Setosa |  |  | Versicolor |  | t(94.7) | p | Cohen’s d | 95% CI |
+| Variable | Men |  |  | Women |  | t(492.94) | p | Cohen’s d | 95% CI |
 |----|----|----|----|----|----|----|----|----|----|
 |  | M | SD |  | M | SD |  |  |  |  |
-| Sepal Width | 3.43 | 0.38 |  | 2.77 | 0.31 | 9.45 | \<.001 | 1.89 | \[1.41, 2.36\] |
+| SAT-Q | 635.87 | 116.02 |  | 596.00 | 113.07 | 4.35 | \<.001 | 0.35 | \[0.19, 0.51\] |
+
+Table 3
+
+One-Sided Welch’s *t* Test of SAT Quantitative Scores
 
 ``` r
 
@@ -136,26 +151,28 @@ apa_note(tbl_greater)
 ```
 
 ```
-[1] "Welch's *t* test compares the groups of Species without assuming equal variances. The *p*-value is one-sided (alternative: greater). Cohen's *d* uses the average of the two groups' variances. CI = confidence interval for Cohen's *d*."
+[1] "Welch's *t* test compares the groups of Gender without assuming equal variances. The *p*-value is one-sided (alternative: greater). Cohen's *d* uses the average of the two groups' variances. CI = confidence interval for Cohen's *d*."
 ```
 
 ## One-Sample Tests
 
 To compare a mean with a fixed value, put `1` on the right side of the
-formula and give the value as `mu`. In `ToothGrowth`, is the mean tooth
-length different from 20?
+formula and give the value as `mu`. SAT section scores were scaled to
+have a mean of 500. Is the mean SAT Verbal score in `sat.act` different
+from 500?
 
 ``` r
 
-d_tooth <- ToothGrowth |>
-  rename(Length = len)
-
-apa_htest(d_tooth, Length ~ 1, mu = 20)
+apa_htest(d_sat, `SAT-V` ~ 1, mu = 500)
 ```
 
-| Variable | M     | SD   | t(59) | p   | Cohen’s d | 95% CI          |
-|----------|-------|------|-------|-----|-----------|-----------------|
-| Length   | 18.81 | 7.65 | −1.20 | .23 | −0.16     | \[−0.41, 0.10\] |
+| Variable | M      | SD     | t(699) | p      | Cohen’s d | 95% CI         |
+|----------|--------|--------|--------|--------|-----------|----------------|
+| SAT-V    | 612.23 | 112.90 | 26.30  | \<.001 | 0.99      | \[0.90, 1.08\] |
+
+Table 4
+
+One-Sample *t* Test of SAT Verbal Scores Against 500
 
 ## Paired Tests
 
@@ -210,11 +227,14 @@ tbl_sleep
 |                   | M      | SD   |     | M      | SD   |       |      |       |                  |
 | Drug 1 vs. Drug 2 | 0.75   | 1.79 |     | 2.33   | 2.00 | −4.06 | .003 | −0.83 | \[−1.23, −0.43\] |
 
-Table 1: Paired-Samples *t* test
+Table 5
+
+Paired-Samples *t* test
 
 *Note*. Paired *t* test compares Drug 1 with Drug 2. *d*_(av) divides
 the mean difference by the average of the two variables’ standard
-deviations (Lakens, 2013). CI = confidence interval for *d*_(av).
+deviations ([Lakens, 2013](#ref-lakensCalculatingReportingEffect2013)).
+CI = confidence interval for *d*_(av).
 
 With one pair, the variable names head their descriptive statistics, and
 differences are the first variable minus the second.
@@ -222,8 +242,8 @@ differences are the first variable minus the second.
 ### Effect sizes for paired data
 
 Paired data have several versions of Cohen’s *d*, which differ in the
-standard deviation that the mean difference is divided by (Lakens,
-2013):
+standard deviation that the mean difference is divided by ([Lakens,
+2013](#ref-lakensCalculatingReportingEffect2013)):
 
 | `effect_size` | Effect size | Mean difference divided by |
 |----|----|----|
@@ -250,6 +270,10 @@ apa_htest(d_sleep, Pair(`Drug 1`, `Drug 2`) ~ 1, effect_size = "d_z")
 |-------------------|--------|------|-----|--------|------|-------|------|-------|------------------|
 |                   | M      | SD   |     | M      | SD   |       |      |       |                  |
 | Drug 1 vs. Drug 2 | 0.75   | 1.79 |     | 2.33   | 2.00 | −4.06 | .003 | −1.28 | \[−2.12, −0.45\] |
+
+Table 6
+
+Paired-Samples *t* Test With *d*_(z)
 
 ### Several pairs
 
@@ -280,6 +304,11 @@ apa_htest(
 
 [TABLE]
 
+Table 7
+
+Paired-Samples *t* Tests of Anxiety and Depression Before and After
+Treatment
+
 Each pair uses the rows in which both of its variables are observed.
 
 ## Wilcoxon Tests
@@ -293,20 +322,24 @@ zero.
 ``` r
 
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  `SAT-V` + `SAT-Q` ~ Gender,
   test = "wilcoxon",
   exact = FALSE
 ) |> 
-  rename(`*Mdn*_Setosa` = `Setosa_*Mdn*`,
-         `*Mdn*_Versicolor` = `Versicolor_*Mdn*`)
+  rename(`*Mdn*_Men` = `Men_*Mdn*`,
+         `*Mdn*_Women` = `Women_*Mdn*`)
 ```
 
-| Variable     | Mdn    |            | W        | p      | rrb  | 95% CI         |
-|--------------|--------|------------|----------|--------|------|----------------|
-|              | Setosa | Versicolor |          |        |      |                |
-| Sepal Length | 5.00   | 5.90       |   168.50 | \<.001 | −.87 | \[−.91, −.80\] |
-| Sepal Width  | 3.40   | 2.80       | 2,312.00 | \<.001 |  .85 | \[ .77,  .90\] |
+| Variable | Mdn |       | W      | p      | rrb | 95% CI        |
+|----------|-----|-------|--------|--------|-----|---------------|
+|          | Men | Women |        |        |     |               |
+| SAT-V    | 630 | 620   | 57,518 |  .54   | .03 | \[−.06, .12\] |
+| SAT-Q    | 660 | 600   | 65,921 | \<.001 | .22 | \[ .13, .30\] |
+
+Table 8
+
+Wilcoxon Rank-Sum Tests Comparing SAT Scores of Men and Women
 
 With ties in the data, `wilcox.test` cannot compute exact *p*-values and
 warns about it. `exact = FALSE` asks for the normal approximation
@@ -332,6 +365,10 @@ apa_htest(
 |                   | Drug 1 | Drug 2 |     |      |       |                  |
 | Drug 1 vs. Drug 2 | 0.35   | 1.75   | 0   | .009 | −1.00 | \[−1.00, −1.00\] |
 
+Table 9
+
+Wilcoxon Signed-Rank Test of Extra Sleep Under Two Drugs
+
 Every patient slept more with Drug 2 (or the same with both), so
 *r*_(rb) is −1.00.
 
@@ -339,30 +376,40 @@ Every patient slept more with Drug 2 (or the same with both), so
 
 With `test = "cor"`, each variable on the left is correlated with the
 variable on the right. The table shows the sample size, the correlation
-with its confidence interval, and the *t* test of the correlation.
+with its confidence interval, and the *t* test of the correlation. The
+`epi.bfi` data in the psychTools package ([Revelle,
+2019](#ref-revellePsychToolsToolsAccompany2019)) has personality,
+depression, and anxiety scores from 231 undergraduates. How strongly do
+depression, anxiety, and extraversion correlate with neuroticism?
 
 ``` r
 
-d_cars <- mtcars |>
-  rename(
-    `Miles per Gallon` = mpg,
-    Horsepower = hp,
-    `Quarter Mile Time` = qsec,
-    Weight = wt
+d_personality <- psychTools::epi.bfi |>
+  as_tibble() |>
+  select(
+    Neuroticism = bfneur,
+    Extraversion = bfext,
+    Depression = bdi,
+    Anxiety = traitanx
   )
 
 apa_htest(
-  d_cars,
-  `Miles per Gallon` + Horsepower + `Quarter Mile Time` ~ Weight,
+  d_personality,
+  Depression + Anxiety + Extraversion ~ Neuroticism,
   test = "cor"
 )
 ```
 
-| Variable          | n   | r    | 95% CI         | t(30) | p      |
-|-------------------|-----|------|----------------|-------|--------|
-| Miles per Gallon  | 32  | −.87 | \[−.93, −.74\] | −9.56 | \<.001 |
-| Horsepower        | 32  |  .66 | \[ .40,  .82\] |  4.80 | \<.001 |
-| Quarter Mile Time | 32  | −.17 | \[−.49,  .19\] | −0.97 |  .34   |
+| Variable     | n   | r   | 95% CI        | t(229) | p      |
+|--------------|-----|-----|---------------|--------|--------|
+| Depression   | 231 | .47 | \[ .36, .56\] |  7.97  | \<.001 |
+| Anxiety      | 231 | .59 | \[ .50, .67\] | 11.14  | \<.001 |
+| Extraversion | 231 | .04 | \[−.09, .17\] |  0.56  |  .57   |
+
+Table 10
+
+Pearson Correlations of Depression, Anxiety, and Extraversion With
+Neuroticism
 
 `method = "spearman"` or `method = "kendall"` gives rank correlations,
 which have no confidence interval:
@@ -370,18 +417,22 @@ which have no confidence interval:
 ``` r
 
 apa_htest(
-  d_cars,
-  `Miles per Gallon` + Horsepower ~ Weight,
+  d_personality,
+  Depression + Anxiety ~ Neuroticism,
   test = "cor",
   method = "spearman",
   exact = FALSE
 )
 ```
 
-| Variable         | n   | ρ    | p      |
-|------------------|-----|------|--------|
-| Miles per Gallon | 32  | −.89 | \<.001 |
-| Horsepower       | 32  |  .77 | \<.001 |
+| Variable   | n   | ρ   | p      |
+|------------|-----|-----|--------|
+| Depression | 231 | .47 | \<.001 |
+| Anxiety    | 231 | .62 | \<.001 |
+
+Table 11
+
+Spearman Correlations of Depression and Anxiety With Neuroticism
 
 To display all the correlations among a set of variables, use `apa_cor`
 (see the [correlations
@@ -394,45 +445,52 @@ the variable on the right and tested for independence. The default
 effect size is Cramér’s *V*. For 2 × 2 tables, `effect_size = "phi"`
 gives *φ*.
 
+The `survey` data in the MASS package ([Venables & Ripley,
+2002](#ref-ripleyModernApplied2002)) has the answers of 237 statistics
+students to questions about themselves. Do women and men differ in how
+often they exercise or in which hand they write with?
+
 ``` r
 
-d_cars <- d_cars |>
-  mutate(
-    Transmission = factor(am, labels = c("Automatic", "Manual")),
-    Cylinders = factor(cyl),
-    Engine = factor(vs, labels = c("V-shaped", "Straight"))
+d_survey <- MASS::survey |>
+  as_tibble() |>
+  transmute(
+    Sex,
+    Exercise = factor(Exer, levels = c("None", "Some", "Freq"),
+                      labels = c("None", "Some", "Frequent")),
+    `Writing Hand` = W.Hnd
   )
 
-tbl_chisq <- apa_htest(d_cars, Cylinders + Engine ~ Transmission, test = "chisq")
+tbl_chisq <- apa_htest(d_survey, Exercise + `Writing Hand` ~ Sex, test = "chisq")
 ```
 
 ```` markdown
 ```{r}
 #| label: tbl-chisq
-#| tbl-cap: Chi-Square Test of Independence
+#| tbl-cap: Chi-Square Tests of Exercise and Writing Hand by Sex
 #| apa-note: !expr 'apa7::apa_note(tbl_chisq)'
 tbl_chisq
 ```
 ````
 
-| Variable  | N   | χ2   | df  | p   | Cramér’s V | 95% CI       |
-|-----------|-----|------|-----|-----|------------|--------------|
-| Cylinders | 32  | 8.74 | 2   | .01 | .52        | \[.11, .85\] |
-| Engine    | 32  | 0.35 | 1   | .56 | .17        | \[.00, .51\] |
+| Variable     | N   | χ2   | df  | p   | Cramér’s V | 95% CI       |
+|--------------|-----|------|-----|-----|------------|--------------|
+| Exercise     | 236 | 5.72 | 2   | .06 | .16        | \[.00, .27\] |
+| Writing Hand | 235 | 0.24 | 1   | .63 | .05        | \[.00, .18\] |
 
-Table 2: Chi-Square Test of Independence
+Table 12
 
-*Note*. Chi-square tests of independence with Transmission. 2 × 2 tables
-use Yates’s continuity correction. CI=confidence interval for Cramér’s
-*V*.
+Chi-Square Tests of Exercise and Writing Hand by Sex
 
-`chisq.test` warns that the chi-square approximation may be incorrect
-because some expected counts in the Cylinders × Transmission table are
-small (only 32 cars). As in `chisq.test`, 2 × 2 tables use Yates’s
+*Note*. Chi-square tests of independence with Sex. 2 × 2 tables use
+Yates’s continuity correction. CI=confidence interval for Cramér’s *V*.
+
+As in `chisq.test`, 2 × 2 tables (here, Writing Hand × Sex) use Yates’s
 continuity correction, and the note says so. Use `correct = FALSE` to
-turn it off. To display the cell counts of one contingency table, use
-`apa_chisq` (see the [contingency tables
-article](https://wjschne.github.io/apa7/articles/chisquare.md)).
+turn it off. If some expected counts are small, `chisq.test` warns that
+the chi-square approximation may be incorrect. To display the cell
+counts of one contingency table, use `apa_chisq` (see the [contingency
+tables article](https://wjschne.github.io/apa7/articles/chisquare.md)).
 
 ## Customizing Hypothesis Test Tables
 
@@ -446,41 +504,45 @@ apaquarto adds that.
 
 ``` r
 
-tbl_iris <- apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+tbl_sat <- apa_htest(
+  d_sat,
+  `SAT-V` + `SAT-Q` ~ Gender,
   starred = "t"
 )
-apa_note(tbl_iris)
+apa_note(tbl_sat)
 ```
 
 ```
-[1] "Welch's *t* tests compare the groups of Species without assuming equal variances. Cohen's *d* uses the average of the two groups' variances. CI = confidence interval for Cohen's *d*. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+[1] "Welch's *t* tests compare the groups of Gender without assuming equal variances. Cohen's *d* uses the average of the two groups' variances. CI = confidence interval for Cohen's *d*. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
 ```
 
 With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note`
 in the `apa-note` chunk option with `!expr`. Chunk options are evaluated
 before the chunk runs, so make the table in an earlier chunk (as
-`tbl_iris` was made above) and display it in the chunk with the note:
+`tbl_sat` was made above) and display it in the chunk with the note:
 
 ```` markdown
 ```{r}
-#| label: tbl-iris
-#| tbl-cap: Welch's *t* Tests of Setosa and Versicolor Irises
-#| apa-note: !expr apa7::apa_note(tbl_iris)
-tbl_iris
+#| label: tbl-sat-note
+#| apa7-width: landscape
+#| column: page-right
+#| tbl-cap: Welch's *t* Tests Comparing SAT Scores of Men and Women
+#| apa-note: !expr apa7::apa_note(tbl_sat)
+tbl_sat
 ```
 ````
 
-| Variable | Setosa |  |  | Versicolor |  | t | df | p | Cohen’s d | 95% CI |
+| Variable | Men |  |  | Women |  | t | df | p | Cohen’s d | 95% CI |
 |----|----|----|----|----|----|----|----|----|----|----|
 |  | M | SD |  | M | SD |  |  |  |  |  |
-| Sepal Length | 5.01 | 0.35 |  | 5.94 | 0.52 | −10.52\*\*\* | 86.54 | \<.001 | −2.10 | \[−2.60, −1.60\] |
-| Sepal Width | 3.43 | 0.38 |  | 2.77 | 0.31 |   9.45\*\*\* | 94.70 | \<.001 |  1.89 | \[ 1.41,  2.36\] |
+| SAT-V | 615.11 | 114.16 |  | 610.66 | 112.31 | 0.50     | 498.58 |  .62  | 0.04 | \[−0.12, 0.19\] |
+| SAT-Q | 635.87 | 116.02 |  | 596.00 | 113.07 | 4.35\*\*\* | 492.94 | \<.001 | 0.35 | \[ 0.19, 0.51\] |
 
-Table 3: Welch’s *t* Tests of Setosa and Versicolor Irises
+Table 13
 
-*Note*. Welch’s *t* tests compare the groups of Species without assuming
+Welch’s *t* Tests Comparing SAT Scores of Men and Women
+
+*Note*. Welch’s *t* tests compare the groups of Gender without assuming
 equal variances. Cohen’s *d* uses the average of the two groups’
 variances. CI = confidence interval for Cohen’s *d*. ^(\* )*p* \< .05.
 ^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
@@ -491,15 +553,20 @@ the note will appear twice.
 
 ``` r
 
-apa_flextable(tbl_iris, note = TRUE)
+apa_flextable(tbl_sat, note = TRUE)
 ```
 
-| Variable | Setosa |  |  | Versicolor |  | t | df | p | Cohen’s d | 95% CI |
+| Variable | Men |  |  | Women |  | t | df | p | Cohen’s d | 95% CI |
 |----|----|----|----|----|----|----|----|----|----|----|
 |  | M | SD |  | M | SD |  |  |  |  |  |
-| Sepal Length | 5.01 | 0.35 |  | 5.94 | 0.52 | −10.52\*\*\* | 86.54 | \<.001 | −2.10 | \[−2.60, −1.60\] |
-| Sepal Width | 3.43 | 0.38 |  | 2.77 | 0.31 |   9.45\*\*\* | 94.70 | \<.001 |  1.89 | \[ 1.41,  2.36\] |
-| Note. Welch’s t tests compare the groups of Species without assuming equal variances. Cohen’s d uses the average of the two groups’ variances. CI = confidence interval for Cohen’s d. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |  |  |  |  |  |
+| SAT-V | 615.11 | 114.16 |  | 610.66 | 112.31 | 0.50     | 498.58 |  .62  | 0.04 | \[−0.12, 0.19\] |
+| SAT-Q | 635.87 | 116.02 |  | 596.00 | 113.07 | 4.35\*\*\* | 492.94 | \<.001 | 0.35 | \[ 0.19, 0.51\] |
+| Note. Welch’s t tests compare the groups of Gender without assuming equal variances. Cohen’s d uses the average of the two groups’ variances. CI = confidence interval for Cohen’s d. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |  |  |  |  |  |
+
+Table 14
+
+Welch’s *t* Tests Comparing SAT Scores of Men and Women With a Generated
+Note
 
 The generated note is a starting point. With `collapse = NULL`,
 `apa_note` returns one sentence per element, so you can drop, reword, or
@@ -513,17 +580,21 @@ bolds significant values:
 ``` r
 
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  `SAT-V` + `SAT-Q` ~ Gender,
   bolded = "p"
 )
 ```
 
-| Variable | Setosa |  |  | Versicolor |  | t | df | p | Cohen’s d | 95% CI |
+| Variable | Men |  |  | Women |  | t | df | p | Cohen’s d | 95% CI |
 |----|----|----|----|----|----|----|----|----|----|----|
 |  | M | SD |  | M | SD |  |  |  |  |  |
-| Sepal Length | 5.01 | 0.35 |  | 5.94 | 0.52 | −10.52 | 86.54 | \<.001 | −2.10 | \[−2.60, −1.60\] |
-| Sepal Width | 3.43 | 0.38 |  | 2.77 | 0.31 |   9.45 | 94.70 | \<.001 |  1.89 | \[ 1.41,  2.36\] |
+| SAT-V | 615.11 | 114.16 |  | 610.66 | 112.31 | 0.50 | 498.58 |  .62  | 0.04 | \[−0.12, 0.19\] |
+| SAT-Q | 635.87 | 116.02 |  | 596.00 | 113.07 | 4.35 | 492.94 | \<.001 | 0.35 | \[ 0.19, 0.51\] |
+
+Table 15
+
+Welch’s *t* Tests With Significant *p*-Values in Bold
 
 ### Fewer columns
 
@@ -533,21 +604,25 @@ apa_htest(
 ``` r
 
 apa_htest(
-  d_iris,
-  `Sepal Length` + `Sepal Width` ~ Species,
+  d_sat,
+  `SAT-V` + `SAT-Q` ~ Gender,
   descriptives = FALSE,
   effect_size = "none"
 )
 ```
 
-| Variable     | t      | df    | p      |
-|--------------|--------|-------|--------|
-| Sepal Length | −10.52 | 86.54 | \<.001 |
-| Sepal Width  |   9.45 | 94.70 | \<.001 |
+| Variable | t    | df     | p      |
+|----------|------|--------|--------|
+| SAT-V    | 0.50 | 498.58 |  .62   |
+| SAT-Q    | 4.35 | 492.94 | \<.001 |
+
+Table 16
+
+Welch’s *t* Tests Without Descriptive Statistics or Effect Sizes
 
 ### Labels
 
-Variable names are converted to title case (e.g., `len` becomes Len).
+Variable names are converted to title case (e.g., `bdi` becomes Bdi).
 For better labels, rename the variables before calling `apa_htest`, as
 was done throughout this article. Because the output is a tibble, you
 can also change the labels afterward.
@@ -556,8 +631,10 @@ can also change the labels afterward.
 
 Each test uses the rows in which the outcome and the grouping (or
 predictor) variable are observed, so rows can have different sample
-sizes. Paired tests use the rows in which both variables of the pair are
-observed.
+sizes. In `sat.act`, for example, 13 people did not report an SAT
+Quantitative score, so the SAT Quantitative tests above use fewer people
+than the ACT and SAT Verbal tests. Paired tests use the rows in which
+both variables of the pair are observed.
 
 ## Test Results Already Computed
 
@@ -568,21 +645,25 @@ The names of the list label the rows:
 
 ``` r
 
-car_tests <- list(
-  Weight = cor.test(mtcars$mpg, mtcars$wt),
-  Displacement = cor.test(mtcars$mpg, mtcars$disp),
-  Horsepower = cor.test(mtcars$mpg, mtcars$hp)
+neuroticism_tests <- list(
+  Depression = cor.test(d_personality$Neuroticism, d_personality$Depression),
+  Anxiety = cor.test(d_personality$Neuroticism, d_personality$Anxiety),
+  Extraversion = cor.test(d_personality$Neuroticism, d_personality$Extraversion)
 )
-apa_htest(car_tests) |>
+apa_htest(neuroticism_tests) |>
   apa_flextable(note = TRUE)
 ```
 
-| Variable | n | r | 95% CI | t(30) | p |
+| Variable | n | r | 95% CI | t(229) | p |
 |----|----|----|----|----|----|
-| Weight | 32 | −.87 | \[−.93, −.74\] | −9.56 | \<.001 |
-| Displacement | 32 | −.85 | \[−.92, −.71\] | −8.75 | \<.001 |
-| Horsepower | 32 | −.78 | \[−.89, −.59\] | −6.74 | \<.001 |
+| Depression | 231 | .47 | \[ .36, .56\] |  7.97 | \<.001 |
+| Anxiety | 231 | .59 | \[ .50, .67\] | 11.14 | \<.001 |
+| Extraversion | 231 | .04 | \[−.09, .17\] |  0.56 |  .57  |
 | Note. Results are from Pearson correlation tests. CI = confidence interval for r. |  |  |  |  |  |
+
+Table 17
+
+Correlations of Neuroticism With Depression, Anxiety, and Extraversion
 
 Effect sizes, however, are computed from what the objects keep, and that
 is not always enough:
@@ -597,20 +678,24 @@ is not always enough:
 | Wilcoxon tests | None, because the group sizes are not kept |
 
 For two groups, the approximation can be noticeably off when the groups
-differ in size or variance, and the note says that it is an
-approximation:
+differ in size or variance, as men (247) and women (453) do in
+`sat.act`. The note says that it is an approximation:
 
 ``` r
 
-t.test(mpg ~ am, data = mtcars) |>
+t.test(`SAT-Q` ~ Gender, data = d_sat) |>
   apa_htest() |>
   apa_flextable(note = TRUE)
 ```
 
-| Variable | t(18.33) | p | Cohen’s d | 95% CI |
+| Variable | t(492.94) | p | Cohen’s d | 95% CI |
 |----|----|----|----|----|
-| mpg by am | −3.77 | .001 | −1.76 | \[−2.82, −0.67\] |
+| SAT-Q by Gender | 4.35 | \<.001 | 0.39 | \[0.21, 0.57\] |
 | Note. The result is from Welch’s t test. Cohen’s d is approximated from t and its degrees of freedom (2t/√df), which assumes groups of equal size. CI = confidence interval for Cohen’s d. |  |  |  |  |
+
+Table 18
+
+Welch’s *t* Test of SAT-Q Scores by Gender
 
 When the data are at hand, giving them to `apa_htest` is better: the
 effect sizes are then computed from the data rather than approximated
@@ -619,6 +704,18 @@ from the test statistic, and the table has descriptive statistics.
 ## References
 
 Lakens, D. (2013). Calculating and reporting effect sizes to facilitate
-cumulative science: A practical primer for *t*-tests and ANOVAs.
-*Frontiers in Psychology, 4*, Article 863.
+cumulative science: A practical primer for t-tests and ANOVAs.
+*Frontiers in Psychology*, *4*, Article 863.
 <https://doi.org/10.3389/fpsyg.2013.00863>
+
+Revelle, W. (2019). *psychTools: Tools to accompany the psych package
+for psychological research* (Version 2.6.4) \[Computer software\].
+Comprehensive R Archive Network.
+<https://doi.org/10.32614/CRAN.package.psychTools>
+
+Revelle, W. (2026). *psych: Procedures for psychological, psychometric,
+and personality research* (Version 2.6.9) \[Computer software\].
+Northwestern University. <https://CRAN.R-project.org/package=psych>
+
+Venables, W. N., & Ripley, B. D. (2002). *Modern applied statistics with
+S* (4th ed.). Springer. <https://www.stats.ox.ac.uk/pub/MASS4/>

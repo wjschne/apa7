@@ -35,15 +35,18 @@ apa_reliability(
 
 - scales:
 
-  named list of character vectors of item names, one for each scale
-  (e.g., `list(Agreeableness = c("A1", "A2", "A3"))`). If `NULL`
-  (default), all columns of `data` form one scale.
+  named list of the items of each scale, given as unquoted or quoted
+  names or tidyselect helpers (e.g.,
+  `list(Agreeableness = c(A1, A2, A3), Conscientiousness = starts_with("C"))`).
+  A named list of character vectors stored in a variable works too. If
+  `NULL` (default), all columns of `data` form one scale.
 
 - reverse:
 
-  names of items to reverse-score before the analysis. Items are
-  reversed within their scale's range of responses (`item_range`), and
-  they are marked "(R)" in the table.
+  items to reverse-score before the analysis, selected like the items in
+  `scales` (e.g., `c(A1, C4, C5)`). Items are reversed within their
+  scale's range of responses (`item_range`), and they are marked "(R)"
+  in the table.
 
 - item_range:
 
@@ -154,14 +157,14 @@ apa_reliability(
 #> 19  *&omega;*~total~     ".73"            ""     ""        ""                  
 #> 20  Mean inter-item *r*  ".35"            ""     ""        ""                  
 
-# One row per scale
+# One row per scale, with items selected by tidyselect helpers
 apa_reliability(
   d,
   scales = list(
-    Agreeableness = paste0("A", 1:5),
-    Conscientiousness = paste0("C", 1:5)
+    Agreeableness = A1:A5,
+    Conscientiousness = starts_with("C")
   ),
-  reverse = c("A1", "C4", "C5"),
+  reverse = c(A1, C4, C5),
   item_range = c(1, 6),
   level = "scales"
 )

@@ -7,11 +7,13 @@ library(tibble)
 library(stringr)
 library(apa7)
 library(psych)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 Two functions make APA-style tables from exploratory factor analyses and
 principal components analyses run with the
-[psych](https://personality-project.org/r/psych/) package:
+[psych](https://personality-project.org/r/psych/) package ([Revelle,
+2026](#ref-revellePsychProceduresPsychological2026)):
 
 - `apa_loadings` makes a table of factor loadings, with optional columns
   for communalities, uniquenesses, and complexity, and optional rows for
@@ -97,7 +99,7 @@ keeps them as they are.
 apa_loadings(fit_bfi, format_variable_names = FALSE)
 ```
 
-| Variable                                 | PA2  | PA3  | PA1  | PA4  | PA5  |
+| Variable                                 | PA3  | PA2  | PA4  | PA5  | PA1  |
 |------------------------------------------|------|------|------|------|------|
 | Get angry easily                         |  .81 |      |      |      |      |
 | Get irritated easily                     |  .78 |      |      |      |      |
@@ -125,15 +127,17 @@ apa_loadings(fit_bfi, format_variable_names = FALSE)
 | Avoid difficult reading material         |      |      |      |      | −.46 |
 | Spend time reflecting on things          |      | −.32 |      |      |  .37 |
 
-Table 1: Factor Loadings of Big Five Personality Items
+Table 1
+
+Factor Loadings of Big Five Personality Items
 
 ### Naming the factors
 
-psych names factors by the fitting method and a number (e.g., PA1 for
-the first principal axis factor). The `factor_names` argument gives them
-meaningful names. Give the names in the order the factors appear in the
-table, which is the order psych gives them (by the variance they
-explain):
+The psych package names factors by the fitting method and a number
+(e.g., PA1 for the first principal axis factor). The `factor_names`
+argument gives them meaningful names. Give the names in the order the
+factors appear in the table, which is the order psych gives them (by the
+variance they explain):
 
 ``` r
 
@@ -176,7 +180,9 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 2: Factor Loadings of Big Five Personality Items
+Table 2
+
+Factor Loadings of Big Five Personality Items
 
 A named vector such as `c(PA1 = "Neuroticism", PA2 = "Extraversion")`
 also works, and it can rename just some of the factors. Be careful with
@@ -228,7 +234,9 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 3: Factor Loadings of .30 or Higher
+Table 3
+
+Factor Loadings of .30 or Higher
 
 To keep the items in their original order, set `sort_loading = FALSE`.
 The `digits` argument sets the number of decimal places.
@@ -277,7 +285,9 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 4: Factor Loadings With Primary Loadings in Bold
+Table 4
+
+Factor Loadings With Primary Loadings in Bold
 
 A loading that is hidden by `min_loading` is never bolded, so an item
 with no loading above the cutoff has no bold value.
@@ -289,9 +299,10 @@ Three optional columns describe each item:
 - `communality = TRUE` adds *h*², the proportion of the item’s variance
   explained by the factors.
 - `uniqueness = TRUE` adds *u*² = 1 − *h*².
-- `complexity = TRUE` adds Hofmann’s (1978) complexity index, which is 1
-  when an item loads on a single factor and increases as its loadings
-  are spread over more factors.
+- `complexity = TRUE` adds Hofmann’s
+  ([1978](#ref-hofmannComplexitySimplicityObjective1978)) complexity
+  index, which is 1 when an item loads on a single factor and increases
+  as its loadings are spread over more factors.
 
 ``` r
 
@@ -331,7 +342,9 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 | .26 | 1.75 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 | .25 | 2.69 |
 
-Table 5: Factor Loadings, Communalities, and Complexity
+Table 5
+
+Factor Loadings, Communalities, and Complexity
 
 ### Variance explained
 
@@ -380,7 +393,9 @@ apa_loadings(fit_bfi,
 | Proportion of variance | .10 | .09 | .08 | .08 | .06 |
 | Cumulative proportion | .10 | .19 | .27 | .35 | .41 |
 
-Table 6: Factor Loadings and Variance Explained
+Table 6
+
+Factor Loadings and Variance Explained
 
 With an oblique rotation, the factors are correlated, so the variance
 they explain overlaps. The sums of squared loadings describe the pattern
@@ -408,7 +423,9 @@ apa_factor_cor(fit_bfi, factor_names = big5)
 | 4. Agreeableness     | −.04 |  .33 |  .20 | —    |     |
 | 5. Openness          | −.01 |  .17 |  .19 |  .19 | —   |
 
-Table 7: Correlations Among Big Five Factors
+Table 7
+
+Correlations Among Big Five Factors
 
 Neuroticism correlates negatively with the other factors because its
 items describe negative emotions, while the other four factors are
@@ -470,8 +487,9 @@ apa_loadings(fit_pca,
 | Proportion of variance | .13 | .12 | .10 | .09 | .08 |
 | Cumulative proportion | .13 | .25 | .35 | .45 | .53 |
 
-Table 8: Varimax-Rotated Principal Components of Big Five Personality
-Items
+Table 8
+
+Varimax-Rotated Principal Components of Big Five Personality Items
 
 ## Output From the parameters Package
 
@@ -522,7 +540,9 @@ apa_loadings(efa_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 9: Factor Loadings From parameters::factor_analysis
+Table 9
+
+Factor Loadings From parameters::factor_analysis
 
 ``` r
 
@@ -537,7 +557,9 @@ apa_factor_cor(efa_bfi, factor_names = big5)
 | 4. Agreeableness     | −.04 |  .33 |  .20 | —    |     |
 | 5. Openness          | −.01 |  .17 |  .19 |  .19 | —   |
 
-Table 10: Factor Correlations From parameters::factor_analysis
+Table 10
+
+Factor Correlations From parameters::factor_analysis
 
 Without a rotation,
 [`parameters::principal_components`](https://easystats.github.io/parameters/reference/principal_components.html)
@@ -587,8 +609,9 @@ parameters::principal_components(d_bfi, n = 5) |>
 | Proportion of variance                   | .21  | .11  | .09  | .07  | .06  |
 | Cumulative proportion                    | .21  | .32  | .40  | .48  | .54  |
 
-Table 11: Unrotated Principal Components From
-parameters::principal_components
+Table 11
+
+Unrotated Principal Components From parameters::principal_components
 
 ## Formatted Variable Names
 
@@ -641,7 +664,9 @@ apa_loadings(fit_harman,
 | Number Figure            |        |  .31    |  .34  | .45    | .41 |
 | Figure Word              |        |         |       | .35    | .23 |
 
-Table 12: Factor Loadings of 24 Ability Tests
+Table 12
+
+Factor Loadings of 24 Ability Tests
 
 The names are split into words and put in title case (e.g.,
 SentenceCompletion becomes Sentence Completion). Names that are
@@ -693,6 +718,7 @@ before [`library(apa7)`](https://github.com/wjschne/apa7) takes effect:
 ```` markdown
 ```{r}
 #| label: tbl-note
+#| apa7-width: landscape
 #| tbl-cap: Factor Loadings of Big Five Personality Items
 #| apa-note: !expr apa7::apa_note(tbl_bfi)
 tbl_bfi
@@ -730,7 +756,9 @@ tbl_bfi
 | Proportion of variance | .10 | .09 | .08 | .08 | .06 |  |
 | Cumulative proportion | .10 | .19 | .27 | .35 | .41 |  |
 
-Table 13: Factor Loadings of Big Five Personality Items
+Table 13
+
+Factor Loadings of Big Five Personality Items
 
 *Note*. Principal axis factoring with oblimin rotation. Loadings are
 pattern coefficients. Loadings smaller than .30 in absolute value are
@@ -801,7 +829,9 @@ apa_loadings(fit_harman,
 | Number Figure            |        |  .31    |  .34  | .45    |
 | Figure Word              |        |         |       | .35    |
 
-Table 14: Factor Loadings of 24 Ability Tests
+Table 14
+
+Factor Loadings of 24 Ability Tests
 
 The variable names are formatted by `apa_loadings`, not by
 `apa_flextable`. The `Variable` column is marked so that `apa_flextable`
@@ -814,7 +844,9 @@ Pass the table to `apa_flextable` for more options (e.g., `table_width`)
 and then to flextable functions for more control. The rule above the
 variance rows is added by `apa_flextable`, which finds the row by its
 label, so the rule stays in place even if rows are filtered or reordered
-first. Here the table is set in a smaller font:
+first. Here the table is set in a smaller font, and the cross-loading of
+the “Spend time reflecting on things” item on Extraversion is
+highlighted in red using flextable’s `color` function.
 
 ``` r
 
@@ -823,7 +855,8 @@ apa_loadings(fit_bfi,
              format_variable_names = FALSE,
              min_loading = .30,
              variance = TRUE) |>
-  apa_flextable(font_size = 10)
+  apa_flextable(font_size = 10) |> 
+  flextable::color(i = 25, j = "Extraversion", color = "firebrick")
 ```
 
 | Variable | Neuroticism | Extraversion | Conscientiousness | Agreeableness | Openness |
@@ -857,13 +890,15 @@ apa_loadings(fit_bfi,
 | Proportion of variance | .10 | .09 | .08 | .08 | .06 |
 | Cumulative proportion | .10 | .19 | .27 | .35 | .41 |
 
-Table 15: Factor Loadings and Variance Explained
+Table 15
+
+Factor Loadings and Variance Explained
 
 ## References
 
 Hofmann, R. J. (1978). Complexity and simplicity as objective indices
-descriptive of factor solutions. *Multivariate Behavioral Research,
-13*(2), 247–250. <https://doi.org/10.1207/s15327906mbr1302_9>
+descriptive of factor solutions. *Multivariate Behavioral Research*,
+*13*(2), 247–250. <https://doi.org/10.1207/s15327906mbr1302_9>
 
 Revelle, W. (2026). *psych: Procedures for psychological, psychometric,
 and personality research* (Version 2.6.9) \[Computer software\].

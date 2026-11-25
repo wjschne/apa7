@@ -49,8 +49,9 @@ for all notes by `apa7_defaults(citations = )` (or
 `options(apa7.citations = )`): `"auto"` (default), `"keys"`, or
 `"text"`. With `"auto"`, a citation is written as a key when a Quarto or
 R Markdown document is being rendered and its `bibliography` (in the
-YAML header) has an entry with that key, and as text otherwise (e.g., in
-the console, or in a table saved with
+YAML header, or for a whole Quarto project or folder in `_quarto.yml` or
+`_metadata.yml`) has an entry with that key, and as text otherwise
+(e.g., in the console, or in a table saved with
 [`flextable::save_as_docx()`](https://davidgohel.github.io/flextable/reference/save_as_docx.html)).
 So listing the file written by `apa7_write_bib()` in the YAML header is
 enough:
@@ -75,12 +76,12 @@ directly to a Word file), so `"auto"` writes text there.
 # In a document's setup chunk: apa7_write_bib("apa7.bib")
 path <- apa7_write_bib(tempfile(fileext = ".bib"))
 readLines(path, n = 8)
-#> [1] "% References cited in apa7 table notes."                                               
-#> [2] "% Exported from the apa7 collection in Zotero (Better BibTeX citation keys)."          
-#> [3] "% Write a copy to a document's folder with apa7::apa7_write_bib()."                    
-#> [4] ""                                                                                      
-#> [5] "@article{beggOperatingCharacteristicsRank1994,"                                        
-#> [6] "  title = {Operating Characteristics of a Rank Correlation Test for Publication Bias},"
-#> [7] "  author = {Begg, Colin B. and Mazumdar, Madhuchhanda},"                               
-#> [8] "  year = 1994,"                                                                        
+#> [1] "@article{adlerImpactPriorSets1973,"                                                                      
+#> [2] "  title = {Impact of Prior Sets given Experimenters and Subjects on the Experimenter Expectancy Effect},"
+#> [3] "  author = {Adler, Nancy E.},"                                                                           
+#> [4] "  date = {1973-03},"                                                                                     
+#> [5] "  journaltitle = {Sociometry},"                                                                          
+#> [6] "  volume = {36},"                                                                                        
+#> [7] "  number = {1},"                                                                                         
+#> [8] "  eprint = {2786286},"                                                                                   
 ```

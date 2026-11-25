@@ -4,216 +4,330 @@
 
 library(apa7)
 library(dplyr)
-library(tidyr)
-library(flextable)
-library(ftExtra)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
-## Data
+A contingency table shows how often each combination of the levels of
+two categorical variables occurs. `apa_chisq` makes an APA-style
+contingency table with a row for each level of one variable and a column
+for each level of the other, tests whether the variables are
+independent, and records the result for the table note.
+
+apa7 has three ways to report categorical variables:
+
+| Function | Table | Article |
+|----|----|----|
+| `apa_chisq` | The cells of one contingency table, with its test of independence in the note | This article |
+| `apa_htest(test = "chisq")` | One row per test, for several variables tested against the same grouping variable | [Hypothesis tests](https://wjschne.github.io/apa7/articles/htest.html#chi-square-tests-of-independence) |
+| `apa_descriptives` | Counts and percentages of categorical variables, with continuous variables, in a sample description (“Table 1”) | [Descriptive statistics](https://wjschne.github.io/apa7/articles/descriptives.md) |
+
+## A Contingency Table
+
+The `survey` data set in the MASS package ([Venables & Ripley,
+2002](#ref-ripleyModernApplied2002)) has the answers of 237 statistics
+students to a short questionnaire. Do women and men differ in how often
+they exercise? Give the variables and their levels names that read well
+in a table:
 
 ``` r
 
-d <- mtcars |>
-  select(Gears = gear, Transmission = am) |>
-  mutate(Transmission = factor(Transmission, labels = c("Automatic", "Manual")))
+d_survey <- MASS::survey |>
+  transmute(
+    Sex,
+    Exercise = factor(Exer,
+                      levels = c("None", "Some", "Freq"),
+                      labels = c("None", "Some", "Frequent")),
+    Smoking = factor(Smoke,
+                     levels = c("Never", "Occas", "Regul", "Heavy"),
+                     labels = c("Never", "Occasionally", "Regularly", "Heavily"))
+  )
 ```
 
-## The `apa_chisq` contingency table function
-
-The default output of the `apa_chisq` function is a contingency table
-with a chi-square test of independence in the table note. The output is
-a flextable, which can be modified with flextable commands.
+`variable` gives the rows of the table, and `by` gives the columns:
 
 ``` r
 
-apa_chisq(d)
+tbl_exercise <- apa_chisq(d_survey, Exercise, by = Sex)
+tbl_exercise
 ```
 
-| Transmission | 3 |  | 4 |  | 5 |  |
-|----|----|----|----|----|----|----|
-|  | n | % | n | % | n | % |
-| Automatic | 15 | 100.0% | 4 | 33.3% | 0 | 0.0% |
-| Manual |  0 | 0.0% | 8 | 66.7% | 5 | 100.0% |
-| Note. χ2 (2) = 20.94, p \< .001, Adj. Cramer’s V = .78 |  |  |  |  |  |  |
+| Exercise | Female |       |     | Male |       |     | Total |       |
+|----------|--------|-------|-----|------|-------|-----|-------|-------|
+|          | n      | %     |     | n    | %     |     | n     | %     |
+| None     |  11    |   9.3 |     |  13  |  11.0 |     |  24   |  10.2 |
+| Some     |  58    |  49.2 |     |  40  |  33.9 |     |  98   |  41.5 |
+| Frequent |  49    |  41.5 |     |  65  |  55.1 |     | 114   |  48.3 |
+| Total    | 118    | 100.0 |     | 118  | 100.0 |     | 236   | 100.0 |
 
-## Styling Options
+Table 1
 
-The table can be styled in many ways:
+Exercise by Sex
+
+Each group has a column of counts (*n*) and a column of percentages, and
+the “Total” row and column give the marginal counts. By default, the
+percentages are of each column’s total, so each group’s distribution can
+be read on its own: 41.5% of the women and 55.1% of the men exercised
+frequently. Variable names can be quoted or unquoted.
+
+In the console, `apa_chisq` returns an ordinary tibble, which can be
+changed with dplyr functions. In Quarto and R Markdown documents, it is
+displayed as an APA-style table automatically.
+
+## Table Notes
+
+`apa_chisq` tests whether the two variables are independent, and
+`apa_note` writes the note: what the values are, the test and its effect
+size, and how many cases were left out because of missing values. The
+text is in markdown, and it does not start with “*Note*.” because
+apaquarto adds that.
+
+``` r
+
+apa_note(tbl_exercise)
+```
+
+    [1] "Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *&chi;*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included."
+
+With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note`
+in the `apa-note` chunk option. Chunk options are evaluated before the
+chunk runs, so make the table in an earlier chunk (as `tbl_exercise` was
+made above):
+
+```` markdown
+```{r}
+#| label: tbl-exercise-note
+#| apa7-width: landscape
+#| tbl-cap: "Exercise by Sex With a Note"
+#| apa-note: !expr apa7::apa_note(tbl_exercise)
+tbl_exercise
+```
+````
+
+| Exercise | Female |       |     | Male |       |     | Total |       |
+|----------|--------|-------|-----|------|-------|-----|-------|-------|
+|          | n      | %     |     | n    | %     |     | n     | %     |
+| None     |  11    |   9.3 |     |  13  |  11.0 |     |  24   |  10.2 |
+| Some     |  58    |  49.2 |     |  40  |  33.9 |     |  98   |  41.5 |
+| Frequent |  49    |  41.5 |     |  65  |  55.1 |     | 114   |  48.3 |
+| Total    | 118    | 100.0 |     | 118  | 100.0 |     | 236   | 100.0 |
+
+Table 2
+
+Exercise by Sex With a Note
+
+*Note*. Values are counts (*n*) and percentages of each column (each
+group of Sex). Chi-square test of independence: *χ*²(2, *N* = 236) =
+5.72, *p* = .06, Cramér’s *V* = .16. Cases with a missing value of
+Exercise or Sex (*n* = 1) are not included.
+
+Without apaquarto, `apa_flextable(note = TRUE)` puts the same note below
+the table. Do not combine it with the `apa-note` chunk option, or the
+note will appear twice.
+
+``` r
+
+apa_flextable(tbl_exercise, note = TRUE)
+```
+
+| Exercise | Female |  |  | Male |  |  | Total |  |
+|----|----|----|----|----|----|----|----|----|
+|  | n | % |  | n | % |  | n | % |
+| None |  11 |   9.3 |  |  13 |  11.0 |  |  24 |  10.2 |
+| Some |  58 |  49.2 |  |  40 |  33.9 |  |  98 |  41.5 |
+| Frequent |  49 |  41.5 |  |  65 |  55.1 |  | 114 |  48.3 |
+| Total | 118 | 100.0 |  | 118 | 100.0 |  | 236 | 100.0 |
+| Note. Values are counts (n) and percentages of each column (each group of Sex). Chi-square test of independence: χ2(2, N = 236) = 5.72, p = .06, Cramér’s V = .16. Cases with a missing value of Exercise or Sex (n = 1) are not included. |  |  |  |  |  |  |  |  |
+
+Table 3
+
+Exercise by Sex With a Generated Note
+
+## Percentages
+
+The `percent` parameter sets which total the percentages are of. By
+default, `percent` is set to `"column"`. With `percent = "row"`, the
+percentages are of each row’s total, which shows how each level of the
+row variable is divided among the groups:
+
+``` r
+
+apa_chisq(d_survey, Exercise, by = Sex, percent = "row") |>
+  apa_flextable(note = TRUE)
+```
+
+| Exercise | Female |  |  | Male |  |  | Total |  |
+|----|----|----|----|----|----|----|----|----|
+|  | n | % |  | n | % |  | n | % |
+| None |  11 | 45.8 |  |  13 | 54.2 |  |  24 | 100.0 |
+| Some |  58 | 59.2 |  |  40 | 40.8 |  |  98 | 100.0 |
+| Frequent |  49 | 43.0 |  |  65 | 57.0 |  | 114 | 100.0 |
+| Total | 118 | 50.0 |  | 118 | 50.0 |  | 236 | 100.0 |
+| Note. Values are counts (n) and percentages of each row (each level of Exercise). Chi-square test of independence: χ2(2, N = 236) = 5.72, p = .06, Cramér’s V = .16. Cases with a missing value of Exercise or Sex (n = 1) are not included. |  |  |  |  |  |  |  |  |
+
+Table 4
+
+Exercise by Sex With Percentages of Each Row
+
+With `percent = "total"`, the percentages are of the whole sample, and
+with `percent = "none"`, the table has counts only. `total = FALSE`
+leaves out the “Total” row and column:
+
+``` r
+
+apa_chisq(d_survey, Exercise, by = Sex, percent = "none", total = FALSE) |>
+  apa_flextable(note = TRUE, table_width = .5)
+```
+
+| Exercise | Female | Male |
+|----|----|----|
+| None | 11 | 13 |
+| Some | 58 | 40 |
+| Frequent | 49 | 65 |
+| Note. Values are counts. Chi-square test of independence: χ2(2, N = 236) = 5.72, p = .06, Cramér’s V = .16. Cases with a missing value of Exercise or Sex (n = 1) are not included. |  |  |
+
+Table 5
+
+Exercise by Sex Without Percentages or Totals
+
+## 2 × 2 Tables
+
+The `Cowles` data set in the carData package ([Cowles & Davis,
+1987](#ref-cowlesSubjectMatterPsychology1987)) has the sex of 1,421
+introductory psychology students and whether they volunteered to take
+part in psychological research. In a 2 × 2 table, the effect size is
+*φ*, and, as in `chisq.test`, the chi-square test uses Yates’s
+continuity correction:
+
+``` r
+
+d_volunteer <- carData::Cowles |>
+  transmute(
+    Sex = factor(sex, levels = c("female", "male"), labels = c("Female", "Male")),
+    Volunteered = factor(volunteer, levels = c("yes", "no"), labels = c("Yes", "No"))
+  )
+
+apa_chisq(d_volunteer, Volunteered, by = Sex) |>
+  apa_flextable(note = TRUE)
+```
+
+| Volunteered | Female |  |  | Male |  |  | Total |  |
+|----|----|----|----|----|----|----|----|----|
+|  | n | % |  | n | % |  | n | % |
+| Yes | 349 |  44.7 |  | 248 |  38.7 |  |   597 |  42.0 |
+| No | 431 |  55.3 |  | 393 |  61.3 |  |   824 |  58.0 |
+| Total | 780 | 100.0 |  | 641 | 100.0 |  | 1,421 | 100.0 |
+| Note. Values are counts (n) and percentages of each column (each group of Sex). Chi-square test of independence: χ2(1, N = 1,421) = 5.05, p = .03, φ = .06. The test uses Yates’s continuity correction. |  |  |  |  |  |  |  |  |
+
+Table 6
+
+Volunteering for Psychological Research by Sex
+
+Women were somewhat more likely to volunteer than men. `correct = FALSE`
+turns the continuity correction off, and `effect_size = "cramers_v"`
+gives Cramér’s *V* instead of *φ* (for a 2 × 2 table, they are equal in
+size).
+
+## Small Expected Counts
+
+The chi-square test is an approximation that can be poor when some
+expected counts are small. When an expected count is below 5, the note
+says so:
+
+``` r
+
+apa_chisq(d_survey, Smoking, by = Exercise) |>
+  apa_flextable(note = TRUE)
+```
+
+| Smoking | None |  |  | Some |  |  | Frequent |  |  | Total |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|
+|  | n | % |  | n | % |  | n | % |  | n | % |
+| Never | 18 |  78.3 |  | 84 |  85.7 |  |  87 |  75.7 |  | 189 |  80.1 |
+| Occasionally |  3 |  13.0 |  |  4 |   4.1 |  |  12 |  10.4 |  |  19 |   8.1 |
+| Regularly |  1 |   4.3 |  |  7 |   7.1 |  |   9 |   7.8 |  |  17 |   7.2 |
+| Heavily |  1 |   4.3 |  |  3 |   3.1 |  |   7 |   6.1 |  |  11 |   4.7 |
+| Total | 23 | 100.0 |  | 98 | 100.0 |  | 115 | 100.0 |  | 236 | 100.0 |
+| Note. Values are counts (n) and percentages of each column (each group of Exercise). Chi-square test of independence: χ2(6, N = 236) = 5.49, p = .48, Cramér’s V = .11. The smallest expected count is 1.07, below 5, so the chi-square approximation may be inaccurate. Cases with a missing value of Smoking or Exercise (n = 1) are not included. |  |  |  |  |  |  |  |  |  |  |  |
+
+Table 7
+
+Smoking by Exercise
+
+Fisher’s exact test does not depend on this approximation. With
+`test = "fisher"`, the note gives its *p*-value instead (`test = "none"`
+leaves the test out):
+
+``` r
+
+apa_chisq(d_survey, Smoking, by = Exercise, test = "fisher") |>
+  apa_flextable(note = TRUE)
+```
+
+| Smoking | None |  |  | Some |  |  | Frequent |  |  | Total |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|
+|  | n | % |  | n | % |  | n | % |  | n | % |
+| Never | 18 |  78.3 |  | 84 |  85.7 |  |  87 |  75.7 |  | 189 |  80.1 |
+| Occasionally |  3 |  13.0 |  |  4 |   4.1 |  |  12 |  10.4 |  |  19 |   8.1 |
+| Regularly |  1 |   4.3 |  |  7 |   7.1 |  |   9 |   7.8 |  |  17 |   7.2 |
+| Heavily |  1 |   4.3 |  |  3 |   3.1 |  |   7 |   6.1 |  |  11 |   4.7 |
+| Total | 23 | 100.0 |  | 98 | 100.0 |  | 115 | 100.0 |  | 236 | 100.0 |
+| Note. Values are counts (n) and percentages of each column (each group of Exercise). Fisher’s exact test: p = .41, Cramér’s V = .11. Cases with a missing value of Smoking or Exercise (n = 1) are not included. |  |  |  |  |  |  |  |  |  |  |  |
+
+Table 8
+
+Smoking by Exercise With Fisher’s Exact Test
+
+## Labels and Other Changes
+
+Variables are labeled by their formatted names, or by `labels`:
 
 ``` r
 
 apa_chisq(
-  d,
-  font_size = 16,
-  line_spacing = 3,
-  text_color = "darkred",
-  border_width = 2,
-  border_color = "gray",
-  font_family = "Arial"
+  d_survey,
+  Smoking,
+  by = Sex,
+  labels = c(Smoking = "Smoking frequency")
 )
 ```
 
-| Transmission | 3 |  | 4 |  | 5 |  |
-|----|----|----|----|----|----|----|
-|  | n | % | n | % | n | % |
-| Automatic | 15 | 100.0% | 4 | 33.3% | 0 | 0.0% |
-| Manual |  0 | 0.0% | 8 | 66.7% | 5 | 100.0% |
-| Note. χ2 (2) = 20.94, p \< .001, Adj. Cramer’s V = .78 |  |  |  |  |  |  |
+| Smoking frequency | Female |       |     | Male |       |     | Total |       |
+|-------------------|--------|-------|-----|------|-------|-----|-------|-------|
+|                   | n      | %     |     | n    | %     |     | n     | %     |
+| Never             |  99    |  83.9 |     |  89  |  76.1 |     | 188   |  80.0 |
+| Occasionally      |   9    |   7.6 |     |  10  |   8.5 |     |  19   |   8.1 |
+| Regularly         |   5    |   4.2 |     |  12  |  10.3 |     |  17   |   7.2 |
+| Heavily           |   5    |   4.2 |     |   6  |   5.1 |     |  11   |   4.7 |
+| Total             | 118    | 100.0 |     | 117  | 100.0 |     | 235   | 100.0 |
 
-``` r
+Table 9
 
-# No note
-apa_chisq(d, note = NA)
-```
+Smoking by Sex With a Variable Label
 
-| Transmission | 3   |        | 4   |       | 5   |        |
-|--------------|-----|--------|-----|-------|-----|--------|
-|              | n   | %      | n   | %     | n   | %      |
-| Automatic    | 15  | 100.0% | 4   | 33.3% | 0   | 0.0%   |
-| Manual       |  0  | 0.0%   | 8   | 66.7% | 5   | 100.0% |
+`apa_flextable` sets the appearance of the table (e.g., `table_width`,
+`font_size`, and `line_spacing`), and the flextable it returns can be
+changed with any flextable function (e.g.,
+[`flextable::bold`](https://davidgohel.github.io/flextable/reference/bold.html)).
+See [Building tables by
+hand](https://wjschne.github.io/apa7/articles/summarize.md) for more.
 
-``` r
+## Changes From Earlier Versions
 
-# Custom note
-apa_chisq(
-  d,
-  note = "This is a *custom* note written in **markdown** $x > \\omega$."
-)
-```
+Earlier versions of `apa_chisq` took a data frame with exactly two
+columns and returned a flextable, with the chi-square test in a note
+below it. Two-column data frames still work (the first column gives the
+columns of the table, and the second gives its rows), but the result is
+now a table like those of the other apa7 functions, and its note comes
+from `apa_note`. The arguments that styled the flextable (e.g., `note`,
+`font_size`, and `table_width`) are deprecated: if any is given, a
+flextable is returned as before, with a warning. Pass the table to
+`apa_flextable` instead.
 
-| Transmission | 3 |  | 4 |  | 5 |  |
-|----|----|----|----|----|----|----|
-|  | n | % | n | % | n | % |
-| Automatic | 15 | 100.0% | 4 | 33.3% | 0 | 0.0% |
-| Manual |  0 | 0.0% | 8 | 66.7% | 5 | 100.0% |
-| Note. This is a custom note written in markdown x \> ω. |  |  |  |  |  |  |
+## References
 
-## What if I want something completely different?
+Cowles, M., & Davis, C. (1987). The subject matter of psychology:
+Volunteers. *British Journal of Social Psychology*, *26*(2), 97–102.
+<https://doi.org/10.1111/j.2044-8309.1987.tb00769.x>
 
-There are a lot of options out there. The flextable package has the
-`proc_freq` function, which has the ability to include row, column, and
-total percentages in the table.
-
-``` r
-
-mtcars %>%
-  proc_freq(row = "gear", col = "vs") %>%
-  theme_apa()
-```
-
-| gear |  | vs |  |  |
-|----|----|----|----|----|
-|  |  | 0 | 1 | Total |
-| 3 | Count | 12 (37.5%) | 3 (9.4%) | 15 (46.9%) |
-|  | Mar. pct (1) | 66.7% ; 80.0% | 21.4% ; 20.0% |  |
-| 4 | Count | 2 (6.2%) | 10 (31.2%) | 12 (37.5%) |
-|  | Mar. pct | 11.1% ; 16.7% | 71.4% ; 83.3% |  |
-| 5 | Count | 4 (12.5%) | 1 (3.1%) | 5 (15.6%) |
-|  | Mar. pct | 22.2% ; 80.0% | 7.1% ; 20.0% |  |
-| Total | Count | 18 (56.2%) | 14 (43.8%) | 32 (100.0%) |
-|  (1) Columns and rows percentages |  |  |  |  |
-
-These can be turned off selectively:
-
-``` r
-
-mtcars %>%
-  proc_freq(
-    row = "gear",
-    col = "vs",
-    include.row_percent = FALSE,
-    include.column_percent = FALSE,
-    include.table_percent = FALSE
-  ) %>%
-  apa_style(table_width = .5)
-```
-
-| gear  | vs  |     |       |
-|-------|-----|-----|-------|
-|       | 0   | 1   | Total |
-| 3     | 12  | 3   | 15    |
-| 4     | 2   | 10  | 12    |
-| 5     | 4   | 1   | 5     |
-| Total | 18  | 14  | 32    |
-
-The flextable package’s `tabulator` function has considerable power in
-creating a wide variety of descriptive tables. In general, the
-`tabulator` function requires that you calculate the statistics first,
-and then you specify where they should go.
-
-Here I calculate the means, standard deviations, and sample sizes within
-each cell of a contingency table.
-
-``` r
-
-d_tension <- warpbreaks |>
-  summarise(
-    m = mean(breaks, na.rm = TRUE),
-    sd = sd(breaks, na.rm = TRUE),
-    n = n(),
-    .by = c(wool, tension)
-  ) %>%
-  rename(Wool = wool) |>
-  mutate(
-    tension = factor(
-      tension,
-      labels = paste(c("Low", "Medium", "High"), "Tension")
-    )) 
-  
-d_tension |> 
-  flextable::tabulator(
-    rows = c("Wool"),
-    columns = "tension",
-    M = as_paragraph(m),
-    SD = as_paragraph(sd),
-    N = as_paragraph(n)
-  ) |> 
-  flextable::as_flextable() |>
-  italic(i = 2, part = "header") |>
-  align(j = 1, align = "center") |> 
-  theme_apa()
-```
-
-| Wool |     | Low Tension |      |     |     | Medium Tension |     |     |     | High Tension |      |     |
-|------|-----|-------------|------|-----|-----|----------------|-----|-----|-----|--------------|------|-----|
-|      |     | M           | SD   | N   |     | M              | SD  | N   |     | M            | SD   | N   |
-| A    |     | 44.6        | 18.1 | 9   |     | 24.0           | 8.7 | 9   |     | 24.6         | 10.3 | 9   |
-| B    |     | 28.2        | 9.9  | 9   |     | 28.8           | 9.4 | 9   |     | 18.8         | 4.9  | 9   |
-
-## Processing Data Yourself
-
-What if you want it to look a little different? Unfortunately, you might
-have to do some of the heavy lifting yourself. The
-`pivot_wider_name_first` function is a wrapper around
-[`tidyr::pivot_wider`](https://tidyr.tidyverse.org/reference/pivot_wider.html)
-that prints and sorts column names as “name_variable” instead of
-“variable_name”. I wanted a shortcut because I frequently needed to make
-a shortcut for setting `names_glue = "{tension}_{.value}"` and
-`names_vary = "slowest"` when `names_from = "tension"`.
-
-A subtle difference in this version of the table is that the columns are
-decimal aligned, which is evident in the standard deviation column.
-
-Also, whereas previously the “stub header” (Wool column) was middle
-aligned, it is now top aligned, which is consistent with comparable
-examples in the *APA Style Manual*. I am not sure if this is a real rule
-in APA style, and I actually prefer middle alignment for situations like
-this.
-
-``` r
-
-d_tension |> 
-  rename(M = m, SD = sd) |> 
-  pivot_wider_name_first(
-    values_from = c(M, SD, n),
-    names_from = tension
-  ) |>
-  apa_flextable(column_formats = column_formats(accuracy = .1)) |>
-  align(j = 1, align = "center") 
-```
-
-| Wool | Low Tension |      |     |     | Medium Tension |     |     |     | High Tension |      |     |
-|------|-------------|------|-----|-----|----------------|-----|-----|-----|--------------|------|-----|
-|      | M           | SD   | n   |     | M              | SD  | n   |     | M            | SD   | n   |
-| A    | 44.6        | 18.1 | 9   |     | 24.0           | 8.7 | 9   |     | 24.6         | 10.3 | 9   |
-| B    | 28.2        |  9.9 | 9   |     | 28.8           | 9.4 | 9   |     | 18.8         |  4.9 | 9   |
+Venables, W. N., & Ripley, B. D. (2002). *Modern applied statistics with
+S* (4th ed.). Springer. <https://www.stats.ox.ac.uk/pub/MASS4/>

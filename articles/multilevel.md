@@ -7,6 +7,7 @@ library(lme4)
 library(apa7)
 library(performance)
 library(parameters)
+apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
 When observations are nested (trials within participants, students
@@ -26,12 +27,13 @@ its own heading.
 ## Linear Mixed Models
 
 How quickly does performance deteriorate when people do not get enough
-sleep, and are some people more vulnerable than others? Belenky et
-al. (2003) restricted 18 participants to 3 hours of sleep per night and
-measured their average reaction time on a vigilance task each day. The
-data are in the `sleepstudy` data set from the lme4 package. Days 0 and
-1 were adaptation and training, and Day 2 was the baseline, so we keep
-Days 2 through 9 and count days of sleep restriction from the baseline.
+sleep, and are some people more vulnerable than others? Belenky et al.
+([2003](#ref-belenkyPatternsPerformanceDegradation2003)) restricted 18
+participants to 3 hours of sleep per night and measured their average
+reaction time on a vigilance task each day. The data are in the
+`sleepstudy` data set from the lme4 package. Days 0 and 1 were
+adaptation and training, and Day 2 was the baseline, so we keep Days 2
+through 9 and count days of sleep restriction from the baseline.
 
 ``` r
 
@@ -57,6 +59,10 @@ apa_performance(sleep0)
 | R2marginal | R2conditional | ICC |
 |------------|---------------|-----|
 | 0          | .49           | .49 |
+
+Table 1
+
+Fit of the Unconditional Model of Reaction Time
 
 About half of the variance in reaction time is between participants, so
 treating the 144 observations as independent would be a mistake.
@@ -98,6 +104,10 @@ apa_parameters(
 |  Participant        |        |       |                    |       |        |        |
 |   Constant          |  41.80 |       |                    |       |        |        |
 |  Residual           |  30.22 |       |                    |       |        |        |
+
+Table 2
+
+Reaction Time by Days of Sleep Restriction With Random Intercepts
 
 The table has two parts, each under a heading. The fixed effects are
 read like ordinary regression coefficients: at baseline, the average
@@ -147,6 +157,11 @@ apa_parameters(
 |   r (Constant, Days) |    .18 |      |                    |       |        |
 |  Residual            |  25.53 |      |                    |       |        |
 
+Table 3
+
+Reaction Time by Days of Sleep Restriction With Random Intercepts and
+Slopes
+
 The average slope is unchanged, but its standard error is larger,
 because the model now recognizes that participants’ slopes vary: the
 *SD* of the slopes is about 7 ms per day around the average of 11 ms per
@@ -178,6 +193,10 @@ apa_parameters(sleep2, random_scale = "variance")
 |   Cov (Constant, Days) |  37.20 |      |       |        |
 |  Residual              | 651.60 |      |       |        |
 
+Table 4
+
+Random-Slope Model With Random Effects as Variances and Covariances
+
 The random-effect rows can be omitted with `random = FALSE`, and the
 “Fixed effects” and “Random effects” headings can be omitted with
 `effect_headings = FALSE`, in which case each random-effect label names
@@ -198,6 +217,10 @@ apa_parameters(
 | Constant | 267.97 | 8.27 | \[250.53, 285.41\] | 32.42 | \<.001 |
 | Days     |  11.44 | 1.85 | \[  7.54,  15.33\] |  6.20 | \<.001 |
 
+Table 5
+
+Fixed Effects of the Random-Slope Model
+
 ### Model fit
 
 For mixed models, `apa_performance` reports the marginal *R*² (the
@@ -213,6 +236,10 @@ apa_performance(sleep2)
 | R2marginal | R2conditional | ICC |
 |------------|---------------|-----|
 | .21        | .81           | .76 |
+
+Table 6
+
+Fit of the Random-Slope Model
 
 ### Comparing models
 
@@ -263,6 +290,10 @@ apa_parameters(list(sleep0, sleep1, sleep2)) |>
 |  |   r (Constant, Days) |    .18 |  |  |  |  |  |  |  |  |  |
 |  |  Residual |  25.53 |  |  |  |  |  |  |  |  |  |
 
+Table 7
+
+Three Multilevel Models of Reaction Time
+
 The random slope does not change the marginal *R*², because the fixed
 effects are the same in both models, but the likelihood ratio test shows
 that the slopes vary across participants.
@@ -282,6 +313,10 @@ apa_performance_comparison(list(sleep0, sleep1, sleep2)) |>
 | Model 1 | .00        | .00         | .49           | .49            |       |     |        |
 | Model 2 | .21        | .21         | .73           | .23            | 78.62 | 1   | \<.001 |
 | Model 3 | .21        | .00         | .81           | .08            | 25.31 | 2   | \<.001 |
+
+Table 8
+
+Comparison of Three Multilevel Models of Reaction Time
 
 ### Correlated residuals with nlme
 
@@ -317,6 +352,10 @@ tbl_sleep_lme
 |   r (Constant, Days)          |    .97 |      |        |        |
 |  Residual                     |  30.91 |      |        |        |
 |  Residual autocorrelation (φ) |    .45 |      |        |        |
+
+Table 9
+
+Random-Slope Model With First-Order Autoregressive Residuals
 
 The fixed effects are tested with *t* tests whose degrees of freedom are
 computed by nlme from the grouping levels at which each effect varies,
@@ -354,6 +393,10 @@ apa_performance_comparison(
 |----|----|----|----|----|----|----|----|
 | Independent residuals | .21 | .21 | .81 |  .81 |  |  |  |
 | AR(1) residuals | .22 | .01 | .72 | −.09 | 9.64 | 1 | .002 |
+
+Table 10
+
+Comparison of Models With Independent and Autoregressive Residuals
 
 Variance functions (the `weights` argument, e.g.,
 `nlme::varIdent(form = ~ 1 | Group)` for a separate residual *SD* in
@@ -417,6 +460,10 @@ apa_parameters(glmer_va)
 |  Item               |       |      |      |        |        |
 |   Constant          |  0.34 |      |      |        |        |
 
+Table 11
+
+Logistic Mixed Model of Endorsing Verbally Aggressive Reactions
+
 Each point of trait anger multiplies the odds of endorsing an item by
 about 1.06. Scolding and shouting are endorsed less often than cursing,
 reactions are endorsed less often when the respondent is to blame than
@@ -434,111 +481,129 @@ for such data, including negative binomial models and models with a
 separate zero-inflation part. `apa_parameters` displays them like
 `glmer` models.
 
-The `Salamanders` data set from the glmmTMB package has 644 counts of
-salamanders at 23 stream sites, some of which were affected by
-mountaintop removal coal mining. Each site was surveyed for seven
-species (or life stages). Do mined sites have fewer salamanders?
+In this made-up daily-diary study, 120 adults who drink heavily recorded
+the number of alcoholic drinks they had each day for 2 weeks. Half of
+them had been assigned to a brief intervention and half to a control
+condition. Do people in the intervention drink less, and do they drink
+more on weekends?
 
 ``` r
 
-data(Salamanders, package = "glmmTMB")
-d_sal <- Salamanders |>
+set.seed(12)
+n_people <- 120
+people <- tibble(
+  Person = factor(1:n_people),
+  Condition = factor(rep(c("Control", "Intervention"), each = n_people / 2)),
+  person_effect = rnorm(n_people, mean = 0, sd = .6)
+)
+
+d_drinks <- tidyr::expand_grid(people, `Diary Day` = 1:14) |>
   mutate(
-    Mined = factor(mined, levels = c("no", "yes"), labels = c("No", "Yes"))
+    Day = factor(`Diary Day` %% 7 %in% c(6, 0), labels = c("Weekday", "Weekend")),
+    intervention = Condition == "Intervention",
+    # Expected drinks on a drinking day
+    mu = exp(log(2.5) - .5 * intervention + .6 * (Day == "Weekend") + person_effect),
+    # Some days are abstinent days, more often in the intervention
+    abstinent = rbinom(n(), 1, plogis(-1.2 + intervention)),
+    Drinks = ifelse(
+      abstinent == 1,
+      0,
+      rnbinom(n(), size = ifelse(intervention, 1, 3), mu = mu)
+    )
   ) |>
-  rename(Count = count, Site = site, Species = spp)
+  select(Person, Condition, `Diary Day`, Day, Drinks)
 ```
 
-The counts have a mean of 1.32 but a variance of 6.95, and 60% of them
-are zeros, far more variability than a Poisson model allows.
+The counts have a mean of 2 but a variance of 12.27, and 48% of them are
+zeros, far more variability than a Poisson model allows.
 
 ### Negative binomial models
 
 A negative binomial model adds a dispersion parameter that lets the
-variance grow faster than the mean. Sites are a random effect, because
-each site was surveyed for every species.
+variance grow faster than the mean. People are a random effect, because
+each person reported on many days.
 
 ``` r
 
 tmb_nb <- glmmTMB::glmmTMB(
-  Count ~ Mined + Species + (1 | Site),
+  Drinks ~ Condition + Day + (1 | Person),
   family = glmmTMB::nbinom2,
-  data = d_sal
+  data = d_drinks
 )
 apa_parameters(tmb_nb)
 ```
 
-| Variable            | B     | SE   | IRR  | z     | p      |
-|---------------------|-------|------|------|-------|--------|
-| Fixed effects       |       |      |      |       |        |
-|  Constant           |  0.58 | 0.23 | 1.79 |  2.57 |  .01   |
-|  Mined–Yes          | −2.26 | 0.28 | 0.10 | −7.97 | \<.001 |
-|  Species–PR         | −1.32 | 0.29 | 0.27 | −4.59 | \<.001 |
-|  Species–DM         |  0.37 | 0.22 | 1.45 |  1.65 |  .10   |
-|  Species–EC-A       | −0.71 | 0.25 | 0.49 | −2.81 |  .005  |
-|  Species–EC-L       |  0.57 | 0.22 | 1.77 |  2.61 |  .009  |
-|  Species–DES-L      |  0.79 | 0.22 | 2.21 |  3.66 | \<.001 |
-|  Species–DF         |  0.31 | 0.23 | 1.37 |  1.34 |  .18   |
-| Random effects (SD) |       |      |      |       |        |
-|  Site               |       |      |      |       |        |
-|   Constant          |  0.54 |      |      |       |        |
+| Variable                | B     | SE   | IRR  | z     | p      |
+|-------------------------|-------|------|------|-------|--------|
+| Fixed effects           |       |      |      |       |        |
+|  Constant               |  0.65 | 0.08 | 1.91 |  7.66 | \<.001 |
+|  Condition–Intervention | −0.73 | 0.12 | 0.48 | −6.24 | \<.001 |
+|  Day–Weekend            |  0.63 | 0.08 | 1.88 |  7.85 | \<.001 |
+| Random effects (SD)     |       |      |      |       |        |
+|  Person                 |       |      |      |       |        |
+|   Constant              |  0.49 |      |      |       |        |
+
+Table 12
+
+Negative Binomial Mixed Model of Daily Drinks
 
 As with `glmer`, coefficients are tested with *z* tests, and
 coefficients of models with a log link are exponentiated. For count
 models, the exponentiated coefficients are incidence rate ratios
-(*IRR*): mined sites have about one tenth as many salamanders as unmined
-sites of the same species. The site *SD* is on the log scale. The
-dispersion parameter itself is not displayed, because it is not tested.
+(*IRR*): people in the intervention had about half as many drinks as
+people in the control condition, and people had almost twice as many
+drinks on weekends as on weekdays. The person *SD* is on the log scale.
+The dispersion parameter itself is not displayed, because it is not
+tested.
 
 ### Zero-inflated models
 
-Another account of the many zeros is that some surveys could not have
-found any salamanders (e.g., because the stream was buried by mining),
-while the others produced counts as usual. A zero-inflated model has two
-parts: a conditional model of the counts, and a logistic model of
-whether a zero is one of these excess zeros. Here a zero-inflated
-Poisson model lets the probability of an excess zero differ between
-mined and unmined sites:
+Another account of the many zeros is that some days are abstinent days,
+on which a person would not drink at all, while on the other days the
+number of drinks varies as usual. A zero-inflated model has two parts: a
+conditional model of the counts, and a logistic model of whether a zero
+is one of these excess zeros. Here a zero-inflated Poisson model lets
+the probability of an excess zero differ between the conditions:
 
 ``` r
 
 tmb_zip <- glmmTMB::glmmTMB(
-  Count ~ Mined + Species + (1 | Site),
-  ziformula = ~ Mined,
+  Drinks ~ Condition + Day + (1 | Person),
+  ziformula = ~ Condition,
   family = poisson,
-  data = d_sal
+  data = d_drinks
 )
 tbl_zip <- apa_parameters(tmb_zip)
 tbl_zip
 ```
 
-| Variable             | B     | SE   | IRR  | z     | p      |
-|----------------------|-------|------|------|-------|--------|
-| Conditional model    |       |      |      |       |        |
-|  Fixed effects       |       |      |      |       |        |
-|   Constant           |  0.91 | 0.14 | 2.49 |  6.40 | \<.001 |
-|   Mined–Yes          | −1.27 | 0.27 | 0.28 | −4.72 | \<.001 |
-|   Species–PR         | −1.27 | 0.24 | 0.28 | −5.27 | \<.001 |
-|   Species–DM         |  0.27 | 0.14 | 1.31 |  1.95 |  .05   |
-|   Species–EC-A       | −0.57 | 0.21 | 0.57 | −2.75 |  .006  |
-|   Species–EC-L       |  0.67 | 0.13 | 1.95 |  5.20 | \<.001 |
-|   Species–DES-L      |  0.63 | 0.13 | 1.87 |  4.96 | \<.001 |
-|   Species–DF         |  0.12 | 0.15 | 1.12 |  0.78 |  .43   |
-|  Random effects (SD) |       |      |      |       |        |
-|   Site               |       |      |      |       |        |
-|    Constant          |  0.33 |      |      |       |        |
-| Zero-inflation model |       |      |      |       |        |
-|  Fixed effects       |       |      |      |       |        |
-|   Constant           | −1.05 | 0.16 |      | −6.39 | \<.001 |
-|   Mined–Yes          |  1.84 | 0.31 |      |  5.87 | \<.001 |
+| Variable                 | B     | SE   | IRR  | z      | p      |
+|--------------------------|-------|------|------|--------|--------|
+| Conditional model        |       |      |      |        |        |
+|  Fixed effects           |       |      |      |        |        |
+|   Constant               |  0.96 | 0.08 | 2.62 |  12.59 | \<.001 |
+|   Condition–Intervention | −0.24 | 0.11 | 0.79 |  −2.16 |  .03   |
+|   Day–Weekend            |  0.55 | 0.04 | 1.73 |  14.51 | \<.001 |
+|  Random effects (SD)     |       |      |      |        |        |
+|   Person                 |       |      |      |        |        |
+|    Constant              |  0.54 |      |      |        |        |
+| Zero-inflation model     |       |      |      |        |        |
+|  Fixed effects           |       |      |      |        |        |
+|   Constant               | −0.95 | 0.09 |      | −10.54 | \<.001 |
+|   Condition–Intervention |  1.18 | 0.12 |      |   9.74 | \<.001 |
+
+Table 13
+
+Zero-Inflated Poisson Mixed Model of Daily Drinks
 
 Each part of the model has its own heading, with its fixed and random
 effects under subheadings. Only the conditional model’s coefficients are
 exponentiated, because the zero-inflation coefficients are log odds: the
-probability of an excess zero is about .26 at unmined sites (the inverse
-logit of −1.05) and .69 at mined sites (the inverse logit of −1.05 +
-1.84). Mined sites have both more excess zeros and fewer salamanders
-otherwise. The table note says what the zero-inflation coefficients are:
+probability of an excess zero is about .28 in the control condition (the
+inverse logit of −0.95) and .56 in the intervention (the inverse logit
+of −0.95 + 1.18). People in the intervention had more abstinent days and
+somewhat fewer drinks on the other days. The table note says what the
+zero-inflation coefficients are:
 
 ``` r
 
@@ -561,48 +626,52 @@ apa_performance(
 
 | Model                 | AIC      | BIC      |
 |-----------------------|----------|----------|
-| Negative binomial     | 1,672.40 | 1,717.08 |
-| Zero-inflated Poisson | 1,795.53 | 1,844.67 |
+| Negative binomial     | 5,989.98 | 6,017.12 |
+| Zero-inflated Poisson | 6,300.71 | 6,333.27 |
+
+Table 14
+
+Information Criteria of the Negative Binomial and Zero-Inflated Poisson
+Models
 
 ### Dispersion models
 
 With `dispformula`, the dispersion parameter itself is modeled, and the
 table has a “Dispersion model” part. For negative binomial models, a
 larger dispersion parameter means less overdispersion, so the negative
-coefficient here means that counts at mined sites are more
-overdispersed. As the note says, dispersion coefficients are on the log
-scale.
+coefficient here means that the counts of people in the intervention are
+more overdispersed: many of their days have no drinks, but some have
+many. As the note says, dispersion coefficients are on the log scale.
 
 ``` r
 
 glmmTMB::glmmTMB(
-  Count ~ Mined + Species + (1 | Site),
-  dispformula = ~ Mined,
+  Drinks ~ Condition + Day + (1 | Person),
+  dispformula = ~ Condition,
   family = glmmTMB::nbinom2,
-  data = d_sal
+  data = d_drinks
 ) |>
   apa_parameters()
 ```
 
-| Variable             | B     | SE   | IRR  | z     | p      |
-|----------------------|-------|------|------|-------|--------|
-| Conditional model    |       |      |      |       |        |
-|  Fixed effects       |       |      |      |       |        |
-|   Constant           |  0.64 | 0.21 | 1.89 |  3.07 |  .002  |
-|   Mined–Yes          | −2.19 | 0.27 | 0.11 | −8.12 | \<.001 |
-|   Species–PR         | −1.39 | 0.29 | 0.25 | −4.88 | \<.001 |
-|   Species–DM         |  0.29 | 0.22 | 1.33 |  1.27 |  .20   |
-|   Species–EC-A       | −0.76 | 0.25 | 0.47 | −3.02 |  .003  |
-|   Species–EC-L       |  0.56 | 0.22 | 1.75 |  2.55 |  .01   |
-|   Species–DES-L      |  0.72 | 0.22 | 2.06 |  3.31 | \<.001 |
-|   Species–DF         |  0.16 | 0.24 | 1.18 |  0.69 |  .49   |
-|  Random effects (SD) |       |      |      |       |        |
-|   Site               |       |      |      |       |        |
-|    Constant          |  0.45 |      |      |       |        |
-| Dispersion model     |       |      |      |       |        |
-|  Fixed effects       |       |      |      |       |        |
-|   Constant           |  0.08 | 0.14 |      |  0.56 |  .57   |
-|   Mined–Yes          | −1.20 | 0.38 |      | −3.18 |  .002  |
+| Variable                 | B     | SE   | IRR  | z     | p      |
+|--------------------------|-------|------|------|-------|--------|
+| Conditional model        |       |      |      |       |        |
+|  Fixed effects           |       |      |      |       |        |
+|   Constant               |  0.63 | 0.08 | 1.88 |  8.09 | \<.001 |
+|   Condition–Intervention | −0.68 | 0.12 | 0.51 | −5.68 | \<.001 |
+|   Day–Weekend            |  0.64 | 0.08 | 1.89 |  8.25 | \<.001 |
+|  Random effects (SD)     |       |      |      |       |        |
+|   Person                 |       |      |      |       |        |
+|    Constant              |  0.47 |      |      |       |        |
+| Dispersion model         |       |      |      |       |        |
+|  Fixed effects           |       |      |      |       |        |
+|   Constant               |  0.05 | 0.09 |      |  0.55 |  .58   |
+|   Condition–Intervention | −1.16 | 0.13 |      | −9.13 | \<.001 |
+
+Table 15
+
+Negative Binomial Mixed Model With Dispersion Depending on Condition
 
 ### Fit and comparisons
 
@@ -613,16 +682,29 @@ tests, as for lme4 models:
 ``` r
 
 tmb_nb0 <- glmmTMB::glmmTMB(
-  Count ~ Mined + (1 | Site),
+  Drinks ~ Condition + (1 | Person),
   family = glmmTMB::nbinom2,
-  data = d_sal
+  data = d_drinks
 )
 apa_performance_comparison(
-  list(`Mining` = tmb_nb0, `Mining and species` = tmb_nb)
+  list(`Condition` = tmb_nb0, `Condition and day` = tmb_nb)
 )
 ```
 
 | Model | R2marginal | ΔR2marginal | R2conditional | ΔR2conditional | χ2 | df | p |
 |----|----|----|----|----|----|----|----|
-| Mining | .47 | .47 | .58 | .58 |  |  |  |
-| Mining and species | .59 | .11 | .68 | .11 | 85.93 | 6 | \<.001 |
+| Condition | .09 | .09 | .24 | .24 |  |  |  |
+| Condition and day | .14 | .05 | .29 | .04 | 62.11 | 1 | \<.001 |
+
+Table 16
+
+Comparison of Models of Daily Drinks With and Without Day of the Week
+
+## References
+
+Belenky, G., Wesensten, N. J., Thorne, D. R., Thomas, M. L., Sing, H.
+C., Redmond, D. P., Russo, M. B., & Balkin, T. J. (2003). Patterns of
+performance degradation and restoration during sleep restriction and
+subsequent recovery: A sleep dose-response study. *Journal of Sleep
+Research*, *12*(1), 1–12.
+<https://doi.org/10.1046/j.1365-2869.2003.00337.x>
