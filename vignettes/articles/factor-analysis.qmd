@@ -82,12 +82,13 @@ apa_loadings(fit_bfi, format_variable_names = FALSE)
 
 ## Naming the factors
 
-psych names factors by the fitting method and a number (e.g., PA1 for the first principal axis factor). The `factor_names` argument gives them meaningful names. Give the names in the order the factors appear in the table, which is the order psych gives them (by the variance they explain):
+The psych package names factors by the fitting method and a number (e.g., PA1 for the first principal axis factor). The `factor_names` argument gives them meaningful names. Give the names in the order the factors appear in the table, which is the order psych gives them (by the variance they explain):
 
 ```{r}
 #| label: tbl-named
 #| apa7-width: landscape
 #| tbl-cap: Factor Loadings of Big Five Personality Items
+#| column: page-right
 big5 <- c("Neuroticism",
           "Extraversion",
           "Conscientiousness",
@@ -109,6 +110,7 @@ The `min_loading` argument sets the smallest absolute loading that is displayed.
 #| label: tbl-min30
 #| apa7-width: landscape
 #| tbl-cap: Factor Loadings of .30 or Higher
+#| column: page-right
 apa_loadings(fit_bfi,
              factor_names = big5,
              format_variable_names = FALSE,
@@ -125,6 +127,7 @@ When some items load on more than one factor, readers need to see which factor e
 #| label: tbl-bold
 #| apa7-width: landscape
 #| tbl-cap: Factor Loadings With Primary Loadings in Bold
+#| column: page-right
 apa_loadings(fit_bfi,
              factor_names = big5,
              format_variable_names = FALSE,
@@ -145,6 +148,7 @@ Three optional columns describe each item:
 #| label: tbl-columns
 #| apa7-width: landscape
 #| tbl-cap: Factor Loadings, Communalities, and Complexity
+#| column: page-right
 apa_loadings(fit_bfi,
              factor_names = big5,
              format_variable_names = FALSE,
@@ -161,6 +165,7 @@ With `variance = TRUE`, three rows are added below the loadings: the sum of squa
 #| label: tbl-variance
 #| apa7-width: landscape
 #| tbl-cap: Factor Loadings and Variance Explained
+#| column: page-right
 apa_loadings(fit_bfi,
              factor_names = big5,
              format_variable_names = FALSE,
@@ -197,6 +202,7 @@ fit_pca <- principal(d_bfi, nfactors = 5, rotate = "varimax")
 #| label: tbl-pca
 #| apa7-width: landscape
 #| tbl-cap: Varimax-Rotated Principal Components of Big Five Personality Items
+#| column: page-right
 apa_loadings(fit_pca,
              factor_names = big5,
              format_variable_names = FALSE,
@@ -212,6 +218,7 @@ apa_loadings(fit_pca,
 #| label: tbl-parameters-efa
 #| apa7-width: landscape
 #| tbl-cap: Factor Loadings From parameters::factor_analysis
+#| column: page-right
 efa_bfi <- parameters::factor_analysis(d_bfi, n = 5, rotation = "oblimin")
 
 apa_loadings(efa_bfi,
@@ -319,7 +326,7 @@ The variable names are formatted by `apa_loadings`, not by `apa_flextable`. The 
 
 ## Further formatting with flextable
 
-Pass the table to `apa_flextable` for more options (e.g., `table_width`) and then to flextable functions for more control. The rule above the variance rows is added by `apa_flextable`, which finds the row by its label, so the rule stays in place even if rows are filtered or reordered first. Here the table is set in a smaller font:
+Pass the table to `apa_flextable` for more options (e.g., `table_width`) and then to flextable functions for more control. The rule above the variance rows is added by `apa_flextable`, which finds the row by its label, so the rule stays in place even if rows are filtered or reordered first. Here the table is set in a smaller font, and the cross-loading of the "Spend time reflecting on things" item on Extraversion is highlighted in red using flextable's `color` function.
 
 ```{r}
 #| label: tbl-flextable
@@ -330,7 +337,8 @@ apa_loadings(fit_bfi,
              format_variable_names = FALSE,
              min_loading = .30,
              variance = TRUE) |>
-  apa_flextable(font_size = 10)
+  apa_flextable(font_size = 10) |> 
+  flextable::color(i = 25, j = "Extraversion", color = "firebrick")
 ```
 
 # References

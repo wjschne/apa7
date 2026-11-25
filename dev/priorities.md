@@ -131,7 +131,7 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
 
 <!-- New ideas go here until they get a priority -->
 
-- [ ] Make a better contingency table article.
+- [x] Make a better contingency table article. `apa_chisq()` was rewritten (tibble output, `apa_note()`, percentages, Fisher's exact test), and `chisquare.qmd` was rewritten around it; its cell-statistics example moved to `summarize.qmd`.
 - [ ] Use examples and data sets relevant to psychology in all articles (e.g., data from `psych`, `psychTools`, `carData`, or simulated psychological variables), replacing general-purpose data sets like `mtcars`, `iris`, and `ToothGrowth`. Process the data so that variable names and factor levels are whole words and phrases that read well in tables.
   - [x] `anova.qmd`: `carData::Friendly` (one-way) and `carData::Adler` (factorial) replace `ToothGrowth`
   - [x] `correlations.qmd`: `psychTools::epi.bfi`
@@ -140,7 +140,7 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
   - [x] `summarize.qmd`: `psychTools::bfi` replaces `ggplot2::diamonds`
   - [x] `marginal-means.qmd`: `carData::Moore`, `psychTools::globalWarm`, `psych::Garcia`, and `MASS::anorexia` replace `ToothGrowth`, `mtcars`, and `MASS::birthwt`
   - Clearly not psychology (replace first):
-    - [ ] `chisquare.qmd`: `mtcars` (gears by transmission and by engine shape, 4 tables) and `warpbreaks` (warp breaks by wool and tension, 2 tables). The whole article needs new data; consider combining with the "better contingency table article" item above.
+    - [x] `chisquare.qmd`: `MASS::survey` and `carData::Cowles` replace `mtcars` and `warpbreaks` (article rewritten)
     - [x] `multilevel.qmd`: simulated daily-diary counts of drinks (intervention vs. control, weekday vs. weekend) replace `glmmTMB::Salamanders` in the count-outcome section
     - [x] `meta-analysis.qmd`: `metadat::dat.landenberger2005` (CBT and reoffending; odds ratios, sessions per week, and program purpose) replaces `metadat::dat.bcg`
     - [x] `lavaan.qmd`: `PoliticalDemocracy` is kept as is (decided 2026-11-25)

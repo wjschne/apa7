@@ -141,7 +141,6 @@ test_that("every table function takes table_width in the same forms", {
   # Inches without a name are read with a warning everywhere
   expect_warning(apa_flextable(d, table_width = 4), "c(inches = 4)", fixed = TRUE)
   expect_warning(apa_style(flextable::flextable(d), table_width = 4), "c(inches = 4)", fixed = TRUE)
-  expect_warning(apa_chisq(mtcars[c("am", "vs")], table_width = 4), "c(inches = 4)", fixed = TRUE)
   expect_error(apa_flextable(d, table_width = "wide"), "must name a width")
 
   # A two-column document

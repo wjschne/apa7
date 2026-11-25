@@ -14,6 +14,7 @@ library(dplyr)
 library(apa7)
 library(lavaan)
 library(ggdiagram)
+apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}
@@ -69,29 +70,49 @@ fit_3 <- cfa(model_3, data = d_cfa)
 #| code-summary: Code
 # Standardized estimates without leading zeros
 std <- standardizedSolution(fit_3)
-lbl <- function(x) signs::signs(x, accuracy = .01, trim_leading_zeros = TRUE)
+lbl <- function(x)
+  signs::signs(x, accuracy = .01, trim_leading_zeros = TRUE)
 loadings <- std |> filter(op == "=~")
 correlations <- std |> filter(op == "~~", lhs != rhs)
 residuals <- std |> filter(op == "~~", lhs == rhs, lhs %in% colnames(d_cfa))
 
-my_fills <- viridis::viridis(n = 3, begin = .25, end = .65) |> 
+my_fills <- viridis::viridis(n = 3, begin = .25, end = .65) |>
   class_color(brightness = .75, saturation = .4)
 
-my_cov <- redefault(connect, arrow_fins = arrowhead(), arc_bend = -.75, resect = 2)
+my_cov <- redefault(
+  connect,
+  arrow_fins = arrowhead(),
+  arc_bend = -.75,
+  resect = 2
+)
 
 
 
 ggdiagram(font_family = "Roboto Condensed", font_size = 18) +
   {tests <- ob_ellipse(a = .5, m1 = 16) |>
-  ob_array(k = 9, sep = 0.35, label = ob_label(paste0(rep(c("V", "T", "S"), each = 3), "~", rep(1:3, 3), "~"), color = "white", fill = NA, nudge_y = -.05), 
-           color = NA, fill = rep(my_fills, each = 3))} +
+      ob_array(
+        k = 9,
+        sep = 0.35,
+        label = ob_label(
+          paste0(rep(c("V", "T", "S"), each = 3), "~", rep(1:3, 3), "~"),
+          color = "white",
+          fill = NA,
+          nudge_y = -.05
+        ),
+        color = NA,
+        fill = rep(my_fills, each = 3)
+      )} +
   {abilities <- ob_circle(
-  center = tests[c(2, 5, 8)]@center + ob_point(0, 3),
-  radius = 0.8,
-  label = ob_label(c("Visual", "Textual", "Speed"), color = "white", fill = NA),
-  fill = my_fills,
-  color = NA
-)} +
+      center = tests[c(2, 5, 8)]@center + ob_point(0, 3),
+      radius = 0.8,
+      label = ob_label(
+        c("Visual", "Textual", "Speed"),
+        color = "white",
+        fill = NA
+      ),
+      fill = my_fills,
+      color = NA
+    )} +
   connect(
     abilities[rep(1:3, each = 3)],
     tests,
@@ -170,7 +191,8 @@ Unstandardized estimates (*B*) are shown with `standardize = FALSE`. Here, the f
 apa_parameters(
   fit_3,
   standardize = FALSE,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "z", "p"), note = TRUE
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Std_Coefficient", "z", "p"), 
+  note = TRUE
 ) |> 
   apa_flextable(note = TRUE)
 
@@ -180,7 +202,7 @@ Variances (labeled "residual" for indicators and outcomes), intercepts, and thre
 
 ## Loading matrix
 
-A CFA can also be reported in the matrix form used for exploratory factor analysis, with a row for each indicator and a column for each factor. `apa_loadings` shows the standardized loadings and leaves blank the loadings fixed at 0. As in exploratory factor analysis, the rows are grouped by the factor with each indicator's largest loading and sorted by the size of that loading (`sort_loading = FALSE` keeps the order of the model syntax). Suppose that *S*~3~ (counting dots and capital letters) loads on Visual as well as on Speed:
+A CFA can also be reported in the matrix form used for exploratory factor analysis, with a row for each indicator and a column for each factor. `apa_loadings` shows the standardized loadings and leaves blank the loadings fixed at 0. As in exploratory factor analysis, the rows are grouped by the factor with each indicator's largest loading and sorted by the size of that loading (`sort_loading = FALSE` keeps the order of the model syntax). Suppose that Speeded Discrimination (*S*~3~, distinguishing straight from curved capital letters) loads on Visual as well as on Speed:
 
 ```{r}
 #| label: tbl-hs-loadings
@@ -193,6 +215,19 @@ model_3x <- "
 fit_3x <- cfa(model_3x, data = d_cfa)
 
 apa_loadings(fit_3x, communality = TRUE) |>
+  # Recode variable names to test names
+  mutate(Variable = case_match(
+    Variable,
+    "V1" ~ "Visual Perception",
+    "V2" ~ "Cubes",
+    "V3" ~ "Lozenges",
+    "T1" ~ "Paragraph Comprehension",
+    "T2" ~ "Sentence Completion",
+    "T3" ~ "Word Meaning",
+    "S1" ~ "Speeded Addition",
+    "S2" ~ "Speeded Counting of Dots",
+    "S3" ~ "Speeded Discrimination"
+  )) |>
   apa_flextable(note = TRUE)
 ```
 

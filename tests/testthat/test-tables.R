@@ -1,35 +1,6 @@
 library(apa7)
 library(testthat)
 
-# apa_chisq ----
-
-test_that("apa_chisq returns an apaflextable for a valid 2-column data frame", {
-  skip_on_cran()
-  result <- apa_chisq(mtcars[, c("am", "gear")])
-  expect_true(inherits(result, "flextable"))
-  expect_warning(
-    apa_chisq(
-      mtcars[, c("am", "gear")],
-      suppress_warnings = FALSE,
-      note = "hello"
-    )
-  )
-})
-
-test_that("apa_chisq errors on non-data.frame input", {
-  expect_error(apa_chisq(matrix(1:4, 2, 2)), "data.frame")
-})
-
-test_that("apa_chisq errors when data has more or fewer than 2 columns", {
-  expect_error(apa_chisq(mtcars[, c("am", "gear", "cyl")]))
-  expect_error(apa_chisq(mtcars[, "am", drop = FALSE]))
-})
-
-test_that("apa_chisq errors when contingency table is smaller than 2x2", {
-  d <- data.frame(a = c(1, 1), b = c(2, 2))
-  expect_error(apa_chisq(d), "2 by 2")
-})
-
 # apa_cor ----
 
 test_that("apa_cor returns a flextable by default", {

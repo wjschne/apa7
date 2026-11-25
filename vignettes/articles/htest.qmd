@@ -56,7 +56,7 @@ d_sat <- psych::sat.act |>
 #| label: tbl-welch
 #| apa7-width: landscape
 #| tbl-cap: "Welch's *t* Tests Comparing Test Scores of Men and Women"
-
+#| column: page-right
 apa_htest(
   d_sat,
   ACT + `SAT-V` + `SAT-Q` ~ Gender
@@ -317,6 +317,7 @@ With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `a
 ```{r}
 #| label: tbl-sat-note
 #| apa7-width: landscape
+#| column: page-right
 #| tbl-cap: Welch's *t* Tests Comparing SAT Scores of Men and Women
 #| apa-note: !expr apa7::apa_note(tbl_sat)
 #| echo: fenced
@@ -329,6 +330,7 @@ Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the same note below th
 #| label: tbl-note-flextable
 #| apa7-width: landscape
 #| tbl-cap: "Welch's *t* Tests Comparing SAT Scores of Men and Women With a Generated Note"
+#| column: page-right
 apa_flextable(tbl_sat, note = TRUE)
 ```
 
@@ -342,6 +344,7 @@ The generated note is a starting point. With `collapse = NULL`, `apa_note` retur
 #| label: tbl-bolded
 #| apa7-width: landscape
 #| tbl-cap: "Welch's *t* Tests With Significant *p*-Values in Bold"
+#| column: page-right
 apa_htest(
   d_sat,
   `SAT-V` + `SAT-Q` ~ Gender,

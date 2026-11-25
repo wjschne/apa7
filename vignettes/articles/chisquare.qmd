@@ -8,133 +8,164 @@ format: html
 #| include: false
 library(apa7)
 library(dplyr)
-library(tidyr)
-library(flextable)
-library(ftExtra)
-my_font <- "Roboto Condensed"
 apa7_defaults(font_family = "Segoe UI", line_spacing = 1.5)
 ```
 
 ```{r}
-#| label: setupdisplay
+#| label: setup2
+#| eval: false
 <<setup>>
 ```
 
-# Data
+A contingency table shows how often each combination of the levels of two categorical variables occurs. `apa_chisq` makes an APA-style contingency table with a row for each level of one variable and a column for each level of the other, tests whether the variables are independent, and records the result for the table note.
+
+apa7 has three ways to report categorical variables:
+
+| Function | Table | Article |
+|---|---|---|
+| `apa_chisq` | The cells of one contingency table, with its test of independence in the note | This article |
+| `apa_htest(test = "chisq")` | One row per test, for several variables tested against the same grouping variable | [Hypothesis tests](htest.html#chi-square-tests-of-independence) |
+| `apa_descriptives` | Counts and percentages of categorical variables, with continuous variables, in a sample description ("Table 1") | [Descriptive statistics](descriptives.html) |
+
+# A Contingency Table
+
+The `survey` data set in the MASS package [@ripleyModernApplied2002] has the answers of 237 statistics students to a short questionnaire. Do women and men differ in how often they exercise? Give the variables and their levels names that read well in a table:
 
 ```{r}
 #| label: data
-d <- mtcars |>
-  select(Gears = gear, Transmission = am) |>
-  mutate(Transmission = factor(Transmission, labels = c("Automatic", "Manual")))
+d_survey <- MASS::survey |>
+  transmute(
+    Sex,
+    Exercise = factor(Exer,
+                      levels = c("None", "Some", "Freq"),
+                      labels = c("None", "Some", "Frequent")),
+    Smoking = factor(Smoke,
+                     levels = c("Never", "Occas", "Regul", "Heavy"),
+                     labels = c("Never", "Occasionally", "Regularly", "Heavily"))
+  )
 ```
 
-# The `apa_chisq` contingency table function
-
-The default output of the `apa_chisq` function is a contingency table with a chi-square test of independence in the table note. The output is a flextable, which can be modified with flextable commands.
+`variable` gives the rows of the table, and `by` gives the columns:
 
 ```{r}
-#| label: tbl-apachisq
-#| tbl-cap: "Number of Gears by Transmission Type"
-apa_chisq(d)
+#| label: tbl-exercise
+#| tbl-cap: "Exercise by Sex"
+tbl_exercise <- apa_chisq(d_survey, Exercise, by = Sex)
+tbl_exercise
 ```
 
+Each group has a column of counts (*n*) and a column of percentages, and the "Total" row and column give the marginal counts. By default, the percentages are of each column's total, so each group's distribution can be read on its own: 41.5% of the women and 55.1% of the men exercised frequently. Variable names can be quoted or unquoted.
 
+In the console, `apa_chisq` returns an ordinary tibble, which can be changed with dplyr functions. In Quarto and R Markdown documents, it is displayed as an APA-style table automatically.
 
+# Table Notes
 
+`apa_chisq` tests whether the two variables are independent, and `apa_note` writes the note: what the values are, the test and its effect size, and how many cases were left out because of missing values. The text is in markdown, and it does not start with "*Note*." because apaquarto adds that.
 
 ```{r}
-#| label: tbl-no-note
-#| tbl-cap: "Number of Gears by Transmission Type Without a Note"
-# No note
-apa_chisq(d, note = NA)
+#| label: note
+apa_note(tbl_exercise)
 ```
 
-
-
-# What if I want something completely different?
-
-There are a lot of options out there. The flextable package has the `proc_freq` function, which has the ability to include row, column, and total percentages in the table.
+With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as `tbl_exercise` was made above):
 
 ```{r}
-#| label: tbl-procfreq
-#| tbl-cap: "Number of Gears by Engine Shape"
-mtcars %>%
-  proc_freq(row = "gear", col = "vs") %>%
-  theme_apa()
+#| label: tbl-exercise-note
+#| tbl-cap: "Exercise by Sex With a Note"
+#| apa-note: !expr apa7::apa_note(tbl_exercise)
+#| echo: fenced
+tbl_exercise
 ```
 
-These can be turned off selectively:
+Without apaquarto, `apa_flextable(note = TRUE)` puts the same note below the table. Do not combine it with the `apa-note` chunk option, or the note will appear twice.
 
 ```{r}
-#| label: tbl-procfreqoptions
-#| tbl-cap: "Number of Gears by Engine Shape Without Percentages"
-mtcars %>%
-  proc_freq(
-    row = "gear",
-    col = "vs",
-    include.row_percent = FALSE,
-    include.column_percent = FALSE,
-    include.table_percent = FALSE
-  ) %>%
-  apa_style(table_width = .5)
+#| label: tbl-exercise-flextable
+#| tbl-cap: "Exercise by Sex With a Generated Note"
+apa_flextable(tbl_exercise, note = TRUE)
 ```
 
-The flextable package's `tabulator` function has considerable power in creating a wide variety of descriptive tables. In general, the `tabulator` function requires that you calculate the statistics first, and then you specify where they should go.
+# Percentages
 
-Here I calculate the means, standard deviations, and sample sizes within each cell of a contingency table.
+The `percent` parameter sets which total the percentages are of. By default, `percent` is set to `"column"`. With `percent = "row"`, the percentages are of each row's total, which shows how each level of the row variable is divided among the groups:
 
 ```{r}
-#| label: tbl-tabulator
-#| tbl-cap: "Mean Number of Warp Breaks by Wool Type and Tension"
-d_tension <- warpbreaks |>
-  summarise(
-    m = mean(breaks, na.rm = TRUE),
-    sd = sd(breaks, na.rm = TRUE),
-    n = n(),
-    .by = c(wool, tension)
-  ) %>%
-  rename(Wool = wool) |>
-  mutate(
-    tension = factor(
-      tension,
-      labels = paste(c("Low", "Medium", "High"), "Tension")
-    )) 
-  
-d_tension |> 
-  flextable::tabulator(
-    rows = c("Wool"),
-    columns = "tension",
-    M = as_paragraph(m),
-    SD = as_paragraph(sd),
-    N = as_paragraph(n)
-  ) |> 
-  flextable::as_flextable() |>
-  italic(i = 2, part = "header") |>
-  align(j = 1, align = "center") |> 
-  theme_apa()
+#| label: tbl-percent-row
+#| tbl-cap: "Exercise by Sex With Percentages of Each Row"
+apa_chisq(d_survey, Exercise, by = Sex, percent = "row") |>
+  apa_flextable(note = TRUE)
 ```
 
-# Processing Data Yourself
+With `percent = "total"`, the percentages are of the whole sample, and with `percent = "none"`, the table has counts only. `total = FALSE` leaves out the "Total" row and column:
 
-What if you want it to look a little different? Unfortunately, you might have to do some of the heavy lifting yourself. The `pivot_wider_name_first` function is a wrapper around `tidyr::pivot_wider` that prints and sorts column names as "name_variable" instead of "variable_name". I wanted a shortcut because I frequently needed to make a shortcut for setting `names_glue = "{tension}_{.value}"` and `names_vary = "slowest"` when `names_from = "tension"`.
-
-A subtle difference in this version of the table is that the columns are decimal aligned, which is evident in the standard deviation column.
-
-Also, whereas previously the "stub header" (Wool column) was middle aligned, it is now top aligned, which is consistent with comparable examples in the *APA Style Manual*. I am not sure if this is a real rule in APA style, and I actually prefer middle alignment for situations like this.
-
-```{r warpbreaks}
-#| label: tbl-tension-wide
-#| tbl-cap: "Mean Number of Warp Breaks by Wool Type and Tension in Wide Format"
-d_tension |> 
-  rename(M = m, SD = sd) |> 
-  pivot_wider_name_first(
-    values_from = c(M, SD, n),
-    names_from = tension
-  ) |>
-  apa_flextable(column_formats = column_formats(accuracy = .1)) |>
-  align(j = 1, align = "center") 
+```{r}
+#| label: tbl-percent-none
+#| tbl-cap: "Exercise by Sex Without Percentages or Totals"
+apa_chisq(d_survey, Exercise, by = Sex, percent = "none", total = FALSE) |>
+  apa_flextable(note = TRUE, table_width = .5)
 ```
 
+# 2 × 2 Tables
 
+The `Cowles` data set in the carData package [@cowlesSubjectMatterPsychology1987] has the sex of 1,421 introductory psychology students and whether they volunteered to take part in psychological research. In a 2 × 2 table, the effect size is *&phi;*, and, as in `chisq.test`, the chi-square test uses Yates's continuity correction:
 
+```{r}
+#| label: tbl-volunteer
+#| tbl-cap: "Volunteering for Psychological Research by Sex"
+d_volunteer <- carData::Cowles |>
+  transmute(
+    Sex = factor(sex, levels = c("female", "male"), labels = c("Female", "Male")),
+    Volunteered = factor(volunteer, levels = c("yes", "no"), labels = c("Yes", "No"))
+  )
+
+apa_chisq(d_volunteer, Volunteered, by = Sex) |>
+  apa_flextable(note = TRUE)
+```
+
+Women were somewhat more likely to volunteer than men. `correct = FALSE` turns the continuity correction off, and `effect_size = "cramers_v"` gives Cramér's *V* instead of *&phi;* (for a 2 × 2 table, they are equal in size).
+
+# Small Expected Counts
+
+The chi-square test is an approximation that can be poor when some expected counts are small. When an expected count is below 5, the note says so:
+
+```{r}
+#| label: tbl-smoking-chisq
+#| tbl-cap: "Smoking by Exercise"
+apa_chisq(d_survey, Smoking, by = Exercise) |>
+  apa_flextable(note = TRUE)
+```
+
+Fisher's exact test does not depend on this approximation. With `test = "fisher"`, the note gives its *p*-value instead (`test = "none"` leaves the test out):
+
+```{r}
+#| label: tbl-smoking-fisher
+#| tbl-cap: "Smoking by Exercise With Fisher's Exact Test"
+apa_chisq(d_survey, Smoking, by = Exercise, test = "fisher") |>
+  apa_flextable(note = TRUE)
+```
+
+# Labels and Other Changes
+
+Variables are labeled by their formatted names, or by `labels`:
+
+```{r}
+#| label: tbl-labels
+#| tbl-cap: "Smoking by Sex With a Variable Label"
+apa_chisq(
+  d_survey,
+  Smoking,
+  by = Sex,
+  labels = c(Smoking = "Smoking frequency")
+)
+```
+
+`apa_flextable` sets the appearance of the table (e.g., `table_width`, `font_size`, and `line_spacing`), and the flextable it returns can be changed with any flextable function (e.g., `flextable::bold`). See [Building tables by hand](summarize.html) for more.
+
+# Changes From Earlier Versions
+
+Earlier versions of `apa_chisq` took a data frame with exactly two columns and returned a flextable, with the chi-square test in a note below it. Two-column data frames still work (the first column gives the columns of the table, and the second gives its rows), but the result is now a table like those of the other apa7 functions, and its note comes from `apa_note`. The arguments that styled the flextable (e.g., `note`, `font_size`, and `table_width`) are deprecated: if any is given, a flextable is returned as before, with a warning. Pass the table to `apa_flextable` instead.
+
+# References
+
+::: {#refs}
+:::

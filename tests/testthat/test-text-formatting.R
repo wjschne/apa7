@@ -446,7 +446,7 @@ test_that("font_size sets the font size of all tables", {
   expect_equal(size_of(ft), 10)
   expect_equal(unique(as.vector(ft$footer$styles$text$font.size$data)), 10)
   expect_equal(size_of(apa_cor(mtcars[, c("mpg", "wt", "hp")])), 10)
-  expect_equal(size_of(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs))), 10)
+  expect_equal(size_of(apa_flextable(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs)))), 10)
 
   # An explicit argument is used instead
   expect_equal(size_of(apa_flextable(apa_parameters(fit), font_size = 11)), 11)
@@ -480,7 +480,7 @@ test_that("line_spacing sets the spacing of all tables, but not of notes", {
   expect_equal(pad(ft, "header"), 0)
   expect_equal(pad(ft, "footer"), footer_padding)
   expect_equal(pad(apa_cor(mtcars[, c("mpg", "wt", "hp")])), 0)
-  expect_equal(pad(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs))), 0)
+  expect_equal(pad(apa_flextable(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs)))), 0)
 
   # An explicit argument is used instead
   expect_equal(pad(apa_flextable(apa_parameters(fit), line_spacing = 1.5)), 4)
