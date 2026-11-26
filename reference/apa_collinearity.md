@@ -8,7 +8,7 @@ tolerance of each predictor in a regression model, as computed by
 
 ``` r
 apa_collinearity(
-  x,
+  fit,
   columns = c("VIF", "VIF_CI", "Tolerance"),
   flag = NULL,
   ci = 0.95,
@@ -20,7 +20,7 @@ apa_collinearity(
 
 ## Arguments
 
-- x:
+- fit:
 
   a regression model with at least two predictors (any model that
   [`performance::check_collinearity()`](https://easystats.github.io/performance/reference/check_collinearity.html)

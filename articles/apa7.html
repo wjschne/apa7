@@ -205,7 +205,7 @@
 <div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">fit</span>, starred <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "&amp;beta; = standardized coefficient. ^\\* ^*p* &lt; .05. ^\\*\\* ^*p* &lt; .01. ^\\*\\*\\* ^*p* &lt; .001."</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "&amp;beta; = standardized coefficient. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."</span></span></code></pre></div>
 </div>
 <p><code>apa_flextable(note = TRUE)</code> puts the note below the table:</p>
 <div class="cell">
@@ -250,7 +250,7 @@
 <td class="cl-2a5ec546"><p class="cl-7a9068f9"><span class="cl-fd7caf76">&lt;.001</span><span class="cl-733a321e">***</span></p></td>
 </tr>
 </tbody>
-<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-e2fe7d46"><p class="cl-a68d07e4"><span class="cl-f148d26d">Note</span><span class="cl-fd7caf76">.</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">β</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">=</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">standardized</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">coefficient.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">* </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> &lt; .05.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> &lt; .01.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">*** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> &lt; .001.</span></p></td></tr></tfoot>
+<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-e2fe7d46"><p class="cl-a68d07e4"><span class="cl-f148d26d">Note</span><span class="cl-fd7caf76">.</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">β</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">=</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">standardized</span><span class="cl-fd7caf76"> </span><span class="cl-fd7caf76">coefficient.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">* </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> ≤ .05.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> ≤ .01.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">*** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> ≤ .001.</span></p></td></tr></tfoot>
 </table>
 </div>
 </div>
@@ -470,7 +470,7 @@
 <td class="cl-cbb83957"><p class="cl-f6483eb1"><span class="cl-fd7caf76"></span></p></td>
 </tr>
 </tbody>
-<tfoot><tr style="overflow-wrap:break-word;"><td colspan="12" class="cl-efedbba3"><p class="cl-0f1762d3"><span class="cl-733a321e">** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> &lt; .01.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">*** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> &lt; .001</span></p></td></tr></tfoot>
+<tfoot><tr style="overflow-wrap:break-word;"><td colspan="12" class="cl-efedbba3"><p class="cl-0f1762d3"><span class="cl-733a321e">** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> ≤ .01.</span><span class="cl-fd7caf76"> </span><span class="cl-733a321e">*** </span><span class="cl-f148d26d">p</span><span class="cl-fd7caf76"> ≤ .001</span></p></td></tr></tfoot>
 </table>
 </div>
 </div>
@@ -605,7 +605,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/p2stars.html">p2stars</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.0004</span>, <span class="fl">.0312</span>, <span class="fl">.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "\\*\\*\\*" "\\*"       ""</span></span>
 <span><span class="fu"><a href="../reference/apa_p_star_note.html">apa_p_star_note</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "^\\* ^*p* &lt; .05. ^\\*\\* ^*p* &lt; .01. ^\\*\\*\\* ^*p* &lt; .001"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001"</span></span></code></pre></div>
 </div>
 <p><code>align_chr</code> rounds numbers, replaces hyphens with true minus signs, and pads the numbers so that they line up on their decimals in a table column. <code>sci_md</code> writes very large or very small numbers in scientific notation:</p>
 <div class="cell">

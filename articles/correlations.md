@@ -56,7 +56,7 @@ d_personality |>
 | 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 1
 
@@ -78,7 +78,7 @@ d_personality |>
 | 4.  | Agreeablness | 125.00 | 18.14 |  .39 |  .45 |  .48 |  —     |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 |  .29 |  .04 |  .04 | −.04 | —     |  |
 | 6.  | Depression |   6.78 |  5.78 | −.08 | −.18 | −.14 | −.14 | .47 | — |
-| Note. Correlations significant at p \< .05 are bolded. |  |  |  |  |  |  |  |  |  |
+| Note. Correlations significant at p ≤ .05 are bolded. |  |  |  |  |  |  |  |  |  |
 
 Table 2
 
@@ -131,7 +131,7 @@ apa_cor(d_personality, summary_functions = my_summaries)
 | 4.  | Agreeablness | 231 | 125.00 | 18.14 | −0.21 | −0.27 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism | 231 |  87.97 | 23.34 |  0.07 | −0.55 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression | 231 |   6.78 |  5.78 |  1.29 |  1.50 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 4
 
@@ -191,7 +191,7 @@ d_personality |>
 | 4.  | Agreeablness | 231 | 125.00 | 18.14 | −0.21 | −0.27 |  .39 |  .45 |  .48 |  —     |  |  |
 | 5.  | Neuroticism | 231 |  87.97 | 23.34 |  0.07 | −0.55 |  .29 |  .04 |  .04 | −.04 | —     |  |
 | 6.  | Depression | 231 |   6.78 |  5.78 |  1.29 |  1.50 | −.08 | −.18 | −.14 | −.14 | .47 | — |
-| Note. Correlations significant at p \< .001 are bolded. |  |  |  |  |  |  |  |  |  |  |  |  |
+| Note. Correlations significant at p ≤ .001 are bolded. |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 5
 
@@ -213,7 +213,7 @@ apa_cor(d_personality, summary_functions = NA)
 | 4.  | Agreeablness | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 6
 
@@ -246,7 +246,7 @@ apa_cor(d_personality, table_width = .5) |>
 | 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | 1This is a footnote. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 7
@@ -314,7 +314,7 @@ apa_cor(d_personality, method = "spearman")
 | 5.  | Neuroticism |  87.97 | 23.34 | .28 | \*\*\* | .04 |  | .05 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.10 |  | −.16 | \* | −.13 | \* | −.11 |  | .47 | \*\*\* | — |  |
 | Note. Values are Spearman correlations. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| \* p \< .05. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p ≤ .05. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 9
 
@@ -359,7 +359,7 @@ apa_cor(d_personality, partial = TRUE)
 | 5.  | Neuroticism |  87.97 | 23.34 | .37 | \*\*\* | .10 |  | −.02 |  | −.15 | \* | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.17 | \* | −.16 | \* | −.06 |  | .05 |  | .51 | \*\*\* | — |  |
 | Note. Values are partial Pearson correlations, each controlling for all other variables in the table. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 10
 
@@ -398,7 +398,7 @@ correlation(d_personality, method = "spearman") |>
 | 5.  | Neuroticism |  87.97 | 23.34 | .28 | \*\*\* | .04 |  | .05 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.10 |  | −.16 |  | −.13 |  | −.11 |  | .47 | \*\*\* | — |  |
 | Note. Values are Spearman correlations. p-values are adjusted for multiple comparisons with Holm’s method ([Holm,](#ref-holmSimpleSequentiallyRejective1979)[ ](#ref-holmSimpleSequentiallyRejective1979)[1979](#ref-holmSimpleSequentiallyRejective1979)). |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 11
 

@@ -51,6 +51,16 @@ column_format(
 
 column_format object
 
+## Details
+
+A `column_format` is an S7 object. Its properties are read and changed
+with `@` (e.g., `R2@header`, or `R2@formatter <- my_function`). Formats
+are collected in a
+[`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md)
+object, in which each format is read, added, or replaced with `$` (e.g.,
+`column_formats()$p`). The table functions use a format for every column
+with the same name as the format.
+
 ## Examples
 
 ``` r

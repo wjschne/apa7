@@ -89,7 +89,7 @@ tests were used, how *p*-values were adjusted, and what the stars mean.
 
 apa_parameters(fit, starred = "p") |>
   apa_note()
-#> [1] "&beta; = standardized coefficient. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+#> [1] "&beta; = standardized coefficient. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."
 ```
 
 `apa_flextable(note = TRUE)` puts the note below the table:
@@ -105,7 +105,7 @@ apa_parameters(fit, starred = "p") |>
 | Constant | 10.57 | 0.85 | .00 | 12.37 | \<.001\*\*\* |
 | Verbal |  0.01 | 0.00 | .31 |  8.05 | \<.001\*\*\* |
 | Quantitative |  0.02 | 0.00 | .39 |  9.99 | \<.001\*\*\* |
-| Note. β = standardized coefficient. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |
+| Note. β = standardized coefficient. \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001. |  |  |  |  |  |
 
 When using [apaquarto](https://wjschne.github.io/apaquarto/), put the
 note in the `apa-note` chunk option instead, as described in the [table
@@ -164,7 +164,7 @@ apa_cor(d_sat[, c("Age", "ACT", "Verbal", "Quantitative")])
 | 2.  | ACT |  28.55 |   4.83 | .11 | \*\* | — |  |  |  |  |  |
 | 3.  | Verbal | 612.33 | 113.29 | −.04 |  | .56 | \*\*\* | — |  |  |  |
 | 4.  | Quantitative | 610.22 | 115.64 | −.03 |  | .59 | \*\*\* | .64 | \*\*\* | — |  |
-| \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |  |  |  |  |  |  |
+| \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |
 
 A list of nested models gives one table, with the change in *R*²:
 
@@ -210,7 +210,7 @@ note that explains them:
 p2stars(c(.0004, .0312, .5))
 #> [1] "\\*\\*\\*" "\\*"       ""
 apa_p_star_note()
-#> [1] "^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001"
+#> [1] "^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001"
 ```
 
 `align_chr` rounds numbers, replaces hyphens with true minus signs, and

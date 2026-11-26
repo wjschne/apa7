@@ -827,7 +827,7 @@ apa_note(tbl_obk)
 ```
 
 ```
-[1] "Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected [@greenhouseMethodsAnalysisProfile1959]. *MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared [@olejnikGeneralizedEtaOmega2003]. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+[1] "Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected [@greenhouseMethodsAnalysisProfile1959]. *MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared [@olejnikGeneralizedEtaOmega2003]. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."
 ```
 
 When stars or bold values are used, the note explains them, after the
@@ -866,8 +866,8 @@ Mixed ANOVA of Treatment and Phase
 effects involving Phase are Greenhouse–Geisser corrected ([Greenhouse &
 Geisser, 1959](#ref-greenhouseMethodsAnalysisProfile1959)). *MSE* = mean
 square error; *η*²_(G) = generalized eta squared ([Olejnik & Algina,
-2003](#ref-olejnikGeneralizedEtaOmega2003)). ^(\* )*p* \< .05.
-^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
+2003](#ref-olejnikGeneralizedEtaOmega2003)). ^(\* )*p* ≤ .05.
+^(\*\* )*p* ≤ .01. ^(\*\*\* )*p* ≤ .001.
 
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the same note
 below the table (or pass your own text as `note`). Do not combine it

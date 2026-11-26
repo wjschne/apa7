@@ -867,7 +867,7 @@ d |>
 | Socioeconomic status |  1.23\*     | .24 |  |  1.45\*     | .31 |
 | Age |  |  |  | −0.23        | .03 |
 | Note. b = unstandardized regression coefficient. β = standardized regression coefficient. |  |  |  |  |  |
-| \* p \< .05. \*\* p \< .01. \*\*\* p \< .001 |  |  |  |  |  |
+| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |
 
 Table 21
 
@@ -886,7 +886,7 @@ With a few minor details omitted, it does roughly this:
     rules under adjacent spanners do not touch.
 2.  If `auto_format_columns = TRUE`, turns columns of whole numbers
     (e.g., degrees of freedom) into integers so that they have no
-    decimals. Then formats the columns with `apa_format_columns`,
+    decimals. Then formats the columns with `apa_format_columns`.
     Columns named in `no_format_columns`, or in a `"no_format_columns"`
     attribute of the data (set by functions such as `apa_loadings`), are
     left as they are.

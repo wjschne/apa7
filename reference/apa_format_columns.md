@@ -1,6 +1,10 @@
 # Format data columns
 
-Format data columns
+`apa_format_columns()` formats the columns of a data frame of results
+and renames their headers in APA style, using a set of
+[`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md).
+[`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+calls it when `auto_format_columns = TRUE`.
 
 ## Usage
 
@@ -61,6 +65,44 @@ apa_format_columns(
 ## Value
 
 tibble
+
+## Details
+
+Each column is matched by name to a
+[`column_format()`](https://wjschne.github.io/apa7/reference/column_format.md)
+in `column_formats` (e.g., `p`, `SE`, `beta`, or `R2`). The values of a
+matched column are formatted by the format's formatter, and its name is
+replaced by the format's markdown header (e.g., `beta` becomes
+`*&beta;*`), or by its LaTeX header if `latex_headers = TRUE`. Columns
+without a format, and columns named in `no_format_columns`, are left as
+they are.
+
+If `format_separated_headers = TRUE` (default), a column name with a
+separator (`sep`, an underscore by default) is matched by its last part,
+so `Model 1_R2` is formatted like `R2` and becomes `Model 1_*R*^2^`. In
+[`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+the part before the separator becomes a column spanner. Format names
+that contain an underscore themselves (e.g., `R2_adjusted`) are matched
+whole.
+
+A few columns are matched by a pattern or combined:
+
+- `CI`, `CI_low`, and `CI_high` (e.g., from
+  [`parameters::parameters()`](https://easystats.github.io/parameters/reference/model_parameters.html))
+  become a single column of intervals, with a header such as "95% CI"
+  that gives the confidence level stored in `CI`.
+
+- If there are `t` and `df_error` columns, the degrees of freedom are
+  moved into the `t` header (e.g., *t*(28)), and `df_error` is dropped.
+
+- A column named like `t(28)` is formatted with the `t_df` format (and
+  gets the header *t*(28)), and one named like `90% CI` with the
+  `CI_percent` format.
+
+To see the default formats, run `column_formats()@get_tibble`. The
+article [Building Tables by
+Hand](https://wjschne.github.io/apa7/articles/summarize.html) shows how
+to change them.
 
 ## Examples
 

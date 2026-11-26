@@ -60,7 +60,7 @@ suggests retaining, as computed by <code><a href="https://easystats.github.io/pa
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_n_factors</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">fit</span>,</span>
 <span>  table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"methods"</span>, <span class="st">"agreement"</span><span class="op">)</span>,</span>
 <span>  bold_consensus <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  format_method_names <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -73,7 +73,7 @@ suggests retaining, as computed by <code><a href="https://easystats.github.io/pa
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dl><dt id="arg-fit">fit<a class="anchor" aria-label="anchor" href="#arg-fit"></a></dt>
 <dd><p>the output of <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors()</a></code>, or a data frame passed to
 it</p></dd>
 
@@ -97,7 +97,7 @@ to keep the names exactly as <code><a href="https://easystats.github.io/paramete
 
 <dt id="arg-components">components<a class="anchor" aria-label="anchor" href="#arg-components"></a></dt>
 <dd><p>if <code>TRUE</code>, the table and note speak of components rather
-than factors. If <code>NULL</code> (default), components are assumed when <code>x</code> is a
+than factors. If <code>NULL</code> (default), components are assumed when <code>fit</code> is a
 data frame and <code>type = "PCA"</code> is passed in <code>...</code>. The output of
 <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors()</a></code> and <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_components()</a></code> does not record
 which was estimated, so set <code>components = TRUE</code> for the output of
@@ -105,7 +105,7 @@ which was estimated, so set <code>components = TRUE</code> for the output of
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>arguments passed to <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors()</a></code> when <code>x</code> is a data
+<dd><p>arguments passed to <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors()</a></code> when <code>fit</code> is a data
 frame (e.g., <code>type</code>, <code>rotation</code>, <code>algorithm</code>, and <code>package</code>)</p></dd>
 
 </dl></div>
@@ -115,7 +115,7 @@ frame (e.g., <code>type</code>, <code>rotation</code>, <code>algorithm</code>, a
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><code>x</code> can be the output of <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors()</a></code>, or a data frame, in
+    <p><code>fit</code> can be the output of <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors()</a></code>, or a data frame, in
 which case <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors()</a></code> is run with the arguments in <code>...</code>
 (e.g., <code>type = "PCA"</code> for components, or <code>package</code> to choose the packages
 whose methods are used: by default nFactors and psych, which must be
@@ -133,6 +133,17 @@ test are generally recommended, while the Kaiser criterion (eigenvalues
 greater than 1) and the chi-square tests (Bartlett's, Anderson's, and
 Lawley's) tend to suggest too many factors. The number of methods that
 agree is not by itself a good reason to retain a number of factors.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Horn, J. L. (1965). A rationale and test for the number of factors in
+factor analysis. <em>Psychometrika, 30</em>(2), 179–185. <a href="https://doi.org/10.1007/BF02289447" class="external-link">doi:10.1007/BF02289447</a></p>
+<p>Kaiser, H. F. (1960). The application of electronic computers to
+factor analysis. <em>Educational and Psychological Measurement, 20</em>(1),
+141–151. <a href="https://doi.org/10.1177/001316446002000116" class="external-link">doi:10.1177/001316446002000116</a></p>
+<p>Velicer, W. F. (1976). Determining the number of components from the
+matrix of partial correlations. <em>Psychometrika, 41</em>(3), 321–327.
+<a href="https://doi.org/10.1007/BF02293557" class="external-link">doi:10.1007/BF02293557</a></p>
     </div>
 
     <div class="section level2">

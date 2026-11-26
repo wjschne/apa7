@@ -159,7 +159,7 @@ them.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>tibble</p>
+    <p><code>apa7_tbl</code> (tibble)</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -208,6 +208,29 @@ metrics are <code>R2</code> and <code>AIC</code>.</p>
 <p>For <code>glm</code> objects, <code>R2</code> is the pseudo-<em>R</em>^2^ that <code><a href="https://easystats.github.io/performance/reference/r2.html" class="external-link">performance::r2()</a></code> selects for the model family (e.g., Tjur's <em>R</em>^2^ for logistic regression and Nagelkerke's <em>R</em>^2^ for count models). The header names the pseudo-<em>R</em>^2^ that was used. Because the residual standard deviation is not meaningful for most GLMs, the default metrics are <code>R2</code> and <code>AIC</code>.</p>
 <p>For mixed models (<code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer</a></code>, <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer</a></code>, <code><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB::glmmTMB</a></code>, and <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">nlme::lme</a></code>), the default metrics are the marginal <em>R</em>^2^ (variance explained by the fixed effects), the conditional <em>R</em>^2^ (fixed and random effects), and the intraclass correlation (ICC), as computed by <code><a href="https://easystats.github.io/performance/reference/model_performance.html" class="external-link">performance::model_performance()</a></code>.</p>
 <p>For a list of models, each model's metrics are displayed in a row, labeled in a <code>Model</code> column by the list's names (or "Model 1", "Model 2", ... for unnamed elements). If <code>metrics</code> is <code>NULL</code> (default), each model's default metrics are used.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>McFadden, D. (1974). Conditional logit analysis of qualitative choice
+behavior. In P. Zarembka (Ed.), <em>Frontiers in econometrics</em> (pp. 105–142).
+Academic Press.</p>
+<p>Nagelkerke, N. J. D. (1991). A note on a general definition of the
+coefficient of determination. <em>Biometrika, 78</em>(3), 691–692.
+<a href="https://doi.org/10.1093/biomet/78.3.691" class="external-link">doi:10.1093/biomet/78.3.691</a></p>
+<p>Nakagawa, S., &amp; Schielzeth, H. (2013). A general and simple method for
+obtaining \(R^2\) from generalized linear mixed-effects models. <em>Methods
+in Ecology and Evolution, 4</em>(2), 133–142.
+<a href="https://doi.org/10.1111/j.2041-210x.2012.00261.x" class="external-link">doi:10.1111/j.2041-210x.2012.00261.x</a></p>
+<p>Satorra, A., &amp; Bentler, P. M. (1994). Corrections to test statistics
+and standard errors in covariance structure analysis. In A. von Eye &amp; C. C.
+Clogg (Eds.), <em>Latent variables analysis: Applications for developmental
+research</em> (pp. 399–419). Sage.</p>
+<p>Tjur, T. (2009). Coefficients of determination in logistic regression
+models—A new proposal: The coefficient of discrimination. <em>The American
+Statistician, 63</em>(4), 366–372. <a href="https://doi.org/10.1198/tast.2009.08210" class="external-link">doi:10.1198/tast.2009.08210</a></p>
+<p>Yuan, K.-H., &amp; Bentler, P. M. (2000). Three likelihood-based methods
+for mean and covariance structure analysis with nonnormal missing data.
+<em>Sociological Methodology, 30</em>(1), 165–200. <a href="https://doi.org/10.1111/0081-1750.00078" class="external-link">doi:10.1111/0081-1750.00078</a></p>
     </div>
 
     <div class="section level2">

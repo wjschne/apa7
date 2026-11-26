@@ -228,6 +228,24 @@
 <p>For <code>afex</code> models (<code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_car()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_ez()</a></code>, <code><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">afex::aov_4()</a></code>), each effect has its own error term, so the table shows each effect's degrees of freedom (<em>df</em>~effect~, <em>df</em>~error~), mean squared error (<em>MSE</em>), <em>F</em>, <em>p</em>, and effect size, as in <code>afex</code>'s own <code>nice()</code> tables. Degrees of freedom and <em>p</em>-values reflect the sphericity correction set in <code>afex</code> (Greenhouse-Geisser by default), and generalized \(\eta^2\) is the default effect size, as in <code>afex</code>.</p>
 <p>For linear mixed models fit with <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code> or <code><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmerTest::lmer()</a></code>, <em>F</em> tests of the fixed effects come from the lmerTest package, which approximates the denominator degrees of freedom with Kenward-Roger's method (default, as in <code><a href="apa_parameters.html">apa_parameters()</a></code>, which requires the pbkrtest package) or Satterthwaite's method (<code>ddf = "Satterthwaite"</code>). Tests are Type III by default, as in lmerTest, whose Type III tests do not depend on how factors are coded. The table shows each effect's degrees of freedom (<em>df</em>~effect~, <em>df</em>~error~), <em>F</em>, and <em>p</em>. Sums of squares and effect sizes have no agreed-upon definition in mixed models, so they are not shown by default. With <code>effect_size = "eta"</code> (or <code>"omega"</code> or <code>"epsilon"</code>), partial effect sizes are computed from <em>F</em> and its degrees of freedom (e.g., <code><a href="https://easystats.github.io/effectsize/reference/F_to_eta2.html" class="external-link">effectsize::F_to_eta2()</a></code>), which only approximates them. ANOVA tables made by lmerTest's <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> are displayed the same way. Generalized linear mixed models (<code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer()</a></code>) have no <em>F</em> tests; use <code><a href="apa_parameters.html">apa_parameters()</a></code> for them.</p>
     </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Greenhouse, S. W., &amp; Geisser, S. (1959). On methods in the analysis of
+profile data. <em>Psychometrika, 24</em>(2), 95–112. <a href="https://doi.org/10.1007/BF02289823" class="external-link">doi:10.1007/BF02289823</a></p>
+<p>Huynh, H., &amp; Feldt, L. S. (1976). Estimation of the Box correction for
+degrees of freedom from sample data in randomized block and split-plot
+designs. <em>Journal of Educational Statistics, 1</em>(1), 69–82.
+<a href="https://doi.org/10.3102/10769986001001069" class="external-link">doi:10.3102/10769986001001069</a></p>
+<p>Kenward, M. G., &amp; Roger, J. H. (1997). Small sample inference for fixed
+effects from restricted maximum likelihood. <em>Biometrics, 53</em>(3), 983–997.
+<a href="https://doi.org/10.2307/2533558" class="external-link">doi:10.2307/2533558</a></p>
+<p>Olejnik, S., &amp; Algina, J. (2003). Generalized eta and omega squared
+statistics: Measures of effect size for some common research designs.
+<em>Psychological Methods, 8</em>(4), 434–447. <a href="https://doi.org/10.1037/1082-989X.8.4.434" class="external-link">doi:10.1037/1082-989X.8.4.434</a></p>
+<p>Satterthwaite, F. E. (1946). An approximate distribution of estimates
+of variance components. <em>Biometrics Bulletin, 2</em>(6), 110–114.
+<a href="https://doi.org/10.2307/3002019" class="external-link">doi:10.2307/3002019</a></p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

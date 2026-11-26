@@ -102,6 +102,14 @@ These change the output of code that worked with apa7 0.2.0.
     [`add_star_column()`](https://wjschne.github.io/apa7/reference/add_star_column.md).
   - `apa_p_star_note(x = )` is now `alpha`.
   - `add_break_columns(d = )` is now `data`, as in the other functions.
+- Notes say *p* ≤ .05 (and ≤ .01 and ≤ .001) where they explain stars or
+  bold, matching the values that are marked: a *p*-value equal to a
+  threshold has always been starred or bolded, but star notes (from
+  [`apa_p_star_note()`](https://wjschne.github.io/apa7/reference/apa_p_star_note.md)
+  and
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)),
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)’s
+  bold note, and Johnson–Neyman sentences said *p* \< .05.
 - Table notes are now single-spaced, even when the table is
   double-spaced. This applies to `apa_flextable(note = TRUE)`,
   [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
@@ -665,6 +673,18 @@ These change the output of code that worked with apa7 0.2.0.
 - [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md)
   can star more than one column (e.g., `starred = c("deltaR2", "F")`).
   Before, it gave an error.
+- [`pivot_wider_name_first()`](https://wjschne.github.io/apa7/reference/pivot_wider_name_first.md)
+  uses its `names_prefix`, `names_sep`, and `names_vary` arguments,
+  which it accepted but ignored. For example, `names_prefix = "Model "`
+  turns `names_from` values 1 and 2 into the spanners “Model 1” and
+  “Model 2”. The defaults give the same names as before.
+- `header_align_vertical` in
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  and
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md)
+  aligns the header cells of every table. Before, it applied only when
+  the first column was named `Variable` or `Predictor`, and other
+  headers were always top-aligned.
 - The documentation of every argument was reviewed. Descriptions that
   contradicted the defaults were corrected (e.g., `trim_leading_zeros`
   and `add_plusses` in

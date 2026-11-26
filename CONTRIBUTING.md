@@ -50,6 +50,10 @@ advice.
 
 ### Code style
 
+- New functions and changes should follow the conventions in
+  [`dev/CONVENTIONS.md`](https://wjschne.github.io/dev/CONVENTIONS.md),
+  which also has a checklist for new table functions.
+
 - New code should follow the tidyverse [style
   guide](https://style.tidyverse.org). You can use the
   [styler](https://CRAN.R-project.org/package=styler) package to apply

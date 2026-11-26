@@ -1,8 +1,9 @@
 # Style `flextable::flextable` object according to APA style
 
-Style
-[`flextable::flextable`](https://davidgohel.github.io/flextable/reference/flextable.html)
-object according to APA style
+`apa_style()` applies the fonts, rules, spacing, and alignment of an
+APA-style table to a flextable and converts markdown in its cells.
+[`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+calls it, so it is needed only for a flextable made some other way.
 
 ## Usage
 
@@ -141,6 +142,58 @@ apa_style(
 ## Value
 
 flextable::flextable
+
+## Details
+
+With a few minor details omitted, `apa_style()` does roughly this:
+
+1.  Separates the headers into column spanners and deckered heads at
+    underscores, if `separate_headers = TRUE` and the header has one
+    row.
+
+2.  Sets the font, font size, and text color of every cell.
+
+3.  Draws the three horizontal rules of an APA table: above the header,
+    below the header, and below the body.
+
+4.  Top-aligns the body cells, centers the header text, and aligns the
+    header cells vertically with `header_align_vertical`.
+
+5.  Adds space above and below each cell's text, (`line_spacing` - 1)
+    times 2/3 of the font size, so that rows have the spacing of
+    `line_spacing` while text that wraps within a cell stays
+    single-spaced. In Typst output, the space is a little larger,
+    because Typst measures lines differently than Word does. The left
+    and right padding is `horizontal_padding`.
+
+6.  Styles apa7's helper columns. Break columns (from
+    [`add_break_columns()`](https://wjschne.github.io/apa7/reference/add_break_columns.md))
+    are left empty. Star columns (from
+    [`add_star_column()`](https://wjschne.github.io/apa7/reference/add_star_column.md)
+    and
+    [`separate_star_column()`](https://wjschne.github.io/apa7/reference/separate_star_column.md))
+    and list columns (from
+    [`add_list_column()`](https://wjschne.github.io/apa7/reference/add_list_column.md))
+    have no header and no padding on the side next to the column they
+    belong to, so that the two read as one column.
+
+7.  Sets the table's layout, alignment on the page, and width (`layout`,
+    `table_align`, and `table_width`). In Word, the table is kept on the
+    same page as the text that follows it.
+
+8.  Converts markdown in the header and the body with
+    [`ftExtra::colformat_md()`](https://ftextra.atusy.net/reference/colformat_md.html),
+    except in the columns named in `no_markdown_columns_header` and
+    `no_markdown_columns` and in cells that are already formatted.
+
+9.  If the first column is named `Variable` or `Predictor`, left-aligns
+    it.
+
+## References
+
+American Psychological Association. (2020). *Publication manual of the
+American Psychological Association* (7th ed.).
+[doi:10.1037/0000165-000](https://doi.org/10.1037/0000165-000)
 
 ## Examples
 

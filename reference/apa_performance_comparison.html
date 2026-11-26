@@ -86,13 +86,27 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>tibble</p>
+    <p><code>apa7_tbl</code> (tibble)</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Nested models are compared with <em>F</em> tests (<code><a href="https://easystats.github.io/performance/reference/test_performance.html" class="external-link">performance::test_wald()</a></code>) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests (<code><a href="https://easystats.github.io/performance/reference/test_performance.html" class="external-link">performance::test_likelihoodratio()</a></code>) are used. For GLMs, <code>R2</code> is the pseudo-<em>R</em>^2^ that <code><a href="https://easystats.github.io/performance/reference/r2.html" class="external-link">performance::r2()</a></code> selects for the model family, and the header names it (e.g., <em>R</em>^2^~Tjur~).</p>
 <p>Mixed models (<code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer</a></code> and <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer</a></code>) are compared with likelihood ratio tests. <code>R2</code> is the marginal <em>R</em>^2^ (variance explained by the fixed effects), and by default the conditional <em>R</em>^2^ (fixed and random effects) and its change (<code>R2_conditional</code>, <code>deltaR2_conditional</code>) are shown too, because adding random effects changes the conditional but not the marginal <em>R</em>^2^.</p>
 <p>Nested <code>lavaan</code> models (e.g., the configural, metric, and scalar models of a measurement invariance analysis) are compared each with the one before it, so they should be listed from the least to the most constrained. Each row shows the fit of the model (any of the metrics of <code><a href="apa_performance.html">apa_performance.lavaan()</a></code>), followed, under a "Change from previous model" spanner, by the chi-square difference test from <code><a href="https://rdrr.io/pkg/lavaan/man/lavTestLRT.html" class="external-link">lavaan::lavTestLRT()</a></code> (<code>"deltaChi2"</code>, <code>"deltaChi2_df"</code>, <code>"p_deltaChi2"</code>) and the changes in fit indices (<code>"deltaCFI"</code>, <code>"deltaTLI"</code>, <code>"deltaRMSEA"</code>, <code>"deltaSRMR"</code>), shown with three decimals. The default metrics are <code>"Chi2"</code>, <code>"Chi2_df"</code>, <code>"CFI"</code>, <code>"RMSEA"</code>, <code>"RMSEA_CI"</code>, <code>"SRMR"</code>, <code>"deltaChi2"</code>, <code>"deltaChi2_df"</code>, <code>"p_deltaChi2"</code>, <code>"deltaCFI"</code>, and <code>"deltaRMSEA"</code>. With a robust estimator (e.g., MLR or WLSMV), the difference test is scaled (e.g., the Satorra-Bentler scaled difference test), and the changes in fit indices are computed from their robust versions. <code><a href="apa_note.html">apa_note()</a></code> names the difference test. <code>starred</code> is ignored for <code>lavaan</code> models.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Satorra, A. (2000). Scaled and adjusted restricted tests in
+multi-sample analysis of moment structures. In R. D. H. Heijmans, D. S. G.
+Pollock, &amp; A. Satorra (Eds.), <em>Innovations in multivariate statistical
+analysis</em> (pp. 233–247). Kluwer Academic Publishers.
+<a href="https://doi.org/10.1007/978-1-4615-4603-0_17" class="external-link">doi:10.1007/978-1-4615-4603-0_17</a></p>
+<p>Satorra, A., &amp; Bentler, P. M. (2001). A scaled difference chi-square
+test statistic for moment structure analysis. <em>Psychometrika, 66</em>(4),
+507–514. <a href="https://doi.org/10.1007/BF02296192" class="external-link">doi:10.1007/BF02296192</a></p>
+<p>Satorra, A., &amp; Bentler, P. M. (2010). Ensuring positiveness of the
+scaled difference chi-square test statistic. <em>Psychometrika, 75</em>(2),
+243–248. <a href="https://doi.org/10.1007/s11336-009-9135-y" class="external-link">doi:10.1007/s11336-009-9135-y</a></p>
     </div>
 
     <div class="section level2">

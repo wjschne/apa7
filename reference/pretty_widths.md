@@ -1,6 +1,8 @@
-# Use flextable::dim_pretty to fit column widths
+# Fit column widths to the contents and the table width
 
-Use flextable::dim_pretty to fit column widths
+`pretty_widths()` sets each column's width to fit its contents and then
+scales the widths so that the table has the width given by
+`table_width`.
 
 ## Usage
 
@@ -55,6 +57,32 @@ pretty_widths(
 ## Value
 
 flextable::flextable
+
+## Details
+
+The widths are first measured with
+[`flextable::dim_pretty()`](https://davidgohel.github.io/flextable/reference/dim_pretty.html),
+and no column is narrower than `min_width`. If the table width is 0,
+these widths are kept. Otherwise, they are scaled up or down in
+proportion so that they add up to the table width, with two exceptions:
+
+- Break columns (from
+  [`add_break_columns()`](https://wjschne.github.io/apa7/reference/add_break_columns.md))
+  are kept at `min_width`.
+
+- List columns (from
+  [`add_list_column()`](https://wjschne.github.io/apa7/reference/add_list_column.md))
+  keep their measured width, and the column to the right of each one
+  (the text of the list) gets the extra width instead.
+
+The table's layout is then set to `"fixed"`, so that Word keeps the
+widths.
+
+If `table_width` is `NULL` (default), the width is taken from the code
+chunk's options or from
+[`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md)
+(see the `table_width` argument). With the defaults, the table is as
+wide as the text on a portrait page.
 
 ## Examples
 

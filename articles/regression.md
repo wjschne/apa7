@@ -744,7 +744,7 @@ tbl_lm <- apa_parameters(list(lm1, lm2, lm3))
 apa_note(tbl_lm)
 ```
 
-    [1] "&beta; = standardized coefficient; &Delta;*R*^2^ = change in *R*^2^. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+    [1] "&beta; = standardized coefficient; &Delta;*R*^2^ = change in *R*^2^. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."
 
 The note changes with the table. With robust standard errors (`vcov`)
 and confidence intervals, it says which standard errors were used and
@@ -774,7 +774,7 @@ apa_parameters(glm1, starred = "p") |>
   apa_note()
 ```
 
-    [1] "*OR* = odds ratio. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+    [1] "*OR* = odds ratio. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."
 
 The text is in markdown and does not start with “*Note*.” because
 apaquarto adds that. With
@@ -828,7 +828,7 @@ Table 22
 Hierarchical Regression Predicting ACT Scores
 
 *Note*. β = standardized coefficient; Δ*R*² = change in *R*².
-^(\* )*p* \< .05. ^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
+^(\* )*p* ≤ .05. ^(\*\* )*p* ≤ .01. ^(\*\*\* )*p* ≤ .001.
 
 Without apaquarto (e.g., in a plain Quarto or R Markdown document, or a
 table saved to Word with
@@ -850,7 +850,7 @@ apa_parameters(glm1, starred = "p") |>
 | Extraversion |  0.07 | 0.01 | 1.07 |  4.65 | \<.001\*\*\* |
 | Neuroticism |  0.01 | 0.01 | 1.01 |  0.56 |  .57      |
 | Sex–Male | −0.24 | 0.11 | 0.79 | −2.12 |  .03 \*   |
-| Note. OR = odds ratio. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |
+| Note. OR = odds ratio. \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001. |  |  |  |  |  |
 
 Table 23
 

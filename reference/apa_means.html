@@ -66,7 +66,7 @@ probe a moderation effect), computed with the
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_means</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">fit</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  starred <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -76,7 +76,7 @@ probe a moderation effect), computed with the
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">apa_contrasts</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">fit</span>,</span>
 <span>  contrast <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -89,7 +89,7 @@ probe a moderation effect), computed with the
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">apa_slopes</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">fit</span>,</span>
 <span>  trend <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -105,7 +105,7 @@ probe a moderation effect), computed with the
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dl><dt id="arg-fit">fit<a class="anchor" aria-label="anchor" href="#arg-fit"></a></dt>
 <dd><p>a model, or output of <code><a href="https://easystats.github.io/modelbased/reference/estimate_means.html" class="external-link">modelbased::estimate_means()</a></code> (for
 <code>apa_means()</code>), <code><a href="https://easystats.github.io/modelbased/reference/estimate_contrasts.html" class="external-link">modelbased::estimate_contrasts()</a></code> (for
 <code>apa_contrasts()</code>), or <code><a href="https://easystats.github.io/modelbased/reference/estimate_slopes.html" class="external-link">modelbased::estimate_slopes()</a></code> (for
@@ -123,7 +123,7 @@ them get heading rows. Passed to the modelbased function.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>other arguments passed to the modelbased function when <code>x</code> is a
+<dd><p>other arguments passed to the modelbased function when <code>fit</code> is a
 model (e.g., <code>p_adjust = "holm"</code>, <code>predict = "link"</code>, or
 <code>estimate = "average"</code>)</p></dd>
 
@@ -186,7 +186,7 @@ cannot be computed.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><code>x</code> is either a model or the output of <code><a href="https://easystats.github.io/modelbased/reference/estimate_means.html" class="external-link">modelbased::estimate_means()</a></code>,
+    <p><code>fit</code> is either a model or the output of <code><a href="https://easystats.github.io/modelbased/reference/estimate_means.html" class="external-link">modelbased::estimate_means()</a></code>,
 <code><a href="https://easystats.github.io/modelbased/reference/estimate_contrasts.html" class="external-link">modelbased::estimate_contrasts()</a></code>, or <code><a href="https://easystats.github.io/modelbased/reference/estimate_slopes.html" class="external-link">modelbased::estimate_slopes()</a></code>.
 With a model, <code>by</code>, <code>contrast</code>, <code>trend</code>, and the arguments in <code>...</code> (e.g.,
 <code>p_adjust</code>) are passed to the modelbased function, so
@@ -237,6 +237,24 @@ distribution for other models (e.g., mixed models). They are not computed
 for models with a link function (e.g., logistic regression), or when the
 slope also depends on other variables (e.g., a three-way interaction).</p>
 <p>Bayesian models are not yet supported.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Benjamini, Y., &amp; Hochberg, Y. (1995). Controlling the false discovery
+rate: A practical and powerful approach to multiple testing. <em>Journal of the
+Royal Statistical Society: Series B (Methodological), 57</em>(1), 289–300.
+<a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x" class="external-link">doi:10.1111/j.2517-6161.1995.tb02031.x</a></p>
+<p>Holm, S. (1979). A simple sequentially rejective multiple test
+procedure. <em>Scandinavian Journal of Statistics, 6</em>(2), 65–70.</p>
+<p>Johnson, P. O., &amp; Neyman, J. (1936). Tests of certain linear hypotheses
+and their application to some educational problems. <em>Statistical Research
+Memoirs, 1</em>, 57–93.</p>
+<p>Kramer, C. Y. (1956). Extension of multiple range tests to group means
+with unequal numbers of replications. <em>Biometrics, 12</em>(3), 307–310.
+<a href="https://doi.org/10.2307/3001469" class="external-link">doi:10.2307/3001469</a></p>
+<p>Tukey, J. W. (1994). The problem of multiple comparisons. In H. I.
+Braun (Ed.), <em>The collected works of John W. Tukey: Vol. VIII. Multiple
+comparisons, 1948–1983</em> (pp. 1–300). Chapman &amp; Hall.</p>
     </div>
 
     <div class="section level2">

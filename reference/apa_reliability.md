@@ -118,6 +118,17 @@ correct answers), *M* is the item's difficulty (the proportion of 1s),
 *r*~it~ is the corrected point-biserial correlation, and \\\alpha\\
 equals KR-20. The note says so.
 
+## References
+
+Feldt, L. S., Woodruff, D. J., & Salih, F. A. (1987). Statistical
+inference for coefficient alpha. *Applied Psychological Measurement,
+11*(1), 93–103.
+[doi:10.1177/014662168701100107](https://doi.org/10.1177/014662168701100107)
+
+McDonald, R. P. (1999). *Test theory: A unified treatment*. Lawrence
+Erlbaum.
+[doi:10.4324/9781410601087](https://doi.org/10.4324/9781410601087)
+
 ## Examples
 
 ``` r

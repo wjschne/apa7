@@ -15,8 +15,10 @@ The tibbles returned by
 [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md),
 [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md),
 [`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md),
+[`apa_n_factors()`](https://wjschne.github.io/apa7/reference/apa_n_factors.md),
+[`apa_publication_bias()`](https://wjschne.github.io/apa7/reference/apa_publication_bias.md),
 and
-[`apa_publication_bias()`](https://wjschne.github.io/apa7/reference/apa_publication_bias.md)
+[`apa_subgroups()`](https://wjschne.github.io/apa7/reference/apa_subgroups.md)
 have class `apa7_tbl`. They are ordinary tibbles for post-processing
 with dplyr, but in knitr and Quarto documents they are rendered as an
 [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)

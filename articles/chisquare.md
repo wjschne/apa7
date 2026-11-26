@@ -4,6 +4,8 @@
 
 library(apa7)
 library(dplyr)
+library(ggplot2)
+library(forcats)
 apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
@@ -43,7 +45,8 @@ d_survey <- MASS::survey |>
   )
 ```
 
-`variable` gives the rows of the table, and `by` gives the columns:
+The `variable` parameter gives the rows of the table, and `by` gives the
+columns:
 
 ``` r
 
@@ -86,7 +89,9 @@ apaquarto adds that.
 apa_note(tbl_exercise)
 ```
 
-    [1] "Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *&chi;*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included."
+```
+[1] "Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *&chi;*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included."
+```
 
 With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note`
 in the `apa-note` chunk option. Chunk options are evaluated before the
@@ -142,6 +147,38 @@ Table 3
 
 Exercise by Sex With a Generated Note
 
+An informal inspection of [Figure 1](#fig-exercise) suggests that
+compared to females, males are more likely to exercise frequently. The
+formal test of the comparison in [Table 3](#tbl-exercise-flextable)
+reveals the apparent difference in proportions is not statistically
+significant.
+
+Code
+
+``` r
+
+d_survey |> 
+  filter_out(is.na(Sex)) |> 
+  mutate(Exercise = fct_rev(Exercise)) |> 
+  count(Sex, Exercise) |> 
+  mutate(Proportion = n / sum(n), .by = Sex) |> 
+  mutate(p = formatC(100 * Proportion, digits = 1, format = "f")) |> 
+  ggplot(aes(Sex, Proportion)) + 
+  geom_col(aes(fill = Exercise)) + 
+  geom_text(aes(label = paste0(Exercise, ": ", p, "%"), group = Exercise), position = position_stack(vjust = .5, reverse = F), size = 16 * .8, size.unit = "pt", color = "white") + 
+  scale_x_discrete(expand = expansion()) +
+  scale_y_continuous("Exercise Proportions", breaks = NULL, expand = expansion()) + 
+  scale_fill_viridis_d(begin = .3, end = .7, direction = -1, alpha = .9) +
+  theme_minimal(base_family = "Open Sans", base_size = 16) + 
+  theme(legend.position = "none", panel.grid = element_blank())
+```
+
+![](chisquare_files/figure-html/fig-exercise-1.png)
+
+Figure 1
+
+Exercise Frequency by Participant Sex
+
 ## Percentages
 
 The `percent` parameter sets which total the percentages are of. By
@@ -194,9 +231,7 @@ Exercise by Sex Without Percentages or Totals
 The `Cowles` data set in the carData package ([Cowles & Davis,
 1987](#ref-cowlesSubjectMatterPsychology1987)) has the sex of 1,421
 introductory psychology students and whether they volunteered to take
-part in psychological research. In a 2 × 2 table, the effect size is
-*φ*, and, as in `chisq.test`, the chi-square test uses Yates’s
-continuity correction:
+part in psychological research.
 
 ``` r
 
@@ -205,6 +240,43 @@ d_volunteer <- carData::Cowles |>
     Sex = factor(sex, levels = c("female", "male"), labels = c("Female", "Male")),
     Volunteered = factor(volunteer, levels = c("yes", "no"), labels = c("Yes", "No"))
   )
+```
+
+A preliminary look at the proportions of volunteering behavior in
+[Figure 2](#fig-cowles) shows that females were more likely to
+volunteer. A formal test that the difference is statistically
+significant is seen in [Table 6](#tbl-volunteer).
+
+Code
+
+``` r
+
+d_volunteer |> 
+  filter_out(is.na(Sex)) |> 
+  mutate(Volunteered = fct_rev(Volunteered)) |>
+  count(Sex, Volunteered) |> 
+  mutate(Proportion = n / sum(n), .by = Sex) |> 
+  mutate(p = formatC(100 * Proportion, digits = 1, format = "f")) |> 
+  ggplot(aes(Sex, Proportion)) + 
+  geom_col(aes(fill = Volunteered)) + 
+  geom_text(aes(label = paste0(Volunteered, ": ", p, "%"), group = Volunteered), position = position_stack(vjust = .5), size = 16 * .8, size.unit = "pt", color = "white") + 
+  scale_x_discrete(expand = expansion()) +
+  scale_y_continuous("Volunteering Proportions", breaks = NULL, expand = expansion()) + 
+  scale_fill_viridis_d(begin = .4, end = .7, direction = -1, alpha = .9) +
+  theme_minimal(base_family = "Open Sans", base_size = 16) + 
+  theme(legend.position = "none", panel.grid = element_blank())
+```
+
+![](chisquare_files/figure-html/fig-cowles-1.png)
+
+Figure 2
+
+Volunteering Proportions by Participant Sex
+
+In a 2 × 2 table, the effect size is *φ*, and, as in `chisq.test`, the
+chi-square test uses Yates’s continuity correction:
+
+``` r
 
 apa_chisq(d_volunteer, Volunteered, by = Sex) |>
   apa_flextable(note = TRUE)

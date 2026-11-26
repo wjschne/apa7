@@ -84,10 +84,12 @@
 
 
 
-    <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
+    <div class="cell fig-cap-location-top">
+<div class="sourceCode cell-code" id="cb1" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wjschne/apa7" class="external-link">apa7</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa7_defaults.html">apa7_defaults</a></span><span class="op">(</span>font_family <span class="op">=</span> <span class="st">"Open Sans"</span>, line_spacing <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>A contingency table shows how often each combination of the levels of two categorical variables occurs. <code>apa_chisq</code> makes an APA-style contingency table with a row for each level of one variable and a column for each level of the other, tests whether the variables are independent, and records the result for the table note.</p>
@@ -119,8 +121,8 @@
 <section class="section level2"><h2 id="a-contingency-table">A Contingency Table<a class="anchor" aria-label="anchor" href="#a-contingency-table"></a>
 </h2>
 <p>The <code>survey</code> data set in the MASS package <span class="citation" data-cites="ripleyModernApplied2002">(<a href="#ref-ripleyModernApplied2002" role="doc-biblioref">Venables &amp; Ripley, 2002</a>)</span> has the answers of 237 statistics students to a short questionnaire. Do women and men differ in how often they exercise? Give the variables and their levels names that read well in a table:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
+<div class="cell fig-cap-location-top">
+<div class="sourceCode cell-code" id="cb2" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_survey</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/survey.html" class="external-link">survey</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    <span class="va">Sex</span>,</span>
@@ -132,12 +134,12 @@
 <span>                     labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Never"</span>, <span class="st">"Occasionally"</span>, <span class="st">"Regularly"</span>, <span class="st">"Heavily"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 </div>
-<p><code>variable</code> gives the rows of the table, and <code>by</code> gives the columns:</p>
-<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-custom-style="FigureWithoutNote">
+<p>The <code>variable</code> parameter gives the rows of the table, and <code>by</code> gives the columns:</p>
+<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tbl_exercise</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d_survey</span>, <span class="va">Exercise</span>, by <span class="op">=</span> <span class="va">Sex</span><span class="op">)</span></span>
 <span><span class="va">tbl_exercise</span></span></code></pre></div>
-<div id="tbl-exercise" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape">
+<div id="tbl-exercise" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-exercise-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 1</p>
 </div>
@@ -227,15 +229,15 @@
 </section><section class="section level2"><h2 id="table-notes">Table Notes<a class="anchor" aria-label="anchor" href="#table-notes"></a>
 </h2>
 <p><code>apa_chisq</code> tests whether the two variables are independent, and <code>apa_note</code> writes the note: what the values are, the test and its effect size, and how many cases were left out because of missing values. The text is in markdown, and it does not start with “<em>Note</em>.” because apaquarto adds that.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<div class="cell fig-cap-location-top">
+<div class="sourceCode cell-code" id="cb4" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_exercise</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *&amp;chi;*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included."</code></pre>
+<pre data-cap-location="top"><code>[1] "Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *&amp;chi;*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included."</code></pre>
 </div>
 </div>
 <p>With <a href="https://wjschne.github.io/apaquarto/" class="external-link">apaquarto</a>, use <code>apa_note</code> in the <code>apa-note</code> chunk option. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as <code>tbl_exercise</code> was made above):</p>
-<div class="cell FigureWithNote" data-apa7-width="landscape" data-apa-note="Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *χ*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included." data-custom-style="FigureWithNote">
+<div class="cell FigureWithNote" data-apa7-width="landscape" data-apa-note="Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *χ*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included." data-tbl-cap-location="top" data-custom-style="FigureWithNote">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-exercise-note</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa7-width: landscape</span></span>
@@ -243,7 +245,7 @@
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_exercise)</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>tbl_exercise</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div id="tbl-exercise-note" class="cell quarto-float quarto-figure quarto-figure-center" data-apa-note="Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *χ*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included." data-apa7-width="landscape" data-apa-note-written="88086b78">
+<div id="tbl-exercise-note" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape" data-apa-note="Values are counts (*n*) and percentages of each column (each group of Sex). Chi-square test of independence: *χ*^2^(2, *N* = 236) = 5.72, *p* = .06, Cramér's *V* = .16. Cases with a missing value of Exercise or Sex (*n* = 1) are not included." data-apa-note-written="88086b78">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-exercise-note-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 2</p>
 </div>
@@ -331,10 +333,10 @@
 </div>
 </div>
 <p>Without apaquarto, <code>apa_flextable(note = TRUE)</code> puts the same note below the table. Do not combine it with the <code>apa-note</code> chunk option, or the note will appear twice.</p>
-<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-custom-style="FigureWithoutNote">
+<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span><span class="va">tbl_exercise</span>, note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-exercise-flextable" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape">
+<div id="tbl-exercise-flextable" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-exercise-flextable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 3</p>
 </div>
@@ -418,14 +420,48 @@
 </figure>
 </div>
 </div>
+<div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
+<p>An informal inspection of <a href="#fig-exercise" class="quarto-xref">Figure 1</a> suggests that compared to females, males are more likely to exercise frequently. The formal test of the comparison in <a href="#tbl-exercise-flextable" class="quarto-xref">Table 3</a> reveals the apparent difference in proportions is not statistically significant.</p>
+</div>
+<div class="cell fig-cap-location-top FigureWithoutNote" data-custom-style="FigureWithoutNote">
+<details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb8" data-cap-location="top"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d_survey</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter_out</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Sex</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Exercise <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_rev.html" class="external-link">fct_rev</a></span><span class="op">(</span><span class="va">Exercise</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Sex</span>, <span class="va">Exercise</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Proportion <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">Sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/formatc.html" class="external-link">formatC</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="va">Proportion</span>, digits <span class="op">=</span> <span class="fl">1</span>, format <span class="op">=</span> <span class="st">"f"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">Sex</span>, <span class="va">Proportion</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">Exercise</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">Exercise</span>, <span class="st">": "</span>, <span class="va">p</span>, <span class="st">"%"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">Exercise</span><span class="op">)</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_stack.html" class="external-link">position_stack</a></span><span class="op">(</span>vjust <span class="op">=</span> <span class="fl">.5</span>, reverse <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">16</span> <span class="op">*</span> <span class="fl">.8</span>, size.unit <span class="op">=</span> <span class="st">"pt"</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span><span class="st">"Exercise Proportions"</span>, breaks <span class="op">=</span> <span class="cn">NULL</span>, expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span>begin <span class="op">=</span> <span class="fl">.3</span>, end <span class="op">=</span> <span class="fl">.7</span>, direction <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, alpha <span class="op">=</span> <span class="fl">.9</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_family <span class="op">=</span> <span class="st">"Open Sans"</span>, base_size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span>, panel.grid <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</details><div class="cell-output-display">
+<div id="fig-exercise" class="quarto-float quarto-figure quarto-figure-center" data-cap-location="top">
+<figure class="quarto-float quarto-float-fig"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-exercise-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
+<p>Figure 1</p>
+</div>
+<div class="Caption" data-custom-style="Caption">
+<p>Exercise Frequency by Participant Sex</p>
+</div>
+</figcaption><div aria-describedby="fig-exercise-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="chisquare_files/figure-html/fig-exercise-1.png" style="width:50.0%">
+</div>
+</figure>
+</div>
+</div>
+</div>
 </section><section class="section level2"><h2 id="percentages">Percentages<a class="anchor" aria-label="anchor" href="#percentages"></a>
 </h2>
 <p>The <code>percent</code> parameter sets which total the percentages are of. By default, <code>percent</code> is set to <code>"column"</code>. With <code>percent = "row"</code>, the percentages are of each row’s total, which shows how each level of the row variable is divided among the groups:</p>
-<div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d_survey</span>, <span class="va">Exercise</span>, by <span class="op">=</span> <span class="va">Sex</span>, percent <span class="op">=</span> <span class="st">"row"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-percent-row" class="cell quarto-float quarto-figure quarto-figure-center">
+<div id="tbl-percent-row" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-percent-row-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 4</p>
 </div>
@@ -512,11 +548,11 @@
 <div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
 <p>With <code>percent = "total"</code>, the percentages are of the whole sample, and with <code>percent = "none"</code>, the table has counts only. <code>total = FALSE</code> leaves out the “Total” row and column:</p>
 </div>
-<div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d_survey</span>, <span class="va">Exercise</span>, by <span class="op">=</span> <span class="va">Sex</span>, percent <span class="op">=</span> <span class="st">"none"</span>, total <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span>, table_width <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-percent-none" class="cell quarto-float quarto-figure quarto-figure-center">
+<div id="tbl-percent-none" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-percent-none-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 5</p>
 </div>
@@ -560,18 +596,55 @@
 </div>
 </section><section class="section level2"><h2 id="tables">2 × 2 Tables<a class="anchor" aria-label="anchor" href="#tables"></a>
 </h2>
-<p>The <code>Cowles</code> data set in the carData package <span class="citation" data-cites="cowlesSubjectMatterPsychology1987">(<a href="#ref-cowlesSubjectMatterPsychology1987" role="doc-biblioref">Cowles &amp; Davis, 1987</a>)</span> has the sex of 1,421 introductory psychology students and whether they volunteered to take part in psychological research. In a 2 × 2 table, the effect size is <em>φ</em>, and, as in <code>chisq.test</code>, the chi-square test uses Yates’s continuity correction:</p>
-<div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<p>The <code>Cowles</code> data set in the carData package <span class="citation" data-cites="cowlesSubjectMatterPsychology1987">(<a href="#ref-cowlesSubjectMatterPsychology1987" role="doc-biblioref">Cowles &amp; Davis, 1987</a>)</span> has the sex of 1,421 introductory psychology students and whether they volunteered to take part in psychological research.</p>
+<div class="cell fig-cap-location-top">
+<div class="sourceCode cell-code" id="cb11" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_volunteer</span> <span class="op">&lt;-</span> <span class="fu">carData</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/carData/man/Cowles.html" class="external-link">Cowles</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    Sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">sex</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"female"</span>, <span class="st">"male"</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Female"</span>, <span class="st">"Male"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    Volunteered <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">volunteer</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yes"</span>, <span class="st">"no"</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Yes"</span>, <span class="st">"No"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d_volunteer</span>, <span class="va">Volunteered</span>, by <span class="op">=</span> <span class="va">Sex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+</div>
+<p>A preliminary look at the proportions of volunteering behavior in <a href="#fig-cowles" class="quarto-xref">Figure 2</a> shows that females were more likely to volunteer. A formal test that the difference is statistically significant is seen in <a href="#tbl-volunteer" class="quarto-xref">Table 6</a>.</p>
+<div class="cell fig-cap-location-top FigureWithoutNote" data-custom-style="FigureWithoutNote">
+<details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb12" data-cap-location="top"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d_volunteer</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter_out</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Sex</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Volunteered <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_rev.html" class="external-link">fct_rev</a></span><span class="op">(</span><span class="va">Volunteered</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Sex</span>, <span class="va">Volunteered</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Proportion <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">Sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/formatc.html" class="external-link">formatC</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="va">Proportion</span>, digits <span class="op">=</span> <span class="fl">1</span>, format <span class="op">=</span> <span class="st">"f"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">Sex</span>, <span class="va">Proportion</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">Volunteered</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">Volunteered</span>, <span class="st">": "</span>, <span class="va">p</span>, <span class="st">"%"</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">Volunteered</span><span class="op">)</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_stack.html" class="external-link">position_stack</a></span><span class="op">(</span>vjust <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">16</span> <span class="op">*</span> <span class="fl">.8</span>, size.unit <span class="op">=</span> <span class="st">"pt"</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span><span class="st">"Volunteering Proportions"</span>, breaks <span class="op">=</span> <span class="cn">NULL</span>, expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span>begin <span class="op">=</span> <span class="fl">.4</span>, end <span class="op">=</span> <span class="fl">.7</span>, direction <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, alpha <span class="op">=</span> <span class="fl">.9</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_family <span class="op">=</span> <span class="st">"Open Sans"</span>, base_size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span>, panel.grid <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</details><div class="cell-output-display">
+<div id="fig-cowles" class="quarto-float quarto-figure quarto-figure-center" data-cap-location="top">
+<figure class="quarto-float quarto-float-fig"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cowles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
+<p>Figure 2</p>
+</div>
+<div class="Caption" data-custom-style="Caption">
+<p>Volunteering Proportions by Participant Sex</p>
+</div>
+</figcaption><div aria-describedby="fig-cowles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="chisquare_files/figure-html/fig-cowles-1.png" style="width:50.0%">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
+<p>In a 2 × 2 table, the effect size is <em>φ</em>, and, as in <code>chisq.test</code>, the chi-square test uses Yates’s continuity correction:</p>
+</div>
+<div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d_volunteer</span>, <span class="va">Volunteered</span>, by <span class="op">=</span> <span class="va">Sex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-volunteer" class="cell quarto-float quarto-figure quarto-figure-center">
+<div id="tbl-volunteer" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-volunteer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 6</p>
 </div>
@@ -650,11 +723,11 @@
 </section><section class="section level2"><h2 id="small-expected-counts">Small Expected Counts<a class="anchor" aria-label="anchor" href="#small-expected-counts"></a>
 </h2>
 <p>The chi-square test is an approximation that can be poor when some expected counts are small. When an expected count is below 5, the note says so:</p>
-<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d_survey</span>, <span class="va">Smoking</span>, by <span class="op">=</span> <span class="va">Exercise</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-smoking-chisq" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape">
+<div id="tbl-smoking-chisq" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-smoking-chisq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 7</p>
 </div>
@@ -771,11 +844,11 @@
 <div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
 <p>Fisher’s exact test does not depend on this approximation. With <code>test = "fisher"</code>, the note gives its <em>p</em>-value instead (<code>test = "none"</code> leaves the test out):</p>
 </div>
-<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span><span class="va">d_survey</span>, <span class="va">Smoking</span>, by <span class="op">=</span> <span class="va">Exercise</span>, test <span class="op">=</span> <span class="st">"fisher"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-smoking-fisher" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape">
+<div id="tbl-smoking-fisher" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-smoking-fisher-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 8</p>
 </div>
@@ -892,15 +965,15 @@
 </section><section class="section level2"><h2 id="labels-and-other-changes">Labels and Other Changes<a class="anchor" aria-label="anchor" href="#labels-and-other-changes"></a>
 </h2>
 <p>Variables are labeled by their formatted names, or by <code>labels</code>:</p>
-<div class="cell FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_chisq.html">apa_chisq</a></span><span class="op">(</span></span>
 <span>  <span class="va">d_survey</span>,</span>
 <span>  <span class="va">Smoking</span>,</span>
 <span>  by <span class="op">=</span> <span class="va">Sex</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Smoking <span class="op">=</span> <span class="st">"Smoking frequency"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-labels" class="cell quarto-float quarto-figure quarto-figure-center">
+<div id="tbl-labels" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 9</p>
 </div>

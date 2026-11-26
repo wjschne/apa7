@@ -1,12 +1,10 @@
 # Pads text on the left or right so that the width is the same for each element of the vector
 
-By default, text is padded with one `padding_character` per missing
-visible character. Markdown markup (e.g., `**`, `*`, `^`, `~`, and
-backslash escapes) is not counted. If `font_family` names an installed
-font, text is instead padded to equal *rendered* width in that font,
-using a combination of figure, punctuation, thin, and hair spaces
-(`padding_character` is then ignored). Superscripts and subscripts are
-measured at 2/3 of the font size.
+`num_pad()` adds spaces to the left or right of each element of a text
+vector so that all elements have the same width, counted in characters
+or measured in a font.
+[`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md)
+uses it to line up numbers.
 
 ## Usage
 
@@ -46,6 +44,16 @@ num_pad(
 ## Value
 
 character vector
+
+## Details
+
+By default, text is padded with one `padding_character` per missing
+visible character. Markdown markup (e.g., `**`, `*`, `^`, `~`, and
+backslash escapes) is not counted. If `font_family` names an installed
+font, text is instead padded to equal *rendered* width in that font,
+using a combination of figure, punctuation, thin, and hair spaces
+(`padding_character` is then ignored). Superscripts and subscripts are
+measured at 2/3 of the font size.
 
 ## Examples
 

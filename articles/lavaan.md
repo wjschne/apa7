@@ -840,8 +840,8 @@ Standardized Parameter Estimates of the Political Democracy Model
 
 *Note*. *N* = 75. Estimation used maximum likelihood (ML). Estimates are
 fully standardized, and their standard errors and *p*-values are for the
-standardized estimates. β = standardized coefficient. ^(\* )*p* \< .05.
-^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
+standardized estimates. β = standardized coefficient. ^(\* )*p* ≤ .05.
+^(\*\* )*p* ≤ .01. ^(\*\*\* )*p* ≤ .001.
 
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the note below
 the table.

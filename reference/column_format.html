@@ -93,6 +93,14 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>column_format object</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>A <code>column_format</code> is an S7 object. Its properties are read and changed with
+<code>@</code> (e.g., <code>R2@header</code>, or <code>R2@formatter &lt;- my_function</code>). Formats are
+collected in a <code><a href="column_formats.html">column_formats()</a></code> object, in which each format is read,
+added, or replaced with <code>$</code> (e.g., <code>column_formats()$p</code>). The table
+functions use a format for every column with the same name as the format.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

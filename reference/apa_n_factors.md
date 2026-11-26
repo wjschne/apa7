@@ -8,7 +8,7 @@ suggests retaining, as computed by
 
 ``` r
 apa_n_factors(
-  x,
+  fit,
   table = c("methods", "agreement"),
   bold_consensus = TRUE,
   format_method_names = TRUE,
@@ -19,7 +19,7 @@ apa_n_factors(
 
 ## Arguments
 
-- x:
+- fit:
 
   the output of
   [`parameters::n_factors()`](https://easystats.github.io/parameters/reference/n_factors.html),
@@ -47,7 +47,7 @@ apa_n_factors(
 - components:
 
   if `TRUE`, the table and note speak of components rather than factors.
-  If `NULL` (default), components are assumed when `x` is a data frame
+  If `NULL` (default), components are assumed when `fit` is a data frame
   and `type = "PCA"` is passed in `...`. The output of
   [`parameters::n_factors()`](https://easystats.github.io/parameters/reference/n_factors.html)
   and
@@ -60,7 +60,7 @@ apa_n_factors(
 
   arguments passed to
   [`parameters::n_factors()`](https://easystats.github.io/parameters/reference/n_factors.html)
-  when `x` is a data frame (e.g., `type`, `rotation`, `algorithm`, and
+  when `fit` is a data frame (e.g., `type`, `rotation`, `algorithm`, and
   `package`)
 
 ## Value
@@ -69,7 +69,7 @@ apa_n_factors(
 
 ## Details
 
-`x` can be the output of
+`fit` can be the output of
 [`parameters::n_factors()`](https://easystats.github.io/parameters/reference/n_factors.html),
 or a data frame, in which case
 [`parameters::n_factors()`](https://easystats.github.io/parameters/reference/n_factors.html)
@@ -93,6 +93,20 @@ often disagree: parallel analysis and Velicer's minimum average partial
 Anderson's, and Lawley's) tend to suggest too many factors. The number
 of methods that agree is not by itself a good reason to retain a number
 of factors.
+
+## References
+
+Horn, J. L. (1965). A rationale and test for the number of factors in
+factor analysis. *Psychometrika, 30*(2), 179–185.
+[doi:10.1007/BF02289447](https://doi.org/10.1007/BF02289447)
+
+Kaiser, H. F. (1960). The application of electronic computers to factor
+analysis. *Educational and Psychological Measurement, 20*(1), 141–151.
+[doi:10.1177/001316446002000116](https://doi.org/10.1177/001316446002000116)
+
+Velicer, W. F. (1976). Determining the number of components from the
+matrix of partial correlations. *Psychometrika, 41*(3), 321–327.
+[doi:10.1007/BF02293557](https://doi.org/10.1007/BF02293557)
 
 ## Examples
 

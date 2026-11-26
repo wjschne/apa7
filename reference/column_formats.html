@@ -99,6 +99,19 @@
     <p>column_formats</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Each <code><a href="column_format.html">column_format()</a></code> in the list is named by the column it formats.
+Formats are read, added, replaced, and removed with <code>$</code> (e.g.,
+<code>my_formats$beta</code>, <code>my_formats$Predictor &lt;- column_format("Predictor")</code>, or
+<code>my_formats$beta &lt;- NULL</code>), and the properties of a single format are read
+and changed with <code>@</code> (e.g., <code>my_formats$p@header</code>). The <code>get_</code> properties
+listed under Slots return the names, headers, formatters, and so on of all
+the formats at once (e.g., <code>my_formats@get_tibble</code>).</p>
+<p>Use the object with the <code>column_formats</code> argument of <code><a href="apa_flextable.html">apa_flextable()</a></code>,
+<code><a href="apa_format_columns.html">apa_format_columns()</a></code>, and the table functions, or set it for every table
+with <code>apa7_defaults(column_formats = my_formats)</code>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="slots">Slots<a class="anchor" aria-label="anchor" href="#slots"></a></h2>
 
 

@@ -232,6 +232,17 @@ In apa7 0.2.0 and earlier, `apa_cor()` computed the correlations with
 `adjust` argument is still accepted as `p_adjust`, with a warning, and
 `use = "complete"` removes incomplete rows, with a warning.
 
+## References
+
+Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery
+rate: A practical and powerful approach to multiple testing. *Journal of
+the Royal Statistical Society: Series B (Methodological), 57*(1),
+289–300.
+[doi:10.1111/j.2517-6161.1995.tb02031.x](https://doi.org/10.1111/j.2517-6161.1995.tb02031.x)
+
+Holm, S. (1979). A simple sequentially rejective multiple test
+procedure. *Scandinavian Journal of Statistics, 6*(2), 65–70.
+
 ## Examples
 
 ``` r

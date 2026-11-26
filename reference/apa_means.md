@@ -9,7 +9,7 @@ them (e.g., pairwise comparisons after an ANOVA), and simple slopes
 
 ``` r
 apa_means(
-  x,
+  fit,
   by = NULL,
   ...,
   starred = NA,
@@ -19,7 +19,7 @@ apa_means(
 )
 
 apa_contrasts(
-  x,
+  fit,
   contrast = NULL,
   by = NULL,
   ...,
@@ -32,7 +32,7 @@ apa_contrasts(
 )
 
 apa_slopes(
-  x,
+  fit,
   trend = NULL,
   by = NULL,
   ...,
@@ -46,7 +46,7 @@ apa_slopes(
 
 ## Arguments
 
-- x:
+- fit:
 
   a model, or output of
   [`modelbased::estimate_means()`](https://easystats.github.io/modelbased/reference/estimate_means.html)
@@ -68,8 +68,8 @@ apa_slopes(
 
 - ...:
 
-  other arguments passed to the modelbased function when `x` is a model
-  (e.g., `p_adjust = "holm"`, `predict = "link"`, or
+  other arguments passed to the modelbased function when `fit` is a
+  model (e.g., `p_adjust = "holm"`, `predict = "link"`, or
   `estimate = "average"`)
 
 - starred:
@@ -132,7 +132,7 @@ apa_slopes(
 
 ## Details
 
-`x` is either a model or the output of
+`fit` is either a model or the output of
 [`modelbased::estimate_means()`](https://easystats.github.io/modelbased/reference/estimate_means.html),
 [`modelbased::estimate_contrasts()`](https://easystats.github.io/modelbased/reference/estimate_contrasts.html),
 or
@@ -194,6 +194,29 @@ when the slope also depends on other variables (e.g., a three-way
 interaction).
 
 Bayesian models are not yet supported.
+
+## References
+
+Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery
+rate: A practical and powerful approach to multiple testing. *Journal of
+the Royal Statistical Society: Series B (Methodological), 57*(1),
+289–300.
+[doi:10.1111/j.2517-6161.1995.tb02031.x](https://doi.org/10.1111/j.2517-6161.1995.tb02031.x)
+
+Holm, S. (1979). A simple sequentially rejective multiple test
+procedure. *Scandinavian Journal of Statistics, 6*(2), 65–70.
+
+Johnson, P. O., & Neyman, J. (1936). Tests of certain linear hypotheses
+and their application to some educational problems. *Statistical
+Research Memoirs, 1*, 57–93.
+
+Kramer, C. Y. (1956). Extension of multiple range tests to group means
+with unequal numbers of replications. *Biometrics, 12*(3), 307–310.
+[doi:10.2307/3001469](https://doi.org/10.2307/3001469)
+
+Tukey, J. W. (1994). The problem of multiple comparisons. In H. I. Braun
+(Ed.), *The collected works of John W. Tukey: Vol. VIII. Multiple
+comparisons, 1948–1983* (pp. 1–300). Chapman & Hall.
 
 ## Examples
 

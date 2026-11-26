@@ -2106,7 +2106,7 @@
 <code class="sourceCode R"><span><span class="va">tbl_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">lm1</span>, <span class="va">lm2</span>, <span class="va">lm3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_lm</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "&amp;beta; = standardized coefficient; &amp;Delta;*R*^2^ = change in *R*^2^. ^\\* ^*p* &lt; .05. ^\\*\\* ^*p* &lt; .01. ^\\*\\*\\* ^*p* &lt; .001."</code></pre>
+<pre><code>[1] "&amp;beta; = standardized coefficient; &amp;Delta;*R*^2^ = change in *R*^2^. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."</code></pre>
 </div>
 </div>
 <p>The note changes with the table. With robust standard errors (<code>vcov</code>) and confidence intervals, it says which standard errors were used and defines CI:</p>
@@ -2128,11 +2128,11 @@
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">glm1</span>, starred <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "*OR* = odds ratio. ^\\* ^*p* &lt; .05. ^\\*\\* ^*p* &lt; .01. ^\\*\\*\\* ^*p* &lt; .001."</code></pre>
+<pre><code>[1] "*OR* = odds ratio. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."</code></pre>
 </div>
 </div>
 <p>The text is in markdown and does not start with “<em>Note</em>.” because apaquarto adds that. With <a href="https://wjschne.github.io/apaquarto/" class="external-link">apaquarto</a>, use <code>apa_note</code> in the <code>apa-note</code> chunk option with <code>!expr</code>. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as <code>tbl_lm</code> was made above) and display it in the chunk with the note. Write it as <code><a href="../reference/apa_note.html">apa7::apa_note</a></code>, because in documents with cached chunks, chunk options can be evaluated before <code><a href="https://github.com/wjschne/apa7" class="external-link">library(apa7)</a></code> takes effect:</p>
-<div class="cell FigureWithNote" data-apa7-width="landscape" data-apa-note="β = standardized coefficient; Δ*R*^2^ = change in *R*^2^. ^* ^*p* &lt; .05. ^** ^*p* &lt; .01. ^*** ^*p* &lt; .001." data-custom-style="FigureWithNote">
+<div class="cell FigureWithNote" data-apa7-width="landscape" data-apa-note="β = standardized coefficient; Δ*R*^2^ = change in *R*^2^. ^* ^*p* ≤ .05. ^** ^*p* ≤ .01. ^*** ^*p* ≤ .001." data-custom-style="FigureWithNote">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-lm-note</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa7-width: landscape</span></span>
@@ -2140,7 +2140,7 @@
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_lm)</span></span>
 <span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>tbl_lm</span>
 <span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div id="tbl-lm-note" class="cell quarto-float quarto-figure quarto-figure-center" data-apa-note="β = standardized coefficient; Δ*R*^2^ = change in *R*^2^. ^* ^*p* &lt; .05. ^** ^*p* &lt; .01. ^*** ^*p* &lt; .001." data-apa7-width="landscape" data-apa-note-written="58cec7ca">
+<div id="tbl-lm-note" class="cell quarto-float quarto-figure quarto-figure-center" data-apa-note="β = standardized coefficient; Δ*R*^2^ = change in *R*^2^. ^* ^*p* ≤ .05. ^** ^*p* ≤ .01. ^*** ^*p* ≤ .001." data-apa7-width="landscape" data-apa-note-written="58cec7ca">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lm-note-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 22</p>
 </div>
@@ -2460,7 +2460,7 @@
 </div>
 </figure><div>
 <div class="FigureNote NoIndent" data-custom-style="FigureNote">
-<em>Note</em>. β = standardized coefficient; Δ<em>R</em><sup>2</sup> = change in <em>R</em><sup>2</sup>. <sup>* </sup><em>p</em> &lt; .05. <sup>** </sup><em>p</em> &lt; .01. <sup>*** </sup><em>p</em> &lt; .001.
+<em>Note</em>. β = standardized coefficient; Δ<em>R</em><sup>2</sup> = change in <em>R</em><sup>2</sup>. <sup>* </sup><em>p</em> ≤ .05. <sup>** </sup><em>p</em> ≤ .01. <sup>*** </sup><em>p</em> ≤ .001.
 </div>
 </div>
 </div>
@@ -2524,7 +2524,7 @@
 <td class="cl-24dfae29"><p class="cl-9b657bb7"><span class="cl-cbf2dfd9"> .03 </span><span class="cl-fe4be2bd">*</span><span class="cl-cbf2dfd9">  </span></p></td>
 </tr>
 </tbody>
-<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-8de8e264"><p class="cl-9700c258"><span class="cl-a9d4540c">Note</span><span class="cl-cbf2dfd9">.</span><span class="cl-cbf2dfd9"> </span><span class="cl-a9d4540c">OR</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">=</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">odds</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">ratio.</span><span class="cl-cbf2dfd9"> </span><span class="cl-fe4be2bd">* </span><span class="cl-a9d4540c">p</span><span class="cl-cbf2dfd9"> &lt; .05.</span><span class="cl-cbf2dfd9"> </span><span class="cl-fe4be2bd">** </span><span class="cl-a9d4540c">p</span><span class="cl-cbf2dfd9"> &lt; .01.</span><span class="cl-cbf2dfd9"> </span><span class="cl-fe4be2bd">*** </span><span class="cl-a9d4540c">p</span><span class="cl-cbf2dfd9"> &lt; .001.</span></p></td></tr></tfoot>
+<tfoot><tr style="overflow-wrap:break-word;"><td colspan="6" class="cl-8de8e264"><p class="cl-9700c258"><span class="cl-a9d4540c">Note</span><span class="cl-cbf2dfd9">.</span><span class="cl-cbf2dfd9"> </span><span class="cl-a9d4540c">OR</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">=</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">odds</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">ratio.</span><span class="cl-cbf2dfd9"> </span><span class="cl-fe4be2bd">* </span><span class="cl-a9d4540c">p</span><span class="cl-cbf2dfd9"> ≤ .05.</span><span class="cl-cbf2dfd9"> </span><span class="cl-fe4be2bd">** </span><span class="cl-a9d4540c">p</span><span class="cl-cbf2dfd9"> ≤ .01.</span><span class="cl-cbf2dfd9"> </span><span class="cl-fe4be2bd">*** </span><span class="cl-a9d4540c">p</span><span class="cl-cbf2dfd9"> ≤ .001.</span></p></td></tr></tfoot>
 </table>
 </div>
 </div>

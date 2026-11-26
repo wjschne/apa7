@@ -115,7 +115,7 @@ apa_means(fit, by = c(`Partner Status`, Authoritarianism)) |>
 | Partner Status: Low |  |  |  |
 |  Low |  8.90 | 1.45 | \[ 5.97, 11.83\] |
 |  Medium |  7.25 | 2.29 | \[ 2.62, 11.88\] |
-|  High | 12.63 | 1.62 | \[ 9.35, 15.90\] |
+|  High | 12.62 | 1.62 | \[ 9.35, 15.90\] |
 | Partner Status: High |  |  |  |
 |  Low | 17.40 | 2.05 | \[13.26, 21.54\] |
 |  Medium | 14.27 | 1.38 | \[11.48, 17.07\] |
@@ -279,7 +279,7 @@ apa_slopes(fit_mod,
 | 30 | 0.36 | 0.04 | \[0.28, 0.44\] |  8.63 | \<.001 |
 | 50 | 0.50 | 0.03 | \[0.45, 0.55\] | 19.99 | \<.001 |
 | 70 | 0.65 | 0.04 | \[0.57, 0.72\] | 16.41 | \<.001 |
-| Note. Values are simple slopes of Negative Emotions (the expected change in Support for a one-unit increase in Negative Emotions) at each value of Age. Johnson–Neyman intervals ([Johnson](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[&](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[Neyman,](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[1936](#ref-johnsonTestsCertainLinear1936)): the slope of Negative Emotions is significant (p \< .05) across the observed range of Age (17 to 87). CI = confidence interval. |  |  |  |  |  |
+| Note. Values are simple slopes of Negative Emotions (the expected change in Support for a one-unit increase in Negative Emotions) at each value of Age. Johnson–Neyman intervals ([Johnson](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[&](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[Neyman,](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[1936](#ref-johnsonTestsCertainLinear1936)): the slope of Negative Emotions is significant (p ≤ .05) across the observed range of Age (17 to 87). CI = confidence interval. |  |  |  |  |  |
 
 Table 8
 
@@ -315,7 +315,7 @@ apa_slopes(fit_mod, trend = `Negative Emotions`, by = Age) |>
 | −1SD (33.20) | 0.38 | 0.04 | \[0.31, 0.46\] | 10.13 | \<.001 |
 | M (49.54) | 0.50 | 0.03 | \[0.45, 0.55\] | 19.81 | \<.001 |
 | +1SD (65.87) | 0.62 | 0.03 | \[0.55, 0.69\] | 17.85 | \<.001 |
-| Note. Values are simple slopes of Negative Emotions (the expected change in Support for a one-unit increase in Negative Emotions) at each value of Age. Johnson–Neyman intervals ([Johnson](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[&](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[Neyman,](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[1936](#ref-johnsonTestsCertainLinear1936)): the slope of Negative Emotions is significant (p \< .05) across the observed range of Age (17 to 87). CI = confidence interval. |  |  |  |  |  |
+| Note. Values are simple slopes of Negative Emotions (the expected change in Support for a one-unit increase in Negative Emotions) at each value of Age. Johnson–Neyman intervals ([Johnson](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[&](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[Neyman,](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[1936](#ref-johnsonTestsCertainLinear1936)): the slope of Negative Emotions is significant (p ≤ .05) across the observed range of Age (17 to 87). CI = confidence interval. |  |  |  |  |  |
 
 Table 9
 
@@ -339,7 +339,7 @@ apa_slopes(fit_mod, trend = `Negative Emotions`,
 | Mdn (51) | 0.51 | 0.03 | \[0.46, 0.56\] | 20.31 | \<.001 |
 | Q3 (63) | 0.60 | 0.03 | \[0.53, 0.66\] | 18.87 | \<.001 |
 | Max (87) | 0.77 | 0.06 | \[0.64, 0.89\] | 12.25 | \<.001 |
-| Note. Values are simple slopes of Negative Emotions (the expected change in Support for a one-unit increase in Negative Emotions) at each value of Age. Johnson–Neyman intervals ([Johnson](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[&](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[Neyman,](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[1936](#ref-johnsonTestsCertainLinear1936)): the slope of Negative Emotions is significant (p \< .05) across the observed range of Age (17 to 87). CI = confidence interval; Q1 = first quartile (lower hinge); Q3 = third quartile (upper hinge). |  |  |  |  |  |
+| Note. Values are simple slopes of Negative Emotions (the expected change in Support for a one-unit increase in Negative Emotions) at each value of Age. Johnson–Neyman intervals ([Johnson](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[&](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[Neyman,](#ref-johnsonTestsCertainLinear1936)[ ](#ref-johnsonTestsCertainLinear1936)[1936](#ref-johnsonTestsCertainLinear1936)): the slope of Negative Emotions is significant (p ≤ .05) across the observed range of Age (17 to 87). CI = confidence interval; Q1 = first quartile (lower hinge); Q3 = third quartile (upper hinge). |  |  |  |  |  |
 
 Table 10
 

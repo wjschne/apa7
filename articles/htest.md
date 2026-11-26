@@ -513,7 +513,7 @@ apa_note(tbl_sat)
 ```
 
 ```
-[1] "Welch's *t* tests compare the groups of Gender without assuming equal variances. Cohen's *d* uses the average of the two groups' variances. CI = confidence interval for Cohen's *d*. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+[1] "Welch's *t* tests compare the groups of Gender without assuming equal variances. Cohen's *d* uses the average of the two groups' variances. CI = confidence interval for Cohen's *d*. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."
 ```
 
 With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note`
@@ -544,8 +544,8 @@ Welch’s *t* Tests Comparing SAT Scores of Men and Women
 
 *Note*. Welch’s *t* tests compare the groups of Gender without assuming
 equal variances. Cohen’s *d* uses the average of the two groups’
-variances. CI = confidence interval for Cohen’s *d*. ^(\* )*p* \< .05.
-^(\*\* )*p* \< .01. ^(\*\*\* )*p* \< .001.
+variances. CI = confidence interval for Cohen’s *d*. ^(\* )*p* ≤ .05.
+^(\*\* )*p* ≤ .01. ^(\*\*\* )*p* ≤ .001.
 
 Without apaquarto, `apa_flextable(tbl, note = TRUE)` puts the same note
 below the table. Do not combine it with the `apa-note` chunk option, or
@@ -561,7 +561,7 @@ apa_flextable(tbl_sat, note = TRUE)
 |  | M | SD |  | M | SD |  |  |  |  |  |
 | SAT-V | 615.11 | 114.16 |  | 610.66 | 112.31 | 0.50     | 498.58 |  .62  | 0.04 | \[−0.12, 0.19\] |
 | SAT-Q | 635.87 | 116.02 |  | 596.00 | 113.07 | 4.35\*\*\* | 492.94 | \<.001 | 0.35 | \[ 0.19, 0.51\] |
-| Note. Welch’s t tests compare the groups of Gender without assuming equal variances. Cohen’s d uses the average of the two groups’ variances. CI = confidence interval for Cohen’s d. \* p \< .05. \*\* p \< .01. \*\*\* p \< .001. |  |  |  |  |  |  |  |  |  |  |
+| Note. Welch’s t tests compare the groups of Gender without assuming equal variances. Cohen’s d uses the average of the two groups’ variances. CI = confidence interval for Cohen’s d. \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001. |  |  |  |  |  |  |  |  |  |  |
 
 Table 14
 

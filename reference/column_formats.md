@@ -52,6 +52,24 @@ column_formats(
 
 column_formats
 
+## Details
+
+Each
+[`column_format()`](https://wjschne.github.io/apa7/reference/column_format.md)
+in the list is named by the column it formats. Formats are read, added,
+replaced, and removed with `$` (e.g., `my_formats$beta`,
+`my_formats$Predictor <- column_format("Predictor")`, or
+`my_formats$beta <- NULL`), and the properties of a single format are
+read and changed with `@` (e.g., `my_formats$p@header`). The `get_`
+properties listed under Slots return the names, headers, formatters, and
+so on of all the formats at once (e.g., `my_formats@get_tibble`).
+
+Use the object with the `column_formats` argument of
+[`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+[`apa_format_columns()`](https://wjschne.github.io/apa7/reference/apa_format_columns.md),
+and the table functions, or set it for every table with
+`apa7_defaults(column_formats = my_formats)`.
+
 ## Slots
 
 - `get_column_names`:

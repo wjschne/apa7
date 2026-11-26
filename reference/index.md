@@ -53,7 +53,7 @@ Alter the look of a flextable previously created
   object according to APA style
 
 - [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md)
-  : Use flextable::dim_pretty to fit column widths
+  : Fit column widths to the contents and the table width
 
 ## Variable Formatters
 
@@ -107,7 +107,7 @@ Change data.frames
 - [`pivot_wider_name_first()`](https://wjschne.github.io/apa7/reference/pivot_wider_name_first.md)
   :
 
-  A wrapper for tidyr::pivot_wider that creates columns names as
+  A wrapper for tidyr::pivot_wider that creates column names as
   `name_variable` instead of `variable_name`
 
 ### Create Special Columns

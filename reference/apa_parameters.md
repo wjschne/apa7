@@ -455,7 +455,7 @@ apa_parameters(
 
 ## Value
 
-tibble
+`apa7_tbl` (tibble)
 
 ## Details
 
@@ -652,6 +652,15 @@ Cheung, M. W.-L. (2014). Modeling dependent effect sizes with
 three-level meta-analyses: A structural equation modeling approach.
 *Psychological Methods, 19*(2), 211–229.
 [doi:10.1037/a0032968](https://doi.org/10.1037/a0032968)
+
+DerSimonian, R., & Laird, N. (1986). Meta-analysis in clinical trials.
+*Controlled Clinical Trials, 7*(3), 177–188.
+[doi:10.1016/0197-2456(86)90046-2](https://doi.org/10.1016/0197-2456%2886%2990046-2)
+
+Knapp, G., & Hartung, J. (2003). Improved tests for a random effects
+meta-regression with a single covariate. *Statistics in Medicine,
+22*(17), 2693–2710.
+[doi:10.1002/sim.1482](https://doi.org/10.1002/sim.1482)
 
 ## Examples
 

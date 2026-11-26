@@ -1,8 +1,7 @@
 # Convert data to flextable consistent with APA style
 
-The `apa_flextable` function performs a number of formatting operations
-on the data before and after the data are sent to flextable. See
-Details.
+The `apa_flextable` function formats a data frame and converts it to a
+flextable in APA style. See Details for the steps it takes.
 
 ## Usage
 
@@ -275,27 +274,64 @@ flextable::flextable
 
 ## Details
 
-Roughly speaking, `apa_flextable` performs these operations by default:
+With a few minor details omitted, `apa_flextable` does roughly this:
 
-1.  Apply as_grouped_data and restructure row titles, if `row_title` is
-    specified.
+1.  Adds a break column between adjacent column spanners, if
+    `add_breaks_between_spanners = TRUE` and `separate_headers = TRUE`.
+    A break column is a narrow blank column without borders, so the
+    rules under adjacent spanners do not touch.
 
-2.  Format data with apa_format_columns if `auto_format_columns = TRUE`
+2.  If `auto_format_columns = TRUE`, turns columns of whole numbers
+    (e.g., degrees of freedom) into integers so that they have no
+    decimals. Then formats the columns with
+    [`apa_format_columns()`](https://wjschne.github.io/apa7/reference/apa_format_columns.md).
+    Columns named in `no_format_columns`, or in a `"no_format_columns"`
+    attribute of the data (set by functions such as
+    [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)),
+    are left as they are.
 
-3.  Separate headers into multiple header rows if
-    `separate_headers = TRUE`
+3.  Makes the flextable. With `row_title_column`, it first restructures
+    the data with
+    [`flextable::as_grouped_data()`](https://davidgohel.github.io/flextable/reference/as_grouped_data.html),
+    and each row title gets a rule above it (`row_title_border`).
 
-4.  Apply
-    [`flextable::flextable`](https://davidgohel.github.io/flextable/reference/flextable.html)
+4.  Separates the headers into spanners and deckered heads, if
+    `separate_headers = TRUE`.
 
-5.  Apply
-    [`flextable::surround`](https://davidgohel.github.io/flextable/reference/surround.html)
-    to make borders to separate row groups, if any.
+5.  Left-aligns the first column and centers the columns of numbers.
 
-6.  Apply the `apa_style` function (table formatting and markdown
-    conversion) if `apa_style = TRUE`
+6.  Applies
+    [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md)
+    to style the table and convert markdown, if `apa_style = TRUE`.
 
-7.  Apply `pretty_widths` if `pretty_widths = TRUE`
+7.  Aligns the row titles (`row_title_align`) and indents the rows under
+    them (`left_column_padding`).
+
+8.  Sets the column widths with
+    [`pretty_widths()`](https://wjschne.github.io/apa7/reference/pretty_widths.md),
+    if `pretty_widths = TRUE`.
+
+9.  Lines up numbers padded by
+    [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md)
+    on their decimal points.
+
+10. Draws a rule above the rows named in a `"rule_above"` attribute of
+    the data (set by functions such as
+    [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+    and
+    [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)).
+
+11. Adds the note, if `note` is given. It is added last so that a long
+    note does not widen the columns.
+
+For a step-by-step version of this process, see the article [Building
+Tables by Hand](https://wjschne.github.io/apa7/articles/summarize.html).
+
+## References
+
+American Psychological Association. (2020). *Publication manual of the
+American Psychological Association* (7th ed.).
+[doi:10.1037/0000165-000](https://doi.org/10.1037/0000165-000)
 
 ## Examples
 

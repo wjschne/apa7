@@ -221,7 +221,7 @@ d$am <- factor(d$am)
 fit <- aov(mpg ~ cyl * am, data = d)
 tbl <- apa_anova(fit, starred = "F")
 apa_note(tbl)
-#> [1] "Sums of squares are sequential (Type I). *&eta;*^2^~p~ = partial eta squared. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+#> [1] "Sums of squares are sequential (Type I). *&eta;*^2^~p~ = partial eta squared. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."
 
 # Descriptive statistics with tests of group differences
 d$Transmission <- factor(d$am, labels = c("Automatic", "Manual"))
@@ -239,5 +239,5 @@ apa_loadings(fit_fa, min_loading = .3, communality = TRUE) |>
 lm(mpg ~ cyl + wt, data = mtcars) |>
   apa_parameters(starred = "p") |>
   apa_note()
-#> [1] "&beta; = standardized coefficient. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
+#> [1] "&beta; = standardized coefficient. ^\\* ^*p* ≤ .05. ^\\*\\* ^*p* ≤ .01. ^\\*\\*\\* ^*p* ≤ .001."
 ```
