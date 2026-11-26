@@ -627,6 +627,13 @@
 <span>    <span class="st">"S3"</span> <span class="op">~</span> <span class="st">"Speeded Discrimination"</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `mutate()`.
+ℹ In argument: `Variable = case_match(...)`.
+Caused by warning:
+! `case_match()` was deprecated in dplyr 1.2.0.
+ℹ Please use `recode_values()` instead.</code></pre>
+</div>
 <div id="tbl-hs-loadings" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-hs-loadings-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 4</p>
@@ -723,7 +730,7 @@
 <p>The communality (<em>h</em><sup>2</sup>) is the proportion of variance in each indicator explained by the factors (<em>R</em><sup>2</sup>). Rows for the variance explained by each factor can be added with <code>variance = TRUE</code>, and <code>apa_factor_cor</code> shows the correlations among the factors:</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_factor_cor.html">apa_factor_cor</a></span><span class="op">(</span><span class="va">fit_3x</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-hs-factor-cor" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -776,7 +783,7 @@
 </h3>
 <p>When the model is fit with a robust estimator (e.g., <code>estimator = "MLR"</code>, or <code>"WLSMV"</code> for ordinal indicators), <code>apa_performance</code> shows the scaled <em>χ</em><sup>2</sup> test and the robust versions of CFI, TLI, and RMSEA, and the note says so. With <code>missing = "fiml"</code>, the note also says that missing data were handled with full information maximum likelihood.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_mlr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lavaan/man/cfa.html" class="external-link">cfa</a></span><span class="op">(</span></span>
 <span>  <span class="va">model_3</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">d_cfa</span>,</span>
@@ -837,7 +844,7 @@
 <strong>Scalar</strong>: loadings and intercepts equal across groups</li>
 </ol>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb10" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb11" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_mi</span> <span class="op">&lt;-</span> <span class="va">d_cfa</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>school <span class="op">=</span> <span class="va">HolzingerSwineford1939</span><span class="op">$</span><span class="va">school</span><span class="op">)</span></span>
 <span></span>
@@ -849,7 +856,7 @@
 </div>
 <p><code>apa_performance_comparison</code> shows the fit of each model, and compares each model with the one before it. The comparison has the <em>χ</em><sup>2</sup> difference test from <code><a href="https://rdrr.io/pkg/lavaan/man/lavTestLRT.html" class="external-link">lavaan::lavTestLRT</a></code> and the changes in CFI and RMSEA, which are often used alongside it because the <em>χ</em><sup>2</sup> test is sensitive to sample size. The models should be listed from the least to the most constrained.</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_performance_comparison.html">apa_performance_comparison</a></span><span class="op">(</span></span>
 <span>  Configural <span class="op">=</span> <span class="va">fit_configural</span>,</span>
 <span>  Metric <span class="op">=</span> <span class="va">fit_metric</span>,</span>
@@ -947,7 +954,7 @@
 </h3>
 <p><code>apa_parameters</code> shows the estimates of a multiple-group model side by side, with a column spanner for each group, so the groups can be compared row by row. Here are the estimates of the metric model:</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">fit_metric</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-hs-metric-parameters" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -1136,7 +1143,7 @@
 <p>Does industrialization lead to democracy? In the classic <code>PoliticalDemocracy</code> data set <span class="citation" data-cites="bollenStructuralEquationsLatent1989">(<a href="#ref-bollenStructuralEquationsLatent1989" role="doc-biblioref">Bollen, 1989</a>)</span> from the lavaan package, industrialization in 1960 was measured in 75 developing countries with three indicators (<em>x</em><sub>1</sub> to <em>x</em><sub>3</sub>), and political democracy was measured in 1960 and in 1965 with four indicators each (<em>y</em><sub>1</sub> to <em>y</em><sub>4</sub> and <em>y</em><sub>5</sub> to <em>y</em><sub>8</sub>). The same democracy indicator measured in different years can share specific variance, so the residuals of matching indicators are allowed to correlate.</p>
 <p>In this model, industrialization affects democracy in 1965 directly (<em>c</em>′) and indirectly, through democracy in 1960 (<em>a</em> × <em>b</em>). The labels <code>a</code>, <code>b</code>, and <code>c</code> name the paths, and <code>:=</code> defines the indirect and total effects from them.</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb13" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_pd</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
 <span><span class="st">  # Measurement model</span></span>
 <span><span class="st">  ind60 =~ x1 + x2 + x3</span></span>
@@ -1161,7 +1168,7 @@
 <span><span class="va">fit_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lavaan/man/sem.html" class="external-link">sem</a></span><span class="op">(</span><span class="va">model_pd</span>, data <span class="op">=</span> <span class="va">PoliticalDemocracy</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell fig-cap-location-top FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb14" data-cap-location="top"><pre class="downlit sourceCode r">
+<details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb15" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">std_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lavaan/man/standardizedSolution.html" class="external-link">standardizedSolution</a></span><span class="op">(</span><span class="va">fit_pd</span><span class="op">)</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">lhs</span>, <span class="va">rhs</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">std_pd</span> <span class="op">|&gt;</span> </span>
@@ -1288,7 +1295,7 @@
 <section class="level2"><h3 id="model-fit-1">Model fit<a class="anchor" aria-label="anchor" href="#model-fit-1"></a>
 </h3>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_performance.html">apa_performance</a></span><span class="op">(</span><span class="va">fit_pd</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-pd-performance" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pd-performance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
@@ -1336,7 +1343,7 @@
 </h3>
 <p>The parameter table has a section for each kind of parameter in the model: the measurement model’s loadings, the structural model’s regressions, the correlated residuals, and the defined parameters. Regressions are labeled with the arrow pointing from predictor to outcome (Dem65 ← Dem60 is read “Dem65 is predicted by Dem60”).</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tbl_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">fit_pd</span>, starred <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span>
 <span><span class="va">tbl_pd</span></span></code></pre></div>
 <div id="tbl-pd-parameters" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -1529,7 +1536,7 @@
 </h3>
 <p>Because the sampling distribution of an indirect effect is usually skewed, indirect effects are often tested with bootstrapped confidence intervals. With <code>se = "bootstrap"</code>, lavaan’s unstandardized confidence intervals are bootstrap percentile intervals. Show them with <code>standardize = FALSE</code> and <code>"CI"</code>:</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span>
 <span><span class="va">fit_pd_boot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lavaan/man/sem.html" class="external-link">sem</a></span><span class="op">(</span></span>
 <span>  <span class="va">model_pd</span>,</span>
@@ -1761,12 +1768,12 @@
 </h2>
 <p>As with other apa7 tables, <code>apa_note</code> writes the note from what the table records, and the note can be used in the <code>apa-note</code> chunk option with <a href="https://wjschne.github.io/apaquarto/" class="external-link">apaquarto</a> (make the table in an earlier chunk, and write <code><a href="../reference/apa_note.html">apa7::apa_note</a></code>):</p>
 <div class="cell FigureWithNote" data-apa-note="*N* = 75. Estimation used maximum likelihood (ML). Estimates are fully standardized, and their standard errors and *p*-values are for the standardized estimates. β = standardized coefficient. ^* ^*p* ≤ .05. ^** ^*p* ≤ .01. ^*** ^*p* ≤ .001." data-tbl-cap-location="top" data-custom-style="FigureWithNote">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-pd</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Standardized Parameter Estimates of the Political Democracy Model</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_pd)</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>tbl_pd</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-pd</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Standardized Parameter Estimates of the Political Democracy Model</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_pd)</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>tbl_pd</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
 <div id="tbl-pd" class="cell quarto-float quarto-figure quarto-figure-center" data-apa-note="*N* = 75. Estimation used maximum likelihood (ML). Estimates are fully standardized, and their standard errors and *p*-values are for the standardized estimates. β = standardized coefficient. ^* ^*p* ≤ .05. ^** ^*p* ≤ .01. ^*** ^*p* ≤ .001." data-tbl-cap-location="top" data-apa-note-written="0b1974d6">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 12</p>

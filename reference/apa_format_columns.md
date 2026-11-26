@@ -90,7 +90,10 @@ A few columns are matched by a pattern or combined:
 - `CI`, `CI_low`, and `CI_high` (e.g., from
   [`parameters::parameters()`](https://easystats.github.io/parameters/reference/model_parameters.html))
   become a single column of intervals, with a header such as "95% CI"
-  that gives the confidence level stored in `CI`.
+  that gives the confidence level stored in `CI`. Prefixed columns are
+  combined the same way for each column spanner (e.g., `Model 1_CI`,
+  `Model 1_CI_low`, and `Model 1_CI_high` become `Model 1_95% CI`). A
+  `CI` column without its bounds is left as it is.
 
 - If there are `t` and `df_error` columns, the degrees of freedom are
   moved into the `t` header (e.g., *t*(28)), and `df_error` is dropped.

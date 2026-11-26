@@ -315,14 +315,14 @@
 </section><section class="level2"><h3 id="skewed-variables-and-group-differences">Skewed Variables and Group Differences<a class="anchor" aria-label="anchor" href="#skewed-variables-and-group-differences"></a>
 </h3>
 <p>Age is strongly skewed in this sample (most students are about 20, a few much older), so its median and interquartile range, <em>Mdn</em> (<em>IQR</em>), describe it better. <code>continuous</code> sets the description of particular variables.</p>
-<p>With <code>test = TRUE</code>, a <em>p</em> column tests the group differences: Welch’s <em>t</em> test (two groups) or Welch’s one-way ANOVA (more groups) for variables described by their mean, the Kruskal–Wallis test for variables described by their median, and the chi-square test of independence for categorical variables. When a categorical variable’s table has an expected count below 5, where the chi-square approximation is poor, Fisher’s exact test is used for that variable instead, and the note names it (<code>categorical_test = "chisq"</code> or <code>"fisher"</code> uses one test for all categorical variables). Tests are not shown by default, because many journals discourage testing baseline differences in randomized trials, where any difference is due to chance.</p>
+<p>With <code>test = "auto"</code>, a <em>p</em> column tests the group differences: Welch’s <em>t</em> test (two groups) or Welch’s one-way ANOVA (more groups) for variables described by their mean, the Kruskal–Wallis test for variables described by their median, and the chi-square test of independence for categorical variables. When a categorical variable’s table has an expected count below 5, where the chi-square approximation is poor, Fisher’s exact test is used for that variable instead, and the note names it (<code>test = "chisq"</code> or <code>test = "fisher"</code> uses one test for all categorical variables). Tests are not shown by default, because many journals discourage testing baseline differences in randomized trials, where any difference is due to chance.</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_descriptives.html">apa_descriptives</a></span><span class="op">(</span></span>
 <span>  <span class="va">d_survey</span>,</span>
 <span>  by <span class="op">=</span> <span class="va">Sex</span>,</span>
 <span>  continuous <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Age <span class="op">=</span> <span class="st">"median_iqr"</span><span class="op">)</span>,</span>
-<span>  test <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>  test <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  format_variable_names <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>

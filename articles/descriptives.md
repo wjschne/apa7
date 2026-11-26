@@ -122,15 +122,15 @@ much older), so its median and interquartile range, *Mdn* (*IQR*),
 describe it better. `continuous` sets the description of particular
 variables.
 
-With `test = TRUE`, a *p* column tests the group differences: Welch’s
+With `test = "auto"`, a *p* column tests the group differences: Welch’s
 *t* test (two groups) or Welch’s one-way ANOVA (more groups) for
 variables described by their mean, the Kruskal–Wallis test for variables
 described by their median, and the chi-square test of independence for
 categorical variables. When a categorical variable’s table has an
 expected count below 5, where the chi-square approximation is poor,
 Fisher’s exact test is used for that variable instead, and the note
-names it (`categorical_test = "chisq"` or `"fisher"` uses one test for
-all categorical variables). Tests are not shown by default, because many
+names it (`test = "chisq"` or `test = "fisher"` uses one test for all
+categorical variables). Tests are not shown by default, because many
 journals discourage testing baseline differences in randomized trials,
 where any difference is due to chance.
 
@@ -140,7 +140,7 @@ apa_descriptives(
   d_survey,
   by = Sex,
   continuous = c(Age = "median_iqr"),
-  test = TRUE, 
+  test = "auto",
   format_variable_names = FALSE
 ) |>
   apa_flextable(note = TRUE)

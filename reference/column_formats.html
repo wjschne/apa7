@@ -59,10 +59,11 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">column_formats</span><span class="op">(</span></span>
 <span>  .data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  accuracy <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  intercept_text <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  starred_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
-<span>  variable_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
-<span>  custom_columns <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  custom_columns <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">variable_labels</span>,</span>
+<span>  <span class="va">intercept_text</span>,</span>
+<span>  <span class="va">starred_columns</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -78,20 +79,27 @@
 <dd><p>rounding accuracy of the formatters (e.g., <code>.01</code> for two decimals). If <code>NULL</code> (default), the <code>accuracy</code> set with <code><a href="apa7_defaults.html">apa7_defaults()</a></code>.</p></dd>
 
 
-<dt id="arg-intercept-text">intercept_text<a class="anchor" aria-label="anchor" href="#arg-intercept-text"></a></dt>
-<dd><p>label of the intercept row (e.g., <code>"Constant"</code> or <code>"Intercept"</code>)</p></dd>
-
-
-<dt id="arg-starred-columns">starred_columns<a class="anchor" aria-label="anchor" href="#arg-starred-columns"></a></dt>
-<dd><p>names of columns to which significance stars are added</p></dd>
-
-
-<dt id="arg-variable-labels">variable_labels<a class="anchor" aria-label="anchor" href="#arg-variable-labels"></a></dt>
-<dd><p>named character vector that relabels variables: the names are the labels and the values are the variable names (e.g., <code>c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")</code>)</p></dd>
+<dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
+<dd><p>named character vector of variable labels, named by the
+variables (e.g., <code>c(parental_income = "Parental Income", n_siblings = "Number of Siblings")</code>), as in <code><a href="apa_descriptives.html">apa_descriptives()</a></code> and <code><a href="apa_chisq.html">apa_chisq()</a></code>.
+It is stored in the <code>labels</code> property; the table functions do not use it
+yet.</p></dd>
 
 
 <dt id="arg-custom-columns">custom_columns<a class="anchor" aria-label="anchor" href="#arg-custom-columns"></a></dt>
 <dd><p>named list of <code><a href="column_format.html">column_format()</a></code> objects that are added, or that replace the formats of the same name</p></dd>
+
+
+<dt id="arg-variable-labels">variable_labels<a class="anchor" aria-label="anchor" href="#arg-variable-labels"></a></dt>
+<dd><p>deprecated; use <code>labels</code>, with the variables as the
+names and the labels as the values</p></dd>
+
+
+<dt id="arg-intercept-text-starred-columns">intercept_text, starred_columns<a class="anchor" aria-label="anchor" href="#arg-intercept-text-starred-columns"></a></dt>
+<dd><p>deprecated, and never used. Set the
+label of the intercept row for all tables with
+<code>apa7_defaults(intercept_text = )</code>, and the columns that get stars with
+the <code>starred</code> argument of each table function.</p></dd>
 
 </dl></div>
     <div class="section level2">

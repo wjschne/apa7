@@ -115,7 +115,7 @@ apa_means(fit, by = c(`Partner Status`, Authoritarianism)) |>
 | Partner Status: Low |  |  |  |
 |  Low |  8.90 | 1.45 | \[ 5.97, 11.83\] |
 |  Medium |  7.25 | 2.29 | \[ 2.62, 11.88\] |
-|  High | 12.62 | 1.62 | \[ 9.35, 15.90\] |
+|  High | 12.63 | 1.62 | \[ 9.35, 15.90\] |
 | Partner Status: High |  |  |  |
 |  Low | 17.40 | 2.05 | \[13.26, 21.54\] |
 |  Medium | 14.27 | 1.38 | \[11.48, 17.07\] |

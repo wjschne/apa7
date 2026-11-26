@@ -312,6 +312,12 @@ apa_loadings(fit_3x, communality = TRUE) |>
   apa_flextable(note = TRUE)
 ```
 
+    Warning: There was 1 warning in `mutate()`.
+    ℹ In argument: `Variable = case_match(...)`.
+    Caused by warning:
+    ! `case_match()` was deprecated in dplyr 1.2.0.
+    ℹ Please use `recode_values()` instead.
+
 | Variable | Visual | Textual | Speed | h2 |
 |----|----|----|----|----|
 | Visual Perception | .76 |  |  | .58 |

@@ -21,6 +21,7 @@ apa_note(x, collapse = " ", citations = NULL)
   (for `lavaan` and `metafor` models),
   [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),
   [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md),
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
   [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md),
   [`apa_means()`](https://wjschne.github.io/apa7/reference/apa_means.md),
   [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md),
@@ -225,7 +226,7 @@ apa_note(tbl)
 
 # Descriptive statistics with tests of group differences
 d$Transmission <- factor(d$am, labels = c("Automatic", "Manual"))
-apa_descriptives(d, variables = c(mpg, hp), by = Transmission, test = TRUE) |>
+apa_descriptives(d, variables = c(mpg, hp), by = Transmission, test = "auto") |>
   apa_note()
 #> [1] "Values are *M* (*SD*) for continuous variables. *p*-values are from Welch's *t* tests (continuous variables) comparing the groups of Transmission."
 

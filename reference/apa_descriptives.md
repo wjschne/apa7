@@ -17,8 +17,7 @@ apa_descriptives(
   continuous = "mean_sd",
   categorical = NULL,
   labels = NULL,
-  test = FALSE,
-  categorical_test = c("auto", "chisq", "fisher"),
+  test = c("none", "auto", "chisq", "fisher"),
   missing = c("note", "row"),
   range = FALSE,
   digits = 2,
@@ -69,20 +68,14 @@ apa_descriptives(
 
 - test:
 
-  if `TRUE`, a column of *p*-values tests the differences between groups
-  (requires `by`). Unlike the `test` argument of
-  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
-  and
-  [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),
-  which names a test, this one is `TRUE` or `FALSE`; the test of
-  categorical variables is chosen with `categorical_test`.
-
-- categorical_test:
-
-  test of categorical variables when `test = TRUE`: `"auto"` (default)
-  for Fisher's exact test when an expected count is below 5 and the
-  chi-square test otherwise, `"chisq"` for the chi-square test, or
-  `"fisher"` for Fisher's exact test
+  tests of the differences between groups (requires `by`): `"none"`
+  (default) for no tests, or a column of *p*-values with categorical
+  variables tested by Fisher's exact test when an expected count is
+  below 5 and the chi-square test otherwise (`"auto"`), by the
+  chi-square test (`"chisq"`), or by Fisher's exact test (`"fisher"`).
+  Continuous variables are tested the same way in each case (see
+  Details). `TRUE` is the same as `"auto"`, and `FALSE` the same as
+  `"none"`.
 
 - missing:
 
@@ -131,18 +124,20 @@ is missing are left out.
 With `range = TRUE`, each continuous variable gets a "Range" row with
 its minimum and maximum.
 
-With `test = TRUE`, a *p* column tests group differences: Welch's *t*
-test (two groups) or Welch's one-way ANOVA
+With `test = "auto"` (or `"chisq"` or `"fisher"`), a *p* column tests
+group differences: Welch's *t* test (two groups) or Welch's one-way
+ANOVA
 ([`stats::oneway.test()`](https://rdrr.io/r/stats/oneway.test.html),
 more groups) for variables described by their mean, the Kruskal-Wallis
 test for variables described by their median, and the chi-square test of
 independence (without continuity correction) for categorical variables.
 When an expected count of a categorical variable's table is below 5, the
-chi-square approximation can be poor, so by default
-(`categorical_test = "auto"`) Fisher's exact test is used for that
-variable instead, and the note names the variables tested this way. Many
-journals discourage testing baseline differences in randomized trials,
-so tests are not shown by default.
+chi-square approximation can be poor, so with `test = "auto"` Fisher's
+exact test is used for that variable instead, and the note names the
+variables tested this way. `test = "chisq"` and `test = "fisher"` use
+one test for every categorical variable. Many journals discourage
+testing baseline differences in randomized trials, so tests are not
+shown by default.
 
 ## Examples
 
@@ -196,7 +191,7 @@ apa_descriptives(
   variables = c(mpg, hp, cyl),
   by = am,
   continuous = c(hp = "median_iqr"),
-  test = TRUE
+  test = "auto"
 )
 #> # A tibble: 6 × 5
 #>   Variable   `Automatic (*n* = 19)` `Manual (*n* = 13)` `Total (*N* = 32)` `*p*`

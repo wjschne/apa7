@@ -94,6 +94,39 @@ These change the output of code that worked with apa7 0.2.0.
     table to
     [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
     instead, with `note = TRUE` for the note.
+- [`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md)
+  takes variable labels as `labels`, named by the variables (e.g.,
+  `c(parental_income = "Parental Income")`), as
+  [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
+  and
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
+  do. `variable_labels`, which was named by the labels, still works,
+  with a warning. Neither is used by the table functions yet. Its
+  `intercept_text` and `starred_columns` arguments, which no function
+  ever used, are deprecated: set the intercept label with
+  `apa7_defaults(intercept_text = )` and stars with each table
+  function’s `starred`.
+- [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md)
+  returns a tibble (an `apa7_tbl`) that is displayed as an APA-style
+  table in documents, like the other table functions, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  writes its note. Before, it returned a flextable with the note below
+  it.
+  - With apaquarto, use `#| apa-note: !expr apa7::apa_note(tbl)`.
+    Otherwise, use `apa_flextable(tbl, note = TRUE)`, which lays out the
+    table as before: numbered variables under a “Variable” header,
+    correlation columns of equal width, and centered summary columns.
+  - The probability note is now part of the note’s paragraph, ending
+    with a period, rather than a paragraph of its own.
+  - The arguments that styled the flextable (`note`, `font_family`,
+    `font_size`, `text_color`, `border_color`, `border_width`,
+    `line_spacing`, and `table_width`) and `output` are deprecated. If
+    any is given, a flextable is returned as before (or the table, for
+    `output = "tibble"`), with a warning. Pass the table to
+    [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+    which takes the same arguments, instead.
+  - `column_formats` now formats the summary columns. Before, it was
+    ignored.
 - Three arguments were renamed so that the same idea has the same name
   everywhere. The old names still work, with a warning:
   - `apa_cor(p_value = )` is now `alpha`, as in
@@ -125,17 +158,18 @@ These change the output of code that worked with apa7 0.2.0.
   makes descriptive statistics tables (“Table 1”): *M* (*SD*) or *Mdn*
   (*IQR*) for continuous variables and *n* (%) for categorical
   variables, with a column for each group of `by` and for the whole
-  sample, and optional tests of group differences.
+  sample, and optional tests of group differences (`test = "auto"`,
+  `"chisq"`, or `"fisher"`).
   [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
   says which statistics are shown and lists missing values.
 - [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
   uses Fisher’s exact test instead of the chi-square test for a
   categorical variable whose table has an expected count below 5, and
-  the note names those variables (`categorical_test = "chisq"` or
-  `"fisher"` chooses one test for all). New `missing = "row"` shows the
-  missing values of each variable in a “Missing” row instead of the
-  note, and `range = TRUE` adds a “Range” row (minimum and maximum)
-  below each continuous variable.
+  the note names those variables (`test = "chisq"` or `"fisher"` chooses
+  one test for all). New `missing = "row"` shows the missing values of
+  each variable in a “Missing” row instead of the note, and
+  `range = TRUE` adds a “Range” row (minimum and maximum) below each
+  continuous variable.
 - New
   [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md)
   makes reliability and item analysis tables: for each item, *M*, *SD*,
@@ -673,6 +707,21 @@ These change the output of code that worked with apa7 0.2.0.
 - [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md)
   can star more than one column (e.g., `starred = c("deltaR2", "F")`).
   Before, it gave an error.
+- [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  no longer gives the error “Tibble columns must have compatible sizes”
+  when formatting combines or drops columns: confidence-interval bounds
+  (`CI`, `CI_low`, and `CI_high`, as in the output of
+  [`parameters::parameters()`](https://easystats.github.io/parameters/reference/model_parameters.html))
+  or `df_error` beside `t`.
+- [`apa_format_columns()`](https://wjschne.github.io/apa7/reference/apa_format_columns.md)
+  combines the confidence-interval columns of each column spanner (e.g.,
+  `Model 1_CI`, `Model 1_CI_low`, and `Model 1_CI_high`) into one
+  interval column with its own level (e.g., “Model 1_95% CI”). Before,
+  it gave an error. A `CI` column without its bounds is left as it is.
+- [`apa_format_columns()`](https://wjschne.github.io/apa7/reference/apa_format_columns.md)
+  puts the degrees of freedom in the *t* header (e.g., *t*(28)) when it
+  drops the `df_error` column. Before, the header was *t*, and the
+  degrees of freedom were lost.
 - [`pivot_wider_name_first()`](https://wjschne.github.io/apa7/reference/pivot_wider_name_first.md)
   uses its `names_prefix`, `names_sep`, and `names_vary` arguments,
   which it accepted but ignored. For example, `names_prefix = "Model "`
@@ -685,6 +734,13 @@ These change the output of code that worked with apa7 0.2.0.
   aligns the header cells of every table. Before, it applied only when
   the first column was named `Variable` or `Predictor`, and other
   headers were always top-aligned.
+- Every error, warning, and message uses cli formatting and names the
+  function you called (e.g.,
+  [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)),
+  with hints in separate lines. When a model needs a package that is not
+  installed (e.g., car for Type 2 and 3 sums of squares, or lavaan),
+  [`rlang::check_installed()`](https://rlang.r-lib.org/reference/is_installed.html)
+  offers to install it in interactive sessions.
 - The documentation of every argument was reviewed. Descriptions that
   contradicted the defaults were corrected (e.g., `trim_leading_zeros`
   and `add_plusses` in

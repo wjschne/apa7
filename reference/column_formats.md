@@ -9,10 +9,11 @@ that can be used to format parameters in APA style.
 column_formats(
   .data = NULL,
   accuracy = NULL,
-  intercept_text = NULL,
-  starred_columns = character(0),
-  variable_labels = character(0),
-  custom_columns = NULL
+  labels = character(0),
+  custom_columns = NULL,
+  variable_labels,
+  intercept_text,
+  starred_columns
 )
 ```
 
@@ -28,25 +29,34 @@ column_formats(
   `NULL` (default), the `accuracy` set with
   [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md).
 
-- intercept_text:
+- labels:
 
-  label of the intercept row (e.g., `"Constant"` or `"Intercept"`)
-
-- starred_columns:
-
-  names of columns to which significance stars are added
-
-- variable_labels:
-
-  named character vector that relabels variables: the names are the
-  labels and the values are the variable names (e.g.,
-  `c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")`)
+  named character vector of variable labels, named by the variables
+  (e.g.,
+  `c(parental_income = "Parental Income", n_siblings = "Number of Siblings")`),
+  as in
+  [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
+  and
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md).
+  It is stored in the `labels` property; the table functions do not use
+  it yet.
 
 - custom_columns:
 
   named list of
   [`column_format()`](https://wjschne.github.io/apa7/reference/column_format.md)
   objects that are added, or that replace the formats of the same name
+
+- variable_labels:
+
+  deprecated; use `labels`, with the variables as the names and the
+  labels as the values
+
+- intercept_text, starred_columns:
+
+  deprecated, and never used. Set the label of the intercept row for all
+  tables with `apa7_defaults(intercept_text = )`, and the columns that
+  get stars with the `starred` argument of each table function.
 
 ## Value
 

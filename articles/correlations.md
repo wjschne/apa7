@@ -38,14 +38,14 @@ d_personality <- psychTools::epi.bfi |>
   )
 ```
 
-By default, the output of `apa_cor`
-[flextable](https://davidgohel.github.io/flextable/), with significant
-correlations starred.
+`apa_cor` returns a table that is displayed in APA style in documents,
+with significant correlations starred. In the console, it is an ordinary
+tibble.
 
 ``` r
 
-d_personality |> 
-  apa_cor()
+tbl_cor <- apa_cor(d_personality)
+tbl_cor
 ```
 
 | Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
@@ -56,18 +56,53 @@ d_personality |>
 | 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
 Table 1
 
 Correlations Among Personality and Depression
+
+`apa_note` writes the table’s note. The text is in markdown, and it does
+not start with “*Note*.” because apaquarto adds that:
+
+``` r
+
+apa_note(tbl_cor)
+```
+
+    [1] "^\\* ^*p*&nbsp;≤&nbsp;.05. ^\\*\\* ^*p*&nbsp;≤&nbsp;.01. ^\\*\\*\\* ^*p*&nbsp;≤&nbsp;.001."
+
+With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note`
+in the `apa-note` chunk option (e.g.,
+`#| apa-note: !expr apa7::apa_note(tbl_cor)`), with the table made in an
+earlier chunk. Without apaquarto, `apa_flextable(note = TRUE)` puts the
+note below the table, as in the rest of this article:
+
+``` r
+
+apa_flextable(tbl_cor, note = TRUE)
+```
+
+| Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1.  | Openness | 123.43 | 20.51 | — |  |  |  |  |  |  |  |  |  |  |  |
+| 2.  | Conscientiousness | 113.25 | 21.88 | .31 | \*\*\* | — |  |  |  |  |  |  |  |  |  |
+| 3.  | Extraversion | 102.18 | 26.45 | .46 | \*\*\* | .27 | \*\*\* | — |  |  |  |  |  |  |  |
+| 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
+| 5.  | Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
+| 6.  | Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
+| Note. \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+
+Table 2
+
+Correlations Among Personality and Depression With a Note
 
 Significant correlations can be bolded instead.
 
 ``` r
 
 d_personality |>
-  apa_cor(bold_significant = TRUE)
+  apa_cor(bold_significant = TRUE) |>
+  apa_flextable(note = TRUE)
 ```
 
 | Variable |  | M | SD | 1 | 2 | 3 | 4 | 5 | 6 |
@@ -80,7 +115,7 @@ d_personality |>
 | 6.  | Depression |   6.78 |  5.78 | −.08 | −.18 | −.14 | −.14 | .47 | — |
 | Note. Correlations significant at p ≤ .05 are bolded. |  |  |  |  |  |  |  |  |  |
 
-Table 2
+Table 3
 
 Correlations With Significant Correlations in Bold
 
@@ -93,9 +128,10 @@ You can include any named list of summary functions:
 # Named list of descriptive functions
 my_summaries <- list(Mdn = median, "*IQR*" = IQR)
 
-apa_cor(d_personality, 
-        summary_functions = my_summaries, 
-        star_significant = FALSE)
+apa_cor(d_personality,
+        summary_functions = my_summaries,
+        star_significant = FALSE) |>
+  apa_flextable(note = TRUE)
 ```
 
 | Variable |                   | Mdn | IQR   | 1      | 2      | 3      | 4      | 5     | 6   |
@@ -107,7 +143,7 @@ apa_cor(d_personality,
 | 5.       | Neuroticism       |  90 | 34.00 |  .29   |  .04   |  .04   | −.04   | —     |     |
 | 6.       | Depression        |   6 |  6.00 | −.08   | −.18   | −.14   | −.14   | .47   | —   |
 
-Table 3
+Table 4
 
 Correlations Among Personality and Depression With Medians and
 Interquartile Ranges
@@ -120,7 +156,8 @@ options:
 
 my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
 
-apa_cor(d_personality, summary_functions = my_summaries)
+apa_cor(d_personality, summary_functions = my_summaries) |>
+  apa_flextable(note = TRUE)
 ```
 
 | Variable |  | n | M | SD | Skewness | Kurtosis | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
@@ -131,19 +168,17 @@ apa_cor(d_personality, summary_functions = my_summaries)
 | 4.  | Agreeablness | 231 | 125.00 | 18.14 | −0.21 | −0.27 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism | 231 |  87.97 | 23.34 |  0.07 | −0.55 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression | 231 |   6.78 |  5.78 |  1.29 |  1.50 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| Note. \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 4
+Table 5
 
 Correlations Among Personality and Depression With Additional Summary
 Statistics
 
-## Styling options
+## Options
 
-Your styling options include:
+`apa_cor` decides what the table shows:
 
-- `note` A custom markdown formatted note. Overrides the automatic note.
-  Default: `NULL`
 - `alpha` *p*-value thresholds for one, two, and three stars (with
   `bold_significant = TRUE`, only the first is used). Default:
   `c(.05, .01, .001)`
@@ -153,17 +188,27 @@ Your styling options include:
 - `star_significant` Whether to star significant correlations. Default:
   `TRUE`
 - `significance_note` Whether the note explains the stars (or bolding).
-  Overridden by a custom note. Also, the automatic note will not appear
-  if no correlations are significant. Default: `TRUE`
-- `output` Options are `flextable` or `tibble`. Default: `flextable`
+  The note does not explain them if no correlations are significant.
+  Default: `TRUE`
+- `keep_empty_star_columns` Whether correlation columns without
+  significant correlations keep their star columns, so that all
+  correlation columns have the same width. Default: `TRUE`
+
+`apa_flextable` decides how it looks:
+
+- `note` `TRUE` for the note from `apa_note`, or a markdown-formatted
+  note of your own. Default: `NULL` (no note)
 - `font_family` Font family (typeface). Default: `Times New Roman`
 - `font_size` Font size (in points). Default: `12`
 - `text_color` Text color. Default: `black`
 - `border_color` Table border color. Default: `black`
-- `border_width` Table border width. Default: `0.5`
+- `border_width` Table border width (in points). Default: `0.5`
 - `line_spacing` Text line spacing. Default: `2`
+- `table_width` Width of the table (e.g., `.5` for half the page width).
+  Default: the full width of the page
 
-For example,
+The defaults of the styling options can be set for all tables with
+`apa7_defaults`. For example,
 
 ``` r
 
@@ -173,7 +218,10 @@ d_personality |>
     digits = 2,
     bold_significant = TRUE,
     significance_note = TRUE,
-    summary_functions = my_summaries,
+    summary_functions = my_summaries
+  ) |>
+  apa_flextable(
+    note = TRUE,
     font_family = "Arial",
     font_size = 10,
     text_color = "darkred",
@@ -193,7 +241,7 @@ d_personality |>
 | 6.  | Depression | 231 |   6.78 |  5.78 |  1.29 |  1.50 | −.08 | −.18 | −.14 | −.14 | .47 | — |
 | Note. Correlations significant at p ≤ .001 are bolded. |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 5
+Table 6
 
 Correlations With Alternative Styling
 
@@ -202,7 +250,8 @@ or `NULL`.
 
 ``` r
 
-apa_cor(d_personality, summary_functions = NA)
+apa_cor(d_personality, summary_functions = NA) |>
+  apa_flextable(note = TRUE)
 ```
 
 | Variable |  | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
@@ -213,23 +262,23 @@ apa_cor(d_personality, summary_functions = NA)
 | 4.  | Agreeablness | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| Note. \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001. |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 6
+Table 7
 
 Correlations Without Summary Statistics
 
 ## Customization
 
-The styling options for `apa_cor` are minimal, but flextable allows for
-all kinds of customization. Just place whatever code from flextable you
-want after `apa_cor`. Here I set the width to 50% and align the table to
-the left of the page. I place a footnote in a specific cell in the table
-body.
+The styling options of `apa_flextable` are minimal, but flextable allows
+for all kinds of customization. Just place whatever code from flextable
+you want after `apa_flextable`. Here I set the width to 50%, and I place
+a footnote in a specific cell in the table body.
 
 ``` r
 
-apa_cor(d_personality, table_width = .5) |>
+apa_cor(d_personality) |>
+  apa_flextable(table_width = .5) |>
   flextable::footnote(
     i = 2,
     j = "Variable",
@@ -246,23 +295,21 @@ apa_cor(d_personality, table_width = .5) |>
 | 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .45 | \*\*\* | .48 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
-| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | 1This is a footnote. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 7
+Table 8
 
 Correlations Styled With flextable Functions
 
-## Output to tibble
+## Changing the tibble
 
-If you need to process the underlying data before converting to
-flextable (or use another table-creating function from another package),
-you can output a tibble and then process the table however you want.
-Here we add a row title.
+Because `apa_cor` returns a tibble, you can change it with dplyr and
+tidyr functions before passing it to `apa_flextable` (or to a table
+function from another package). Here we add a row title.
 
 ``` r
 
-apa_cor(d_personality, output = "tibble") |>
+apa_cor(d_personality) |>
   mutate(apa7listcolumn = str_trim(apa7listcolumn)) |>
   unite(col = Variable, 
         apa7listcolumn, 
@@ -285,7 +332,7 @@ apa_cor(d_personality, output = "tibble") |>
 | 5. Neuroticism |  87.97 | 23.34 | .29 | \*\*\* | .04 |  | .04 |  | −.04 |  | — |  |  |  |
 | 6. Depression |   6.78 |  5.78 | −.08 |  | −.18 | \*\* | −.14 | \* | −.14 | \* | .47 | \*\*\* | — |  |
 
-Table 8
+Table 9
 
 Correlations With a Row Title
 
@@ -302,7 +349,8 @@ rank correlations:
 
 ``` r
 
-apa_cor(d_personality, method = "spearman")
+apa_cor(d_personality, method = "spearman") |>
+  apa_flextable(note = TRUE)
 ```
 
 | Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
@@ -313,10 +361,9 @@ apa_cor(d_personality, method = "spearman")
 | 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .43 | \*\*\* | .50 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 | .28 | \*\*\* | .04 |  | .05 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.10 |  | −.16 | \* | −.13 | \* | −.11 |  | .47 | \*\*\* | — |  |
-| Note. Values are Spearman correlations. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| \* p ≤ .05. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| Note. Values are Spearman correlations. \* p ≤ .05. \*\*\* p ≤ .001. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 9
+Table 10
 
 Spearman Rank Correlations Among Personality and Depression
 
@@ -347,7 +394,8 @@ variables in the table, need only `partial = TRUE`:
 
 ``` r
 
-apa_cor(d_personality, partial = TRUE)
+apa_cor(d_personality, partial = TRUE) |>
+  apa_flextable(note = TRUE)
 ```
 
 | Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
@@ -358,10 +406,9 @@ apa_cor(d_personality, partial = TRUE)
 | 4.  | Agreeablness | 125.00 | 18.14 | .20 | \*\* | .35 | \*\*\* | .33 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 | .37 | \*\*\* | .10 |  | −.02 |  | −.15 | \* | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.17 | \* | −.16 | \* | −.06 |  | .05 |  | .51 | \*\*\* | — |  |
-| Note. Values are partial Pearson correlations, each controlling for all other variables in the table. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| Note. Values are partial Pearson correlations, each controlling for all other variables in the table. \* p ≤ .05. \*\* p ≤ .01. \*\*\* p ≤ .001. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 10
+Table 11
 
 Partial Correlations Among Personality and Depression
 
@@ -386,7 +433,8 @@ can also be given to `apa_cor`:
 ``` r
 
 correlation(d_personality, method = "spearman") |>
-  apa_cor()
+  apa_cor() |>
+  apa_flextable(note = TRUE)
 ```
 
 | Variable |  | M | SD | 1 |  | 2 |  | 3 |  | 4 |  | 5 |  | 6 |  |
@@ -397,10 +445,9 @@ correlation(d_personality, method = "spearman") |>
 | 4.  | Agreeablness | 125.00 | 18.14 | .39 | \*\*\* | .43 | \*\*\* | .50 | \*\*\* | — |  |  |  |  |  |
 | 5.  | Neuroticism |  87.97 | 23.34 | .28 | \*\*\* | .04 |  | .05 |  | −.04 |  | — |  |  |  |
 | 6.  | Depression |   6.78 |  5.78 | −.10 |  | −.16 |  | −.13 |  | −.11 |  | .47 | \*\*\* | — |  |
-| Note. Values are Spearman correlations. p-values are adjusted for multiple comparisons with Holm’s method ([Holm,](#ref-holmSimpleSequentiallyRejective1979)[ ](#ref-holmSimpleSequentiallyRejective1979)[1979](#ref-holmSimpleSequentiallyRejective1979)). |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| \*\*\* p ≤ .001 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| Note. Values are Spearman correlations. p-values are adjusted for multiple comparisons with Holm’s method ([Holm,](#ref-holmSimpleSequentiallyRejective1979)[ ](#ref-holmSimpleSequentiallyRejective1979)[1979](#ref-holmSimpleSequentiallyRejective1979)). \*\*\* p ≤ .001. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 
-Table 11
+Table 12
 
 Spearman Rank Correlations Computed by the correlation Package
 
