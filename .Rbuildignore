@@ -28,3 +28,4 @@ README.qmd
 ^CRAN-SUBMISSION$
 ^\.positai$
 ^\.claude$
+^CLAUDE\.md$

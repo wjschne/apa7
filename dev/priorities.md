@@ -6,6 +6,7 @@ Last reviewed: 2026-11-23
 
 ## Before CRAN submission
 
+- [ ] Review `dev/CONVENTIONS.md` against the code, and decide or fix its open inconsistencies (every release)
 - [x] Commit the current changes in `R/tables.R`, `vignettes/articles/multilevel.qmd`, and `vignettes/articles/regression.qmd`
 - [x] Make the version numbers match (both are 0.2.0)
 - [x] Make `apa_parameters()` handle `aov` objects correctly (they now return the `apa_anova()` table)

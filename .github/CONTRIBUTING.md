@@ -32,6 +32,8 @@ See our guide on [how to create a great issue](https://code-review.tidyverse.org
 
 ### Code style
 
+*   New functions and changes should follow the conventions in [`dev/CONVENTIONS.md`](../dev/CONVENTIONS.md), which also has a checklist for new table functions.
+
 *   New code should follow the tidyverse [style guide](https://style.tidyverse.org). 
     You can use the [styler](https://CRAN.R-project.org/package=styler) package to apply these styles, but please don't restyle code that has nothing to do with your PR.  
 
