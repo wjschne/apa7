@@ -165,20 +165,24 @@
 </div>
 <div class="cell fig-cap-location-top FigureWithoutNote" data-custom-style="FigureWithoutNote">
 <details class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb3" data-cap-location="top"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d_recall</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="co"># Mean and 95% confidence interval, as ggplot2::mean_cl_normal() computes</span></span>
+<span><span class="co"># them, but without needing the Hmisc package</span></span>
+<span><span class="va">mean_ci</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">half</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">qt</a></span><span class="op">(</span><span class="fl">.975</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">m</span>, ymin <span class="op">=</span> <span class="va">m</span> <span class="op">-</span> <span class="va">half</span>, ymax <span class="op">=</span> <span class="va">m</span> <span class="op">+</span> <span class="va">half</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">d_recall</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">`Presentation Format`</span>, <span class="va">`Words Recalled`</span>, color <span class="op">=</span> <span class="va">`Presentation Format`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"pointrange"</span>, fun.data <span class="op">=</span> <span class="va">mean_cl_normal</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"pointrange"</span>, fun.data <span class="op">=</span> <span class="va">mean_ci</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">mean</span>, geom <span class="op">=</span> <span class="st">"text"</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.15</span><span class="op">)</span>, hjust <span class="op">=</span> <span class="fl">0</span>, family <span class="op">=</span> <span class="va">my_font</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggbeeswarm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggbeeswarm/man/geom_beeswarm.html" class="external-link">geom_beeswarm</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_family <span class="op">=</span> <span class="va">my_font</span>, base_size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_d</a></span><span class="op">(</span>begin <span class="op">=</span> <span class="fl">.2</span>, end <span class="op">=</span> <span class="fl">.7</span><span class="op">)</span></span></code></pre></div>
-</details><div class="cell-output cell-output-stderr">
-<pre data-cap-location="top"><code>Warning: Computation failed in `stat_summary()`.
-Caused by error in `fun.data()`:
-! The package "Hmisc" is required.</code></pre>
-</div>
-<div class="cell-output-display">
+</details><div class="cell-output-display">
 <div id="fig-friendly" class="quarto-float quarto-figure quarto-figure-center" data-cap-location="top">
 <figure class="quarto-float quarto-float-fig"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-friendly-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Figure 1</p>
@@ -194,7 +198,7 @@ Caused by error in `fun.data()`:
 </div>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_recall</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-one-way" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-one-way-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
@@ -256,7 +260,7 @@ Caused by error in `fun.data()`:
 <p>The One-Way ANOVA Table as a Tibble</p>
 </div>
 </figcaption><div aria-describedby="tbl-one-way-tibble-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_recall</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -273,7 +277,7 @@ Caused by error in `fun.data()`:
 <p>In follow-up tests using <code>apa_contrast</code>, we can see that performance was lower in the standard condition, compared to the other conditions, which had equal means:</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_means.html">apa_contrasts</a></span><span class="op">(</span><span class="va">fit_recall</span>, </span>
 <span>              contrast <span class="op">=</span> <span class="va">`Presentation Format`</span>, </span>
 <span>              p_adjust <span class="op">=</span> <span class="st">"tukey"</span>,</span>
@@ -340,7 +344,7 @@ Caused by error in `fun.data()`:
 </h3>
 <p>The <code>Adler</code> data set from the carData package comes from a study of experimenter expectancy effects <span class="citation" data-cites="adlerImpactPriorSets1973">(<a href="#ref-adlerImpactPriorSets1973" role="doc-biblioref">Adler, 1973</a>)</span>, in a simplified version from <span class="citation" data-cites="ericksonUnderstandingData1977">Erickson and Nosanchuk (<a href="#ref-ericksonUnderstandingData1977" role="doc-biblioref">1977</a>)</span>. Experimenters collected ratings of how successful people in photographs appeared to be. The photographs had been chosen because the people in them looked neither especially successful nor unsuccessful. Before collecting the data, the experimenters were told to expect either high or low ratings, and they were told to get good data, to get scientific data, or were given no such instruction. The outcome is the average success rating each experimenter obtained.</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb9" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_adler</span> <span class="op">&lt;-</span> <span class="fu">carData</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/carData/man/Adler.html" class="external-link">Adler</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    instruction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span></span>
@@ -361,11 +365,11 @@ Caused by error in `fun.data()`:
 <span>  <span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell fig-cap-location-top FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb10" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_adler</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">`Expected Ratings`</span> , <span class="va">`Success Rating`</span>, color <span class="op">=</span> <span class="va">`Expected Ratings`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="co"># geom_violin() +</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>fun.data <span class="op">=</span> <span class="va">mean_cl_normal</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>fun.data <span class="op">=</span> <span class="va">mean_ci</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">mean</span>, geom <span class="op">=</span> <span class="st">"text"</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">signs</span><span class="fu">::</span><span class="fu"><a href="https://benjaminwolfe.github.io/signs/reference/signs.html" class="external-link">signs</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span><span class="op">)</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.25</span><span class="op">)</span>, hjust <span class="op">=</span> <span class="fl">0</span>, family <span class="op">=</span> <span class="va">my_font</span>, size <span class="op">=</span> <span class="fl">.8</span> <span class="op">*</span> <span class="fl">14</span> <span class="op">/</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="va"><a href="https://ggplot2.tidyverse.org/reference/graphical-units.html" class="external-link">.pt</a></span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggbeeswarm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggbeeswarm/man/geom_beeswarm.html" class="external-link">geom_beeswarm</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span>base_family <span class="op">=</span> <span class="va">my_font</span>, base_size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span> <span class="op">+</span></span>
@@ -373,13 +377,6 @@ Caused by error in `fun.data()`:
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_d</a></span><span class="op">(</span>begin <span class="op">=</span> <span class="fl">.2</span>, end <span class="op">=</span> <span class="fl">.7</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">Instruction</span><span class="op">)</span>, labeller <span class="op">=</span> <span class="st">"label_both"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">signs</span><span class="fu">::</span><span class="va"><a href="https://benjaminwolfe.github.io/signs/reference/signs.html" class="external-link">signs</a></span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre data-cap-location="top"><code>Warning: Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Caused by error in `fun.data()`:
-! The package "Hmisc" is required.</code></pre>
-</div>
 <div class="cell-output-display">
 <div id="fig-adler" class="quarto-float quarto-figure quarto-figure-center" data-cap-location="top">
 <figure class="quarto-float quarto-float-fig"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-adler-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
@@ -399,7 +396,7 @@ Caused by error in `fun.data()`:
 <p>The factorial model tests both main effects and their interaction. Interaction terms are labeled with a multiplication sign (e.g., Instruction × Expected Ratings).</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_adler</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">`Success Rating`</span> <span class="op">~</span> <span class="va">Instruction</span> <span class="op">*</span> <span class="va">`Expected Ratings`</span>, data <span class="op">=</span> <span class="va">d_adler</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_adler</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-factorial" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -472,7 +469,7 @@ Caused by error in `fun.data()`:
 </h3>
 <p>The <code>anova_parameters</code> argument selects the columns and their order. <code>"Effect_Size"</code> stands for whichever effect size is selected (see below), and <code>"CI"</code> adds its confidence interval. Columns are labeled by <code>apa_anova</code> automatically.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_adler</span>,</span>
 <span>  anova_parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Parameter"</span>, <span class="st">"df"</span>, <span class="st">"F"</span>, <span class="st">"p"</span>, <span class="st">"Effect_Size"</span><span class="op">)</span></span>
@@ -537,7 +534,7 @@ Caused by error in `fun.data()`:
 <p>To mark significant effects, <code>starred</code> adds significance stars to a column, and <code>bolded</code> bolds the values of a column when the effect is significant. Columns are named as in <code>anova_parameters</code> (e.g., <code>"Parameter"</code> for the Source column).</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_adler</span>, starred <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-starred" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-starred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
@@ -657,7 +654,7 @@ Caused by error in `fun.data()`:
 </table>
 <p><em>η</em><sup>2</sup> overestimates the population effect size in small samples. <em>ω</em><sup>2</sup> and <em>ε</em><sup>2</sup> are less biased, so they are good choices for small samples.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_adler</span>, effect_size <span class="op">=</span> <span class="st">"omega"</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-omega" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-omega-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
@@ -732,7 +729,7 @@ Caused by error in `fun.data()`:
 </h3>
 <p>APA style recommends reporting confidence intervals for effect sizes. Add <code>"CI"</code> to <code>anova_parameters</code> to show them.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_adler</span>,</span>
 <span>  anova_parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -809,7 +806,7 @@ Caused by error in `fun.data()`:
 </h2>
 <p>When cell sizes are unequal, the effects in a factorial design are correlated, and the sums of squares depend on how the variance they share is divided. In the <code>Moore</code> data set from the carData package, participants were paired with a partner of high or low status, and the number of times they conformed to their partner’s judgments was recorded. Participants’ authoritarianism was classified as low, medium, or high. The cell sizes are unequal:</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb17" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_moore</span> <span class="op">&lt;-</span> <span class="fu">carData</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/carData/man/Moore.html" class="external-link">Moore</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    fcategory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">fcategory</span>, </span>
@@ -835,12 +832,12 @@ Caused by error in `fun.data()`:
 </div>
 </div>
 <div class="cell fig-cap-location-top FigureWithoutNote" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb19" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_moore</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="co"># rename(`Participant Authoritarianism` = Authoritarianism) |&gt; </span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">`Partner Status`</span> , <span class="va">conformity</span>, color <span class="op">=</span> <span class="va">`Partner Status`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="co"># geom_violin() +</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>fun.data <span class="op">=</span> <span class="va">mean_cl_normal</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>fun.data <span class="op">=</span> <span class="va">mean_ci</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/stat_summary.html" class="external-link">stat_summary</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">mean</span>, geom <span class="op">=</span> <span class="st">"text"</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">signs</span><span class="fu">::</span><span class="fu"><a href="https://benjaminwolfe.github.io/signs/reference/signs.html" class="external-link">signs</a></span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span><span class="op">)</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span><span class="fl">.25</span><span class="op">)</span>, hjust <span class="op">=</span> <span class="fl">0</span>, family <span class="op">=</span> <span class="va">my_font</span>, size <span class="op">=</span> <span class="fl">.8</span> <span class="op">*</span> <span class="fl">14</span> <span class="op">/</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="va"><a href="https://ggplot2.tidyverse.org/reference/graphical-units.html" class="external-link">.pt</a></span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggbeeswarm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggbeeswarm/man/geom_beeswarm.html" class="external-link">geom_beeswarm</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span>base_family <span class="op">=</span> <span class="va">my_font</span>, base_size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span> <span class="op">+</span></span>
@@ -848,13 +845,6 @@ Caused by error in `fun.data()`:
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_d</a></span><span class="op">(</span>begin <span class="op">=</span> <span class="fl">.2</span>, end <span class="op">=</span> <span class="fl">.7</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">`Authoritarianism`</span><span class="op">)</span>, labeller <span class="op">=</span> <span class="st">"label_both"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span><span class="st">"Conformity"</span>, labels <span class="op">=</span> <span class="fu">signs</span><span class="fu">::</span><span class="va"><a href="https://benjaminwolfe.github.io/signs/reference/signs.html" class="external-link">signs</a></span><span class="op">)</span> </span></code></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre data-cap-location="top"><code>Warning: Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Caused by error in `fun.data()`:
-! The package "Hmisc" is required.</code></pre>
-</div>
 <div class="cell-output-display">
 <div id="fig-moore" class="quarto-float quarto-figure quarto-figure-center" data-cap-location="top">
 <figure class="quarto-float quarto-float-fig"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-moore-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
@@ -874,7 +864,7 @@ Caused by error in `fun.data()`:
 <p>By default, <code>apa_anova</code> uses Type 1 (sequential) sums of squares, as <code>anova</code> and <code>summary.aov</code> do. Each effect is adjusted only for the effects entered before it, so the results depend on the order of the terms in the formula.</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_moore</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">conformity</span> <span class="op">~</span> <span class="va">Authoritarianism</span> <span class="op">*</span> <span class="va">`Partner Status`</span>, data <span class="op">=</span> <span class="va">d_moore</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_moore</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-moore-type1" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -947,7 +937,7 @@ Caused by error in `fun.data()`:
 <p>Set <code>type = 2</code> or <code>type = 3</code> for Type 2 or Type 3 sums of squares, which are computed with <code><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">car::Anova</a></code>. Type 2 tests adjust each main effect for the other main effects but not for the interaction, which is appropriate when the interaction is negligible.</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_moore</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-moore-type2" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-moore-type2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
@@ -1019,7 +1009,7 @@ Caused by error in `fun.data()`:
 <p>Type 3 tests adjust each effect for all other effects, including interactions. Type 3 tests are meaningful only when factors are coded with contrasts that sum to zero (e.g., <code>contr.sum</code>), not with R’s default treatment contrasts, so set the contrasts before fitting the model:</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_moore_sum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>  <span class="va">conformity</span> <span class="op">~</span> <span class="va">Authoritarianism</span> <span class="op">*</span> <span class="va">`Partner Status`</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">d_moore</span>,</span>
@@ -1096,7 +1086,7 @@ Caused by error in `fun.data()`:
 <p>A table from <code><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">car::Anova</a></code> or <code>anova</code> can also be passed to <code>apa_anova</code> directly. It already has a type of sums of squares, so the <code>type</code> argument is not needed.</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">Anova</a></span><span class="op">(</span><span class="va">fit_moore</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-car-anova" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -1166,7 +1156,7 @@ Caused by error in `fun.data()`:
 </div>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_means.html">apa_contrasts</a></span><span class="op">(</span><span class="va">fit_moore</span>, contrast <span class="op">=</span> <span class="va">`Partner Status`</span>, by <span class="op">=</span> <span class="va">Authoritarianism</span>, effect_size <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-moorecontrast" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -1251,7 +1241,7 @@ Caused by error in `fun.data()`:
 </h2>
 <p>An analysis of covariance (ANCOVA) is an ANOVA with one or more continuous covariates. Fit it with <code>lm</code> or <code>aov</code>. Here, partner status is tested while controlling for participants’ authoritarianism scores. Type 2 sums of squares adjust each effect for the other, regardless of the order of the terms.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_ancova</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">conformity</span> <span class="op">~</span> <span class="va">`Authoritarianism Score`</span> <span class="op">+</span> <span class="va">`Partner Status`</span>, data <span class="op">=</span> <span class="va">d_moore</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_ancova</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-ancova" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -1318,7 +1308,7 @@ Caused by error in `fun.data()`:
 </h3>
 <p>In the <code>obk.long</code> data set from the afex package <span class="citation" data-cites="obrienMANOVAMethodAnalyzing1985">(<a href="#ref-obrienMANOVAMethodAnalyzing1985" role="doc-biblioref">O’Brien &amp; Kaiser, 1985</a>)</span>, 16 participants in three treatment groups were measured before treatment, after treatment, and at follow-up. Each phase had five measurements, which we average here.</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb27" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_obk</span> <span class="op">&lt;-</span> <span class="va">obk.long</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>phase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">phase</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pre"</span>, <span class="st">"post"</span>, <span class="st">"fup"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">id</span>, <span class="va">treatment</span>, <span class="va">phase</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1326,7 +1316,7 @@ Caused by error in `fun.data()`:
 </div>
 <p>In base R, a mixed design with a between-subjects factor (treatment) and a within-subjects factor (phase) is fit with <code>aov</code> and an <code>Error</code> term. Each error stratum has its own error term. <code>apa_anova</code> introduces each stratum with a heading row and indents its effects.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_obk_aov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">value</span> <span class="op">~</span> <span class="va">Treatment</span> <span class="op">*</span> <span class="va">Phase</span> <span class="op">+</span> <span class="fu">Error</span><span class="op">(</span><span class="va">id</span> <span class="op">/</span> <span class="va">Phase</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d_obk</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_obk_aov</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-obk-aov" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
@@ -1429,7 +1419,7 @@ Caused by error in `fun.data()`:
 </h3>
 <p>The afex package fits repeated-measures ANOVAs with Type 3 sums of squares and corrects the degrees of freedom of within-subjects effects for violations of sphericity (Greenhouse–Geisser by default). In afex models, each effect has its own error term, so the table shows the degrees of freedom of each effect and its error term (<em>df</em><sub>effect</sub> and <em>df</em><sub>error</sub>) and the mean squared error (<em>MSE</em>), as afex’s <code>nice</code> function does. As in afex, generalized <em>η</em><sup>2</sup> is the default effect size.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_obk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/afex/man/aov_car.html" class="external-link">aov_ez</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  dv <span class="op">=</span> <span class="st">"value"</span>,</span>
@@ -1499,7 +1489,7 @@ Caused by error in `fun.data()`:
 <p>The degrees of freedom of the within-subjects effects are not whole numbers because they have been corrected for sphericity. To report partial <em>η</em><sup>2</sup> with confidence intervals instead:</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_obk</span>,</span>
 <span>  generalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1572,7 +1562,7 @@ Caused by error in `fun.data()`:
 </h3>
 <p>Repeated-measures ANOVAs need complete data from every participant, and they average over repeated measurements within each cell. Linear mixed models fit with <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer</a></code> have neither requirement. Here the same O’Brien and Kaiser data are analyzed without averaging the five measurements within each phase, with a random intercept for each participant:</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_obk_trials</span> <span class="op">&lt;-</span> <span class="va">obk.long</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>phase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">phase</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pre"</span>, <span class="st">"post"</span>, <span class="st">"fup"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>Treatment <span class="op">=</span> <span class="va">treatment</span>, Phase <span class="op">=</span> <span class="va">phase</span><span class="op">)</span></span>
@@ -1635,7 +1625,7 @@ Caused by error in `fun.data()`:
 <p>The <em>F</em> tests come from the <a href="https://cran.r-project.org/package=lmerTest" class="external-link">lmerTest</a> package, which must be installed. Models fit with <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer</a></code> are converted for lmerTest automatically, and models fit with <code><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmerTest::lmer</a></code> are used as they are. Mixed models have no simple error terms, so each test’s denominator degrees of freedom (<em>df</em><sub>error</sub>) are approximated. By default, the approximation is Kenward–Roger’s (which requires the pbkrtest package), as in <code>apa_parameters</code>, so tables of the same model’s <em>F</em> tests and coefficients use the same approximation. Satterthwaite’s approximation, lmerTest’s default, is faster for large data sets:</p>
 </div>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb32" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb29" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tbl_obk_lmer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_obk_lmer</span>, ddf <span class="op">=</span> <span class="st">"Satterthwaite"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_obk_lmer</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1645,7 +1635,7 @@ Caused by error in `fun.data()`:
 <p>Tests are Type 3 by default, as in lmerTest. lmerTest’s Type 3 tests do not depend on how factors are coded, so sum-to-zero contrasts are not needed. Use <code>type = 2</code> or <code>type = 1</code> for other types.</p>
 <p>Sums of squares and effect sizes have no agreed-upon definitions in mixed models, so they are not shown by default. When a partial effect size is requested, it is computed from <em>F</em> and its degrees of freedom (e.g., <code><a href="https://easystats.github.io/effectsize/reference/F_to_eta2.html" class="external-link">effectsize::F_to_eta2</a></code>), and the note says that it only approximates the effect size:</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit_obk_lmer</span>,</span>
 <span>  effect_size <span class="op">=</span> <span class="st">"eta"</span>,</span>
@@ -1721,7 +1711,7 @@ Caused by error in `fun.data()`:
 </h3>
 <p>The table does not say which type of sums of squares or which sphericity correction was used, so say so in a table note. <code>apa_anova</code> records how the table was made, and <code>apa_note</code> turns that record into note text:</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb35" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb32" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tbl_moore</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_moore</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_moore</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1730,7 +1720,7 @@ Caused by error in `fun.data()`:
 </div>
 <p>The note says which type of sums of squares was used and defines the effect size. For afex models, it also says which effects have sphericity-corrected degrees of freedom. afex corrects only effects that involve a within-subjects factor with more than two levels, so the note names those factors:</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb37" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb34" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tbl_obk</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_obk</span>, starred <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="va">tbl_obk</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1740,13 +1730,13 @@ Caused by error in `fun.data()`:
 <p>When stars or bold values are used, the note explains them, after the general notes as APA style requires. The text is in markdown, and it does not start with “<em>Note</em>.” because apaquarto adds that.</p>
 <p>With <a href="https://wjschne.github.io/apaquarto/" class="external-link">apaquarto</a>, use <code>apa_note</code> in the <code>apa-note</code> chunk option with <code>!expr</code>. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as <code>tbl_obk</code> was made above) and display it in the chunk with the note. Write it as <code><a href="../reference/apa_note.html">apa7::apa_note</a></code>, because in documents with cached chunks, chunk options can be evaluated before <code><a href="https://github.com/wjschne/apa7" class="external-link">library(apa7)</a></code> takes effect:</p>
 <div class="cell FigureWithNote" data-apa-note="Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected [@greenhouseMethodsAnalysisProfile1959]. *MSE* = mean square error; *η*^2^~G~ = generalized eta squared [@olejnikGeneralizedEtaOmega2003]. ^* ^*p* ≤ .05. ^** ^*p* ≤ .01. ^*** ^*p* ≤ .001." data-tbl-cap-location="top" data-custom-style="FigureWithNote">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-obk</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Mixed ANOVA of Treatment and Phase</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_obk)</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>tbl_obk</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div id="tbl-obk" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa-note="Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected [@greenhouseMethodsAnalysisProfile1959]. *MSE* = mean square error; *η*^2^~G~ = generalized eta squared [@olejnikGeneralizedEtaOmega2003]. ^* ^*p* ≤ .05. ^** ^*p* ≤ .01. ^*** ^*p* ≤ .001." data-apa-note-written="083008e4">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-obk</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Mixed ANOVA of Treatment and Phase</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_obk)</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>tbl_obk</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div id="tbl-obk" class="cell quarto-float quarto-figure quarto-figure-center" data-apa-note="Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected [@greenhouseMethodsAnalysisProfile1959]. *MSE* = mean square error; *η*^2^~G~ = generalized eta squared [@olejnikGeneralizedEtaOmega2003]. ^* ^*p* ≤ .05. ^** ^*p* ≤ .01. ^*** ^*p* ≤ .001." data-tbl-cap-location="top" data-apa-note-written="083008e4">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-obk-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
 <p>Table 20</p>
 </div>
@@ -1815,7 +1805,7 @@ Caused by error in `fun.data()`:
 <p>Variable names are converted to title case (e.g., <code>correct</code> would become Correct). For better labels, rename the variables before fitting the model, as was done for the Moore data above. Because the output is a tibble, you can also change the labels afterward.</p>
 <p>Further formatting is available with <code>apa_flextable</code>.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_anova.html">apa_anova</a></span><span class="op">(</span><span class="va">fit_adler</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>table_width <span class="op">=</span> <span class="fl">.8</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-flextable" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">

@@ -73,20 +73,23 @@ Code
 
 ``` r
 
+# Mean and 95% confidence interval, as ggplot2::mean_cl_normal() computes
+# them, but without needing the Hmisc package
+mean_ci <- function(x) {
+  x <- x[!is.na(x)]
+  m <- mean(x)
+  half <- qt(.975, length(x) - 1) * sd(x) / sqrt(length(x))
+  data.frame(y = m, ymin = m - half, ymax = m + half)
+}
+
 d_recall |> 
   ggplot(aes(`Presentation Format`, `Words Recalled`, color = `Presentation Format`)) + 
-  stat_summary(geom = "pointrange", fun.data = mean_cl_normal, position = position_nudge(.1)) +
+  stat_summary(geom = "pointrange", fun.data = mean_ci, position = position_nudge(.1)) +
   stat_summary(fun = mean, geom = "text", aes(label = after_stat(y)), position = position_nudge(.15), hjust = 0, family = my_font) +
   ggbeeswarm::geom_beeswarm(alpha = .5, pch = 16) + 
   theme_minimal(base_family = my_font, base_size = 16) +
   theme(legend.position = "none") + 
   scale_color_viridis_d(begin = .2, end = .7)
-```
-
-```
-Warning: Computation failed in `stat_summary()`.
-Caused by error in `fun.data()`:
-! The package "Hmisc" is required.
 ```
 
 ![](anova_files/figure-html/fig-friendly-1.png)
@@ -204,7 +207,7 @@ d_adler <- carData::Adler |>
 d_adler |> 
   ggplot(aes(`Expected Ratings` , `Success Rating`, color = `Expected Ratings`)) + 
   # geom_violin() +
-  stat_summary(fun.data = mean_cl_normal, position = position_nudge(.15)) +
+  stat_summary(fun.data = mean_ci, position = position_nudge(.15)) +
   stat_summary(fun = mean, geom = "text", aes(label = after_stat(y) |> signs::signs(accuracy = .1)), position = position_nudge(.25), hjust = 0, family = my_font, size = .8 * 14 / ggplot2::.pt) +
   ggbeeswarm::geom_beeswarm(alpha = .5, pch = 16) + 
   theme_light(base_family = my_font, base_size = 14) +
@@ -212,14 +215,6 @@ d_adler |>
   scale_color_viridis_d(begin = .2, end = .7) + 
   facet_grid(cols = vars(Instruction), labeller = "label_both") + 
   scale_y_continuous(labels = signs::signs)
-```
-
-```
-Warning: Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Caused by error in `fun.data()`:
-! The package "Hmisc" is required.
 ```
 
 ![](anova_files/figure-html/fig-adler-1.png)
@@ -425,7 +420,7 @@ d_moore |>
   # rename(`Participant Authoritarianism` = Authoritarianism) |> 
   ggplot(aes(`Partner Status` , conformity, color = `Partner Status`)) + 
   # geom_violin() +
-  stat_summary(fun.data = mean_cl_normal, position = position_nudge(.15)) +
+  stat_summary(fun.data = mean_ci, position = position_nudge(.15)) +
   stat_summary(fun = mean, geom = "text", aes(label = after_stat(y) |> signs::signs(accuracy = .1)), position = position_nudge(.25), hjust = 0, family = my_font, size = .8 * 14 / ggplot2::.pt) +
   ggbeeswarm::geom_beeswarm(alpha = .5, pch = 16) + 
   theme_light(base_family = my_font, base_size = 14) +
@@ -433,14 +428,6 @@ d_moore |>
   scale_color_viridis_d(begin = .2, end = .7) + 
   facet_grid(cols = vars(`Authoritarianism`), labeller = "label_both") + 
   scale_y_continuous("Conformity", labels = signs::signs) 
-```
-
-```
-Warning: Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Computation failed in `stat_summary()`.
-Caused by error in `fun.data()`:
-! The package "Hmisc" is required.
 ```
 
 ![](anova_files/figure-html/fig-moore-1.png)
