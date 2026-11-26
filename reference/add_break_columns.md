@@ -1,40 +1,50 @@
 # Add break columns
 
-Add break columns
+Inserts an empty column after (or before) each selected column. In
+[`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
+empty columns separate groups of columns, such as those under different
+column spanners.
 
 ## Usage
 
 ``` r
 add_break_columns(
-  d,
+  data,
   ...,
   .before = FALSE,
   omit_first = FALSE,
-  omit_last = FALSE
+  omit_last = FALSE,
+  d
 )
 ```
 
 ## Arguments
 
-- d:
+- data:
 
   data.frame or tibble
 
 - ...:
 
-  Column name or tidyselect function. Select columns
+  columns after which break columns are inserted: unquoted or quoted
+  names, or tidyselect helpers (e.g., `ends_with("_mean")`)
 
 - .before:
 
-  insert break columns before selected columns (defaults to FALSE)
+  if `TRUE`, break columns are inserted before the selected columns
+  instead of after them (default: `FALSE`)
 
 - omit_first:
 
-  omit the first break column
+  if `TRUE`, no break column is inserted at the first selected column
 
 - omit_last:
 
-  omit the last break column
+  if `TRUE`, no break column is inserted at the last selected column
+
+- d:
+
+  deprecated; use `data`
 
 ## Value
 

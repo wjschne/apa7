@@ -27,13 +27,13 @@ add_list_column(
 
 - type:
 
-  list type. Can be "1" (numeric), "a" (lowercase alphabetical), or
-  "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I"
-  (uppercase Roman numerals)
+  list type: `"1"` (default) for 1, 2, 3; `"a"` for a, b, c; `"A"` for
+  A, B, C; `"i"` for i, ii, iii; or `"I"` for I, II, III
 
 - sep:
 
-  separator
+  text between the list label and the item (default: `". "`, as in "1.
+  ")
 
 - merge:
 

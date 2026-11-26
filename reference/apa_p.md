@@ -23,13 +23,15 @@ apa_p(
 
 - inline:
 
-  If TRUE (default), returns statistic (e.g., p = .04), otherwise just
-  the number (e.g., .04)
+  if `TRUE`, the symbol and relation are included (e.g., *p* = .04 or
+  *p* \< .001), for use in running text (one *p*-value at a time). If
+  `FALSE` (default), only the number is returned (e.g., .04 or \<.001),
+  for use in tables.
 
 - markdown:
 
-  By default, outputs text compatible with markdown if TRUE, otherwise
-  prints plain text compatible with latex.
+  if `TRUE` (default), the output is markdown (e.g., `*p*` in italics).
+  If `FALSE`, it is plain text, which can be used in LaTeX.
 
 - min_digits:
 
@@ -57,7 +59,7 @@ apa_p(.0002)
 apa_p(.002)
 #> [1] ".002"
 # Values between .01 and .995 are rounded to 2 digits
-apa_p(.02)#'
+apa_p(.02)
 #> [1] ".02"
 apa_p(.22)
 #> [1] ".22"

@@ -93,8 +93,10 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://personality-project.org/r/psych/" class="external-link">psych</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/apa7_defaults.html">apa7_defaults</a></span><span class="op">(</span>font_family <span class="op">=</span> <span class="st">"Open Sans"</span>, line_spacing <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>Two functions make APA-style tables from exploratory factor analyses and principal components analyses run with the <a href="https://personality-project.org/r/psych/" class="external-link">psych</a> package <span class="citation" data-cites="revellePsychProceduresPsychological2026">(<a href="#ref-revellePsychProceduresPsychological2026" role="doc-biblioref">Revelle, 2026</a>)</span>:</p>
+<p>Three functions make APA-style tables for exploratory factor analyses and principal components analyses run with the <a href="https://personality-project.org/r/psych/" class="external-link">psych</a> package <span class="citation" data-cites="revellePsychProceduresPsychological2026">(<a href="#ref-revellePsychProceduresPsychological2026" role="doc-biblioref">Revelle, 2026</a>)</span>:</p>
 <ul>
+<li>
+<code>apa_n_factors</code> makes a table of how many factors each of several methods suggests retaining, from <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors</a></code>.</li>
 <li>
 <code>apa_loadings</code> makes a table of factor loadings, with optional columns for communalities, uniquenesses, and complexity, and optional rows for variance explained.</li>
 <li>
@@ -124,13 +126,205 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">A1</span><span class="op">:</span><span class="va">O5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">item_text</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
+</section><section class="section level2"><h2 id="how-many-factors">How Many Factors?<a class="anchor" aria-label="anchor" href="#how-many-factors"></a>
+</h2>
+<p>Before the loadings, papers usually report how the number of factors was chosen. <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors</a></code> applies many methods at once (e.g., parallel analysis, Velicer’s minimum average partial test, and the Kaiser criterion), and <code>apa_n_factors</code> makes a table of the number of factors each suggests. It can run <code><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">parameters::n_factors</a></code> itself, with any of its arguments, or format its output. Parallel analysis uses random data, so set a seed to get the same results each time:</p>
+<div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">nf_bfi</span> <span class="op">&lt;-</span> <span class="fu">parameters</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/parameters/reference/n_factors.html" class="external-link">n_factors</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">d_bfi</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/apa_n_factors.html">apa_n_factors</a></span><span class="op">(</span><span class="va">nf_bfi</span><span class="op">)</span></span></code></pre></div>
+<div id="tbl-n-factors" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
+<figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-n-factors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
+<p>Table 1</p>
+</div>
+<div class="Caption" data-custom-style="Caption">
+<p>Number of Factors Suggested by Each Method</p>
+</div>
+</figcaption><div aria-describedby="tbl-n-factors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid tabwid_left">
+<style>.cl-d8bad469{}.cl-cbf2dfd9{font-family:'Open Sans';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a9d4540c{font-family:'Open Sans';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-4fb6f15d{font-family:'Open Sans';font-size:12pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-fe4be2bd{font-family:'Open Sans';font-size:7.8pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;vertical-align:4.08pt;}.cl-7f4fbc6f{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-8d7f0425{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-dfa9d96a{width:5.374in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d1fd8191{width:1.126in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c5aa5899{width:5.374in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5443bbb8{width:1.126in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9fc2aa63{width:5.374in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-38ed43e5{width:1.126in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-dfa9d96a"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Method</span></p></th>
+<th class="cl-d1fd8191"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Factors</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Acceleration</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">factor</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">1</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Cattell–Nelson–Gorsuch</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(CNG)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">3</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Multiple</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">regression</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">β</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">4</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Very</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">simple</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">structure</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(complexity</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">1)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">4</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Very</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">simple</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">structure</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(complexity</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">2)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">5</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Velicer’s</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">minimum</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">average</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">partial</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(MAP)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">5</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Optimal</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">coordinates</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">6</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Parallel</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">analysis</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">6</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Kaiser</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">criterion</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(eigenvalues</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">&gt;</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">1)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">6</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Multiple</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">regression</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">t</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">7</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Multiple</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">regression</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">p</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">7</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Standard</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">error</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">scree</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">R</span><span class="cl-fe4be2bd">2</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">7</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Standard</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">error</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">scree</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">(</span><span class="cl-a9d4540c">SE</span><span class="cl-cbf2dfd9">)</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">8</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-a9d4540c">BIC</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">8</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Sample-size</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">adjusted</span><span class="cl-cbf2dfd9"> </span><span class="cl-a9d4540c">BIC</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">11</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Bentler’s</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">test</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">22</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Bartlett’s</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">test</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">24</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-c5aa5899"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Anderson’s</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">test</span></p></td>
+<td class="cl-5443bbb8"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">24</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-9fc2aa63"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">Lawley’s</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">test</span></p></td>
+<td class="cl-38ed43e5"><p class="cl-7f4fbc6f"><span class="cl-4fb6f15d">24</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
+<p>The numbers of factors supported by the most methods are bolded, and the note names them. The methods often disagree, as they do here, and they are not equally good: parallel analysis and Velicer’s MAP test are generally recommended, while the Kaiser criterion and the chi-square tests (Bartlett’s, Anderson’s, and Lawley’s) tend to suggest too many factors. The theory behind the items matters too. The bfi items were written to measure five traits. Velicer’s MAP test suggests five factors and parallel analysis six, so the five-factor solution below is a reasonable choice, though a six-factor solution would be worth a look.</p>
+</div>
+<p>With <code>table = "agreement"</code>, there is a row for each suggested number of factors, with the number of methods that suggest it and the cumulative proportion of variance explained by that many factors:</p>
+<div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_n_factors.html">apa_n_factors</a></span><span class="op">(</span><span class="va">nf_bfi</span>, table <span class="op">=</span> <span class="st">"agreement"</span><span class="op">)</span></span></code></pre></div>
+<div id="tbl-n-factors-agreement" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
+<figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-n-factors-agreement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
+<p>Table 2</p>
+</div>
+<div class="Caption" data-custom-style="Caption">
+<p>Agreement Among Methods for the Number of Factors</p>
+</div>
+</figcaption><div aria-describedby="tbl-n-factors-agreement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid tabwid_left">
+<style>.cl-d8bad469{}.cl-cbf2dfd9{font-family:'Open Sans';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7f4fbc6f{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-8d7f0425{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:4pt;padding-top:4pt;padding-left:3pt;padding-right:3pt;line-height: 1.442;background-color:transparent;}.cl-0f374222{width:1.392in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-94e94d53{width:1.641in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-50036f9f{width:3.467in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6e509336{width:1.392in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b4d250dc{width:1.641in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-26c4649c{width:3.467in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2886f615{width:1.392in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fb0295c{width:1.641in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-990737db{width:3.467in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead><tr style="overflow-wrap:break-word;">
+<th class="cl-0f374222"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Factors</span></p></th>
+<th class="cl-94e94d53"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Methods</span></p></th>
+<th class="cl-50036f9f"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Cumulative</span><span class="cl-cbf2dfd9"> </span><span class="cl-cbf2dfd9">variance</span></p></th>
+</tr></thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">1</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">1</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.19</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">3</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">1</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.35</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">4</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">2</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.41</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">5</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">2</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.45</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">6</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">3</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.48</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">7</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">3</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.49</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">8</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">2</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.51</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">11</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">1</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.53</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6e509336"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">22</span></p></td>
+<td class="cl-b4d250dc"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">1</span></p></td>
+<td class="cl-26c4649c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.57</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-2886f615"><p class="cl-8d7f0425"><span class="cl-cbf2dfd9">24</span></p></td>
+<td class="cl-1fb0295c"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">3</span></p></td>
+<td class="cl-990737db"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">.57</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
 </section><section class="section level2"><h2 id="factor-loadings">Factor Loadings<a class="anchor" aria-label="anchor" href="#factor-loadings"></a>
 </h2>
 <section class="level2"><h3 id="a-basic-table">A basic table<a class="anchor" aria-label="anchor" href="#a-basic-table"></a>
 </h3>
 <p>A five-factor solution with principal axis factoring (<code>fm = "pa"</code>) and an oblimin rotation (the default in <code><a href="https://rdrr.io/pkg/psych/man/fa.html" class="external-link">psych::fa</a></code>) finds the Big Five:</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb3" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb5" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_bfi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/psych/man/fa.html" class="external-link">fa</a></span><span class="op">(</span><span class="va">d_bfi</span>, nfactors <span class="op">=</span> <span class="fl">5</span>, fm <span class="op">=</span> <span class="st">"pa"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>By default, <code>apa_loadings</code></p>
@@ -141,11 +335,11 @@
 </ul>
 <p>The bfi items are short sentences, so <code>format_variable_names = FALSE</code> keeps them as they are.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>, format_variable_names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-basic" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-basic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 1</p>
+<p>Table 3</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings of Big Five Personality Items</p>
@@ -157,11 +351,11 @@
 <table data-quarto-disable-processing="true" class="table cl-d8bad469">
 <thead><tr style="overflow-wrap:break-word;">
 <th class="cl-eb8fe624"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">Variable</span></p></th>
-<th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA2</span></p></th>
 <th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA5</span></p></th>
-<th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA1</span></p></th>
-<th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA4</span></p></th>
+<th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA2</span></p></th>
 <th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA3</span></p></th>
+<th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA4</span></p></th>
+<th class="cl-f100b85d"><p class="cl-7f4fbc6f"><span class="cl-cbf2dfd9">PA1</span></p></th>
 </tr></thead>
 <tbody>
 <tr style="overflow-wrap:break-word;">
@@ -376,7 +570,7 @@
 </h3>
 <p>The psych package names factors by the fitting method and a number (e.g., PA1 for the first principal axis factor). The <code>factor_names</code> argument gives them meaningful names. Give the names in the order the factors appear in the table, which is the order psych gives them (by the variance they explain):</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">big5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Neuroticism"</span>,</span>
 <span>          <span class="st">"Extraversion"</span>,</span>
 <span>          <span class="st">"Conscientiousness"</span>,</span>
@@ -386,9 +580,9 @@
 <span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-named" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-named" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-named-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 2</p>
+<p>Table 4</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings of Big Five Personality Items</p>
@@ -622,14 +816,14 @@
 </h3>
 <p>The <code>min_loading</code> argument sets the smallest absolute loading that is displayed. Many authors show only loadings of .30 or higher. To show every loading, set <code>min_loading = 0</code>.</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>             min_loading <span class="op">=</span> <span class="fl">.30</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-min30" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-min30" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-min30-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 3</p>
+<p>Table 5</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings of .30 or Higher</p>
@@ -863,14 +1057,14 @@
 </h3>
 <p>When some items load on more than one factor, readers need to see which factor each item belongs to. With <code>bold_max = TRUE</code>, the largest loading in each row (in absolute value) is bolded. Here all loadings of .20 or higher are shown, so the cross-loadings are visible next to the bolded primary loadings:</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>             bold_max <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-bold" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-bold" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-bold-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 4</p>
+<p>Table 6</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings With Primary Loadings in Bold</p>
@@ -1112,16 +1306,16 @@
 <code>complexity = TRUE</code> adds <span class="citation" data-cites="hofmannComplexitySimplicityObjective1978">Hofmann’s (<a href="#ref-hofmannComplexitySimplicityObjective1978" role="doc-biblioref">1978</a>)</span> complexity index, which is 1 when an item loads on a single factor and increases as its loadings are spread over more factors.</li>
 </ul>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>             min_loading <span class="op">=</span> <span class="fl">.30</span>,</span>
 <span>             communality <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>             complexity <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-columns" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-columns" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-columns-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 5</p>
+<p>Table 7</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings, Communalities, and Complexity</p>
@@ -1404,15 +1598,15 @@
 </h3>
 <p>With <code>variance = TRUE</code>, three rows are added below the loadings: the sum of squared loadings for each factor, the proportion of the total variance it explains, and the cumulative proportion. A rule separates these rows from the loadings.</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>             min_loading <span class="op">=</span> <span class="fl">.30</span>,</span>
 <span>             variance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-variance" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-variance" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 6</p>
+<p>Table 8</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings and Variance Explained</p>
@@ -1670,11 +1864,11 @@
 </h2>
 <p>After an oblique rotation, report the correlations among the factors. <code>apa_factor_cor</code> numbers the factors in the first column and uses the numbers as column headers. The factors are in the same order as in <code>apa_loadings</code>, so the same <code>factor_names</code> vector works for both.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_factor_cor.html">apa_factor_cor</a></span><span class="op">(</span><span class="va">fit_bfi</span>, factor_names <span class="op">=</span> <span class="va">big5</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-factor-cor" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-factor-cor-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 7</p>
+<p>Table 9</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Correlations Among Big Five Factors</p>
@@ -1749,19 +1943,19 @@
 </h2>
 <p><code>apa_loadings</code> and <code>apa_factor_cor</code> work the same way with principal components from <code><a href="https://rdrr.io/pkg/psych/man/principal.html" class="external-link">psych::principal</a></code>. Here the components are rotated with varimax, an orthogonal rotation.</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb11" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/psych/man/principal.html" class="external-link">principal</a></span><span class="op">(</span><span class="va">d_bfi</span>, nfactors <span class="op">=</span> <span class="fl">5</span>, rotate <span class="op">=</span> <span class="st">"varimax"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_pca</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>             min_loading <span class="op">=</span> <span class="fl">.30</span>,</span>
 <span>             variance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-pca" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-pca" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 8</p>
+<p>Table 10</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Varimax-Rotated Principal Components of Big Five Personality Items</p>
@@ -2016,16 +2210,16 @@
 </h2>
 <p><code>apa_loadings</code> and <code>apa_factor_cor</code> also accept output from <code><a href="https://easystats.github.io/parameters/reference/principal_components.html" class="external-link">parameters::factor_analysis</a></code> and <code><a href="https://easystats.github.io/parameters/reference/principal_components.html" class="external-link">parameters::principal_components</a></code>, the easystats functions for factor analysis and principal components. The loadings come from the model that parameters fits, so the <code>sort</code> and <code>threshold</code> arguments of the parameters functions make no difference. Use <code>sort_loading</code> and <code>min_loading</code> instead.</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">efa_bfi</span> <span class="op">&lt;-</span> <span class="fu">parameters</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/parameters/reference/principal_components.html" class="external-link">factor_analysis</a></span><span class="op">(</span><span class="va">d_bfi</span>, n <span class="op">=</span> <span class="fl">5</span>, rotation <span class="op">=</span> <span class="st">"oblimin"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">efa_bfi</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>             min_loading <span class="op">=</span> <span class="fl">.30</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-parameters-efa" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-parameters-efa" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-parameters-efa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 9</p>
+<p>Table 11</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings From parameters::factor_analysis</p>
@@ -2253,11 +2447,11 @@
 </div>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_factor_cor.html">apa_factor_cor</a></span><span class="op">(</span><span class="va">efa_bfi</span>, factor_names <span class="op">=</span> <span class="va">big5</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-parameters-cor" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-parameters-cor-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 10</p>
+<p>Table 12</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Correlations From parameters::factor_analysis</p>
@@ -2328,7 +2522,7 @@
 <p>Without a rotation, <code><a href="https://easystats.github.io/parameters/reference/principal_components.html" class="external-link">parameters::principal_components</a></code> uses <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp</a></code>. The loadings are the correlations between the items and the components (when <code>standardize = TRUE</code>, the default), and the sums of squared loadings are the eigenvalues. Unrotated components are hard to interpret, so they keep their default names here.</p>
 </div>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">parameters</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/parameters/reference/principal_components.html" class="external-link">principal_components</a></span><span class="op">(</span><span class="va">d_bfi</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span>format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>               min_loading <span class="op">=</span> <span class="fl">.30</span>,</span>
@@ -2336,7 +2530,7 @@
 <span>               variance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-parameters-pca" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-parameters-pca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 11</p>
+<p>Table 13</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Unrotated Principal Components From parameters::principal_components</p>
@@ -2591,7 +2785,7 @@
 </h2>
 <p>When the variables have names rather than text, the default <code>format_variable_names = TRUE</code> makes them readable. The <code>Harman74.cor</code> data set has the correlations among 24 ability tests, with names such as <code>SentenceCompletion</code> and <code>VisualPerception</code>. Because <code><a href="https://rdrr.io/pkg/psych/man/fa.html" class="external-link">psych::fa</a></code> accepts a correlation matrix, give it the sample size (<code>n.obs</code>) so that it can compute fit statistics.</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_harman</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/psych/man/fa.html" class="external-link">fa</a></span><span class="op">(</span><span class="va">Harman74.cor</span><span class="op">$</span><span class="va">cov</span>,</span>
 <span>                 nfactors <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>                 n.obs <span class="op">=</span> <span class="va">Harman74.cor</span><span class="op">$</span><span class="va">n.obs</span>,</span>
@@ -2604,7 +2798,7 @@
 <span>             communality <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-harman" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-harman-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 12</p>
+<p>Table 14</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings of 24 Ability Tests</p>
@@ -2832,7 +3026,7 @@
 </h3>
 <p>A table of loadings should say how the factors were extracted and rotated and which loadings were omitted. <code>apa_loadings</code> records these details, and <code>apa_note</code> turns them into note text:</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb17" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tbl_bfi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>,</span>
 <span>                        factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>                        format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -2848,16 +3042,16 @@
 <p>The note names the extraction method and rotation, says that loadings after an oblique rotation are pattern coefficients, gives the cutoff for omitted loadings, explains bold values, and defines <em>h</em><sup>2</sup> (and <em>u</em><sup>2</sup> and Complexity, if shown). When there are variance rows and the factors are correlated, it says that the cumulative proportion is approximate. The text is in markdown and does not start with “<em>Note</em>.” because apaquarto adds that.</p>
 <p>With <a href="https://wjschne.github.io/apaquarto/" class="external-link">apaquarto</a>, use <code>apa_note</code> in the <code>apa-note</code> chunk option with <code>!expr</code>. Chunk options are evaluated before the chunk runs, so make the table in an earlier chunk (as <code>tbl_bfi</code> was made above) and display it in the chunk with the note. Write it as <code><a href="../reference/apa_note.html">apa7::apa_note</a></code>, because in documents with cached chunks, chunk options can be evaluated before <code><a href="https://github.com/wjschne/apa7" class="external-link">library(apa7)</a></code> takes effect:</p>
 <div class="cell FigureWithNote" data-apa7-width="landscape" data-apa-note="Principal axis factoring with oblimin rotation. Loadings are pattern coefficients. Loadings smaller than .30 in absolute value are omitted. The largest loading for each variable is in bold. *h*^2^ = communality. Because the factors are correlated, the variance they explain overlaps, and the cumulative proportion is approximate." data-tbl-cap-location="top" data-custom-style="FigureWithNote">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-note</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa7-width: landscape</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Factor Loadings of Big Five Personality Items</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_bfi)</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>tbl_bfi</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div id="tbl-note" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa-note="Principal axis factoring with oblimin rotation. Loadings are pattern coefficients. Loadings smaller than .30 in absolute value are omitted. The largest loading for each variable is in bold. *h*^2^ = communality. Because the factors are correlated, the variance they explain overlaps, and the cumulative proportion is approximate." data-apa7-width="landscape" data-apa-note-written="da7923ed">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-note</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa7-width: landscape</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: Factor Loadings of Big Five Personality Items</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| apa-note: !expr apa7::apa_note(tbl_bfi)</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>tbl_bfi</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div id="tbl-note" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape" data-apa-note="Principal axis factoring with oblimin rotation. Loadings are pattern coefficients. Loadings smaller than .30 in absolute value are omitted. The largest loading for each variable is in bold. *h*^2^ = communality. Because the factors are correlated, the variance they explain overlaps, and the cumulative proportion is approximate." data-apa-note-written="da7923ed">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-note-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 13</p>
+<p>Table 15</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings of Big Five Personality Items</p>
@@ -3143,7 +3337,7 @@
 </div>
 <p><code>apa_note</code> also works for factor correlation tables:</p>
 <div class="cell fig-cap-location-top">
-<div class="sourceCode cell-code" id="cb20" data-cap-location="top"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb22" data-cap-location="top"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_factor_cor.html">apa_factor_cor</a></span><span class="op">(</span><span class="va">fit_bfi</span>, factor_names <span class="op">=</span> <span class="va">big5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_note.html">apa_note</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3156,14 +3350,14 @@
 </h3>
 <p>The output is a tibble, so dplyr functions can change it before it is displayed. For example, to fix the misspelled test name:</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_harman</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Verbal"</span>, <span class="st">"Spatial"</span>, <span class="st">"Speed"</span>, <span class="st">"Memory"</span><span class="op">)</span>,</span>
 <span>             min_loading <span class="op">=</span> <span class="fl">.30</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Variable <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_replace.html" class="external-link">str_replace</a></span><span class="op">(</span><span class="va">Variable</span>, <span class="st">"Pargraph"</span>, <span class="st">"Paragraph"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-fix" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fix-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 14</p>
+<p>Table 16</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings of 24 Ability Tests</p>
@@ -3364,7 +3558,7 @@
 </h3>
 <p>Pass the table to <code>apa_flextable</code> for more options (e.g., <code>table_width</code>) and then to flextable functions for more control. The rule above the variance rows is added by <code>apa_flextable</code>, which finds the row by its label, so the rule stays in place even if rows are filtered or reordered first. Here the table is set in a smaller font, and the cross-loading of the “Spend time reflecting on things” item on Extraversion is highlighted in red using flextable’s <code>color</code> function.</p>
 <div class="cell FigureWithoutNote" data-apa7-width="landscape" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_loadings.html">apa_loadings</a></span><span class="op">(</span><span class="va">fit_bfi</span>,</span>
 <span>             factor_names <span class="op">=</span> <span class="va">big5</span>,</span>
 <span>             format_variable_names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -3372,9 +3566,9 @@
 <span>             variance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>font_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/color.html" class="external-link">color</a></span><span class="op">(</span>i <span class="op">=</span> <span class="fl">25</span>, j <span class="op">=</span> <span class="st">"Extraversion"</span>, color <span class="op">=</span> <span class="st">"firebrick"</span><span class="op">)</span></span></code></pre></div>
-<div id="tbl-flextable" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top" data-apa7-width="landscape">
+<div id="tbl-flextable" class="cell quarto-float quarto-figure quarto-figure-center" data-apa7-width="landscape" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-flextable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca"><div class="FigureTitle" data-custom-style="FigureTitle">
-<p>Table 15</p>
+<p>Table 17</p>
 </div>
 <div class="Caption" data-custom-style="Caption">
 <p>Factor Loadings and Variance Explained</p>

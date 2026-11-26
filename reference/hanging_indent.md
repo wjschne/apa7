@@ -24,27 +24,32 @@ hanging_indent(
 
 - indent:
 
-  number of spaces to indent
+  number of `space` characters that indent the second and later lines
 
 - width:
 
-  number of characters to break lines
+  maximum number of characters per line
 
 - space:
 
-  indenting space character (defaults to non-breaking space)
+  indenting character. If `NULL` (default), a non-breaking space.
 
 - newline:
 
-  text for creating new line
+  text inserted at each line break (default: a markdown hard line break,
+  a backslash followed by a newline)
 
 - whitespace_only:
 
-  wrapping spaces only
+  if `TRUE`, lines break only at spaces. If `FALSE` (default), they can
+  also break after hyphens and slashes (see
+  [`stringr::str_wrap()`](https://stringr.tidyverse.org/reference/str_wrap.html)).
 
 - wrap_equal_width:
 
-  Attempts to split lines to make them of approximately equal width
+  if `TRUE`, lines are made roughly equal in width (see
+  [`str_wrap_equal()`](https://wjschne.github.io/apa7/reference/str_wrap_equal.md)).
+  If `FALSE` (default), each line is filled up to `width`.
 
 ## Value
 
@@ -53,6 +58,8 @@ character vector
 ## Examples
 
 ``` r
-hanging_indent("Hello Darkness, my old friend. I've come to talk with you again.")
-#> [1] "Hello Darkness, my old friend.\\\n    I've come to talk with you\\\n    again."
+hanging_indent(
+  "Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Erlbaum."
+)
+#> [1] "Cohen, J. (1988). Statistical\\\n    power analysis for the\\\n    behavioral sciences (2nd ed.).\\\n    Erlbaum."
 ```

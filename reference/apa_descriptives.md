@@ -70,7 +70,12 @@ apa_descriptives(
 - test:
 
   if `TRUE`, a column of *p*-values tests the differences between groups
-  (requires `by`)
+  (requires `by`). Unlike the `test` argument of
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md)
+  and
+  [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),
+  which names a test, this one is `TRUE` or `FALSE`; the test of
+  categorical variables is chosen with `categorical_test`.
 
 - categorical_test:
 
@@ -92,7 +97,8 @@ apa_descriptives(
 - digits:
 
   number of decimal places of means, standard deviations, medians,
-  interquartile ranges, and ranges
+  interquartile ranges, and ranges (unaffected by
+  `apa7_defaults(accuracy = )`)
 
 - percent_digits:
 

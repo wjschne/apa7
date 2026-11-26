@@ -669,28 +669,28 @@
 <p>Your styling options include:</p>
 <ul>
 <li>
-<code>note</code> A custom markdown formatted note. Overrides automatic note about bolded correlations being significant. Default: <code>NULL</code>
+<code>note</code> A custom markdown formatted note. Overrides the automatic note. Default: <code>NULL</code>
 </li>
 <li>
-<code>p_value</code> Significance value. Default: <code>0.05</code>
+<code>alpha</code> <em>p</em>-value thresholds for one, two, and three stars (with <code>bold_significant = TRUE</code>, only the first is used). Default: <code>c(.05, .01, .001)</code>
 </li>
 <li>
-<code>digits</code> Number of digits for rounding. Default: <code>2</code>
+<code>digits</code> Number of decimal places. Default: <code>2</code>
 </li>
 <li>
-<code>bold_significant</code> Whether to bold significant correlations. Default: <code>FALSE</code>
+<code>bold_significant</code> Whether to bold significant correlations instead of starring them. Default: <code>FALSE</code>
 </li>
 <li>
 <code>star_significant</code> Whether to star significant correlations. Default: <code>TRUE</code>
 </li>
 <li>
-<code>significance_note</code> Whether note about bolding correlations appears. Overridden by a custom note. Also, the automatic note will not appear if no correlations are significant. Default: <code>TRUE</code>
+<code>significance_note</code> Whether the note explains the stars (or bolding). Overridden by a custom note. Also, the automatic note will not appear if no correlations are significant. Default: <code>TRUE</code>
 </li>
 <li>
 <code>output</code> Options are <code>flextable</code> or <code>tibble</code>. Default: <code>flextable</code>
 </li>
 <li>
-<code>family</code> Font family (typeface). Default: <code>Times New Roman</code>
+<code>font_family</code> Font family (typeface). Default: <code>Times New Roman</code>
 </li>
 <li>
 <code>font_size</code> Font size (in points). Default: <code>12</code>
@@ -713,7 +713,7 @@
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_personality</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_cor.html">apa_cor</a></span><span class="op">(</span></span>
-<span>    p_value <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>    digits <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>    bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    significance_note <span class="op">=</span> <span class="cn">TRUE</span>,</span>

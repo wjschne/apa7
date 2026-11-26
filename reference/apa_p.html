@@ -75,11 +75,11 @@
 
 
 <dt id="arg-inline">inline<a class="anchor" aria-label="anchor" href="#arg-inline"></a></dt>
-<dd><p>If TRUE (default), returns statistic (e.g., p = .04), otherwise just the number (e.g., .04)</p></dd>
+<dd><p>if <code>TRUE</code>, the symbol and relation are included (e.g., <em>p</em> = .04 or <em>p</em> &lt; .001), for use in running text (one <em>p</em>-value at a time). If <code>FALSE</code> (default), only the number is returned (e.g., .04 or &lt;.001), for use in tables.</p></dd>
 
 
 <dt id="arg-markdown">markdown<a class="anchor" aria-label="anchor" href="#arg-markdown"></a></dt>
-<dd><p>By default, outputs text compatible with markdown if TRUE, otherwise prints plain text compatible with latex.</p></dd>
+<dd><p>if <code>TRUE</code> (default), the output is markdown (e.g., <code>*p*</code> in italics). If <code>FALSE</code>, it is plain text, which can be used in LaTeX.</p></dd>
 
 
 <dt id="arg-min-digits">min_digits<a class="anchor" aria-label="anchor" href="#arg-min-digits"></a></dt>
@@ -108,7 +108,7 @@
 <span class="r-in"><span><span class="fu">apa_p</span><span class="op">(</span><span class="fl">.002</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ".002"</span>
 <span class="r-in"><span><span class="co"># Values between .01 and .995 are rounded to 2 digits</span></span></span>
-<span class="r-in"><span><span class="fu">apa_p</span><span class="op">(</span><span class="fl">.02</span><span class="op">)</span><span class="co">#'</span></span></span>
+<span class="r-in"><span><span class="fu">apa_p</span><span class="op">(</span><span class="fl">.02</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ".02"</span>
 <span class="r-in"><span><span class="fu">apa_p</span><span class="op">(</span><span class="fl">.22</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ".22"</span>

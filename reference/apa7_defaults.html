@@ -85,7 +85,10 @@ are left as they are.</p>
 
 <dl><dt id="arg-accuracy">accuracy<a class="anchor" aria-label="anchor" href="#arg-accuracy"></a></dt>
 <dd><p>rounding accuracy of numbers in tables (default: .01, for
-two decimals)</p></dd>
+two decimals). Model tables such as <code><a href="apa_parameters.html">apa_parameters()</a></code> and <code><a href="apa_anova.html">apa_anova()</a></code>
+use it. Descriptive tables such as <code><a href="apa_descriptives.html">apa_descriptives()</a></code>, <code><a href="apa_cor.html">apa_cor()</a></code>, and
+<code><a href="apa_loadings.html">apa_loadings()</a></code> have their own <code>digits</code> argument instead (<code>digits = 2</code>
+is the same as <code>accuracy = .01</code>).</p></dd>
 
 
 <dt id="arg-font-family">font_family<a class="anchor" aria-label="anchor" href="#arg-font-family"></a></dt>
@@ -104,19 +107,19 @@ single-spaced.</p></dd>
 
 
 <dt id="arg-intercept-text">intercept_text<a class="anchor" aria-label="anchor" href="#arg-intercept-text"></a></dt>
-<dd><p>what to call the intercept</p></dd>
+<dd><p>label of the intercept row in regression tables (default: <code>"Constant"</code>)</p></dd>
 
 
 <dt id="arg-column-formats">column_formats<a class="anchor" aria-label="anchor" href="#arg-column-formats"></a></dt>
-<dd><p>column formatting functions</p></dd>
+<dd><p>a <code><a href="column_formats.html">column_formats()</a></code> object: the headers, formatters, and note definitions of table columns</p></dd>
 
 
 <dt id="arg-number-formatter">number_formatter<a class="anchor" aria-label="anchor" href="#arg-number-formatter"></a></dt>
-<dd><p>default function to format numbers</p></dd>
+<dd><p>function that formats numbers that can exceed 1 in absolute value (e.g., coefficients, standard errors, and test statistics). It takes a numeric vector and <code>accuracy</code> and returns a character vector. By default, <code><a href="align_chr.html">align_chr()</a></code> with the <code>accuracy</code> setting.</p></dd>
 
 
 <dt id="arg-trim-leading-zero">trim_leading_zero<a class="anchor" aria-label="anchor" href="#arg-trim-leading-zero"></a></dt>
-<dd><p>default function to trim leading zeros from numbers</p></dd>
+<dd><p>function that formats numbers that cannot exceed 1 in absolute value (e.g., correlations, standardized coefficients, and <em>R</em>^2^), which APA style writes without a leading zero. By default, <code><a href="align_chr.html">align_chr()</a></code> with <code>trim_leading_zeros = TRUE</code>. Note that this is a function, unlike the <code>TRUE</code>/<code>FALSE</code> <code>trim_leading_zeros</code> argument of <code><a href="align_chr.html">align_chr()</a></code>.</p></dd>
 
 
 <dt id="arg-width-aware-padding">width_aware_padding<a class="anchor" aria-label="anchor" href="#arg-width-aware-padding"></a></dt>

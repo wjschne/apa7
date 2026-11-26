@@ -104,55 +104,67 @@
 
 
 <dt id="arg-row-title-column">row_title_column<a class="anchor" aria-label="anchor" href="#arg-row-title-column"></a></dt>
-<dd><p>Column name or tidyselect function. column to group rows</p></dd>
+<dd><p>column whose values become heading rows that group
+the rows below them (unquoted or quoted name, or a tidyselect helper). The
+column itself is not displayed. Rows should already be sorted by it.</p></dd>
 
 
 <dt id="arg-row-title-align">row_title_align<a class="anchor" aria-label="anchor" href="#arg-row-title-align"></a></dt>
-<dd><p>alignment of row title ("left", "center", "right")</p></dd>
+<dd><p>alignment of the heading rows: <code>"left"</code> (default),
+<code>"center"</code>, or <code>"right"</code></p></dd>
 
 
 <dt id="arg-row-title-prefix">row_title_prefix<a class="anchor" aria-label="anchor" href="#arg-row-title-prefix"></a></dt>
-<dd><p>text to be added to each title</p></dd>
+<dd><p>text placed before each heading (e.g., <code>"Group"</code>
+gives "Group A")</p></dd>
 
 
 <dt id="arg-row-title-sep">row_title_sep<a class="anchor" aria-label="anchor" href="#arg-row-title-sep"></a></dt>
-<dd><p>separator for prefix</p></dd>
+<dd><p>text between <code>row_title_prefix</code> and the heading
+(default: a space)</p></dd>
 
 
 <dt id="arg-row-title-border">row_title_border<a class="anchor" aria-label="anchor" href="#arg-row-title-border"></a></dt>
-<dd><p>list of flextable styles</p></dd>
+<dd><p>border drawn around each group of rows: a list of
+<code>color</code>, <code>style</code>, and <code>width</code> (in points), as in <code><a href="https://davidgohel.github.io/officer/reference/fp_border.html" class="external-link">officer::fp_border()</a></code></p></dd>
 
 
 <dt id="arg-left-column-padding">left_column_padding<a class="anchor" aria-label="anchor" href="#arg-left-column-padding"></a></dt>
-<dd><p>Number of points the left column is padded (only relevant when there is a <code>row_title_column</code> and <code>row_title_align = "left"</code>)</p></dd>
+<dd><p>left padding of the first column's body rows, in points, which indents them under left-aligned heading rows (only used with <code>row_title_column</code> and <code>row_title_align = "left"</code>)</p></dd>
 
 
 <dt id="arg-col-keys">col_keys<a class="anchor" aria-label="anchor" href="#arg-col-keys"></a></dt>
-<dd><p>column keys passed to flextable (defaults data column names)</p></dd>
+<dd><p>columns to display, in order (default: all columns of
+<code>data</code>), passed to <code><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable::flextable()</a></code></p></dd>
 
 
-<dt id="arg-cwidth">cwidth<a class="anchor" aria-label="anchor" href="#arg-cwidth"></a></dt>
-<dd><p>initial cell width in inches</p></dd>
-
-
-<dt id="arg-cheight">cheight<a class="anchor" aria-label="anchor" href="#arg-cheight"></a></dt>
-<dd><p>initial cell height in inches</p></dd>
+<dt id="arg-cwidth-cheight">cwidth, cheight<a class="anchor" aria-label="anchor" href="#arg-cwidth-cheight"></a></dt>
+<dd><p>initial cell width and height in inches, passed to
+<code><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable::flextable()</a></code>. With <code>pretty_widths = TRUE</code> (default), the
+widths are then fitted to the contents and <code>table_width</code>.</p></dd>
 
 
 <dt id="arg-header-align-vertical">header_align_vertical<a class="anchor" aria-label="anchor" href="#arg-header-align-vertical"></a></dt>
-<dd><p>vertical alignment of headers. Can be "top", "middle", or "bottom"</p></dd>
+<dd><p>vertical alignment of header text when header
+cells differ in height: <code>"top"</code> (default), <code>"middle"</code>, or <code>"bottom"</code></p></dd>
 
 
 <dt id="arg-separate-headers">separate_headers<a class="anchor" aria-label="anchor" href="#arg-separate-headers"></a></dt>
-<dd><p>separate header rows (default: <code>TRUE</code>)</p></dd>
+<dd><p>if <code>TRUE</code> (default), column names with an
+underscore become two header rows: the part before it is a column
+spanner over the columns that share it (e.g., <code>Model 1_B</code> and
+<code>Model 1_SE</code> share a "Model 1" spanner)</p></dd>
 
 
 <dt id="arg-apa-style">apa_style<a class="anchor" aria-label="anchor" href="#arg-apa-style"></a></dt>
-<dd><p>apply <code>apa_style</code> function (default: <code>TRUE</code>)</p></dd>
+<dd><p>if <code>TRUE</code> (default), <code><a href="apa_style.html">apa_style()</a></code> is applied (fonts,
+borders, spacing, and markdown)</p></dd>
 
 
 <dt id="arg-font-family">font_family<a class="anchor" aria-label="anchor" href="#arg-font-family"></a></dt>
-<dd><p>font family</p></dd>
+<dd><p>font family (e.g., <code>"Times New Roman"</code> or <code>"Arial"</code>). If
+<code>NULL</code> (default), the font set with <code>apa7_defaults(font_family = )</code>
+(Times New Roman unless changed).</p></dd>
 
 
 <dt id="arg-font-size">font_size<a class="anchor" aria-label="anchor" href="#arg-font-size"></a></dt>
@@ -161,15 +173,16 @@ with <code>apa7_defaults(font_size = )</code> (12 unless changed).</p></dd>
 
 
 <dt id="arg-text-color">text_color<a class="anchor" aria-label="anchor" href="#arg-text-color"></a></dt>
-<dd><p>text color</p></dd>
+<dd><p>color of the text: an R color name (e.g., <code>"black"</code>, the
+default) or a hex code (e.g., <code>"#333333"</code>)</p></dd>
 
 
 <dt id="arg-border-color">border_color<a class="anchor" aria-label="anchor" href="#arg-border-color"></a></dt>
-<dd><p>border color</p></dd>
+<dd><p>color of the rules, in the same forms as <code>text_color</code></p></dd>
 
 
 <dt id="arg-border-width">border_width<a class="anchor" aria-label="anchor" href="#arg-border-width"></a></dt>
-<dd><p>border width in pixels</p></dd>
+<dd><p>width of the rules, in points (default: 0.5)</p></dd>
 
 
 <dt id="arg-line-spacing">line_spacing<a class="anchor" aria-label="anchor" href="#arg-line-spacing"></a></dt>
@@ -180,15 +193,19 @@ notes are single-spaced.</p></dd>
 
 
 <dt id="arg-horizontal-padding">horizontal_padding<a class="anchor" aria-label="anchor" href="#arg-horizontal-padding"></a></dt>
-<dd><p>horizontal padding (in pixels)</p></dd>
+<dd><p>space to the left and right of each cell's
+contents, in points (default: 3)</p></dd>
 
 
 <dt id="arg-table-align">table_align<a class="anchor" aria-label="anchor" href="#arg-table-align"></a></dt>
-<dd><p>table alignment ("left", "center", "right")</p></dd>
+<dd><p>alignment of the table on the page: <code>"left"</code> (default),
+<code>"center"</code>, or <code>"right"</code></p></dd>
 
 
 <dt id="arg-layout">layout<a class="anchor" aria-label="anchor" href="#arg-layout"></a></dt>
-<dd><p>table layout ("autofit", "fixed")</p></dd>
+<dd><p><code>"autofit"</code> (default) lets the column widths adjust to the
+contents in Word; <code>"fixed"</code> keeps the widths as set (see
+<code><a href="https://davidgohel.github.io/flextable/reference/set_table_properties.html" class="external-link">flextable::set_table_properties()</a></code>)</p></dd>
 
 
 <dt id="arg-table-width">table_width<a class="anchor" aria-label="anchor" href="#arg-table-width"></a></dt>
@@ -212,23 +229,26 @@ warning to write it as <code>c(inches = )</code>.</p></dd>
 
 
 <dt id="arg-markdown">markdown<a class="anchor" aria-label="anchor" href="#arg-markdown"></a></dt>
-<dd><p>apply markdown formatting to header and body</p></dd>
+<dd><p>if <code>TRUE</code> (default), text in the header and body is
+converted from markdown (e.g., <code>*p*</code> becomes an italic <em>p</em>)</p></dd>
 
 
-<dt id="arg-markdown-header">markdown_header<a class="anchor" aria-label="anchor" href="#arg-markdown-header"></a></dt>
-<dd><p>apply markdown formatting to header</p></dd>
-
-
-<dt id="arg-markdown-body">markdown_body<a class="anchor" aria-label="anchor" href="#arg-markdown-body"></a></dt>
-<dd><p>apply markdown formatting to body</p></dd>
+<dt id="arg-markdown-header-markdown-body">markdown_header, markdown_body<a class="anchor" aria-label="anchor" href="#arg-markdown-header-markdown-body"></a></dt>
+<dd><p>whether the header or the body is
+converted from markdown (both default to <code>markdown</code>)</p></dd>
 
 
 <dt id="arg-no-markdown-columns">no_markdown_columns<a class="anchor" aria-label="anchor" href="#arg-no-markdown-columns"></a></dt>
-<dd><p>body columns that should not be treated as markdown</p></dd>
+<dd><p>body columns whose text is shown as it is, not
+converted from markdown (unquoted or quoted names, or tidyselect helpers)</p></dd>
 
 
 <dt id="arg-no-markdown-columns-header">no_markdown_columns_header<a class="anchor" aria-label="anchor" href="#arg-no-markdown-columns-header"></a></dt>
-<dd><p>column headers that should not be treated as markdown</p></dd>
+<dd><p>column headers that are not treated as
+markdown. If <code>NULL</code> (default), every header is treated as markdown. (In
+<code><a href="apa_style.html">apa_style()</a></code>, the default is <code>no_markdown_columns</code>. Here it differs
+because numeric columns are added to <code>no_markdown_columns</code>, and their
+headers still need markdown.)</p></dd>
 
 
 <dt id="arg-no-format-columns">no_format_columns<a class="anchor" aria-label="anchor" href="#arg-no-format-columns"></a></dt>
@@ -236,19 +256,25 @@ warning to write it as <code>c(inches = )</code>.</p></dd>
 
 
 <dt id="arg-auto-format-columns">auto_format_columns<a class="anchor" aria-label="anchor" href="#arg-auto-format-columns"></a></dt>
-<dd><p>if true, will attempt to format some columns automatically</p></dd>
+<dd><p>if <code>TRUE</code> (default), columns whose names have a
+format in <code>column_formats</code> (e.g., <code>p</code>, <code>SE</code>, or <code>R2</code>) are formatted and
+given APA headers with <code><a href="apa_format_columns.html">apa_format_columns()</a></code></p></dd>
 
 
 <dt id="arg-column-formats">column_formats<a class="anchor" aria-label="anchor" href="#arg-column-formats"></a></dt>
-<dd><p>a column_formats object</p></dd>
+<dd><p>a <code><a href="column_formats.html">column_formats()</a></code> object. If <code>NULL</code> (default), the
+column formats set with <code><a href="apa7_defaults.html">apa7_defaults()</a></code>.</p></dd>
 
 
 <dt id="arg-pretty-widths">pretty_widths<a class="anchor" aria-label="anchor" href="#arg-pretty-widths"></a></dt>
-<dd><p>apply <code>pretty_widths</code> function</p></dd>
+<dd><p>if <code>TRUE</code> (default), column widths are fitted to the
+contents and to <code>table_width</code> with <code><a href="pretty_widths.html">pretty_widths()</a></code></p></dd>
 
 
 <dt id="arg-add-breaks-between-spanners">add_breaks_between_spanners<a class="anchor" aria-label="anchor" href="#arg-add-breaks-between-spanners"></a></dt>
-<dd><p>add breaks between spanners if TRUE</p></dd>
+<dd><p>if <code>TRUE</code> (default), a narrow empty
+column separates adjacent column spanners (see <code>separate_headers</code>), so
+that their rules do not touch</p></dd>
 
 
 <dt id="arg-note">note<a class="anchor" aria-label="anchor" href="#arg-note"></a></dt>
@@ -256,7 +282,8 @@ warning to write it as <code>c(inches = )</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>arguments passed to <code>apa_style</code></p></dd>
+<dd><p>passed to <code><a href="apa_style.html">apa_style()</a></code>. Every argument of <code><a href="apa_style.html">apa_style()</a></code> is also
+an argument of <code>apa_flextable()</code>, so this is rarely needed.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -276,27 +303,15 @@ warning to write it as <code>c(inches = )</code>.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     filter, lag</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/flextable-book/" class="external-link">flextable</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">vs</span>, <span class="va">am</span>, <span class="va">gear</span>, <span class="va">carb</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">vs</span>,  names_to <span class="op">=</span> <span class="st">"Variable"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>Mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   SD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Variable</span>,<span class="va">vs</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>vs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vs</span>, levels <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Automatic"</span>, <span class="st">"Manual"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">apa_flextable</span><span class="op">(</span>row_title_column<span class="op">=</span> <span class="va">vs</span>,  row_title_align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/align.html" class="external-link">align</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span></span></span>
-<style></style><div class="tabwid"><style>.cl-d8bad469{}.cl-fd7caf76{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-f148d26d{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7a9068f9{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-8dbfbcff{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-2ecfc044{width:2.821in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e394e442{width:2.021in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc7d142c{width:1.659in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-15cc1680{width:2.821in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e154610f{width:2.021in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1b4d3780{width:1.659in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c43e7c76{width:2.821in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cb1ffc1d{width:2.821in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(51, 51, 51, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6c7b976b{width:2.021in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(51, 51, 51, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-51c6443d{width:1.659in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(51, 51, 51, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2a2a14eb{width:2.821in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(51, 51, 51, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b41dd69c{width:2.021in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(51, 51, 51, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-44ff72a7{width:1.659in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(51, 51, 51, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-32fff860{width:2.821in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3a239cc8{width:2.021in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-281633cc{width:1.659in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="table cl-d8bad469"><thead><tr style="overflow-wrap:break-word;"><th class="cl-2ecfc044"><p class="cl-7a9068f9"><span class="cl-fd7caf76">Variable</span></p></th><th class="cl-e394e442"><p class="cl-7a9068f9"><span class="cl-f148d26d">Mean</span></p></th><th class="cl-cc7d142c"><p class="cl-7a9068f9"><span class="cl-f148d26d">SD</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-15cc1680"><p class="cl-7a9068f9"><span class="cl-fd7caf76">Automatic</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c43e7c76"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Am</span></p></td><td class="cl-e154610f"><p class="cl-7a9068f9"><span class="cl-fd7caf76">0.33</span></p></td><td class="cl-1b4d3780"><p class="cl-7a9068f9"><span class="cl-fd7caf76">0.49</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c43e7c76"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Gear</span></p></td><td class="cl-e154610f"><p class="cl-7a9068f9"><span class="cl-fd7caf76">3.56</span></p></td><td class="cl-1b4d3780"><p class="cl-7a9068f9"><span class="cl-fd7caf76">0.86</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cb1ffc1d"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Carb</span></p></td><td class="cl-6c7b976b"><p class="cl-7a9068f9"><span class="cl-fd7caf76">3.61</span></p></td><td class="cl-51c6443d"><p class="cl-7a9068f9"><span class="cl-fd7caf76">1.54</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-2a2a14eb"><p class="cl-7a9068f9"><span class="cl-fd7caf76">Manual</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c43e7c76"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Am</span></p></td><td class="cl-e154610f"><p class="cl-7a9068f9"><span class="cl-fd7caf76">0.50</span></p></td><td class="cl-1b4d3780"><p class="cl-7a9068f9"><span class="cl-fd7caf76">0.52</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-c43e7c76"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Gear</span></p></td><td class="cl-e154610f"><p class="cl-7a9068f9"><span class="cl-fd7caf76">3.86</span></p></td><td class="cl-1b4d3780"><p class="cl-7a9068f9"><span class="cl-fd7caf76">0.53</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-32fff860"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Carb</span></p></td><td class="cl-3a239cc8"><p class="cl-7a9068f9"><span class="cl-fd7caf76">1.79</span></p></td><td class="cl-281633cc"><p class="cl-7a9068f9"><span class="cl-fd7caf76">1.05</span></p></td></tr></tbody></table></div><span class="r-in"><span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Means and SDs, with a heading row for each transmission type</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">mtcars</span></span></span>
+<span class="r-in"><span><span class="va">d</span><span class="op">$</span><span class="va">am</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">am</span>, levels <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Automatic"</span>, <span class="st">"Manual"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"am"</span>, <span class="st">"mpg"</span>, <span class="st">"hp"</span>, <span class="st">"wt"</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">am</span>, names_to <span class="op">=</span> <span class="st">"Variable"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>Mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>, SD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">am</span>, <span class="va">Variable</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">am</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">apa_flextable</span><span class="op">(</span>row_title_column <span class="op">=</span> <span class="va">am</span>, row_title_align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span></span></span>
+<style></style><div class="tabwid"><style>.cl-d8bad469{}.cl-fd7caf76{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-f148d26d{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:italic;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7a9068f9{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-8dbfbcff{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:3pt;padding-right:3pt;line-height: 1.15;background-color:transparent;}.cl-45e32d07{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:60.1pt;padding-right:57.1pt;line-height: 1.15;background-color:transparent;}.cl-dfedf37f{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:8pt;padding-top:8pt;padding-left:51.9pt;padding-right:48.9pt;line-height: 1.15;background-color:transparent;}.cl-421a1a9d{width:2.558in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-76e4e006{width:2.127in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e169e5ca{width:1.816in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-89f9387b{width:2.558in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8ce250dc{width:2.127in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e11f10e9{width:1.816in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-61f27041{width:2.558in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e70dd598{width:2.127in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-205f9145{width:1.816in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a97e4157{width:2.558in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(51, 51, 51, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6d6edc22{width:2.127in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(51, 51, 51, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7a246159{width:1.816in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(51, 51, 51, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-09686b73{width:2.558in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(51, 51, 51, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c47bae75{width:2.127in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(51, 51, 51, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5fe6f585{width:1.816in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(51, 51, 51, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52264a18{width:2.558in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-acf0b881{width:2.127in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3f9a815e{width:1.816in;background-color:transparent;vertical-align: top;border-bottom: 0.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="table cl-d8bad469"><thead><tr style="overflow-wrap:break-word;"><th class="cl-421a1a9d"><p class="cl-7a9068f9"><span class="cl-fd7caf76">Variable</span></p></th><th class="cl-76e4e006"><p class="cl-7a9068f9"><span class="cl-f148d26d">Mean</span></p></th><th class="cl-e169e5ca"><p class="cl-7a9068f9"><span class="cl-f148d26d">SD</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-89f9387b"><p class="cl-7a9068f9"><span class="cl-fd7caf76">Automatic</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-61f27041"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Mpg</span></p></td><td class="cl-e70dd598"><p class="cl-45e32d07"><span class="cl-fd7caf76"> 17.15</span></p></td><td class="cl-205f9145"><p class="cl-dfedf37f"><span class="cl-fd7caf76"> 3.83</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-61f27041"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Hp</span></p></td><td class="cl-e70dd598"><p class="cl-45e32d07"><span class="cl-fd7caf76">160.26</span></p></td><td class="cl-205f9145"><p class="cl-dfedf37f"><span class="cl-fd7caf76">53.91</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a97e4157"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Wt</span></p></td><td class="cl-6d6edc22"><p class="cl-45e32d07"><span class="cl-fd7caf76">  3.77</span></p></td><td class="cl-7a246159"><p class="cl-dfedf37f"><span class="cl-fd7caf76"> 0.78</span></p></td></tr><tr style="overflow-wrap:break-word;"><td colspan="3" class="cl-09686b73"><p class="cl-7a9068f9"><span class="cl-fd7caf76">Manual</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-61f27041"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Mpg</span></p></td><td class="cl-e70dd598"><p class="cl-45e32d07"><span class="cl-fd7caf76"> 24.39</span></p></td><td class="cl-205f9145"><p class="cl-dfedf37f"><span class="cl-fd7caf76"> 6.17</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-61f27041"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Hp</span></p></td><td class="cl-e70dd598"><p class="cl-45e32d07"><span class="cl-fd7caf76">126.85</span></p></td><td class="cl-205f9145"><p class="cl-dfedf37f"><span class="cl-fd7caf76">84.06</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-52264a18"><p class="cl-8dbfbcff"><span class="cl-fd7caf76">Wt</span></p></td><td class="cl-acf0b881"><p class="cl-45e32d07"><span class="cl-fd7caf76">  2.41</span></p></td><td class="cl-3f9a815e"><p class="cl-dfedf37f"><span class="cl-fd7caf76"> 0.62</span></p></td></tr></tbody></table></div><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Widths for a landscape page, one column of a two-column page, and 10 cm</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">apa_flextable</span><span class="op">(</span><span class="fu"><a href="apa_parameters.html">apa_parameters</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, table_width <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span></span></span>

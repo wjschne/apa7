@@ -10,11 +10,14 @@ library(psych)
 apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
-Two functions make APA-style tables from exploratory factor analyses and
-principal components analyses run with the
+Three functions make APA-style tables for exploratory factor analyses
+and principal components analyses run with the
 [psych](https://personality-project.org/r/psych/) package ([Revelle,
 2026](#ref-revellePsychProceduresPsychological2026)):
 
+- `apa_n_factors` makes a table of how many factors each of several
+  methods suggests retaining, from
+  [`parameters::n_factors`](https://easystats.github.io/parameters/reference/n_factors.html).
 - `apa_loadings` makes a table of factor loadings, with optional columns
   for communalities, uniquenesses, and complexity, and optional rows for
   variance explained.
@@ -70,6 +73,88 @@ d_bfi <- bfi |>
   rename(all_of(item_text))
 ```
 
+## How Many Factors?
+
+Before the loadings, papers usually report how the number of factors was
+chosen.
+[`parameters::n_factors`](https://easystats.github.io/parameters/reference/n_factors.html)
+applies many methods at once (e.g., parallel analysis, Velicer’s minimum
+average partial test, and the Kaiser criterion), and `apa_n_factors`
+makes a table of the number of factors each suggests. It can run
+[`parameters::n_factors`](https://easystats.github.io/parameters/reference/n_factors.html)
+itself, with any of its arguments, or format its output. Parallel
+analysis uses random data, so set a seed to get the same results each
+time:
+
+``` r
+
+set.seed(1)
+nf_bfi <- parameters::n_factors(na.omit(d_bfi))
+apa_n_factors(nf_bfi)
+```
+
+| Method                                  | Factors |
+|-----------------------------------------|---------|
+| Acceleration factor                     | 1       |
+| Cattell–Nelson–Gorsuch (CNG)            | 3       |
+| Multiple regression (β)                 | 4       |
+| Very simple structure (complexity 1)    | 4       |
+| Very simple structure (complexity 2)    | 5       |
+| Velicer’s minimum average partial (MAP) | 5       |
+| Optimal coordinates                     | 6       |
+| Parallel analysis                       | 6       |
+| Kaiser criterion (eigenvalues \> 1)     | 6       |
+| Multiple regression (t)                 | 7       |
+| Multiple regression (p)                 | 7       |
+| Standard error scree (R2)               | 7       |
+| Standard error scree (SE)               | 8       |
+| BIC                                     | 8       |
+| Sample-size adjusted BIC                | 11      |
+| Bentler’s test                          | 22      |
+| Bartlett’s test                         | 24      |
+| Anderson’s test                         | 24      |
+| Lawley’s test                           | 24      |
+
+Table 1
+
+Number of Factors Suggested by Each Method
+
+The numbers of factors supported by the most methods are bolded, and the
+note names them. The methods often disagree, as they do here, and they
+are not equally good: parallel analysis and Velicer’s MAP test are
+generally recommended, while the Kaiser criterion and the chi-square
+tests (Bartlett’s, Anderson’s, and Lawley’s) tend to suggest too many
+factors. The theory behind the items matters too. The bfi items were
+written to measure five traits. Velicer’s MAP test suggests five factors
+and parallel analysis six, so the five-factor solution below is a
+reasonable choice, though a six-factor solution would be worth a look.
+
+With `table = "agreement"`, there is a row for each suggested number of
+factors, with the number of methods that suggest it and the cumulative
+proportion of variance explained by that many factors:
+
+``` r
+
+apa_n_factors(nf_bfi, table = "agreement")
+```
+
+| Factors | Methods | Cumulative variance |
+|---------|---------|---------------------|
+| 1       | 1       | .19                 |
+| 3       | 1       | .35                 |
+| 4       | 2       | .41                 |
+| 5       | 2       | .45                 |
+| 6       | 3       | .48                 |
+| 7       | 3       | .49                 |
+| 8       | 2       | .51                 |
+| 11      | 1       | .53                 |
+| 22      | 1       | .57                 |
+| 24      | 3       | .57                 |
+
+Table 2
+
+Agreement Among Methods for the Number of Factors
+
 ## Factor Loadings
 
 ### A basic table
@@ -99,7 +184,7 @@ keeps them as they are.
 apa_loadings(fit_bfi, format_variable_names = FALSE)
 ```
 
-| Variable                                 | PA2  | PA5  | PA1  | PA4  | PA3  |
+| Variable                                 | PA5  | PA2  | PA3  | PA4  | PA1  |
 |------------------------------------------|------|------|------|------|------|
 | Get angry easily                         |  .81 |      |      |      |      |
 | Get irritated easily                     |  .78 |      |      |      |      |
@@ -127,7 +212,7 @@ apa_loadings(fit_bfi, format_variable_names = FALSE)
 | Avoid difficult reading material         |      |      |      |      | −.46 |
 | Spend time reflecting on things          |      | −.32 |      |      |  .37 |
 
-Table 1
+Table 3
 
 Factor Loadings of Big Five Personality Items
 
@@ -180,7 +265,7 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 2
+Table 4
 
 Factor Loadings of Big Five Personality Items
 
@@ -234,7 +319,7 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 3
+Table 5
 
 Factor Loadings of .30 or Higher
 
@@ -285,7 +370,7 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 4
+Table 6
 
 Factor Loadings With Primary Loadings in Bold
 
@@ -342,7 +427,7 @@ apa_loadings(fit_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 | .26 | 1.75 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 | .25 | 2.69 |
 
-Table 5
+Table 7
 
 Factor Loadings, Communalities, and Complexity
 
@@ -393,7 +478,7 @@ apa_loadings(fit_bfi,
 | Proportion of variance | .10 | .09 | .08 | .08 | .06 |
 | Cumulative proportion | .10 | .19 | .27 | .35 | .41 |
 
-Table 6
+Table 8
 
 Factor Loadings and Variance Explained
 
@@ -423,7 +508,7 @@ apa_factor_cor(fit_bfi, factor_names = big5)
 | 4. Agreeableness     | −.04 |  .33 |  .20 | —    |     |
 | 5. Openness          | −.01 |  .17 |  .19 |  .19 | —   |
 
-Table 7
+Table 9
 
 Correlations Among Big Five Factors
 
@@ -487,7 +572,7 @@ apa_loadings(fit_pca,
 | Proportion of variance | .13 | .12 | .10 | .09 | .08 |
 | Cumulative proportion | .13 | .25 | .35 | .45 | .53 |
 
-Table 8
+Table 10
 
 Varimax-Rotated Principal Components of Big Five Personality Items
 
@@ -540,7 +625,7 @@ apa_loadings(efa_bfi,
 | Avoid difficult reading material |  |  |  |  | −.46 |
 | Spend time reflecting on things |  | −.32 |  |  |  .37 |
 
-Table 9
+Table 11
 
 Factor Loadings From parameters::factor_analysis
 
@@ -557,7 +642,7 @@ apa_factor_cor(efa_bfi, factor_names = big5)
 | 4. Agreeableness     | −.04 |  .33 |  .20 | —    |     |
 | 5. Openness          | −.01 |  .17 |  .19 |  .19 | —   |
 
-Table 10
+Table 12
 
 Factor Correlations From parameters::factor_analysis
 
@@ -609,7 +694,7 @@ parameters::principal_components(d_bfi, n = 5) |>
 | Proportion of variance                   | .21  | .11  | .09  | .07  | .06  |
 | Cumulative proportion                    | .21  | .32  | .40  | .48  | .54  |
 
-Table 11
+Table 13
 
 Unrotated Principal Components From parameters::principal_components
 
@@ -664,7 +749,7 @@ apa_loadings(fit_harman,
 | Number Figure            |        |  .31    |  .34  | .45    | .41 |
 | Figure Word              |        |         |       | .35    | .23 |
 
-Table 12
+Table 14
 
 Factor Loadings of 24 Ability Tests
 
@@ -756,7 +841,7 @@ tbl_bfi
 | Proportion of variance | .10 | .09 | .08 | .08 | .06 |  |
 | Cumulative proportion | .10 | .19 | .27 | .35 | .41 |  |
 
-Table 13
+Table 15
 
 Factor Loadings of Big Five Personality Items
 
@@ -829,7 +914,7 @@ apa_loadings(fit_harman,
 | Number Figure            |        |  .31    |  .34  | .45    |
 | Figure Word              |        |         |       | .35    |
 
-Table 14
+Table 16
 
 Factor Loadings of 24 Ability Tests
 
@@ -890,7 +975,7 @@ apa_loadings(fit_bfi,
 | Proportion of variance | .10 | .09 | .08 | .08 | .06 |
 | Cumulative proportion | .10 | .19 | .27 | .35 | .41 |
 
-Table 15
+Table 17
 
 Factor Loadings and Variance Explained
 

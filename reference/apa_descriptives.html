@@ -129,7 +129,10 @@ names.</p></dd>
 
 <dt id="arg-test">test<a class="anchor" aria-label="anchor" href="#arg-test"></a></dt>
 <dd><p>if <code>TRUE</code>, a column of <em>p</em>-values tests the differences
-between groups (requires <code>by</code>)</p></dd>
+between groups (requires <code>by</code>). Unlike the <code>test</code> argument of
+<code><a href="apa_chisq.html">apa_chisq()</a></code> and <code><a href="apa_htest.html">apa_htest()</a></code>, which names a test, this one is <code>TRUE</code>
+or <code>FALSE</code>; the test of categorical variables is chosen with
+<code>categorical_test</code>.</p></dd>
 
 
 <dt id="arg-categorical-test">categorical_test<a class="anchor" aria-label="anchor" href="#arg-categorical-test"></a></dt>
@@ -152,7 +155,8 @@ added below each continuous variable</p></dd>
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
 <dd><p>number of decimal places of means, standard deviations,
-medians, interquartile ranges, and ranges</p></dd>
+medians, interquartile ranges, and ranges (unaffected by
+<code>apa7_defaults(accuracy = )</code>)</p></dd>
 
 
 <dt id="arg-percent-digits">percent_digits<a class="anchor" aria-label="anchor" href="#arg-percent-digits"></a></dt>

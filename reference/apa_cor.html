@@ -59,7 +59,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_cor</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
 <span>  note <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  p_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span><span class="op">)</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span><span class="op">)</span>,</span>
 <span>  digits <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  bold_significant <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  star_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -78,7 +78,8 @@
 <span>  method <span class="op">=</span> <span class="st">"pearson"</span>,</span>
 <span>  p_adjust <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  partial <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  <span class="va">p_value</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -92,35 +93,47 @@ output of <code><a href="https://easystats.github.io/correlation/reference/corre
 
 
 <dt id="arg-note">note<a class="anchor" aria-label="anchor" href="#arg-note"></a></dt>
-<dd><p>Custom note to appear below table. (Overrides automatic note.)</p></dd>
+<dd><p>note placed below the table, replacing the automatic note
+(for <code>output = "flextable"</code>)</p></dd>
 
 
-<dt id="arg-p-value">p_value<a class="anchor" aria-label="anchor" href="#arg-p-value"></a></dt>
-<dd><p>p-value needed to be flagged as significant</p></dd>
+<dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
+<dd><p><em>p</em>-value thresholds for significance stars, from largest to
+smallest (default: <code>c(.05, .01, .001)</code>, for one, two, and three stars).
+With <code>bold_significant = TRUE</code>, only the first is used.</p></dd>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
-<dd><p>Number of digits for rounding</p></dd>
+<dd><p>number of decimal places of the correlations (unaffected by
+<code>apa7_defaults(accuracy = )</code>)</p></dd>
 
 
 <dt id="arg-bold-significant">bold_significant<a class="anchor" aria-label="anchor" href="#arg-bold-significant"></a></dt>
-<dd><p>bold significant correlations</p></dd>
+<dd><p>if <code>TRUE</code>, correlations with <em>p</em> below the first
+<code>alpha</code> are bolded instead of starred. If <code>FALSE</code> (default), they are not.</p></dd>
 
 
 <dt id="arg-star-significant">star_significant<a class="anchor" aria-label="anchor" href="#arg-star-significant"></a></dt>
-<dd><p>start significant correlations</p></dd>
+<dd><p>if <code>TRUE</code> (default), significant correlations get
+stars (one for each <code>alpha</code> they are below). Ignored when
+<code>bold_significant = TRUE</code>. Model tables such as <code><a href="apa_parameters.html">apa_parameters()</a></code> do the
+same with their <code>starred</code> and <code>bolded</code> arguments.</p></dd>
 
 
 <dt id="arg-significance-note">significance_note<a class="anchor" aria-label="anchor" href="#arg-significance-note"></a></dt>
-<dd><p>If TRUE, place note at bottom of table that significant correlations are bolded.</p></dd>
+<dd><p>if <code>TRUE</code> (default), the note explains the stars
+(or the bolding) when any correlation is significant</p></dd>
 
 
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
-<dd><p>output type. Can be "flextable" or "tibble"</p></dd>
+<dd><p><code>"flextable"</code> (default) for a formatted table, or <code>"tibble"</code>
+for a tibble of the formatted values (without a note)</p></dd>
 
 
 <dt id="arg-font-family">font_family<a class="anchor" aria-label="anchor" href="#arg-font-family"></a></dt>
-<dd><p>font family</p></dd>
+<dd><p>font family (e.g., <code>"Times New Roman"</code> or <code>"Arial"</code>). If
+<code>NULL</code> (default), the font set with <code>apa7_defaults(font_family = )</code>
+(Times New Roman unless changed).</p></dd>
 
 
 <dt id="arg-font-size">font_size<a class="anchor" aria-label="anchor" href="#arg-font-size"></a></dt>
@@ -129,15 +142,16 @@ with <code>apa7_defaults(font_size = )</code> (12 unless changed).</p></dd>
 
 
 <dt id="arg-text-color">text_color<a class="anchor" aria-label="anchor" href="#arg-text-color"></a></dt>
-<dd><p>text color</p></dd>
+<dd><p>color of the text: an R color name (e.g., <code>"black"</code>, the
+default) or a hex code (e.g., <code>"#333333"</code>)</p></dd>
 
 
 <dt id="arg-border-color">border_color<a class="anchor" aria-label="anchor" href="#arg-border-color"></a></dt>
-<dd><p>border color</p></dd>
+<dd><p>color of the rules, in the same forms as <code>text_color</code></p></dd>
 
 
 <dt id="arg-border-width">border_width<a class="anchor" aria-label="anchor" href="#arg-border-width"></a></dt>
-<dd><p>border width in pixels</p></dd>
+<dd><p>width of the rules, in points (default: 0.5)</p></dd>
 
 
 <dt id="arg-line-spacing">line_spacing<a class="anchor" aria-label="anchor" href="#arg-line-spacing"></a></dt>
@@ -168,7 +182,10 @@ warning to write it as <code>c(inches = )</code>.</p></dd>
 
 
 <dt id="arg-keep-empty-star-columns">keep_empty_star_columns<a class="anchor" aria-label="anchor" href="#arg-keep-empty-star-columns"></a></dt>
-<dd><p>Keep remove empty star columns (Default: <code>TRUE</code>)</p></dd>
+<dd><p>if <code>TRUE</code> (default), every correlation
+column keeps its star column, even when no correlation in it is
+significant, so that the columns have the same width. If <code>FALSE</code>, empty
+star columns are removed.</p></dd>
 
 
 <dt id="arg-summary-functions">summary_functions<a class="anchor" aria-label="anchor" href="#arg-summary-functions"></a></dt>
@@ -176,7 +193,7 @@ warning to write it as <code>c(inches = )</code>.</p></dd>
 
 
 <dt id="arg-column-formats">column_formats<a class="anchor" aria-label="anchor" href="#arg-column-formats"></a></dt>
-<dd><p>column_formats object</p></dd>
+<dd><p><code><a href="column_formats.html">column_formats()</a></code> object. If <code>NULL</code> (default), the default column formats are used.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -203,6 +220,10 @@ output.</p></dd>
 <dd><p>other arguments passed to <code><a href="https://easystats.github.io/correlation/reference/correlation.html" class="external-link">correlation::correlation()</a></code> (e.g.,
 <code>robust = TRUE</code>, <code>winsorize = .2</code>, or <code>multilevel = TRUE</code>). Not used for
 <code><a href="https://easystats.github.io/correlation/reference/correlation.html" class="external-link">correlation::correlation()</a></code> output.</p></dd>
+
+
+<dt id="arg-p-value">p_value<a class="anchor" aria-label="anchor" href="#arg-p-value"></a></dt>
+<dd><p>deprecated; use <code>alpha</code></p></dd>
 
 </dl></div>
     <div class="section level2">

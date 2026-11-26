@@ -14,13 +14,29 @@ apa_note(x, collapse = " ", citations = NULL)
 
 - x:
 
-  a table made by
+  a table made by an apa7 table function:
   [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md),
-  [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),
   [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md),
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  (for `lavaan` and `metafor` models),
+  [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md),
+  [`apa_chisq()`](https://wjschne.github.io/apa7/reference/apa_chisq.md),
+  [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md),
+  [`apa_means()`](https://wjschne.github.io/apa7/reference/apa_means.md),
+  [`apa_contrasts()`](https://wjschne.github.io/apa7/reference/apa_means.md),
+  [`apa_slopes()`](https://wjschne.github.io/apa7/reference/apa_means.md),
   [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md),
+  [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md),
+  [`apa_n_factors()`](https://wjschne.github.io/apa7/reference/apa_n_factors.md),
+  [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md),
+  [`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md),
+  [`apa_publication_bias()`](https://wjschne.github.io/apa7/reference/apa_publication_bias.md),
   or
-  [`apa_factor_cor()`](https://wjschne.github.io/apa7/reference/apa_factor_cor.md)
+  [`apa_subgroups()`](https://wjschne.github.io/apa7/reference/apa_subgroups.md).
+  Call `apa_note()` before changing the table, because some operations
+  (e.g.,
+  [`dplyr::bind_rows()`](https://dplyr.tidyverse.org/reference/bind_rows.html))
+  drop the information it needs.
 
 - collapse:
 
@@ -191,13 +207,10 @@ cached chunks, chunk options can be evaluated before
     ```
 
 The information is stored in an `"apa_note"` attribute of the table.
-dplyr functions such as
-[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) and
-[`filter()`](https://dplyr.tidyverse.org/reference/filter.html) keep it,
-but some operations (e.g.,
-[`bind_rows()`](https://dplyr.tidyverse.org/reference/bind_rows.html)
-and joins) drop it, so call `apa_note()` on the table that the table
-function returned.
+dplyr functions such as `mutate()` and
+[`filter()`](https://rdrr.io/r/stats/filter.html) keep it, but some
+operations (e.g., `bind_rows()` and joins) drop it, so call `apa_note()`
+on the table that the table function returned.
 
 ## Examples
 
@@ -210,16 +223,11 @@ tbl <- apa_anova(fit, starred = "F")
 apa_note(tbl)
 #> [1] "Sums of squares are sequential (Type I). *&eta;*^2^~p~ = partial eta squared. ^\\* ^*p* < .05. ^\\*\\* ^*p* < .01. ^\\*\\*\\* ^*p* < .001."
 
-if (requireNamespace("afex", quietly = TRUE)) {
-  data(obk.long, package = "afex")
-  fit_afex <- afex::aov_ez(
-    "id", "value", obk.long,
-    between = "treatment", within = "phase", fun_aggregate = mean
-  )
-  apa_note(apa_anova(fit_afex))
-}
-#> Contrasts set to contr.sum for the following variables: treatment
-#> [1] "Type III sums of squares. Degrees of freedom and *p*-values for effects involving Phase are Greenhouse–Geisser corrected (Greenhouse & Geisser, 1959). *MSE* = mean square error; *&eta;*^2^~G~ = generalized eta squared (Olejnik & Algina, 2003)."
+# Descriptive statistics with tests of group differences
+d$Transmission <- factor(d$am, labels = c("Automatic", "Manual"))
+apa_descriptives(d, variables = c(mpg, hp), by = Transmission, test = TRUE) |>
+  apa_note()
+#> [1] "Values are *M* (*SD*) for continuous variables. *p*-values are from Welch's *t* tests (continuous variables) comparing the groups of Transmission."
 
 # Factor analysis
 fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")

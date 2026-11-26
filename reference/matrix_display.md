@@ -16,7 +16,9 @@ matrix_display(x, bracket = c("[", "(", "|", ""), include_names = TRUE)
 
 - bracket:
 
-  type of bracket: bmatrix, Bmatrix, pmatrix, vmatrix, Vmatrix, , matrix
+  bracket around the matrix: `"["` (default) for square brackets, `"("`
+  for parentheses, `"|"` for vertical bars (as for a determinant), or
+  `""` for none
 
 - include_names:
 

@@ -26,12 +26,13 @@ header_md(x, level = 1)
 
 - tag:
 
-  opening tag, e.g., `<span>`
+  opening tag, e.g., `<span>` or `**`
 
 - right_tag:
 
-  closing tag, e.g., `</span>`. Defaults to the same value as the
-  opening tag.
+  closing tag. By default, the opening tag with `<` replaced by `</`
+  (e.g., `<span>` becomes `</span>`), so markdown tags such as `**`
+  close with themselves.
 
 - level:
 

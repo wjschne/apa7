@@ -5,6 +5,29 @@ format model parameters in APA style
 ## Usage
 
 ``` r
+apa_parameters(
+  fit,
+  predictor_parameters = c("Coefficient", "SE", "Std_Coefficient", "t", "df_error", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  ...
+)
+
+# S3 method for class 'glm'
+apa_parameters(
+  fit,
+  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "t", "z",
+    "df_error", "p"),
+  starred = NA,
+  bolded = NA,
+  column_formats = NULL,
+  t_with_df = TRUE,
+  exponentiate = NULL,
+  ...
+)
+
 # S3 method for class 'aov'
 apa_parameters(
   fit,
@@ -135,16 +158,6 @@ apa_parameters(
   ...
 )
 
-apa_parameters(
-  fit,
-  predictor_parameters = c("Coefficient", "SE", "Std_Coefficient", "t", "df_error", "p"),
-  starred = NULL,
-  bolded = NULL,
-  column_formats = NULL,
-  t_with_df = TRUE,
-  ...
-)
-
 # S3 method for class 'lm'
 apa_parameters(
   fit,
@@ -154,19 +167,6 @@ apa_parameters(
   bolded = NA,
   column_formats = NULL,
   t_with_df = TRUE,
-  ...
-)
-
-# S3 method for class 'glm'
-apa_parameters(
-  fit,
-  predictor_parameters = c("Parameter", "Coefficient", "SE", "Exp_Coefficient", "t", "z",
-    "df_error", "p"),
-  starred = NA,
-  bolded = NA,
-  column_formats = NULL,
-  t_with_df = TRUE,
-  exponentiate = NULL,
   ...
 )
 
@@ -260,36 +260,64 @@ apa_parameters(
 
 - fit:
 
-  model fit object
+  a fitted model: `lm`, `glm` (including
+  [`MASS::glm.nb`](https://rdrr.io/pkg/MASS/man/glm.nb.html)), `aov`,
+  `aovlist`, `afex_aov`, ordinal
+  ([`MASS::polr`](https://rdrr.io/pkg/MASS/man/polr.html),
+  [`ordinal::clm`](https://rdrr.io/pkg/ordinal/man/clm.html)), mixed
+  ([`lme4::lmer`](https://rdrr.io/pkg/lme4/man/lmer.html),
+  [`lme4::glmer`](https://rdrr.io/pkg/lme4/man/glmer.html),
+  [`glmmTMB::glmmTMB`](https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html),
+  [`nlme::lme`](https://rdrr.io/pkg/nlme/man/lme.html)), generalized
+  additive ([`mgcv::gam`](https://rdrr.io/pkg/mgcv/man/gam.html),
+  [`mgcv::bam`](https://rdrr.io/pkg/mgcv/man/bam.html)), structural
+  equation (`lavaan`), meta-analysis
+  ([`metafor::rma`](https://wviechtb.github.io/metafor/reference/rma.uni.html)),
+  multinomial
+  ([`nnet::multinom`](https://rdrr.io/pkg/nnet/man/multinom.html)), or
+  zero-inflated and hurdle
+  ([`pscl::zeroinfl`](https://rdrr.io/pkg/pscl/man/zeroinfl.html),
+  [`pscl::hurdle`](https://rdrr.io/pkg/pscl/man/hurdle.html)) models, or
+  a named list of models of the same kind (see `performance_parameters`)
 
 - predictor_parameters:
 
-  predictor parameters to display. If named vector, column names will be
-  vector names. Columns not present in the model output (e.g., `t` for a
-  model tested with *z*) are silently dropped. For lists of models,
-  `NULL` (default) uses the default for each model's class. Add `"CI"`
-  to show confidence intervals as \[*LL*, *UL*\] (headed, e.g., "95%
-  CI"), and, for `glm`, `polr`, and `clm` models, `"Exp_CI"` to show
-  confidence intervals of exponentiated coefficients (headed, e.g., "95%
-  CI for *OR*"). Confidence intervals are not shown by default.
+  columns to display, in order, named as in
+  [`parameters::model_parameters()`](https://easystats.github.io/parameters/reference/model_parameters.html):
+  `"Parameter"`, `"Coefficient"`, `"SE"`, `"Std_Coefficient"`
+  (standardized coefficient, *β*), `"CI"`, `"t"`, `"z"`, `"df_error"`,
+  `"p"`, and, for models with a log or logit link, `"Exp_Coefficient"`
+  and `"Exp_CI"`. If named vector, column names will be vector names.
+  Columns not present in the model output (e.g., `t` for a model tested
+  with *z*) are silently dropped. For lists of models, `NULL` (default)
+  uses the default for each model's class. Add `"CI"` to show confidence
+  intervals as \[*LL*, *UL*\] (headed, e.g., "95% CI"), and, for `glm`,
+  `polr`, and `clm` models, `"Exp_CI"` to show confidence intervals of
+  exponentiated coefficients (headed, e.g., "95% CI for *OR*").
+  Confidence intervals are not shown by default.
 
 - starred:
 
-  columns to star with significant p_values
+  columns to which significance stars are added (e.g., `"Coefficient"`
+  or `"p"`). `NULL` or `NA` for none.
 
 - bolded:
 
-  columns to bold, if significant
+  columns whose values are bolded when *p* \\\le\\ .05 (e.g.,
+  `"Coefficient"`). `NULL` or `NA` (default) for none.
 
 - column_formats:
 
-  column_formats object to format columns. If NULL, the default
-  column_formats is used.
+  [`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md)
+  object to format columns. If `NULL` (default), the column formats set
+  with
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md).
 
 - t_with_df:
 
-  if TRUE, the t column will be displayed with degrees of freedom in
-  parentheses. If FALSE, only the t value is displayed.
+  if `TRUE` (default), the *t* column header includes the degrees of
+  freedom (e.g., *t*(29)), and the *df* column is dropped, when all rows
+  have the same *df*. If `FALSE`, *t* and *df* are separate columns.
 
 - ...:
 
@@ -324,7 +352,10 @@ apa_parameters(
 - variances, intercepts:
 
   for `lavaan` models, if `TRUE`, sections for (residual) variances or
-  intercepts are added. Both are `FALSE` by default.
+  intercepts are added. Both are `FALSE` by default. (The `variance`
+  argument of
+  [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+  is different: it adds rows for the variance explained by each factor.)
 
 - thresholds:
 
@@ -427,6 +458,17 @@ apa_parameters(
 tibble
 
 ## Details
+
+For `glm` objects (including
+[`MASS::glm.nb`](https://rdrr.io/pkg/MASS/man/glm.nb.html)), the test
+statistic is *z* for families with a fixed dispersion parameter
+(binomial, Poisson, negative binomial) and *t* for families with an
+estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi
+families). Whichever statistic applies is displayed. The exponentiated
+coefficient column (`Exp_Coefficient`) is labeled *OR* for logit links,
+*IRR* for log links in count models (Poisson, quasi-Poisson, negative
+binomial), *RR* for log links in binomial models, and Exp(*B*)
+otherwise.
 
 For `aov` models (including repeated-measures models with an `Error()`
 term) and `afex` models, `apa_parameters()` returns the ANOVA table from
@@ -547,17 +589,6 @@ count is greater than zero.
 says which, names the count distribution, and gives the negative
 binomial dispersion parameter (\\\theta\\).
 
-For `glm` objects (including
-[`MASS::glm.nb`](https://rdrr.io/pkg/MASS/man/glm.nb.html)), the test
-statistic is *z* for families with a fixed dispersion parameter
-(binomial, Poisson, negative binomial) and *t* for families with an
-estimated dispersion parameter (Gaussian, Gamma, inverse Gaussian, quasi
-families). Whichever statistic applies is displayed. The exponentiated
-coefficient column (`Exp_Coefficient`) is labeled *OR* for logit links,
-*IRR* for log links in count models (Poisson, quasi-Poisson, negative
-binomial), *RR* for log links in binomial models, and Exp(*B*)
-otherwise.
-
 For ordinal regression models
 ([`MASS::polr`](https://rdrr.io/pkg/MASS/man/polr.html) and
 [`ordinal::clm`](https://rdrr.io/pkg/ordinal/man/clm.html)),
@@ -625,111 +656,6 @@ three-level meta-analyses: A structural equation modeling approach.
 ## Examples
 
 ``` r
-# \donttest{
-if (requireNamespace("mgcv", quietly = TRUE)) {
-  mgcv::gam(mpg ~ am + s(hp, k = 5) + s(wt, k = 5), data = mtcars,
-            method = "REML") |>
-    apa_parameters()
-}
-#> # A tibble: 6 × 7
-#>   Variable         `*B*`   `*SE*` `*t*(25.43)` `*edf*` `*F*`  `*p*`  
-#>   <chr>            <chr>   <chr>  <chr>        <chr>   <chr>  <chr>  
-#> 1 Parametric terms ""      ""     ""           ""      ""     ""     
-#> 2  Constant        "19.86" "0.69" "28.67"      ""      ""     "<.001"
-#> 3  Am              " 0.57" "1.43" " 0.40"      ""      ""     " .70 "
-#> 4 Smooth terms     ""      ""     ""           ""      ""     ""     
-#> 5  s(Hp)           ""      ""     ""           "2.36"  "5.46" " .006"
-#> 6  s(Wt)           ""      ""     ""           "2.21"  "5.83" " .005"
-# }
-# \donttest{
-if (requireNamespace("lavaan", quietly = TRUE)) {
-  model <- "visual =~ x1 + x2 + x3
-            textual =~ x4 + x5 + x6
-            speed =~ x7 + x8 + x9
-            speed ~ visual + textual"
-  lavaan::sem(model, data = lavaan::HolzingerSwineford1939) |>
-    apa_parameters()
-
-  # Multiple groups, side by side
-  lavaan::cfa(
-    "visual =~ x1 + x2 + x3",
-    data = lavaan::HolzingerSwineford1939,
-    group = "school",
-    group.equal = "loadings"
-  ) |>
-    apa_parameters()
-}
-#> # A tibble: 4 × 7
-#>   Parameter   `Pasteur_&beta;` `Pasteur_*SE*` `Pasteur_*p*` `Grant-White_&beta;`
-#>   <chr>       <chr>            <chr>          <chr>         <chr>               
-#> 1 Factor loa… ""               ""             ""            ""                  
-#> 2  Visual → … ".61"            "0.07"         "<.001"       ".60"               
-#> 3  Visual → … ".48"            "0.07"         "<.001"       ".52"               
-#> 4  Visual → … ".72"            "0.08"         "<.001"       ".77"               
-#> # ℹ 2 more variables: `Grant-White_*SE*` <chr>, `Grant-White_*p*` <chr>
-# }
-# \donttest{
-if (requireNamespace("metafor", quietly = TRUE) &&
-    requireNamespace("metadat", quietly = TRUE)) {
-  d_bcg <- metafor::escalc(
-    measure = "RR",
-    ai = tpos, bi = tneg, ci = cpos, di = cneg,
-    data = metadat::dat.bcg,
-    slab = paste(author, year)
-  )
-  fit_meta <- metafor::rma(yi, vi, data = d_bcg)
-  apa_parameters(fit_meta)
-  apa_performance(fit_meta)
-
-  # Meta-regression
-  metafor::rma(yi, vi, mods = ~ ablat, data = d_bcg) |>
-    apa_parameters()
-}
-#> # A tibble: 2 × 7
-#>   Variable `*B*` `*SE*` `95% CI`       `*RR*` `*z*` `*p*`
-#>   <chr>    <chr> <chr>  <chr>          <chr>  <chr> <chr>
-#> 1 Constant  0.25 0.25   [−0.24,  0.74] 1.29    1.01  .31 
-#> 2 Ablat    −0.03 0.01   [−0.04, −0.01] 0.97   −4.04 <.001
-# }
-# \donttest{
-if (requireNamespace("nnet", quietly = TRUE) &&
-    requireNamespace("carData", quietly = TRUE)) {
-  d <- carData::Womenlf
-  d$partic <- relevel(d$partic, ref = "not.work")
-  nnet::multinom(partic ~ hincome + children, data = d, trace = FALSE) |>
-    apa_parameters()
-}
-#> # A tibble: 8 × 6
-#>   Variable              `*B*`   `*SE*` `*OR*` `*z*`   `*p*`  
-#>   <chr>                 <chr>   <chr>  <chr>  <chr>   <chr>  
-#> 1 fulltime vs. not.work ""      ""     ""     ""      ""     
-#> 2  Constant             " 1.98" "0.48" "7.26" " 4.10" "<.001"
-#> 3  Hincome              "−0.10" "0.03" "0.91" "−3.46" "<.001"
-#> 4  Children–Present     "−2.56" "0.36" "0.08" "−7.06" "<.001"
-#> 5 parttime vs. not.work ""      ""     ""     ""      ""     
-#> 6  Constant             "−1.43" "0.59" "0.24" "−2.42" " .02 "
-#> 7  Hincome              " 0.01" "0.02" "1.01" " 0.29" " .77 "
-#> 8  Children–Present     " 0.02" "0.47" "1.02" " 0.05" " .96 "
-# }
-# \donttest{
-if (requireNamespace("pscl", quietly = TRUE)) {
-  data("bioChemists", package = "pscl")
-  pscl::zeroinfl(art ~ fem + kid5 + ment | ment,
-                 data = bioChemists, dist = "negbin") |>
-    apa_parameters()
-}
-#> # A tibble: 8 × 6
-#>   Variable             `*B*`   `*SE*` `*IRR*` `*z*`   `*p*`  
-#>   <chr>                <chr>   <chr>  <chr>   <chr>   <chr>  
-#> 1 Count model          ""      ""     ""      ""      ""     
-#> 2  Constant            " 0.49" "0.07" "1.64"  " 6.92" "<.001"
-#> 3  Fem–Women           "−0.23" "0.07" "0.80"  "−3.18" " .002"
-#> 4  Kid 5               "−0.13" "0.05" "0.88"  "−2.73" " .006"
-#> 5  Ment                " 0.02" "0.00" "1.02"  " 7.04" "<.001"
-#> 6 Zero-inflation model ""      ""     ""      ""      ""     
-#> 7  Constant            "−0.79" "0.35" ""      "−2.27" " .02 "
-#> 8  Ment                "−0.62" "0.25" ""      "−2.49" " .01 "
-# }
 lm(mpg ~ cyl + wt, data = mtcars) |>
    apa_parameters() |>
    apa_flextable()

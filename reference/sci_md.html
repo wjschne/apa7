@@ -64,23 +64,19 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Numeric vector</p></dd>
+<dd><p>numeric vector</p></dd>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
-<dd><p>number of digits of precision</p></dd>
+<dd><p>number of decimal places (of the mantissa, for numbers in scientific notation)</p></dd>
 
 
-<dt id="arg-lb">lb<a class="anchor" aria-label="anchor" href="#arg-lb"></a></dt>
-<dd><p>lower bound where scientific notation is turned on</p></dd>
-
-
-<dt id="arg-ub">ub<a class="anchor" aria-label="anchor" href="#arg-ub"></a></dt>
-<dd><p>upper bound where scientific notation is turned on</p></dd>
+<dt id="arg-lb-ub">lb, ub<a class="anchor" aria-label="anchor" href="#arg-lb-ub"></a></dt>
+<dd><p>numbers at or below <code>lb</code> or at or above <code>ub</code> are written in scientific notation (e.g., 2.46 × 10^7^); numbers between them are written as usual</p></dd>
 
 
 <dt id="arg-align">align<a class="anchor" aria-label="anchor" href="#arg-align"></a></dt>
-<dd><p>decimal align</p></dd>
+<dd><p>if <code>TRUE</code>, the numbers are aligned on the decimal point with <code><a href="align_chr.html">align_chr()</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">

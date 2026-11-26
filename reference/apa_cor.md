@@ -8,7 +8,7 @@ APA-formatted correlation table
 apa_cor(
   data,
   note = NULL,
-  p_value = c(0.05, 0.01, 0.001),
+  alpha = c(0.05, 0.01, 0.001),
   digits = 2,
   bold_significant = FALSE,
   star_significant = TRUE,
@@ -27,7 +27,8 @@ apa_cor(
   method = "pearson",
   p_adjust = "none",
   partial = FALSE,
-  ...
+  ...,
+  p_value
 )
 ```
 
@@ -41,36 +42,48 @@ apa_cor(
 
 - note:
 
-  Custom note to appear below table. (Overrides automatic note.)
+  note placed below the table, replacing the automatic note (for
+  `output = "flextable"`)
 
-- p_value:
+- alpha:
 
-  p-value needed to be flagged as significant
+  *p*-value thresholds for significance stars, from largest to smallest
+  (default: `c(.05, .01, .001)`, for one, two, and three stars). With
+  `bold_significant = TRUE`, only the first is used.
 
 - digits:
 
-  Number of digits for rounding
+  number of decimal places of the correlations (unaffected by
+  `apa7_defaults(accuracy = )`)
 
 - bold_significant:
 
-  bold significant correlations
+  if `TRUE`, correlations with *p* below the first `alpha` are bolded
+  instead of starred. If `FALSE` (default), they are not.
 
 - star_significant:
 
-  start significant correlations
+  if `TRUE` (default), significant correlations get stars (one for each
+  `alpha` they are below). Ignored when `bold_significant = TRUE`. Model
+  tables such as
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  do the same with their `starred` and `bolded` arguments.
 
 - significance_note:
 
-  If TRUE, place note at bottom of table that significant correlations
-  are bolded.
+  if `TRUE` (default), the note explains the stars (or the bolding) when
+  any correlation is significant
 
 - output:
 
-  output type. Can be "flextable" or "tibble"
+  `"flextable"` (default) for a formatted table, or `"tibble"` for a
+  tibble of the formatted values (without a note)
 
 - font_family:
 
-  font family
+  font family (e.g., `"Times New Roman"` or `"Arial"`). If `NULL`
+  (default), the font set with `apa7_defaults(font_family = )` (Times
+  New Roman unless changed).
 
 - font_size:
 
@@ -79,15 +92,16 @@ apa_cor(
 
 - text_color:
 
-  text color
+  color of the text: an R color name (e.g., `"black"`, the default) or a
+  hex code (e.g., `"#333333"`)
 
 - border_color:
 
-  border color
+  color of the rules, in the same forms as `text_color`
 
 - border_width:
 
-  border width in pixels
+  width of the rules, in points (default: 0.5)
 
 - line_spacing:
 
@@ -122,7 +136,9 @@ apa_cor(
 
 - keep_empty_star_columns:
 
-  Keep remove empty star columns (Default: `TRUE`)
+  if `TRUE` (default), every correlation column keeps its star column,
+  even when no correlation in it is significant, so that the columns
+  have the same width. If `FALSE`, empty star columns are removed.
 
 - summary_functions:
 
@@ -135,7 +151,8 @@ apa_cor(
 
 - column_formats:
 
-  column_formats object
+  [`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md)
+  object. If `NULL` (default), the default column formats are used.
 
 - method:
 
@@ -170,6 +187,10 @@ apa_cor(
   used for
   [`correlation::correlation()`](https://easystats.github.io/correlation/reference/correlation.html)
   output.
+
+- p_value:
+
+  deprecated; use `alpha`
 
 ## Value
 

@@ -33,11 +33,14 @@ apa_style(
 
 - x:
 
-  object
+  a
+  [`flextable::flextable()`](https://davidgohel.github.io/flextable/reference/flextable.html)
 
 - font_family:
 
-  font family
+  font family (e.g., `"Times New Roman"` or `"Arial"`). If `NULL`
+  (default), the font set with `apa7_defaults(font_family = )` (Times
+  New Roman unless changed).
 
 - font_size:
 
@@ -46,15 +49,16 @@ apa_style(
 
 - text_color:
 
-  text color
+  color of the text: an R color name (e.g., `"black"`, the default) or a
+  hex code (e.g., `"#333333"`)
 
 - border_color:
 
-  border color
+  color of the rules, in the same forms as `text_color`
 
 - border_width:
 
-  border width in pixels
+  width of the rules, in points (default: 0.5)
 
 - line_spacing:
 
@@ -65,19 +69,24 @@ apa_style(
 
 - horizontal_padding:
 
-  horizontal padding (in pixels)
+  space to the left and right of each cell's contents, in points
+  (default: 3)
 
 - table_align:
 
-  table alignment ("left", "center", "right")
+  alignment of the table on the page: `"left"` (default), `"center"`, or
+  `"right"`
 
 - header_align_vertical:
 
-  vertical alignment of headers. Can be "top", "middle", or "bottom"
+  vertical alignment of header text when header cells differ in height:
+  `"top"` (default), `"middle"`, or `"bottom"`
 
 - layout:
 
-  table layout ("autofit", "fixed")
+  `"autofit"` (default) lets the column widths adjust to the contents in
+  Word; `"fixed"` keeps the widths as set (see
+  [`flextable::set_table_properties()`](https://davidgohel.github.io/flextable/reference/set_table_properties.html))
 
 - table_width:
 
@@ -105,31 +114,33 @@ apa_style(
 
 - markdown:
 
-  apply markdown formatting to header and body
+  if `TRUE` (default), text in the header and body is converted from
+  markdown (e.g., `*p*` becomes an italic *p*)
 
-- markdown_header:
+- markdown_header, markdown_body:
 
-  apply markdown formatting to header
-
-- markdown_body:
-
-  apply markdown formatting to body
+  whether the header or the body is converted from markdown (both
+  default to `markdown`)
 
 - no_markdown_columns:
 
-  body columns that should not be treated as markdown
+  body columns whose text is shown as it is, not converted from markdown
+  (unquoted or quoted names, or tidyselect helpers)
 
 - no_markdown_columns_header:
 
-  column headers that should not be treated as markdown
+  column headers that are not converted from markdown. By default, the
+  same columns as `no_markdown_columns`.
 
 - separate_headers:
 
-  separate headers into column spanner labels
+  if `TRUE` (default) and the table has one header row, column names
+  with an underscore are split into a column spanner and a header (e.g.,
+  `Model 1_B` becomes "B" under a "Model 1" spanner)
 
 ## Value
 
-object
+flextable::flextable
 
 ## Examples
 

@@ -54,7 +54,7 @@ apa_collinearity(
 
 - digits:
 
-  number of decimal places
+  number of decimal places (unaffected by `apa7_defaults(accuracy = )`)
 
 - ...:
 

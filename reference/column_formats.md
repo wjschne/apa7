@@ -24,25 +24,29 @@ column_formats(
 
 - accuracy:
 
-  numeric (passed to scales::number)
+  rounding accuracy of the formatters (e.g., `.01` for two decimals). If
+  `NULL` (default), the `accuracy` set with
+  [`apa7_defaults()`](https://wjschne.github.io/apa7/reference/apa7_defaults.md).
 
 - intercept_text:
 
-  describe intercept
+  label of the intercept row (e.g., `"Constant"` or `"Intercept"`)
 
 - starred_columns:
 
-  which columns get p-value stars
+  names of columns to which significance stars are added
 
 - variable_labels:
 
-  named vector of variable names (with vector names as labels). For
-  example, c(`Parental Income` = "parental_income", `Number of Siblings`
-  = "n_siblings")
+  named character vector that relabels variables: the names are the
+  labels and the values are the variable names (e.g.,
+  `c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")`)
 
 - custom_columns:
 
-  named list of column_formats to add or replace existing columns
+  named list of
+  [`column_format()`](https://wjschne.github.io/apa7/reference/column_format.md)
+  objects that are added, or that replace the formats of the same name
 
 ## Value
 
@@ -87,8 +91,8 @@ column_formats
 ## Examples
 
 ``` r
-my_formatter <- column_formats()
-my_formatter$Coefficient@formatter <- \(x) round(x, 2)
-my_formatter$Coefficient@formatter(2.214)
+my_formats <- column_formats()
+my_formats$Coefficient@formatter <- \(x) round(x, 2)
+my_formats$Coefficient@formatter(2.214)
 #> [1] 2.21
 ```

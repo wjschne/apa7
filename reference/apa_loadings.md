@@ -58,7 +58,11 @@ apa_loadings(
 
 - variance:
 
-  add rows for the variance explained by each factor
+  if `TRUE`, rows are added for the variance explained by each factor
+  (sums of squared loadings, proportion, and cumulative proportion). Not
+  to be confused with the `variances` argument of
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  for `lavaan` models, which adds residual variances.
 
 - communality:
 
@@ -83,7 +87,8 @@ apa_loadings(
 
 - digits:
 
-  number of decimal places for loadings
+  number of decimal places for loadings (unaffected by
+  `apa7_defaults(accuracy = )`)
 
 ## Value
 

@@ -56,19 +56,24 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_p_star_note</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span><span class="op">)</span>, first_alpha_marginal <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apa_p_star_note</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span><span class="op">)</span>, first_alpha_marginal <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>vector of alpha values (p-value thresholds)</p></dd>
+<dl><dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
+<dd><p>vector of alpha values (<em>p</em>-value thresholds), from largest to
+smallest. Each gets one more star.</p></dd>
 
 
 <dt id="arg-first-alpha-marginal">first_alpha_marginal<a class="anchor" aria-label="anchor" href="#arg-first-alpha-marginal"></a></dt>
 <dd><p>if TRUE, the first alpha value is treated as marginal and gets a dagger instead of a star</p></dd>
+
+
+<dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>deprecated; use <code>alpha</code></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -80,7 +85,7 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">apa_p_star_note</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "^\\* ^*p* &lt; .05. ^\\*\\* ^*p* &lt; .01. ^\\*\\*\\* ^*p* &lt; .001"</span>
-<span class="r-in"><span><span class="fu">apa_p_star_note</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="fu">apa_p_star_note</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                first_alpha_marginal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "^† ^*p* &lt; .1. ^\\* ^*p* &lt; .05. ^\\*\\* ^*p* &lt; .01. ^\\*\\*\\* ^*p* &lt; .001"</span>
 </code></pre></div>

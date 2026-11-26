@@ -58,7 +58,7 @@ R2 <- column_format(
          "R2",
          header = "*R*^2^",
          latex = "$R^2$",
-         formatter = \(x, accuracy = the$accuracy, ...) {
+         formatter = \(x, accuracy = .01, ...) {
                        align_chr(x,
                                  accuracy = accuracy,
                                  trim_leading_zeros = TRUE,
@@ -74,13 +74,8 @@ R2
 #> 1 R2    *R*^2^ $R^2$ <fn>      NA          
 R2@header
 #> [1] "*R*^2^"
-R2@formatter
-#> function (x, accuracy = the$accuracy, ...) 
-#> {
-#>     align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, 
-#>         ...)
-#> }
-#> <environment: 0x6249de749428>
+R2@formatter(c(.123, .45))
+#> [1] ".12" ".45"
 
 # Define an abbreviation in table notes
 SS <- column_formats()$Sum_Squares

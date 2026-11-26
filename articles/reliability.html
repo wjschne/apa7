@@ -297,7 +297,7 @@
 <div class="AfterWithoutNote" data-custom-style="AfterWithoutNote">
 <p>Each scale has a heading, with its items and statistics indented below it. Reverse-scored items are marked (R). Each scale uses the respondents who answered all of its items, and the note gives their number.</p>
 </div>
-<p>“Am indifferent to the feelings of others” has the weakest item–total correlation of the agreeableness items (.31), and deleting it would raise α slightly, from .70 to .72. With <code>flag = TRUE</code>, item–total correlations below .30 (or another cutoff, with <code>min_item_total</code>) and values of α if deleted that exceed the scale’s α are bolded:</p>
+<p>“Am indifferent to the feelings of others” has the weakest item–total correlation of the agreeableness items (.31), and deleting it would raise α slightly, from .70 to .72. With <code>flag = .30</code>, item–total correlations below .30 and values of α if deleted that exceed the scale’s α are bolded:</p>
 <div class="cell FigureWithoutNote" data-tbl-cap-location="top" data-custom-style="FigureWithoutNote">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/apa_reliability.html">apa_reliability</a></span><span class="op">(</span></span>
@@ -305,7 +305,7 @@
 <span>  scales <span class="op">=</span> <span class="va">bfi_scales</span>,</span>
 <span>  reverse <span class="op">=</span> <span class="va">bfi_reverse</span>,</span>
 <span>  item_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">6</span><span class="op">)</span>,</span>
-<span>  flag <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  flag <span class="op">=</span> <span class="fl">.30</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/apa_flextable.html">apa_flextable</a></span><span class="op">(</span>note <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-bfi-flag" class="cell quarto-float quarto-figure quarto-figure-center" data-tbl-cap-location="top">

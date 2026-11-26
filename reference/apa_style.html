@@ -83,11 +83,13 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>object</p></dd>
+<dd><p>a <code><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable::flextable()</a></code></p></dd>
 
 
 <dt id="arg-font-family">font_family<a class="anchor" aria-label="anchor" href="#arg-font-family"></a></dt>
-<dd><p>font family</p></dd>
+<dd><p>font family (e.g., <code>"Times New Roman"</code> or <code>"Arial"</code>). If
+<code>NULL</code> (default), the font set with <code>apa7_defaults(font_family = )</code>
+(Times New Roman unless changed).</p></dd>
 
 
 <dt id="arg-font-size">font_size<a class="anchor" aria-label="anchor" href="#arg-font-size"></a></dt>
@@ -96,15 +98,16 @@ with <code>apa7_defaults(font_size = )</code> (12 unless changed).</p></dd>
 
 
 <dt id="arg-text-color">text_color<a class="anchor" aria-label="anchor" href="#arg-text-color"></a></dt>
-<dd><p>text color</p></dd>
+<dd><p>color of the text: an R color name (e.g., <code>"black"</code>, the
+default) or a hex code (e.g., <code>"#333333"</code>)</p></dd>
 
 
 <dt id="arg-border-color">border_color<a class="anchor" aria-label="anchor" href="#arg-border-color"></a></dt>
-<dd><p>border color</p></dd>
+<dd><p>color of the rules, in the same forms as <code>text_color</code></p></dd>
 
 
 <dt id="arg-border-width">border_width<a class="anchor" aria-label="anchor" href="#arg-border-width"></a></dt>
-<dd><p>border width in pixels</p></dd>
+<dd><p>width of the rules, in points (default: 0.5)</p></dd>
 
 
 <dt id="arg-line-spacing">line_spacing<a class="anchor" aria-label="anchor" href="#arg-line-spacing"></a></dt>
@@ -115,19 +118,24 @@ notes are single-spaced.</p></dd>
 
 
 <dt id="arg-horizontal-padding">horizontal_padding<a class="anchor" aria-label="anchor" href="#arg-horizontal-padding"></a></dt>
-<dd><p>horizontal padding (in pixels)</p></dd>
+<dd><p>space to the left and right of each cell's
+contents, in points (default: 3)</p></dd>
 
 
 <dt id="arg-table-align">table_align<a class="anchor" aria-label="anchor" href="#arg-table-align"></a></dt>
-<dd><p>table alignment ("left", "center", "right")</p></dd>
+<dd><p>alignment of the table on the page: <code>"left"</code> (default),
+<code>"center"</code>, or <code>"right"</code></p></dd>
 
 
 <dt id="arg-header-align-vertical">header_align_vertical<a class="anchor" aria-label="anchor" href="#arg-header-align-vertical"></a></dt>
-<dd><p>vertical alignment of headers. Can be "top", "middle", or "bottom"</p></dd>
+<dd><p>vertical alignment of header text when header
+cells differ in height: <code>"top"</code> (default), <code>"middle"</code>, or <code>"bottom"</code></p></dd>
 
 
 <dt id="arg-layout">layout<a class="anchor" aria-label="anchor" href="#arg-layout"></a></dt>
-<dd><p>table layout ("autofit", "fixed")</p></dd>
+<dd><p><code>"autofit"</code> (default) lets the column widths adjust to the
+contents in Word; <code>"fixed"</code> keeps the widths as set (see
+<code><a href="https://davidgohel.github.io/flextable/reference/set_table_properties.html" class="external-link">flextable::set_table_properties()</a></code>)</p></dd>
 
 
 <dt id="arg-table-width">table_width<a class="anchor" aria-label="anchor" href="#arg-table-width"></a></dt>
@@ -151,32 +159,34 @@ warning to write it as <code>c(inches = )</code>.</p></dd>
 
 
 <dt id="arg-markdown">markdown<a class="anchor" aria-label="anchor" href="#arg-markdown"></a></dt>
-<dd><p>apply markdown formatting to header and body</p></dd>
+<dd><p>if <code>TRUE</code> (default), text in the header and body is
+converted from markdown (e.g., <code>*p*</code> becomes an italic <em>p</em>)</p></dd>
 
 
-<dt id="arg-markdown-header">markdown_header<a class="anchor" aria-label="anchor" href="#arg-markdown-header"></a></dt>
-<dd><p>apply markdown formatting to header</p></dd>
-
-
-<dt id="arg-markdown-body">markdown_body<a class="anchor" aria-label="anchor" href="#arg-markdown-body"></a></dt>
-<dd><p>apply markdown formatting to body</p></dd>
+<dt id="arg-markdown-header-markdown-body">markdown_header, markdown_body<a class="anchor" aria-label="anchor" href="#arg-markdown-header-markdown-body"></a></dt>
+<dd><p>whether the header or the body is
+converted from markdown (both default to <code>markdown</code>)</p></dd>
 
 
 <dt id="arg-no-markdown-columns">no_markdown_columns<a class="anchor" aria-label="anchor" href="#arg-no-markdown-columns"></a></dt>
-<dd><p>body columns that should not be treated as markdown</p></dd>
+<dd><p>body columns whose text is shown as it is, not
+converted from markdown (unquoted or quoted names, or tidyselect helpers)</p></dd>
 
 
 <dt id="arg-no-markdown-columns-header">no_markdown_columns_header<a class="anchor" aria-label="anchor" href="#arg-no-markdown-columns-header"></a></dt>
-<dd><p>column headers that should not be treated as markdown</p></dd>
+<dd><p>column headers that are not converted
+from markdown. By default, the same columns as <code>no_markdown_columns</code>.</p></dd>
 
 
 <dt id="arg-separate-headers">separate_headers<a class="anchor" aria-label="anchor" href="#arg-separate-headers"></a></dt>
-<dd><p>separate headers into column spanner labels</p></dd>
+<dd><p>if <code>TRUE</code> (default) and the table has one header
+row, column names with an underscore are split into a column spanner and
+a header (e.g., <code>Model 1_B</code> becomes "B" under a "Model 1" spanner)</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>object</p>
+    <p>flextable::flextable</p>
     </div>
 
     <div class="section level2">

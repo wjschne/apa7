@@ -35,7 +35,9 @@ align_chr(
 
 - trim_leading_zeros:
 
-  if TRUE (default), trims leading zeros, otherwise keeps them
+  if `TRUE`, leading zeros are removed (e.g., .45 instead of 0.45), as
+  APA style requires for values that cannot exceed 1 (correlations,
+  proportions, *p*-values). If `FALSE` (default), they are kept.
 
 - drop0trailing:
 
@@ -43,7 +45,8 @@ align_chr(
 
 - add_plusses:
 
-  if TRUE (default), adds a plus to positive numbers
+  if `TRUE`, positive numbers get a plus sign. If `FALSE` (default),
+  they do not.
 
 - padding_character:
 

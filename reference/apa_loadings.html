@@ -98,7 +98,10 @@ analysis fit with <code>lavaan</code>.</p>
 
 
 <dt id="arg-variance">variance<a class="anchor" aria-label="anchor" href="#arg-variance"></a></dt>
-<dd><p>add rows for the variance explained by each factor</p></dd>
+<dd><p>if <code>TRUE</code>, rows are added for the variance explained by
+each factor (sums of squared loadings, proportion, and cumulative
+proportion). Not to be confused with the <code>variances</code> argument of
+<code><a href="apa_parameters.html">apa_parameters()</a></code> for <code>lavaan</code> models, which adds residual variances.</p></dd>
 
 
 <dt id="arg-communality">communality<a class="anchor" aria-label="anchor" href="#arg-communality"></a></dt>
@@ -122,7 +125,8 @@ analysis fit with <code>lavaan</code>.</p>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
-<dd><p>number of decimal places for loadings</p></dd>
+<dd><p>number of decimal places for loadings (unaffected by
+<code>apa7_defaults(accuracy = )</code>)</p></dd>
 
 </dl></div>
     <div class="section level2">

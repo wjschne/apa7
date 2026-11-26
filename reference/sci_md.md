@@ -12,23 +12,23 @@ sci_md(x, digits = 2, lb = 0.0095, ub = 99.5, align = FALSE)
 
 - x:
 
-  Numeric vector
+  numeric vector
 
 - digits:
 
-  number of digits of precision
+  number of decimal places (of the mantissa, for numbers in scientific
+  notation)
 
-- lb:
+- lb, ub:
 
-  lower bound where scientific notation is turned on
-
-- ub:
-
-  upper bound where scientific notation is turned on
+  numbers at or below `lb` or at or above `ub` are written in scientific
+  notation (e.g., 2.46 × 10^7^); numbers between them are written as
+  usual
 
 - align:
 
-  decimal align
+  if `TRUE`, the numbers are aligned on the decimal point with
+  [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md)
 
 ## Value
 

@@ -1,12 +1,14 @@
-# Fit indices of lavaan models
-
-Fit indices of lavaan models
+# format model performance metrics in APA style
 
 format model performance metrics in APA style
+
+Fit indices of lavaan models
 
 ## Usage
 
 ``` r
+apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
+
 # S3 method for class 'gam'
 apa_performance(
   fit,
@@ -39,8 +41,6 @@ apa_performance(fit, metrics = c("R2", "AIC"), column_formats = NULL)
 
 # S3 method for class 'hurdle'
 apa_performance(fit, metrics = c("R2", "AIC"), column_formats = NULL)
-
-apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 
 # S3 method for class 'lm'
 apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
@@ -83,11 +83,23 @@ apa_performance(fit, metrics = NULL, column_formats = NULL)
 
 - fit:
 
-  model fit object
+  a fitted model of any class that
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  accepts (except `aov`, `aovlist`, and `afex_aov`), or a named list of
+  models
 
 - metrics:
 
-  performance metrics. Default is R2 and Sigma
+  fit statistics to display, named as in
+  [`performance::model_performance()`](https://easystats.github.io/performance/reference/model_performance.html)
+  (e.g., `"R2"`, `"R2_adjusted"`, `"AIC"`, `"BIC"`, `"RMSE"`,
+  `"Sigma"`). The defaults depend on the model: `R2` and `Sigma` for
+  `lm`; `R2` (a pseudo-*R*^2^) and `AIC` for `glm`, ordinal,
+  multinomial, zero-inflated, and hurdle models; `R2_marginal`,
+  `R2_conditional`, and `ICC` for mixed models; `R2_adjusted`,
+  `Deviance_explained`, and `AIC` for generalized additive models; and
+  the fit indices listed under `apa_performance.lavaan()` for `lavaan`
+  models. For meta-analyses and lists, `NULL` (default) chooses them.
 
 - column_formats:
 
@@ -187,19 +199,6 @@ model's default metrics are used.
 ## Examples
 
 ``` r
-# \donttest{
-if (requireNamespace("lavaan", quietly = TRUE)) {
-  model <- "visual =~ x1 + x2 + x3
-            textual =~ x4 + x5 + x6
-            speed =~ x7 + x8 + x9"
-  fit_cfa <- lavaan::cfa(model, data = lavaan::HolzingerSwineford1939)
-  apa_performance(fit_cfa)
-}
-#> # A tibble: 1 × 8
-#>   `*&chi;*^2^` `*df*` `*p*` CFI   TLI   RMSEA `90% CI`   SRMR 
-#>   <chr>        <chr>  <chr> <chr> <chr> <chr> <chr>      <chr>
-#> 1 85.31        24     <.001 .93   .90   .09   [.07, .11] .07  
-# }
 lm(mpg ~ cyl + wt, data = mtcars) |>
    apa_performance() |>
    apa_flextable()

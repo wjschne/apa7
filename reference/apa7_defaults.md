@@ -31,7 +31,17 @@ apa7_defaults(
 - accuracy:
 
   rounding accuracy of numbers in tables (default: .01, for two
-  decimals)
+  decimals). Model tables such as
+  [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
+  and
+  [`apa_anova()`](https://wjschne.github.io/apa7/reference/apa_anova.md)
+  use it. Descriptive tables such as
+  [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md),
+  [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
+  and
+  [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
+  have their own `digits` argument instead (`digits = 2` is the same as
+  `accuracy = .01`).
 
 - font_family:
 
@@ -49,19 +59,33 @@ apa7_defaults(
 
 - intercept_text:
 
-  what to call the intercept
+  label of the intercept row in regression tables (default:
+  `"Constant"`)
 
 - column_formats:
 
-  column formatting functions
+  a
+  [`column_formats()`](https://wjschne.github.io/apa7/reference/column_formats.md)
+  object: the headers, formatters, and note definitions of table columns
 
 - number_formatter:
 
-  default function to format numbers
+  function that formats numbers that can exceed 1 in absolute value
+  (e.g., coefficients, standard errors, and test statistics). It takes a
+  numeric vector and `accuracy` and returns a character vector. By
+  default,
+  [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md)
+  with the `accuracy` setting.
 
 - trim_leading_zero:
 
-  default function to trim leading zeros from numbers
+  function that formats numbers that cannot exceed 1 in absolute value
+  (e.g., correlations, standardized coefficients, and *R*^2^), which APA
+  style writes without a leading zero. By default,
+  [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md)
+  with `trim_leading_zeros = TRUE`. Note that this is a function, unlike
+  the `TRUE`/`FALSE` `trim_leading_zeros` argument of
+  [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md).
 
 - width_aware_padding:
 

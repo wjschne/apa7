@@ -100,7 +100,7 @@
 <span class="r-in"><span>         <span class="st">"R2"</span>,</span></span>
 <span class="r-in"><span>         header <span class="op">=</span> <span class="st">"*R*^2^"</span>,</span></span>
 <span class="r-in"><span>         latex <span class="op">=</span> <span class="st">"$R^2$"</span>,</span></span>
-<span class="r-in"><span>         formatter <span class="op">=</span> \<span class="op">(</span><span class="va">x</span>, <span class="va">accuracy</span> <span class="op">=</span> <span class="va">the</span><span class="op">$</span><span class="va">accuracy</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>         formatter <span class="op">=</span> \<span class="op">(</span><span class="va">x</span>, <span class="va">accuracy</span> <span class="op">=</span> <span class="fl">.01</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>                       <span class="fu"><a href="align_chr.html">align_chr</a></span><span class="op">(</span><span class="va">x</span>,</span></span>
 <span class="r-in"><span>                                 accuracy <span class="op">=</span> <span class="va">accuracy</span>,</span></span>
 <span class="r-in"><span>                                 trim_leading_zeros <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
@@ -116,13 +116,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> R2    *R*^2^ $R^2$ <span style="color: #949494;">&lt;fn&gt;</span>      <span style="color: #BB0000;">NA</span>          </span>
 <span class="r-in"><span><span class="va">R2</span><span class="op">@</span><span class="va">header</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "*R*^2^"</span>
-<span class="r-in"><span><span class="va">R2</span><span class="op">@</span><span class="va">formatter</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> function (x, accuracy = the$accuracy, ...) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     align_chr(x, accuracy = accuracy, trim_leading_zeros = TRUE, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         ...)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x6249de749428&gt;</span>
+<span class="r-in"><span><span class="va">R2</span><span class="op">@</span><span class="va">formatter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.123</span>, <span class="fl">.45</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ".12" ".45"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Define an abbreviation in table notes</span></span></span>
 <span class="r-in"><span><span class="va">SS</span> <span class="op">&lt;-</span> <span class="fu"><a href="column_formats.html">column_formats</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">Sum_Squares</span></span></span>

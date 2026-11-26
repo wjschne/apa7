@@ -18,11 +18,11 @@ str_wrap_equal(x, max_width = 30L, sep = "\n")
 
 - max_width:
 
-  maximum line width
+  maximum number of characters per line
 
 - sep:
 
-  separation character
+  text inserted at each line break
 
 ## Value
 

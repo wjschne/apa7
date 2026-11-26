@@ -39,7 +39,7 @@ apa_factor_cor(fit, factor_names = NULL, digits = 2)
 
 - digits:
 
-  number of decimal places
+  number of decimal places (unaffected by `apa7_defaults(accuracy = )`)
 
 ## Value
 
@@ -59,13 +59,13 @@ fit <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "oblimin")
 #> Loading required namespace: GPArotation
 apa_factor_cor(
   fit,
-  factor_names = c("Verbal", "Spatial", "Memory", "Speed")
+  factor_names = c("Verbal", "Spatial", "Speed", "Memory")
 )
 #> # A tibble: 4 × 5
 #>   Factor     `1`   `2`    `3`    `4`  
 #>   <chr>      <chr> <chr>  <chr>  <chr>
 #> 1 1. Verbal  —     ""     ""     ""   
 #> 2 2. Spatial  .41  "—"    ""     ""   
-#> 3 3. Memory   .30  " .27" "—"    ""   
-#> 4 4. Speed    .40  " .38" " .32" "—"  
+#> 3 3. Speed    .30  " .27" "—"    ""   
+#> 4 4. Memory   .40  " .38" " .32" "—"  
 ```

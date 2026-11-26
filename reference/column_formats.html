@@ -75,23 +75,23 @@
 
 
 <dt id="arg-accuracy">accuracy<a class="anchor" aria-label="anchor" href="#arg-accuracy"></a></dt>
-<dd><p>numeric (passed to scales::number)</p></dd>
+<dd><p>rounding accuracy of the formatters (e.g., <code>.01</code> for two decimals). If <code>NULL</code> (default), the <code>accuracy</code> set with <code><a href="apa7_defaults.html">apa7_defaults()</a></code>.</p></dd>
 
 
 <dt id="arg-intercept-text">intercept_text<a class="anchor" aria-label="anchor" href="#arg-intercept-text"></a></dt>
-<dd><p>describe intercept</p></dd>
+<dd><p>label of the intercept row (e.g., <code>"Constant"</code> or <code>"Intercept"</code>)</p></dd>
 
 
 <dt id="arg-starred-columns">starred_columns<a class="anchor" aria-label="anchor" href="#arg-starred-columns"></a></dt>
-<dd><p>which columns get p-value stars</p></dd>
+<dd><p>names of columns to which significance stars are added</p></dd>
 
 
 <dt id="arg-variable-labels">variable_labels<a class="anchor" aria-label="anchor" href="#arg-variable-labels"></a></dt>
-<dd><p>named vector of variable names (with vector names as labels). For example, c(<code>Parental Income</code> = "parental_income", <code>Number of Siblings</code> = "n_siblings")</p></dd>
+<dd><p>named character vector that relabels variables: the names are the labels and the values are the variable names (e.g., <code>c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")</code>)</p></dd>
 
 
 <dt id="arg-custom-columns">custom_columns<a class="anchor" aria-label="anchor" href="#arg-custom-columns"></a></dt>
-<dd><p>named list of column_formats to add or replace existing columns</p></dd>
+<dd><p>named list of <code><a href="column_format.html">column_format()</a></code> objects that are added, or that replace the formats of the same name</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -138,9 +138,9 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">my_formatter</span> <span class="op">&lt;-</span> <span class="fu">column_formats</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">my_formatter</span><span class="op">$</span><span class="va">Coefficient</span><span class="op">@</span><span class="va">formatter</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">my_formatter</span><span class="op">$</span><span class="va">Coefficient</span><span class="op">@</span><span class="va">formatter</span><span class="op">(</span><span class="fl">2.214</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">my_formats</span> <span class="op">&lt;-</span> <span class="fu">column_formats</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">my_formats</span><span class="op">$</span><span class="va">Coefficient</span><span class="op">@</span><span class="va">formatter</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">my_formats</span><span class="op">$</span><span class="va">Coefficient</span><span class="op">@</span><span class="va">formatter</span><span class="op">(</span><span class="fl">2.214</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.21</span>
 </code></pre></div>
     </div>

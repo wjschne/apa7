@@ -76,27 +76,27 @@
 
 
 <dt id="arg-indent">indent<a class="anchor" aria-label="anchor" href="#arg-indent"></a></dt>
-<dd><p>number of spaces to indent</p></dd>
+<dd><p>number of <code>space</code> characters that indent the second and later lines</p></dd>
 
 
 <dt id="arg-width">width<a class="anchor" aria-label="anchor" href="#arg-width"></a></dt>
-<dd><p>number of characters to break lines</p></dd>
+<dd><p>maximum number of characters per line</p></dd>
 
 
 <dt id="arg-space">space<a class="anchor" aria-label="anchor" href="#arg-space"></a></dt>
-<dd><p>indenting space character (defaults to non-breaking space)</p></dd>
+<dd><p>indenting character. If <code>NULL</code> (default), a non-breaking space.</p></dd>
 
 
 <dt id="arg-newline">newline<a class="anchor" aria-label="anchor" href="#arg-newline"></a></dt>
-<dd><p>text for creating new line</p></dd>
+<dd><p>text inserted at each line break (default: a markdown hard line break, a backslash followed by a newline)</p></dd>
 
 
 <dt id="arg-whitespace-only">whitespace_only<a class="anchor" aria-label="anchor" href="#arg-whitespace-only"></a></dt>
-<dd><p>wrapping spaces only</p></dd>
+<dd><p>if <code>TRUE</code>, lines break only at spaces. If <code>FALSE</code> (default), they can also break after hyphens and slashes (see <code><a href="https://stringr.tidyverse.org/reference/str_wrap.html" class="external-link">stringr::str_wrap()</a></code>).</p></dd>
 
 
 <dt id="arg-wrap-equal-width">wrap_equal_width<a class="anchor" aria-label="anchor" href="#arg-wrap-equal-width"></a></dt>
-<dd><p>Attempts to split lines to make them of approximately equal width</p></dd>
+<dd><p>if <code>TRUE</code>, lines are made roughly equal in width (see <code><a href="str_wrap_equal.html">str_wrap_equal()</a></code>). If <code>FALSE</code> (default), each line is filled up to <code>width</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -106,8 +106,10 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">hanging_indent</span><span class="op">(</span><span class="st">"Hello Darkness, my old friend. I've come to talk with you again."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Hello Darkness, my old friend.\\\n    I've come to talk with you\\\n    again."</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">hanging_indent</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Erlbaum."</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Cohen, J. (1988). Statistical\\\n    power analysis for the\\\n    behavioral sciences (2nd ed.).\\\n    Erlbaum."</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

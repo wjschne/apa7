@@ -95,10 +95,12 @@ Convert objects to flextables
   : Format hypothesis tests in APA style
 - [`apa_loadings()`](https://wjschne.github.io/apa7/reference/apa_loadings.md)
   : Factor loadings table
+- [`apa_n_factors()`](https://wjschne.github.io/apa7/reference/apa_n_factors.md)
+  : Factor retention table
 - [`apa_parameters()`](https://wjschne.github.io/apa7/reference/apa_parameters.md)
   : format model parameters in APA style
 - [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
-  : Fit indices of lavaan models
+  : format model performance metrics in APA style
 - [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md)
   : format model comparison metrics in APA style
 - [`apa_publication_bias()`](https://wjschne.github.io/apa7/reference/apa_publication_bias.md)
@@ -198,7 +200,7 @@ and `apa_flextable`
 Functions for creating apaquarto documents
 
 - [`install_apaquarto()`](https://wjschne.github.io/apa7/reference/install_apaquarto.md)
-  : Installs the apaquarto extension.
+  : Install the apaquarto extension
 - [`make_apaquarto()`](https://wjschne.github.io/apa7/reference/make_apaquarto.md)
   : Run shiny app to make a document in APA style via Quarto
 - [`apa7_write_bib()`](https://wjschne.github.io/apa7/reference/apa7_write_bib.md)

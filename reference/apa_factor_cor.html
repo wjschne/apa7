@@ -90,7 +90,8 @@ linked by regression paths, these correlations are implied by the model.</p>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
-<dd><p>number of decimal places</p></dd>
+<dd><p>number of decimal places (unaffected by
+<code>apa7_defaults(accuracy = )</code>)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -110,15 +111,15 @@ same order as in <code><a href="apa_loadings.html">apa_loadings()</a></code>.</p
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: GPArotation</span>
 <span class="r-in"><span><span class="fu">apa_factor_cor</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span>,</span></span>
-<span class="r-in"><span>  factor_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Verbal"</span>, <span class="st">"Spatial"</span>, <span class="st">"Memory"</span>, <span class="st">"Speed"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  factor_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Verbal"</span>, <span class="st">"Spatial"</span>, <span class="st">"Speed"</span>, <span class="st">"Memory"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Factor     `1`   `2`    `3`    `4`  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1. Verbal  —     <span style="color: #949494;">""</span>     <span style="color: #949494;">""</span>     <span style="color: #949494;">""</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2. Spatial  .41  <span style="color: #949494;">"</span>—<span style="color: #949494;">"</span>    <span style="color: #949494;">""</span>     <span style="color: #949494;">""</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 3. Memory   .30  <span style="color: #949494;">"</span> .27<span style="color: #949494;">"</span> <span style="color: #949494;">"</span>—<span style="color: #949494;">"</span>    <span style="color: #949494;">""</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 4. Speed    .40  <span style="color: #949494;">"</span> .38<span style="color: #949494;">"</span> <span style="color: #949494;">"</span> .32<span style="color: #949494;">"</span> <span style="color: #949494;">"</span>—<span style="color: #949494;">"</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 3. Speed    .30  <span style="color: #949494;">"</span> .27<span style="color: #949494;">"</span> <span style="color: #949494;">"</span>—<span style="color: #949494;">"</span>    <span style="color: #949494;">""</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 4. Memory   .40  <span style="color: #949494;">"</span> .38<span style="color: #949494;">"</span> <span style="color: #949494;">"</span> .32<span style="color: #949494;">"</span> <span style="color: #949494;">"</span>—<span style="color: #949494;">"</span>  </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -111,9 +111,9 @@ who answered all of its items, and the note gives their number.
 
 “Am indifferent to the feelings of others” has the weakest item–total
 correlation of the agreeableness items (.31), and deleting it would
-raise α slightly, from .70 to .72. With `flag = TRUE`, item–total
-correlations below .30 (or another cutoff, with `min_item_total`) and
-values of α if deleted that exceed the scale’s α are bolded:
+raise α slightly, from .70 to .72. With `flag = .30`, item–total
+correlations below .30 and values of α if deleted that exceed the
+scale’s α are bolded:
 
 ``` r
 
@@ -122,7 +122,7 @@ apa_reliability(
   scales = bfi_scales,
   reverse = bfi_reverse,
   item_range = c(1, 6),
-  flag = TRUE
+  flag = .30
 ) |>
   apa_flextable(note = TRUE)
 ```

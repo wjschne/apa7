@@ -29,7 +29,9 @@ character vector
 ## Examples
 
 ``` r
-
-star_balance(".05\\^\\*\\*\\^")
-#> [1] "^&numsp;&numsp;^.05\\^\\*\\*\\^"
+# Starred values get one figure space per star on the left,
+# so that the numbers line up when the column is centered
+star_balance(c(".32", ".04\\^\\*\\^", ".005\\^\\*\\*\\^"))
+#> [1] ".32"                              "^&numsp;^.04\\^\\*\\^"           
+#> [3] "^&numsp;&numsp;^.005\\^\\*\\*\\^"
 ```

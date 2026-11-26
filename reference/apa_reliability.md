@@ -20,8 +20,7 @@ apa_reliability(
   omega = TRUE,
   ci = 0.95,
   score = c("mean", "sum"),
-  flag = FALSE,
-  min_item_total = 0.3,
+  flag = NULL,
   format_variable_names = TRUE,
   digits = 2
 )
@@ -73,12 +72,11 @@ apa_reliability(
 
 - flag:
 
-  if `TRUE`, item-total correlations below `min_item_total` and
-  \\\alpha\\-if-deleted values above the scale's \\\alpha\\ are bolded
-
-- min_item_total:
-
-  cutoff for flagging item-total correlations
+  `NULL` (default) or a number: item-total correlations below it, and
+  \\\alpha\\-if-deleted values above the scale's \\\alpha\\, are bolded
+  (e.g., `flag = .30`), and the note says so. `TRUE` is the same as
+  `.30`. This works like `flag` in
+  [`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md).
 
 - format_variable_names:
 
@@ -89,7 +87,7 @@ apa_reliability(
 
 - digits:
 
-  number of decimal places
+  number of decimal places (unaffected by `apa7_defaults(accuracy = )`)
 
 ## Value
 

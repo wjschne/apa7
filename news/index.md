@@ -94,6 +94,14 @@ These change the output of code that worked with apa7 0.2.0.
     table to
     [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
     instead, with `note = TRUE` for the note.
+- Three arguments were renamed so that the same idea has the same name
+  everywhere. The old names still work, with a warning:
+  - `apa_cor(p_value = )` is now `alpha`, as in
+    [`p2stars()`](https://wjschne.github.io/apa7/reference/p2stars.md)
+    and
+    [`add_star_column()`](https://wjschne.github.io/apa7/reference/add_star_column.md).
+  - `apa_p_star_note(x = )` is now `alpha`.
+  - `add_break_columns(d = )` is now `data`, as in the other functions.
 - Table notes are now single-spaced, even when the table is
   double-spaced. This applies to `apa_flextable(note = TRUE)`,
   [`apa_cor()`](https://wjschne.github.io/apa7/reference/apa_cor.md),
@@ -128,7 +136,10 @@ These change the output of code that worked with apa7 0.2.0.
   confidence interval, McDonald’s *ω*_(total), and the mean inter-item
   correlation. It handles several scales, reverse-keyed items, and items
   scored 0 or 1 (difficulty and KR-20), and `level = "scales"` gives one
-  row per scale.
+  row per scale. `flag = .30` bolds item–total correlations below .30
+  and values of α if deleted above the scale’s α, as `flag` bolds large
+  *VIF*s in
+  [`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md).
 - [`apa_descriptives()`](https://wjschne.github.io/apa7/reference/apa_descriptives.md)
   selects `variables`, `by`, and `categorical`, and
   [`apa_reliability()`](https://wjschne.github.io/apa7/reference/apa_reliability.md)
@@ -192,6 +203,20 @@ These change the output of code that worked with apa7 0.2.0.
   at which the slope is significant. The boundaries are computed exactly
   from the coefficients and their covariance matrix, rather than from a
   grid of moderator values. `johnson_neyman = FALSE` leaves them out.
+- New
+  [`apa_n_factors()`](https://wjschne.github.io/apa7/reference/apa_n_factors.md)
+  makes a factor retention table from
+  [`parameters::n_factors()`](https://easystats.github.io/parameters/reference/n_factors.html):
+  each method (e.g., parallel analysis, Velicer’s minimum average
+  partial test, and the Kaiser criterion) with the number of factors it
+  suggests, the numbers supported by the most methods bolded, and method
+  names spelled out. With `table = "agreement"`, each suggested number
+  of factors gets a row with the number of methods that suggest it and
+  the cumulative variance explained. It can run
+  [`parameters::n_factors()`](https://easystats.github.io/parameters/reference/n_factors.html)
+  on a data frame or format its output, and
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  names the number of factors supported by the most methods.
 - New
   [`apa_collinearity()`](https://wjschne.github.io/apa7/reference/apa_collinearity.md)
   makes tables of collinearity diagnostics from
@@ -637,6 +662,30 @@ These change the output of code that worked with apa7 0.2.0.
   [`apa_htest()`](https://wjschne.github.io/apa7/reference/apa_htest.md)
   have already formatted. Before, random-effect labels such as “Subject:
   *r* (Constant, Days)” lost their spacing and commas in flextables.
+- [`apa_performance_comparison()`](https://wjschne.github.io/apa7/reference/apa_performance_comparison.md)
+  can star more than one column (e.g., `starred = c("deltaR2", "F")`).
+  Before, it gave an error.
+- The documentation of every argument was reviewed. Descriptions that
+  contradicted the defaults were corrected (e.g., `trim_leading_zeros`
+  and `add_plusses` in
+  [`align_chr()`](https://wjschne.github.io/apa7/reference/align_chr.md),
+  `inline` in
+  [`apa_p()`](https://wjschne.github.io/apa7/reference/apa_p.md),
+  `bracket` in
+  [`matrix_display()`](https://wjschne.github.io/apa7/reference/matrix_display.md),
+  `type` in
+  [`add_list_column()`](https://wjschne.github.io/apa7/reference/add_list_column.md),
+  and `right_tag` in
+  [`tagger()`](https://wjschne.github.io/apa7/reference/tagger.md)), and
+  units, accepted values, and defaults were added (e.g.,
+  [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md)
+  and
+  [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md)
+  sizes are in points).
+  [`apa_note()`](https://wjschne.github.io/apa7/reference/apa_note.md)
+  lists every table function whose notes it writes, and
+  [`apa_performance()`](https://wjschne.github.io/apa7/reference/apa_performance.md)
+  lists its default metrics for each kind of model.
 - The documentation of `table_width` in
   [`apa_flextable()`](https://wjschne.github.io/apa7/reference/apa_flextable.md),
   [`apa_style()`](https://wjschne.github.io/apa7/reference/apa_style.md),
