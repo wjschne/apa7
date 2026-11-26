@@ -964,8 +964,19 @@ test_that("pivot_wider_name_first ", {
 
   expect_error(
     pivot_wider_name_first(d, names_from = c(Model, p), values_from = c(t, p)),
-    "Only one names_from variable is allowed."
+    "Only one `names_from` column is allowed."
   )
+})
+
+test_that("pivot_wider_name_first honors names_prefix, names_sep, and names_vary", {
+  d <- data.frame(Model = 1:2, t = c(2.1, 0.8), p = c(.04, .45))
+  wide <- \(...) colnames(pivot_wider_name_first(d, names_from = Model, values_from = c(t, p), ...))
+  expect_equal(wide(), c("1_t", "1_p", "2_t", "2_p"))
+  expect_equal(wide(names_prefix = "Model "), c("Model 1_t", "Model 1_p", "Model 2_t", "Model 2_p"))
+  expect_equal(wide(names_sep = "."), c("1.t", "1.p", "2.t", "2.p"))
+  expect_equal(wide(names_vary = "fastest"), c("1_t", "2_t", "1_p", "2_p"))
+  # Braces are literal text, not glue expressions
+  expect_equal(wide(names_prefix = "{M}"), c("{M}1_t", "{M}1_p", "{M}2_t", "{M}2_p"))
 })
 
 test_that("apa_cor centers every summary column", {

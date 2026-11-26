@@ -3940,18 +3940,29 @@ pretty_widths <- function(
 #' [apa_flextable()], the `names_from` values then become column spanners.
 #'
 #' @details
-#' The new columns are grouped by the value of `names_from` (as with
-#' `names_vary = "slowest"`), so that the columns under each spanner are next
-#' to each other. Only one `names_from` column is allowed. Because the names are
-#' always made as `{names_from}_{.value}`, the `names_prefix`, `names_sep`, and
-#' `names_vary` arguments have no effect.
+#' The new column names are made of `names_prefix`, the value of
+#' `names_from`, `names_sep`, and the name of the `values_from` column, in
+#' that order (e.g., `names_prefix = "Model "` gives `Model 1_t`). Only one
+#' `names_from` column is allowed.
+#'
+#' Unlike in [tidyr::pivot_wider()], `names_vary` defaults to `"slowest"`,
+#' which keeps the columns of each `names_from` value next to each other
+#' (e.g., `Model 1_t`, `Model 1_p`, `Model 2_t`, `Model 2_p`). Two settings
+#' keep [apa_flextable()] from making one spanner per `names_from` value:
+#' `names_vary = "fastest"`, which interleaves the columns (`Model 1_t`,
+#' `Model 2_t`, `Model 1_p`, `Model 2_p`), and a `names_sep` other than an
+#' underscore, which [apa_flextable()] does not split into header rows.
 #'
 #' @inheritParams tidyr::pivot_wider
+#' @param names_vary `"slowest"` (default) to keep the columns of each
+#'   `names_from` value together, or `"fastest"` to interleave them (see
+#'   [tidyr::pivot_wider()])
 #' @return data.frame
 #' @export
 #' @examples
-#' d <- data.frame(Model = paste0("Model","_", 1:2), t = 1:2, p = c(.05, .45))
-#' pivot_wider_name_first(d, names_from = Model, values_from = c(t, p))
+#' d <- data.frame(Model = 1:2, t = c(2.1, 0.8), p = c(.04, .45))
+#' pivot_wider_name_first(d, names_from = Model, values_from = c(t, p),
+#'                        names_prefix = "Model ")
 #' # For comparison:
 #' tidyr::pivot_wider(d, names_from = Model, values_from = c(t, p))
 pivot_wider_name_first <- function(
@@ -3976,7 +3987,11 @@ pivot_wider_name_first <- function(
     names()
 
   if (length(nf) > 1) {
-    stop("Only one names_from variable is allowed.")
+    cli::cli_abort("Only one {.arg names_from} column is allowed.")
+  }
+  # Braces in the prefix and separator are literal text, not glue
+  glue_literal <- function(s) {
+    gsub("}", "}}", gsub("{", "{{", s, fixed = TRUE), fixed = TRUE)
   }
 
   tidyr::pivot_wider(
@@ -3987,9 +4002,16 @@ pivot_wider_name_first <- function(
     names_from = {{ names_from }},
     names_prefix = names_prefix,
     names_sep = names_sep,
-    names_glue = paste0("{", nf, "}", "_{.value}"),
+    names_glue = paste0(
+      glue_literal(names_prefix),
+      "{",
+      nf,
+      "}",
+      glue_literal(names_sep),
+      "{.value}"
+    ),
     names_sort = names_sort,
-    names_vary = "slowest",
+    names_vary = names_vary,
     names_expand = names_expand,
     names_repair = names_repair,
     values_from = {{ values_from }},

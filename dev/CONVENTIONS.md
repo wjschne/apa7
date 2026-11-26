@@ -263,6 +263,5 @@ fix it, or record it as an exception to the rule.
 | 3 | ARG-2 | `apa_cor()` uses `star_significant` and `bold_significant` instead of `starred` and `bolded`. | Exception: they are switches over every correlation, not column selections |
 | 4 | ARG-2 | Variable relabeling is `labels` (`apa_chisq()`, `apa_descriptives()`), `variable_labels` (`column_formats()`), and `factor_names` (`apa_loadings()`). | Decide whether `factor_names` is a different idea; align the other two |
 | 5 | ARG-5 | `test` is logical in `apa_descriptives()` but a choice in `apa_chisq()` and `apa_htest()`. | Exception, or accept `test = "auto"` style values |
-| 7 | ARG-6 | `pivot_wider_name_first()` accepts `names_prefix`, `names_sep`, and `names_vary` but ignores them. | Remove them (with deprecation) or honor them |
 | 8 | TAB-1 | `apa_format_columns()` looks for `Model 1_low`/`Model 1_high` rather than `Model 1_CI_low`/`Model 1_CI_high` for prefixed intervals (untested). | Test, then fix |
 | 9 | CODE-2 | 28 `stop()` and 3 `warning()` calls remain beside 125 `cli::cli_abort()` calls. | Convert when the code is next touched |

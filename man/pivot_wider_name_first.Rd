@@ -63,15 +63,9 @@ string to use as a column name.}
 \item{names_sort}{Should the column names be sorted? If \code{FALSE}, the default,
 column names are ordered by first appearance.}
 
-\item{names_vary}{When \code{names_from} identifies a column (or columns) with
-multiple unique values, and multiple \code{values_from} columns are provided,
-in what order should the resulting column names be combined?
-\itemize{
-\item \code{"fastest"} varies \code{names_from} values fastest, resulting in a column
-naming scheme of the form: \verb{value1_name1, value1_name2, value2_name1, value2_name2}. This is the default.
-\item \code{"slowest"} varies \code{names_from} values slowest, resulting in a column
-naming scheme of the form: \verb{value1_name1, value2_name1, value1_name2, value2_name2}.
-}}
+\item{names_vary}{\code{"slowest"} (default) to keep the columns of each
+\code{names_from} value together, or \code{"fastest"} to interleave them (see
+\code{\link[tidyr:pivot_wider]{tidyr::pivot_wider()}})}
 
 \item{names_expand}{Should the values in the \code{names_from} columns be expanded
 by \code{\link[tidyr:expand]{expand()}} before pivoting? This results in more columns, the output
@@ -125,15 +119,23 @@ new column names (e.g., \verb{Model 1_t} instead of \verb{t_Model 1}). In
 \code{\link[=apa_flextable]{apa_flextable()}}, the \code{names_from} values then become column spanners.
 }
 \details{
-The new columns are grouped by the value of \code{names_from} (as with
-\code{names_vary = "slowest"}), so that the columns under each spanner are next
-to each other. Only one \code{names_from} column is allowed. Because the names are
-always made as \verb{\{names_from\}_\{.value\}}, the \code{names_prefix}, \code{names_sep}, and
-\code{names_vary} arguments have no effect.
+The new column names are made of \code{names_prefix}, the value of
+\code{names_from}, \code{names_sep}, and the name of the \code{values_from} column, in
+that order (e.g., \code{names_prefix = "Model "} gives \verb{Model 1_t}). Only one
+\code{names_from} column is allowed.
+
+Unlike in \code{\link[tidyr:pivot_wider]{tidyr::pivot_wider()}}, \code{names_vary} defaults to \code{"slowest"},
+which keeps the columns of each \code{names_from} value next to each other
+(e.g., \verb{Model 1_t}, \verb{Model 1_p}, \verb{Model 2_t}, \verb{Model 2_p}). Two settings
+keep \code{\link[=apa_flextable]{apa_flextable()}} from making one spanner per \code{names_from} value:
+\code{names_vary = "fastest"}, which interleaves the columns (\verb{Model 1_t},
+\verb{Model 2_t}, \verb{Model 1_p}, \verb{Model 2_p}), and a \code{names_sep} other than an
+underscore, which \code{\link[=apa_flextable]{apa_flextable()}} does not split into header rows.
 }
 \examples{
-d <- data.frame(Model = paste0("Model","_", 1:2), t = 1:2, p = c(.05, .45))
-pivot_wider_name_first(d, names_from = Model, values_from = c(t, p))
+d <- data.frame(Model = 1:2, t = c(2.1, 0.8), p = c(.04, .45))
+pivot_wider_name_first(d, names_from = Model, values_from = c(t, p),
+                       names_prefix = "Model ")
 # For comparison:
 tidyr::pivot_wider(d, names_from = Model, values_from = c(t, p))
 }
