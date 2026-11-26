@@ -21,15 +21,17 @@
 #' With `range = TRUE`, each continuous variable gets a "Range" row with its
 #' minimum and maximum.
 #'
-#' With `test = TRUE`, a *p* column tests group differences: Welch's *t* test
+#' With `test = "auto"` (or `"chisq"` or `"fisher"`), a *p* column tests
+#' group differences: Welch's *t* test
 #' (two groups) or Welch's one-way ANOVA ([stats::oneway.test()], more groups)
 #' for variables described by their mean, the Kruskal-Wallis test for
 #' variables described by their median, and the chi-square test of
 #' independence (without continuity correction) for categorical variables.
 #' When an expected count of a categorical variable's table is below 5, the
-#' chi-square approximation can be poor, so by default (`categorical_test =
-#' "auto"`) Fisher's exact test is used for that variable instead, and the
-#' note names the variables tested this way.
+#' chi-square approximation can be poor, so with `test = "auto"` Fisher's
+#' exact test is used for that variable instead, and the note names the
+#' variables tested this way. `test = "chisq"` and `test = "fisher"` use one
+#' test for every categorical variable.
 #' Many journals discourage testing baseline differences in randomized
 #' trials, so tests are not shown by default.
 #'
@@ -51,15 +53,13 @@
 #' @param labels named character vector of variable labels (e.g., `c(age =
 #'   "Age (years)")`). Variables without a label are named by their formatted
 #'   names.
-#' @param test if `TRUE`, a column of *p*-values tests the differences
-#'   between groups (requires `by`). Unlike the `test` argument of
-#'   [apa_chisq()] and [apa_htest()], which names a test, this one is `TRUE`
-#'   or `FALSE`; the test of categorical variables is chosen with
-#'   `categorical_test`.
-#' @param categorical_test test of categorical variables when `test = TRUE`:
-#'   `"auto"` (default) for Fisher's exact test when an expected count is
-#'   below 5 and the chi-square test otherwise, `"chisq"` for the chi-square
-#'   test, or `"fisher"` for Fisher's exact test
+#' @param test tests of the differences between groups (requires `by`):
+#'   `"none"` (default) for no tests, or a column of *p*-values with
+#'   categorical variables tested by Fisher's exact test when an expected
+#'   count is below 5 and the chi-square test otherwise (`"auto"`), by the
+#'   chi-square test (`"chisq"`), or by Fisher's exact test (`"fisher"`).
+#'   Continuous variables are tested the same way in each case (see Details).
+#'   `TRUE` is the same as `"auto"`, and `FALSE` the same as `"none"`.
 #' @param missing where missing values are reported: `"note"` (default) in
 #'   the note, or `"row"` in a "Missing" row below each variable that has
 #'   missing values
@@ -94,7 +94,7 @@
 #'   variables = c(mpg, hp, cyl),
 #'   by = am,
 #'   continuous = c(hp = "median_iqr"),
-#'   test = TRUE
+#'   test = "auto"
 #' )
 apa_descriptives <- function(
   data,
@@ -104,15 +104,22 @@ apa_descriptives <- function(
   continuous = "mean_sd",
   categorical = NULL,
   labels = NULL,
-  test = FALSE,
-  categorical_test = c("auto", "chisq", "fisher"),
+  test = c("none", "auto", "chisq", "fisher"),
   missing = c("note", "row"),
   range = FALSE,
   digits = 2,
   percent_digits = 1,
   format_variable_names = TRUE
 ) {
-  categorical_test <- rlang::arg_match(categorical_test)
+  # TRUE and FALSE are shorthand for "auto" and "none"
+  if (isTRUE(test)) {
+    test <- "auto"
+  } else if (isFALSE(test)) {
+    test <- "none"
+  }
+  test <- rlang::arg_match(test, c("none", "auto", "chisq", "fisher"))
+  categorical_test <- if (test == "none") "auto" else test
+  test <- test != "none"
   missing <- rlang::arg_match(missing)
   if (!is.data.frame(data)) {
     cli::cli_abort("{.arg data} must be a data frame, not {.obj_type_friendly {data}}.")
@@ -143,7 +150,7 @@ apa_descriptives <- function(
   }
   categorical <- select_names(rlang::enquo(categorical), data)
   if (isTRUE(test) && is.null(by)) {
-    cli::cli_abort("{.code test = TRUE} needs groups to compare. Give {.arg by}.")
+    cli::cli_abort("Tests of group differences need groups to compare. Give {.arg by}, or use {.code test = \"none\"}.")
   }
   methods <- descriptives_methods(continuous, variables)
 
@@ -340,7 +347,7 @@ descriptives_test <- function(x, g, method, categorical_test = "auto") {
         error = function(e) {
           cli::cli_warn(c(
             "Fisher's exact test could not be computed for a table with {nrow(tab)} rows and {ncol(tab)} columns, so its {.emph p}-value is missing.",
-            i = "Use {.code categorical_test = \"chisq\"} for the chi-square test."
+            i = "Use {.code test = \"chisq\"} for the chi-square test."
           ))
           NA_real_
         }

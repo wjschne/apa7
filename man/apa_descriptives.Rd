@@ -12,8 +12,7 @@ apa_descriptives(
   continuous = "mean_sd",
   categorical = NULL,
   labels = NULL,
-  test = FALSE,
-  categorical_test = c("auto", "chisq", "fisher"),
+  test = c("none", "auto", "chisq", "fisher"),
   missing = c("note", "row"),
   range = FALSE,
   digits = 2,
@@ -45,16 +44,13 @@ like \code{variables}}
 \item{labels}{named character vector of variable labels (e.g., \code{c(age = "Age (years)")}). Variables without a label are named by their formatted
 names.}
 
-\item{test}{if \code{TRUE}, a column of \emph{p}-values tests the differences
-between groups (requires \code{by}). Unlike the \code{test} argument of
-\code{\link[=apa_chisq]{apa_chisq()}} and \code{\link[=apa_htest]{apa_htest()}}, which names a test, this one is \code{TRUE}
-or \code{FALSE}; the test of categorical variables is chosen with
-\code{categorical_test}.}
-
-\item{categorical_test}{test of categorical variables when \code{test = TRUE}:
-\code{"auto"} (default) for Fisher's exact test when an expected count is
-below 5 and the chi-square test otherwise, \code{"chisq"} for the chi-square
-test, or \code{"fisher"} for Fisher's exact test}
+\item{test}{tests of the differences between groups (requires \code{by}):
+\code{"none"} (default) for no tests, or a column of \emph{p}-values with
+categorical variables tested by Fisher's exact test when an expected
+count is below 5 and the chi-square test otherwise (\code{"auto"}), by the
+chi-square test (\code{"chisq"}), or by Fisher's exact test (\code{"fisher"}).
+Continuous variables are tested the same way in each case (see Details).
+\code{TRUE} is the same as \code{"auto"}, and \code{FALSE} the same as \code{"none"}.}
 
 \item{missing}{where missing values are reported: \code{"note"} (default) in
 the note, or \code{"row"} in a "Missing" row below each variable that has
@@ -98,14 +94,17 @@ are left out.
 With \code{range = TRUE}, each continuous variable gets a "Range" row with its
 minimum and maximum.
 
-With \code{test = TRUE}, a \emph{p} column tests group differences: Welch's \emph{t} test
+With \code{test = "auto"} (or \code{"chisq"} or \code{"fisher"}), a \emph{p} column tests
+group differences: Welch's \emph{t} test
 (two groups) or Welch's one-way ANOVA (\code{\link[stats:oneway.test]{stats::oneway.test()}}, more groups)
 for variables described by their mean, the Kruskal-Wallis test for
 variables described by their median, and the chi-square test of
 independence (without continuity correction) for categorical variables.
 When an expected count of a categorical variable's table is below 5, the
-chi-square approximation can be poor, so by default (\code{categorical_test = "auto"}) Fisher's exact test is used for that variable instead, and the
-note names the variables tested this way.
+chi-square approximation can be poor, so with \code{test = "auto"} Fisher's
+exact test is used for that variable instead, and the note names the
+variables tested this way. \code{test = "chisq"} and \code{test = "fisher"} use one
+test for every categorical variable.
 Many journals discourage testing baseline differences in randomized
 trials, so tests are not shown by default.
 }
@@ -129,6 +128,6 @@ apa_descriptives(
   variables = c(mpg, hp, cyl),
   by = am,
   continuous = c(hp = "median_iqr"),
-  test = TRUE
+  test = "auto"
 )
 }

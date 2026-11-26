@@ -1793,9 +1793,17 @@ the$columns <- list(
 #'
 #' @param .data list of `column_format` objects
 #' @param accuracy rounding accuracy of the formatters (e.g., `.01` for two decimals). If `NULL` (default), the `accuracy` set with [apa7_defaults()].
-#' @param intercept_text label of the intercept row (e.g., `"Constant"` or `"Intercept"`)
-#' @param starred_columns names of columns to which significance stars are added
-#' @param variable_labels named character vector that relabels variables: the names are the labels and the values are the variable names (e.g., `c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")`)
+#' @param labels named character vector of variable labels, named by the
+#'   variables (e.g., `c(parental_income = "Parental Income", n_siblings =
+#'   "Number of Siblings")`), as in [apa_descriptives()] and [apa_chisq()].
+#'   It is stored in the `labels` property; the table functions do not use it
+#'   yet.
+#' @param variable_labels deprecated; use `labels`, with the variables as the
+#'   names and the labels as the values
+#' @param intercept_text,starred_columns deprecated, and never used. Set the
+#'   label of the intercept row for all tables with
+#'   `apa7_defaults(intercept_text = )`, and the columns that get stars with
+#'   the `starred` argument of each table function.
 #' @param custom_columns named list of [column_format()] objects that are added, or that replace the formats of the same name
 #' @slot get_column_names getter for column names
 #' @slot get_headers getter for column headers
@@ -1834,9 +1842,7 @@ column_formats <- new_class(
         self
       }
     ),
-    intercept_text = class_character,
-    starred_columns = class_character,
-    variable_labels = class_character,
+    labels = class_character,
     get_column_names = new_property(getter = \(self) {
       names(S7_data(self))
     }),
@@ -1877,21 +1883,36 @@ column_formats <- new_class(
   constructor = function(
     .data = NULL,
     accuracy = NULL,
-    intercept_text = NULL,
-    starred_columns = character(0),
-    variable_labels = character(0),
-    custom_columns = NULL
+    labels = character(0),
+    custom_columns = NULL,
+    variable_labels,
+    intercept_text,
+    starred_columns
   ) {
+    # Properties of apa7 0.2.0 that no function used
+    unused <- c("intercept_text", "starred_columns")[c(!missing(intercept_text), !missing(starred_columns))]
+    if (length(unused) > 0) {
+      cli::cli_warn(
+        c(
+          "{.arg {unused}} {cli::qty(unused)}{?is/are} deprecated and {?has/have} no effect.",
+          i = "Set the intercept label with {.code apa7_defaults(intercept_text = )}, and stars with the {.arg starred} argument of each table function."
+        ),
+        .frequency = "regularly",
+        .frequency_id = "apa7_column_formats_unused"
+      )
+    }
+    if (!missing(variable_labels)) {
+      warn_renamed_arg("variable_labels", "labels", "column_formats")
+      # variable_labels was named by the labels; labels is named by the
+      # variables
+      labels <- stats::setNames(names(variable_labels), unname(variable_labels))
+    }
     if (is.null(.data)) {
       .data <- the$columns
     }
     if (is.null(accuracy)) {
       accuracy <- the$accuracy
     }
-    if (is.null(intercept_text)) {
-      intercept_text <- the$intercept_text
-    }
-
     for (cf in .data) {
       if (!is.null(formals(cf@formatter)["accuracy"])) {
         cff <- formals(cf@formatter)
@@ -1911,9 +1932,7 @@ column_formats <- new_class(
     S7::new_object(
       .data,
       accuracy = accuracy,
-      intercept_text = intercept_text,
-      starred_columns = starred_columns,
-      variable_labels = variable_labels
+      labels = labels
     )
   }
 )

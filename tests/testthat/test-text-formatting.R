@@ -523,3 +523,22 @@ test_that("apa_flextable handles columns that formatting combines or drops", {
   ft <- apa_flextable(parameters::parameters(lm(mpg ~ wt, data = mtcars)))
   expect_equal(ft$col_keys, c("Variable", "*B*", "*SE*", "95% CI", "*t*(30)", "*p*"))
 })
+
+test_that("column_formats takes labels named by the variables", {
+  cf <- column_formats(labels = c(n_siblings = "Number of Siblings"))
+  expect_equal(cf@labels, c(n_siblings = "Number of Siblings"))
+  withr::local_options(rlib_warning_verbosity = "verbose")
+  expect_warning(
+    old <- column_formats(variable_labels = c("Number of Siblings" = "n_siblings")),
+    "deprecated"
+  )
+  expect_equal(old@labels, cf@labels)
+})
+
+test_that("column_formats warns that intercept_text and starred_columns have no effect", {
+  withr::local_options(rlib_warning_verbosity = "verbose")
+  expect_warning(cf <- column_formats(intercept_text = "Intercept"), "no effect")
+  expect_s3_class(cf, "apa7::column_formats")
+  expect_warning(column_formats(starred_columns = "p"), "no effect")
+  expect_false(any(c("intercept_text", "starred_columns") %in% S7::prop_names(column_formats())))
+})

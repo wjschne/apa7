@@ -141,7 +141,7 @@
 #'
 #' # Descriptive statistics with tests of group differences
 #' d$Transmission <- factor(d$am, labels = c("Automatic", "Manual"))
-#' apa_descriptives(d, variables = c(mpg, hp), by = Transmission, test = TRUE) |>
+#' apa_descriptives(d, variables = c(mpg, hp), by = Transmission, test = "auto") |>
 #'   apa_note()
 #'
 #' # Factor analysis

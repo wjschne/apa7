@@ -137,6 +137,8 @@ Tables record how they were made in an `apa_note` attribute, and `apa_note(tbl)`
 
 ## Ideas / backlog
 
+- **Variable labels for every table** (after 0.3.0; decided 2026-11-26). `column_formats(labels = c(ses = "Socioeconomic status"))`, set for all tables with `apa7_defaults(column_formats = )`, becomes the default `labels` of every table function (`apa_parameters()`, `apa_descriptives()`, `apa_cor()`, `apa_reliability()`, `apa_chisq()`, and others). A `labels` argument in a call overrides it, and `format_variable_names` handles variables without a label. The `labels` property exists but is not used yet.
+
 <!-- New ideas go here until they get a priority -->
 
 - [x] Make a better contingency table article. `apa_chisq()` was rewritten (tibble output, `apa_note()`, percentages, Fisher's exact test), and `chisquare.qmd` was rewritten around it; its cell-statistics example moved to `summarize.qmd`.

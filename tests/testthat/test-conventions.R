@@ -21,6 +21,17 @@ table_functions <- table_functions[
       grepl(".", table_functions, fixed = TRUE)
 ]
 
+# Deprecated arguments of each function (ARG-7)
+deprecated <- list(
+  apa_cor = c(
+    "output", "note", "font_family", "font_size", "text_color", "border_color",
+    "border_width", "line_spacing", "table_width", "p_value"
+  ),
+  apa_p_star_note = "x",
+  add_break_columns = "d",
+  column_formats = c("variable_labels", "intercept_text", "starred_columns")
+)
+
 arg_names <- function(f) names(formals(get(f, ns)))
 after_dots <- function(f) {
   a <- arg_names(f)
@@ -55,10 +66,11 @@ test_that("ARG-1: the first argument of a table function is fit or data", {
 
 test_that("ARG-2: renamed argument names are not used for new arguments", {
   # Old names that 0.3.0 replaced. They may remain only as deprecated
-  # arguments after `...` (ARG-7).
-  retired <- c("p_value", "d")
+  # arguments (ARG-7).
+  retired <- c("p_value", "d", "variable_labels", "categorical_test")
   for (f in exported) {
-    expect_false(any(retired %in% setdiff(arg_names(f), after_dots(f))), label = f)
+    current <- setdiff(arg_names(f), c(after_dots(f), deprecated[[f]]))
+    expect_false(any(retired %in% current), label = f)
   }
 })
 
@@ -93,15 +105,11 @@ test_that("ARG-3: no function takes both digits and accuracy", {
 })
 
 test_that("ARG-7: deprecated arguments come after the current ones", {
-  deprecated <- list(
-    apa_cor = "p_value",
-    apa_p_star_note = "x",
-    add_break_columns = "d"
-  )
   for (f in names(deprecated)) {
     a <- arg_names(f)
     # After `...`, or last when the function has no `...`
-    ok <- if ("..." %in% a) deprecated[[f]] %in% after_dots(f) else utils::tail(a, 1) == deprecated[[f]]
+    old <- deprecated[[f]]
+    ok <- if ("..." %in% a) all(old %in% after_dots(f)) else setequal(utils::tail(a, length(old)), old)
     expect_true(ok, label = f)
   }
 })

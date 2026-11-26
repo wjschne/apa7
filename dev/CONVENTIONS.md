@@ -56,10 +56,17 @@ take `fit` or `data`, never `x`, even when they also accept other input
 | Grouping variable | `by` | `NULL` |
 | Reformat snake_case variable names for display | `format_variable_names` | `TRUE` |
 | Flag values past a cutoff | `flag` | `NULL` (no flag) |
+| Labels of variables, named by the variables | `labels` | `NULL` |
 | Model fit statistics to show | `metrics` | per model class |
 
-*Why:* 0.3.0 renamed `p_value`, `x`, and `d` because the same idea had
-different names. *Checked* (banned names).
+*Why:* 0.3.0 renamed `p_value`, `x`, `d`, and `variable_labels` because the
+same idea had different names. *Checked* (banned names).
+
+Different ideas keep different names, even when they sound alike:
+`star_significant` and `bold_significant` in `apa_cor()` switch stars or bold
+on for every correlation, while `starred` and `bolded` select the columns
+that get them; `factor_names` in `apa_loadings()` names factors, not
+variables.
 
 **ARG-3: `digits` versus `accuracy`.**
 Table functions that round their own output take `digits` (a count of
@@ -73,7 +80,10 @@ selects columns defaults to `NA` when none is the default.
 
 **ARG-5: Choices are character vectors resolved with `match.arg()`.**
 The first element is the default (e.g., `effect_size = c("eta", "omega",
-"epsilon")`). Logical arguments are reserved for on/off switches.
+"epsilon")`). When the choice may be made from the data, the choice is
+`"auto"` (e.g., `test = "auto"` in `apa_descriptives()`). Logical arguments
+are reserved for on/off switches; an argument that became a choice may keep
+accepting `TRUE` and `FALSE` as shorthand for two of its values.
 
 **ARG-6: Arguments after `...`.**
 Arguments come after `...` only when `...` holds a tidyselect selection
@@ -261,11 +271,9 @@ get the old behavior if it changed.
 
 ## Open inconsistencies
 
-Found while drafting this document (2026-11-26). Each needs a decision:
-fix it, or record it as an exception to the rule.
+Each needs a decision: fix it, or record it as an exception to the rule.
+None are open. The eleven found while drafting this document were resolved
+on 2026-11-26 (see NEWS.md and the exceptions noted under the rules).
 
 | # | Rule | Departure | Suggested resolution |
 |---|---|---|---|
-| 3 | ARG-2 | `apa_cor()` uses `star_significant` and `bold_significant` instead of `starred` and `bolded`. | Exception: they are switches over every correlation, not column selections |
-| 4 | ARG-2 | Variable relabeling is `labels` (`apa_chisq()`, `apa_descriptives()`), `variable_labels` (`column_formats()`), and `factor_names` (`apa_loadings()`). | Decide whether `factor_names` is a different idea; align the other two |
-| 5 | ARG-5 | `test` is logical in `apa_descriptives()` but a choice in `apa_chisq()` and `apa_htest()`. | Exception, or accept `test = "auto"` style values |

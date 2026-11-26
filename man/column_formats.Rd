@@ -7,10 +7,11 @@
 column_formats(
   .data = NULL,
   accuracy = NULL,
-  intercept_text = NULL,
-  starred_columns = character(0),
-  variable_labels = character(0),
-  custom_columns = NULL
+  labels = character(0),
+  custom_columns = NULL,
+  variable_labels,
+  intercept_text,
+  starred_columns
 )
 }
 \arguments{
@@ -18,13 +19,20 @@ column_formats(
 
 \item{accuracy}{rounding accuracy of the formatters (e.g., \code{.01} for two decimals). If \code{NULL} (default), the \code{accuracy} set with \code{\link[=apa7_defaults]{apa7_defaults()}}.}
 
-\item{intercept_text}{label of the intercept row (e.g., \code{"Constant"} or \code{"Intercept"})}
-
-\item{starred_columns}{names of columns to which significance stars are added}
-
-\item{variable_labels}{named character vector that relabels variables: the names are the labels and the values are the variable names (e.g., \code{c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")})}
+\item{labels}{named character vector of variable labels, named by the
+variables (e.g., \code{c(parental_income = "Parental Income", n_siblings = "Number of Siblings")}), as in \code{\link[=apa_descriptives]{apa_descriptives()}} and \code{\link[=apa_chisq]{apa_chisq()}}.
+It is stored in the \code{labels} property; the table functions do not use it
+yet.}
 
 \item{custom_columns}{named list of \code{\link[=column_format]{column_format()}} objects that are added, or that replace the formats of the same name}
+
+\item{variable_labels}{deprecated; use \code{labels}, with the variables as the
+names and the labels as the values}
+
+\item{intercept_text, starred_columns}{deprecated, and never used. Set the
+label of the intercept row for all tables with
+\code{apa7_defaults(intercept_text = )}, and the columns that get stars with
+the \code{starred} argument of each table function.}
 }
 \value{
 column_formats

@@ -100,7 +100,7 @@ test_that("apa_descriptives() checks its arguments", {
   expect_error(apa_descriptives(as.matrix(d)), "data frame")
   expect_error(apa_descriptives(d, by = "zzz"), "name of a column")
   expect_error(apa_descriptives(d, variables = "zzz"), "zzz")
-  expect_error(apa_descriptives(d, variables = "mpg", test = TRUE), "needs groups")
+  expect_error(apa_descriptives(d, variables = "mpg", test = TRUE), "need groups")
   expect_error(apa_descriptives(d, variables = "mpg", continuous = "mode"), "mean_sd")
   expect_error(apa_descriptives(d, variables = "mpg", continuous = c(zz = "median_iqr")), "unknown")
   d$one <- "a"
@@ -118,18 +118,24 @@ test_that("Fisher's exact test is used when expected counts are small", {
   note <- apa_note(auto)
   expect_match(note, "Fisher's exact test was used instead for Cyl and Gear, which had expected counts below 5.", fixed = TRUE)
 
-  chisq <- apa_descriptives(d, variables = "cyl", by = "am", test = TRUE, categorical_test = "chisq")
+  chisq <- apa_descriptives(d, variables = "cyl", by = "am", test = "chisq")
   p_chisq <- suppressWarnings(stats::chisq.test(table(d$cyl, d$am), correct = FALSE)$p.value)
   expect_equal(unpad(chisq$`*p*`[1]), sub("^0", "", sprintf("%.2f", p_chisq)))
   expect_no_match(apa_note(chisq), "Fisher", fixed = TRUE)
 
-  fisher <- apa_descriptives(d, variables = "cyl", by = "am", test = TRUE, categorical_test = "fisher")
+  fisher <- apa_descriptives(d, variables = "cyl", by = "am", test = "fisher")
   expect_match(apa_note(fisher), "Fisher's exact tests (categorical variables)", fixed = TRUE)
 
   # Large expected counts keep the chi-square test
   big <- data.frame(g = rep(c("a", "b"), each = 100), x = rep(c("u", "v"), 100))
   expect_no_match(apa_note(apa_descriptives(big, variables = "x", by = "g", test = TRUE)), "Fisher", fixed = TRUE)
-  expect_error(apa_descriptives(d, variables = "cyl", by = "am", test = TRUE, categorical_test = "exact"), "categorical_test")
+  expect_error(apa_descriptives(d, variables = "cyl", by = "am", test = "exact"), "test")
+  # TRUE and FALSE are shorthand for "auto" and "none"
+  expect_identical(
+    apa_descriptives(d, variables = c("cyl", "gear"), by = "am", test = "auto"),
+    auto
+  )
+  expect_false("*p*" %in% colnames(apa_descriptives(d, variables = "cyl", by = "am", test = FALSE)))
 })
 
 test_that("missing values can be shown in rows, and ranges added", {
