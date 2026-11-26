@@ -3558,7 +3558,8 @@ model_names <- function(models) {
 #' 2. Sets the font, font size, and text color of every cell.
 #' 3. Draws the three horizontal rules of an APA table: above the header, below
 #'    the header, and below the body.
-#' 4. Top-aligns the cells and centers the header text.
+#' 4. Top-aligns the body cells, centers the header text, and aligns the
+#'    header cells vertically with `header_align_vertical`.
 #' 5. Adds space above and below each cell's text, (`line_spacing` - 1) times
 #'    2/3 of the font size, so that rows have the spacing of `line_spacing`
 #'    while text that wraps within a cell stays single-spaced. In Typst output,
@@ -3576,8 +3577,7 @@ model_names <- function(models) {
 #'    [ftExtra::colformat_md()], except in the columns named in
 #'    `no_markdown_columns_header` and `no_markdown_columns` and in cells that
 #'    are already formatted.
-#' 9. If the first column is named `Variable` or `Predictor`, left-aligns it and
-#'    applies `header_align_vertical` to the header.
+#' 9. If the first column is named `Variable` or `Predictor`, left-aligns it.
 #'
 #' @param x a [flextable::flextable()]
 #' @param font_family font family (e.g., `"Times New Roman"` or `"Arial"`). If
@@ -3842,9 +3842,9 @@ apa_style <- function(
       )
     }
   }
+  x <- flextable::valign(x, valign = header_align_vertical, part = "header")
   if (x$col_keys[1] == "Variable" || x$col_keys[1] == "Predictor") {
-    x <- flextable::align(x, j = 1, align = "left", part = "body") |>
-      flextable::valign(valign = header_align_vertical, part = "header")
+    x <- flextable::align(x, j = 1, align = "left", part = "body")
   }
   x
 }

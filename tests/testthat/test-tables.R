@@ -1171,3 +1171,11 @@ test_that("apa_performance_comparison() stars several columns", {
   expect_true(grepl("*", cp[[grep("Delta", names(cp))[1]]][2], fixed = TRUE))
   expect_true(grepl("*", cp[[grep("F", names(cp), fixed = TRUE)[1]]][2], fixed = TRUE))
 })
+
+test_that("header_align_vertical aligns the header of every table", {
+  d <- data.frame(Group = "A", `Model 1_b` = 1, `Model 1_SE` = 2, check.names = FALSE)
+  for (va in c("top", "middle", "bottom")) {
+    ft <- apa_flextable(d, header_align_vertical = va)
+    expect_true(all(ft$header$styles$cells$vertical.align$data == va), label = va)
+  }
+})

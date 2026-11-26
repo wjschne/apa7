@@ -110,7 +110,8 @@ underscores, if \code{separate_headers = TRUE} and the header has one row.
 \item Sets the font, font size, and text color of every cell.
 \item Draws the three horizontal rules of an APA table: above the header, below
 the header, and below the body.
-\item Top-aligns the cells and centers the header text.
+\item Top-aligns the body cells, centers the header text, and aligns the
+header cells vertically with \code{header_align_vertical}.
 \item Adds space above and below each cell's text, (\code{line_spacing} - 1) times
 2/3 of the font size, so that rows have the spacing of \code{line_spacing}
 while text that wraps within a cell stays single-spaced. In Typst output,
@@ -128,8 +129,7 @@ page as the text that follows it.
 \code{\link[ftExtra:colformat_md]{ftExtra::colformat_md()}}, except in the columns named in
 \code{no_markdown_columns_header} and \code{no_markdown_columns} and in cells that
 are already formatted.
-\item If the first column is named \code{Variable} or \code{Predictor}, left-aligns it and
-applies \code{header_align_vertical} to the header.
+\item If the first column is named \code{Variable} or \code{Predictor}, left-aligns it.
 }
 }
 \examples{
