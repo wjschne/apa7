@@ -169,7 +169,7 @@ d_volunteer <- carData::Cowles |>
   )
 ```
 
-A preliminary look at the proportions of volunteering behavior in @fig-cowles shows that females were more likely to volunteer. A formal test that the difference is statistical is seen in @tbl-volunteer.
+A preliminary look at the proportions of volunteering behavior in @fig-cowles shows that females were more likely to volunteer. A formal test that the difference is statistically significant is seen in @tbl-volunteer.
 
 ```{r}
 #| label: fig-cowles
