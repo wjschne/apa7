@@ -862,18 +862,41 @@ apa_cor <- function(
 
 #' Convert data to flextable consistent with APA style
 #'
+#' The `apa_flextable` function formats a data frame and converts it to a
+#' flextable in APA style. See Details for the steps it takes.
 #'
-#' The `apa_flextable` function performs a number of formatting operations on the data before and after the data are sent to flextable. See Details.
+#' @details
+#' With a few minor details omitted, `apa_flextable` does roughly this:
 #'
-#'Roughly speaking, `apa_flextable` performs these operations by default:
+#' 1. Adds a break column between adjacent column spanners, if
+#'    `add_breaks_between_spanners = TRUE` and `separate_headers = TRUE`. A
+#'    break column is a narrow blank column without borders, so the rules
+#'    under adjacent spanners do not touch.
+#' 2. If `auto_format_columns = TRUE`, turns columns of whole numbers (e.g.,
+#'    degrees of freedom) into integers so that they have no decimals. Then
+#'    formats the columns with [apa_format_columns()]. Columns named in
+#'    `no_format_columns`, or in a `"no_format_columns"` attribute of the data
+#'    (set by functions such as [apa_loadings()]), are left as they are.
+#' 3. Makes the flextable. With `row_title_column`, it first restructures the
+#'    data with [flextable::as_grouped_data()], and each row title gets a rule
+#'    above it (`row_title_border`).
+#' 4. Separates the headers into spanners and deckered heads, if
+#'    `separate_headers = TRUE`.
+#' 5. Left-aligns the first column and centers the columns of numbers.
+#' 6. Applies [apa_style()] to style the table and convert markdown, if
+#'    `apa_style = TRUE`.
+#' 7. Aligns the row titles (`row_title_align`) and indents the rows under
+#'    them (`left_column_padding`).
+#' 8. Sets the column widths with [pretty_widths()], if `pretty_widths = TRUE`.
+#' 9. Lines up numbers padded by [align_chr()] on their decimal points.
+#' 10. Draws a rule above the rows named in a `"rule_above"` attribute of the
+#'    data (set by functions such as [apa_loadings()] and [apa_chisq()]).
+#' 11. Adds the note, if `note` is given. It is added last so that a long note
+#'    does not widen the columns.
 #'
-#' 1. Apply as_grouped_data and restructure row titles, if `row_title` is specified.
-#' 2. Format data with apa_format_columns if `auto_format_columns = TRUE`
-#' 3. Separate headers into multiple header rows if `separate_headers = TRUE`
-#' 3. Apply `flextable::flextable`
-#' 4. Apply `flextable::surround` to make borders to separate row groups, if any.
-#' 5. Apply the `apa_style` function (table formatting and markdown conversion) if `apa_style = TRUE`
-#' 6. Apply `pretty_widths` if `pretty_widths = TRUE`
+#' For a step-by-step version of this process, see the article
+#' [Building Tables by Hand](https://wjschne.github.io/apa7/articles/summarize.html).
+#'
 #' @param data data.frame or tibble
 #' @param row_title_column column whose values become heading rows that group
 #'   the rows below them (unquoted or quoted name, or a tidyselect helper). The

@@ -168,19 +168,41 @@ an argument of \code{apa_flextable()}, so this is rarely needed.}
 flextable::flextable
 }
 \description{
-The \code{apa_flextable} function performs a number of formatting operations on the data before and after the data are sent to flextable. See Details.
+The \code{apa_flextable} function formats a data frame and converts it to a
+flextable in APA style. See Details for the steps it takes.
 }
 \details{
-Roughly speaking, \code{apa_flextable} performs these operations by default:
+With a few minor details omitted, \code{apa_flextable} does roughly this:
 \enumerate{
-\item Apply as_grouped_data and restructure row titles, if \code{row_title} is specified.
-\item Format data with apa_format_columns if \code{auto_format_columns = TRUE}
-\item Separate headers into multiple header rows if \code{separate_headers = TRUE}
-\item Apply \code{flextable::flextable}
-\item Apply \code{flextable::surround} to make borders to separate row groups, if any.
-\item Apply the \code{apa_style} function (table formatting and markdown conversion) if \code{apa_style = TRUE}
-\item Apply \code{pretty_widths} if \code{pretty_widths = TRUE}
+\item Adds a break column between adjacent column spanners, if
+\code{add_breaks_between_spanners = TRUE} and \code{separate_headers = TRUE}. A
+break column is a narrow blank column without borders, so the rules
+under adjacent spanners do not touch.
+\item If \code{auto_format_columns = TRUE}, turns columns of whole numbers (e.g.,
+degrees of freedom) into integers so that they have no decimals. Then
+formats the columns with \code{\link[=apa_format_columns]{apa_format_columns()}}. Columns named in
+\code{no_format_columns}, or in a \code{"no_format_columns"} attribute of the data
+(set by functions such as \code{\link[=apa_loadings]{apa_loadings()}}), are left as they are.
+\item Makes the flextable. With \code{row_title_column}, it first restructures the
+data with \code{\link[flextable:as_grouped_data]{flextable::as_grouped_data()}}, and each row title gets a rule
+above it (\code{row_title_border}).
+\item Separates the headers into spanners and deckered heads, if
+\code{separate_headers = TRUE}.
+\item Left-aligns the first column and centers the columns of numbers.
+\item Applies \code{\link[=apa_style]{apa_style()}} to style the table and convert markdown, if
+\code{apa_style = TRUE}.
+\item Aligns the row titles (\code{row_title_align}) and indents the rows under
+them (\code{left_column_padding}).
+\item Sets the column widths with \code{\link[=pretty_widths]{pretty_widths()}}, if \code{pretty_widths = TRUE}.
+\item Lines up numbers padded by \code{\link[=align_chr]{align_chr()}} on their decimal points.
+\item Draws a rule above the rows named in a \code{"rule_above"} attribute of the
+data (set by functions such as \code{\link[=apa_loadings]{apa_loadings()}} and \code{\link[=apa_chisq]{apa_chisq()}}).
+\item Adds the note, if \code{note} is given. It is added last so that a long note
+does not widen the columns.
 }
+
+For a step-by-step version of this process, see the article
+\href{https://wjschne.github.io/apa7/articles/summarize.html}{Building Tables by Hand}.
 }
 \examples{
 # Means and SDs, with a heading row for each transmission type

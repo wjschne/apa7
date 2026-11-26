@@ -485,7 +485,7 @@ d |>
 The `apa_flextable` function does more than might be apparent at first glance. To understand what it does under the hood, I have outlined the major steps in changing a data frame into a flextable in APA format. With a few minor details omitted, it does roughly this:
 
 1. Adds a break column between adjacent column spanners, if `add_breaks_between_spanners = TRUE` and `separate_headers = TRUE`. A break column is a narrow blank column without borders, so the rules under adjacent spanners do not touch.
-2. If `auto_format_columns = TRUE`, turns columns of whole numbers (e.g., degrees of freedom) into integers so that they have no decimals. Then formats the columns with `apa_format_columns`,  Columns named in `no_format_columns`, or in a `"no_format_columns"` attribute of the data (set by functions such as `apa_loadings`), are left as they are.
+2. If `auto_format_columns = TRUE`, turns columns of whole numbers (e.g., degrees of freedom) into integers so that they have no decimals. Then formats the columns with `apa_format_columns`. Columns named in `no_format_columns`, or in a `"no_format_columns"` attribute of the data (set by functions such as `apa_loadings`), are left as they are.
 3. Makes the flextable. With `row_title_column`, it first restructures the data with `flextable::as_grouped_data`, and each row title gets a rule above it (`row_title_border`).
 4. Separates the headers into spanners and deckered heads, if `separate_headers = TRUE`.
 5. Left-aligns the first column and centers the columns of numbers.
