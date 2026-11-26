@@ -34,6 +34,6 @@ same order as in \code{\link[=apa_loadings]{apa_loadings()}}.
 fit <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "oblimin")
 apa_factor_cor(
   fit,
-  factor_names = c("Verbal", "Spatial", "Memory", "Speed")
+  factor_names = c("Verbal", "Spatial", "Speed", "Memory")
 )
 }

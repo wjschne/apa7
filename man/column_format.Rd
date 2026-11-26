@@ -34,7 +34,7 @@ R2 <- column_format(
          "R2",
          header = "*R*^2^",
          latex = "$R^2$",
-         formatter = \(x, accuracy = the$accuracy, ...) {
+         formatter = \(x, accuracy = .01, ...) {
                        align_chr(x,
                                  accuracy = accuracy,
                                  trim_leading_zeros = TRUE,
@@ -42,7 +42,7 @@ R2 <- column_format(
                        })
 R2
 R2@header
-R2@formatter
+R2@formatter(c(.123, .45))
 
 # Define an abbreviation in table notes
 SS <- column_formats()$Sum_Squares

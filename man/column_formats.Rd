@@ -53,7 +53,7 @@ Returns an S7 object that contains a list of \code{column_format} objects that c
 }}
 
 \examples{
-my_formatter <- column_formats()
-my_formatter$Coefficient@formatter <- \(x) round(x, 2)
-my_formatter$Coefficient@formatter(2.214)
+my_formats <- column_formats()
+my_formats$Coefficient@formatter <- \(x) round(x, 2)
+my_formats$Coefficient@formatter(2.214)
 }

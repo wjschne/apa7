@@ -865,18 +865,14 @@ apa_cor <- function(
 #' @export
 #'
 #' @examples
-#' library(dplyr)
-#' library(tidyr)
-#' library(flextable)
-#' mtcars %>%
-#'   dplyr::select(vs, am, gear, carb) |>
-#'   tidyr::pivot_longer(-vs,  names_to = "Variable") |>
-#'   dplyr::summarise(Mean = round(mean(value), 2),
-#'                    SD = round(sd(value), 2),
-#'                    .by = c(Variable,vs)) |>
-#'   dplyr::mutate(vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))) |>
-#'   apa_flextable(row_title_column= vs,  row_title_align = "center") |>
-#'   align(j = 2:3, align = "center")
+#' # Means and SDs, with a heading row for each transmission type
+#' d <- mtcars
+#' d$am <- factor(d$am, levels = 0:1, labels = c("Automatic", "Manual"))
+#' d[, c("am", "mpg", "hp", "wt")] |>
+#'   tidyr::pivot_longer(-am, names_to = "Variable") |>
+#'   dplyr::summarise(Mean = mean(value), SD = sd(value), .by = c(am, Variable)) |>
+#'   dplyr::arrange(am) |>
+#'   apa_flextable(row_title_column = am, row_title_align = "center")
 #'
 #' # Widths for a landscape page, one column of a two-column page, and 10 cm
 #' fit <- lm(mpg ~ wt + hp, data = mtcars)
@@ -1322,6 +1318,15 @@ align_padded_columns <- function(
 #'     ) |>
 #'     apa_flextable()
 #' }
+#'
+#' # Hierarchical regression: a list of models, with R-squared and its
+#' # change in rows below each model's parameters
+#' list(
+#'   `Model 1` = lm(mpg ~ cyl, data = mtcars),
+#'   `Model 2` = lm(mpg ~ cyl + wt, data = mtcars)
+#' ) |>
+#'   apa_parameters(performance_layout = "rows")
+#' @order 1
 apa_parameters <- function(
   fit,
   predictor_parameters = c(
@@ -1399,7 +1404,9 @@ apa_parameters.lm <- function(
 #' @export apa_parameters.glm
 #' @export
 #' @rdname apa_parameters
+#' @order 2
 #' @examples
+#' # Logistic regression, with odds ratios
 #' glm(am ~ wt + hp, data = mtcars, family = binomial) |>
 #'    apa_parameters() |>
 #'    apa_flextable()
@@ -2800,6 +2807,7 @@ performance_rows <- function(d_fit, comparison) {
 #' lm(mpg ~ cyl + wt, data = mtcars) |>
 #'    apa_performance() |>
 #'    apa_flextable()
+#' @order 1
 apa_performance <- function(
   fit,
   metrics = c("R2", "Sigma"),
@@ -3062,7 +3070,7 @@ has_fixed_dispersion <- function(fit) {
 #' @examples
 #' m1 <- lm(mpg ~ cyl, data = mtcars)
 #' m2 <- lm(mpg ~ cyl + wt, data = mtcars)
-#' apa_performance_comparison(list(`Model 1` =m1, `Model 3` =m2)) |>
+#' apa_performance_comparison(list(Cylinders = m1, `Cylinders and weight` = m2)) |>
 #'    apa_flextable()
 #'
 #' # Measurement invariance across schools
@@ -3650,6 +3658,12 @@ apa_style <- function(
 #'   `table_width` greater than 1 (without a name) is read in this unit.
 #' @return flextable::flextable
 #' @export
+#' @examples
+#' ft <- flextable::flextable(head(mtcars[, 1:4]))
+#' # Widths fitted to the contents
+#' pretty_widths(ft)
+#' # Widths stretched to a total of 4 inches
+#' pretty_widths(ft, table_width = c(inches = 4))
 pretty_widths <- function(
   x,
   min_width = 0.05,

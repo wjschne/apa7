@@ -36,5 +36,7 @@ character vector
 Return markdown text with hanging indent
 }
 \examples{
-hanging_indent("Hello Darkness, my old friend. I've come to talk with you again.")
+hanging_indent(
+  "Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Erlbaum."
+)
 }

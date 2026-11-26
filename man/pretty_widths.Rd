@@ -43,3 +43,10 @@ flextable::flextable
 \description{
 Use flextable::dim_pretty to fit column widths
 }
+\examples{
+ft <- flextable::flextable(head(mtcars[, 1:4]))
+# Widths fitted to the contents
+pretty_widths(ft)
+# Widths stretched to a total of 4 inches
+pretty_widths(ft, table_width = c(inches = 4))
+}

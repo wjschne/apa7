@@ -152,18 +152,14 @@ Roughly speaking, \code{apa_flextable} performs these operations by default:
 }
 }
 \examples{
-library(dplyr)
-library(tidyr)
-library(flextable)
-mtcars \%>\%
-  dplyr::select(vs, am, gear, carb) |>
-  tidyr::pivot_longer(-vs,  names_to = "Variable") |>
-  dplyr::summarise(Mean = round(mean(value), 2),
-                   SD = round(sd(value), 2),
-                   .by = c(Variable,vs)) |>
-  dplyr::mutate(vs = factor(vs, levels = 0:1, labels = c("Automatic", "Manual"))) |>
-  apa_flextable(row_title_column= vs,  row_title_align = "center") |>
-  align(j = 2:3, align = "center")
+# Means and SDs, with a heading row for each transmission type
+d <- mtcars
+d$am <- factor(d$am, levels = 0:1, labels = c("Automatic", "Manual"))
+d[, c("am", "mpg", "hp", "wt")] |>
+  tidyr::pivot_longer(-am, names_to = "Variable") |>
+  dplyr::summarise(Mean = mean(value), SD = sd(value), .by = c(am, Variable)) |>
+  dplyr::arrange(am) |>
+  apa_flextable(row_title_column = am, row_title_align = "center")
 
 # Widths for a landscape page, one column of a two-column page, and 10 cm
 fit <- lm(mpg ~ wt + hp, data = mtcars)

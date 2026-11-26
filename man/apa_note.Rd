@@ -146,14 +146,10 @@ fit <- aov(mpg ~ cyl * am, data = d)
 tbl <- apa_anova(fit, starred = "F")
 apa_note(tbl)
 
-if (requireNamespace("afex", quietly = TRUE)) {
-  data(obk.long, package = "afex")
-  fit_afex <- afex::aov_ez(
-    "id", "value", obk.long,
-    between = "treatment", within = "phase", fun_aggregate = mean
-  )
-  apa_note(apa_anova(fit_afex))
-}
+# Descriptive statistics with tests of group differences
+d$Transmission <- factor(d$am, labels = c("Automatic", "Manual"))
+apa_descriptives(d, variables = c(mpg, hp), by = Transmission, test = TRUE) |>
+  apa_note()
 
 # Factor analysis
 fit_fa <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "varimax")

@@ -36,7 +36,7 @@ Nested \code{lavaan} models (e.g., the configural, metric, and scalar models of 
 \examples{
 m1 <- lm(mpg ~ cyl, data = mtcars)
 m2 <- lm(mpg ~ cyl + wt, data = mtcars)
-apa_performance_comparison(list(`Model 1` =m1, `Model 3` =m2)) |>
+apa_performance_comparison(list(Cylinders = m1, `Cylinders and weight` = m2)) |>
    apa_flextable()
 
 # Measurement invariance across schools

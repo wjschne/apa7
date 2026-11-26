@@ -38,7 +38,7 @@ apa_p(.0002)
 # Values between .001 and .01 are rounded to 3 digits
 apa_p(.002)
 # Values between .01 and .995 are rounded to 2 digits
-apa_p(.02)#'
+apa_p(.02)
 apa_p(.22)
 apa_p(.994)
 # Values above .995 are >.99

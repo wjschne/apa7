@@ -31,5 +31,6 @@ By default, text is padded with one \code{padding_character} per missing visible
 }
 \examples{
 num_pad(c("a", "bb"))
-num_pad(c(paste0(intToUtf8(8722), "1"), "1"), font_family = "Times New Roman")
+# A minus sign (U+2212) and a figure-space-padded 1 have the same width
+num_pad(c("−1", "1"), font_family = "Times New Roman")
 }

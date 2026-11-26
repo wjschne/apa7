@@ -170,7 +170,7 @@ align_chr <- function(
 #' # Values between .001 and .01 are rounded to 3 digits
 #' apa_p(.002)
 #' # Values between .01 and .995 are rounded to 2 digits
-#' apa_p(.02)#'
+#' apa_p(.02)
 #' apa_p(.22)
 #' apa_p(.994)
 #' # Values above .995 are >.99
@@ -317,7 +317,9 @@ apa_p_star_note <- function(
 #' @export
 #'
 #' @examples
-#' hanging_indent("Hello Darkness, my old friend. I've come to talk with you again.")
+#' hanging_indent(
+#'   "Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Erlbaum."
+#' )
 hanging_indent <- function(
   x,
   indent = 4,
@@ -442,7 +444,8 @@ is_numeric_like <- function(x, elementwise = FALSE) {
 #'
 #' @examples
 #' num_pad(c("a", "bb"))
-#' num_pad(c(paste0(intToUtf8(8722), "1"), "1"), font_family = "Times New Roman")
+#' # A minus sign (U+2212) and a figure-space-padded 1 have the same width
+#' num_pad(c("−1", "1"), font_family = "Times New Roman")
 num_pad <- function(
   x,
   pad_left = TRUE,
@@ -825,7 +828,7 @@ header_md <- function(x, level = 1) {
 #'          "R2",
 #'          header = "*R*^2^",
 #'          latex = "$R^2$",
-#'          formatter = \(x, accuracy = the$accuracy, ...) {
+#'          formatter = \(x, accuracy = .01, ...) {
 #'                        align_chr(x,
 #'                                  accuracy = accuracy,
 #'                                  trim_leading_zeros = TRUE,
@@ -833,7 +836,7 @@ header_md <- function(x, level = 1) {
 #'                        })
 #' R2
 #' R2@header
-#' R2@formatter
+#' R2@formatter(c(.123, .45))
 #'
 #' # Define an abbreviation in table notes
 #' SS <- column_formats()$Sum_Squares
@@ -1729,9 +1732,9 @@ the$columns <- list(
 #' @export
 #'
 #' @examples
-#' my_formatter <- column_formats()
-#' my_formatter$Coefficient@formatter <- \(x) round(x, 2)
-#' my_formatter$Coefficient@formatter(2.214)
+#' my_formats <- column_formats()
+#' my_formats$Coefficient@formatter <- \(x) round(x, 2)
+#' my_formats$Coefficient@formatter(2.214)
 column_formats <- new_class(
   name = "column_formats",
   parent = class_list,
@@ -2463,8 +2466,9 @@ apa_format_columns <- function(
 #' @export
 #'
 #' @examples
-#'
-#' star_balance(".05\\^\\*\\*\\^")
+#' # Starred values get one figure space per star on the left,
+#' # so that the numbers line up when the column is centered
+#' star_balance(c(".32", ".04\\^\\*\\^", ".005\\^\\*\\*\\^"))
 star_balance <- function(x, star = "\\*", superscript = TRUE) {
   k <- stringr::str_count(x, star)
   ss <- strrep(ifelse(superscript, "^", ""), (k > 0) * 1)

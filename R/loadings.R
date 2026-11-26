@@ -240,7 +240,7 @@ apa_loadings <- function(
 #' fit <- psych::fa(Harman74.cor$cov, 4, fm = "pa", rotate = "oblimin")
 #' apa_factor_cor(
 #'   fit,
-#'   factor_names = c("Verbal", "Spatial", "Memory", "Speed")
+#'   factor_names = c("Verbal", "Spatial", "Speed", "Memory")
 #' )
 apa_factor_cor <- function(
   fit,
