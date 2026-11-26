@@ -35,7 +35,8 @@ as in \code{\link[=apa_parameters]{apa_parameters()}} (e.g., "factor(cyl)" becom
 becomes "Wt \eqn{\times}{x} Hp"). Set to \code{FALSE} to keep the names exactly as
 \code{\link[performance:check_collinearity]{performance::check_collinearity()}} gives them.}
 
-\item{digits}{number of decimal places}
+\item{digits}{number of decimal places (unaffected by
+\code{apa7_defaults(accuracy = )})}
 
 \item{...}{arguments passed to \code{\link[performance:check_collinearity]{performance::check_collinearity()}} (e.g.,
 \code{component})}

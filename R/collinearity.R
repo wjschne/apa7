@@ -40,7 +40,8 @@
 #'   as in [apa_parameters()] (e.g., "factor(cyl)" becomes "Cyl", and "wt:hp"
 #'   becomes "Wt \eqn{\times}{x} Hp"). Set to `FALSE` to keep the names exactly as
 #'   [performance::check_collinearity()] gives them.
-#' @param digits number of decimal places
+#' @param digits number of decimal places (unaffected by
+#'   `apa7_defaults(accuracy = )`)
 #' @param ... arguments passed to [performance::check_collinearity()] (e.g.,
 #'   `component`)
 #'

@@ -11,7 +11,8 @@ apa_factor_cor(fit, factor_names = NULL, digits = 2)
 
 \item{factor_names}{names for the factors. Either an unnamed character vector in the order the factors appear in the table (psych orders factors by variance explained), or a named vector that maps the original names to new names (e.g., \code{c(PA1 = "Verbal")}). The unnamed form is safer: after an oblimin rotation, the labels psych assigns (PA1, PA2, ...) can change from one run to the next, but the order of the factors does not.}
 
-\item{digits}{number of decimal places}
+\item{digits}{number of decimal places (unaffected by
+\code{apa7_defaults(accuracy = )})}
 }
 \value{
 \code{apa7_tbl} (tibble)

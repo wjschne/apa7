@@ -150,7 +150,7 @@ apa_n_factors <- function(
 n_factors_method_labels <- function(methods) {
   labels <- c(
     `Acceleration factor` = "Acceleration factor",
-    CNG = "Cattell–Nelson–Gorsuch (CNG)",
+    CNG = "Cattell\u2013Nelson\u2013Gorsuch (CNG)",
     beta = "Multiple regression (*&beta;*)",
     t = "Multiple regression (*t*)",
     p = "Multiple regression (*p*)",

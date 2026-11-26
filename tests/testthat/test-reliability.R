@@ -171,3 +171,17 @@ test_that("select_names() ignores the names of a selection", {
   expect_equal(select_names(rlang::quo(c(x = a, y = b)), d), c("a", "b"))
   expect_equal(select_names(rlang::quo(starts_with("b")), d), "b")
 })
+
+test_that("flag takes a cutoff for item-total correlations", {
+  d <- psych::bfi[, paste0("A", 1:5)]
+  flagged <- apa_reliability(d, reverse = "A1", item_range = c(1, 6), flag = .45)
+  rit <- flagged$`*r*~it~`[1:5]
+  expect_true(all(grepl("**", rit, fixed = TRUE) == (as_num(rit) < .45)))
+  expect_match(apa_note(flagged), "below .45", fixed = TRUE)
+  expect_identical(
+    apa_reliability(d, flag = TRUE),
+    apa_reliability(d, flag = .30)
+  )
+  expect_false(any(grepl("**", apa_reliability(d)$`*r*~it~`, fixed = TRUE)))
+  expect_error(apa_reliability(d, flag = "yes"), "must be")
+})

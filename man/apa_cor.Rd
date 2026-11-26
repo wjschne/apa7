@@ -7,7 +7,7 @@
 apa_cor(
   data,
   note = NULL,
-  p_value = c(0.05, 0.01, 0.001),
+  alpha = c(0.05, 0.01, 0.001),
   digits = 2,
   bold_significant = FALSE,
   star_significant = TRUE,
@@ -26,37 +26,51 @@ apa_cor(
   method = "pearson",
   p_adjust = "none",
   partial = FALSE,
-  ...
+  ...,
+  p_value
 )
 }
 \arguments{
 \item{data}{data.frame or tibble with variables to be correlated, or the
 output of \code{\link[correlation:correlation]{correlation::correlation()}} (see Details)}
 
-\item{note}{Custom note to appear below table. (Overrides automatic note.)}
+\item{note}{note placed below the table, replacing the automatic note
+(for \code{output = "flextable"})}
 
-\item{p_value}{p-value needed to be flagged as significant}
+\item{alpha}{\emph{p}-value thresholds for significance stars, from largest to
+smallest (default: \code{c(.05, .01, .001)}, for one, two, and three stars).
+With \code{bold_significant = TRUE}, only the first is used.}
 
-\item{digits}{Number of digits for rounding}
+\item{digits}{number of decimal places of the correlations (unaffected by
+\code{apa7_defaults(accuracy = )})}
 
-\item{bold_significant}{bold significant correlations}
+\item{bold_significant}{if \code{TRUE}, correlations with \emph{p} below the first
+\code{alpha} are bolded instead of starred. If \code{FALSE} (default), they are not.}
 
-\item{star_significant}{start significant correlations}
+\item{star_significant}{if \code{TRUE} (default), significant correlations get
+stars (one for each \code{alpha} they are below). Ignored when
+\code{bold_significant = TRUE}. Model tables such as \code{\link[=apa_parameters]{apa_parameters()}} do the
+same with their \code{starred} and \code{bolded} arguments.}
 
-\item{significance_note}{If TRUE, place note at bottom of table that significant correlations are bolded.}
+\item{significance_note}{if \code{TRUE} (default), the note explains the stars
+(or the bolding) when any correlation is significant}
 
-\item{output}{output type. Can be "flextable" or "tibble"}
+\item{output}{\code{"flextable"} (default) for a formatted table, or \code{"tibble"}
+for a tibble of the formatted values (without a note)}
 
-\item{font_family}{font family}
+\item{font_family}{font family (e.g., \code{"Times New Roman"} or \code{"Arial"}). If
+\code{NULL} (default), the font set with \code{apa7_defaults(font_family = )}
+(Times New Roman unless changed).}
 
 \item{font_size}{font size, in points. If \code{NULL} (default), the size set
 with \code{apa7_defaults(font_size = )} (12 unless changed).}
 
-\item{text_color}{text color}
+\item{text_color}{color of the text: an R color name (e.g., \code{"black"}, the
+default) or a hex code (e.g., \code{"#333333"})}
 
-\item{border_color}{border color}
+\item{border_color}{color of the rules, in the same forms as \code{text_color}}
 
-\item{border_width}{border width in pixels}
+\item{border_width}{width of the rules, in points (default: 0.5)}
 
 \item{line_spacing}{spacing between lines of the header and body (e.g., 2
 for double spacing or 1 for single spacing). If \code{NULL} (default), the
@@ -81,11 +95,14 @@ the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments
 \code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
 warning to write it as \code{c(inches = )}.}
 
-\item{keep_empty_star_columns}{Keep remove empty star columns (Default: \code{TRUE})}
+\item{keep_empty_star_columns}{if \code{TRUE} (default), every correlation
+column keeps its star column, even when no correlation in it is
+significant, so that the columns have the same width. If \code{FALSE}, empty
+star columns are removed.}
 
 \item{summary_functions}{Any named list of functions that summarize data columns (e.g., \code{list(Mean = mean, SD = sd)}). Can also be a character vector of function names (e.g., \code{c("n", "M", "SD")}). Functions available in a character vector: IQR, Interquartile Range, Kurtosis, MAD, Median Absolute Deviation, M, Mean, Med, Median, n, N, Quantile, Range, SD, Skewness, Var, Variance}
 
-\item{column_formats}{column_formats object}
+\item{column_formats}{\code{\link[=column_formats]{column_formats()}} object. If \code{NULL} (default), the default column formats are used.}
 
 \item{method}{kind of correlation (e.g., \code{"pearson"}, \code{"spearman"},
 \code{"kendall"}, \code{"biweight"}, or \code{"percentage"}), passed to
@@ -104,6 +121,8 @@ output.}
 \item{...}{other arguments passed to \code{\link[correlation:correlation]{correlation::correlation()}} (e.g.,
 \code{robust = TRUE}, \code{winsorize = .2}, or \code{multilevel = TRUE}). Not used for
 \code{\link[correlation:correlation]{correlation::correlation()}} output.}
+
+\item{p_value}{deprecated; use \code{alpha}}
 }
 \value{
 flextable::flextable

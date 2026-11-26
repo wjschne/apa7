@@ -9,7 +9,7 @@ matrix_display(x, bracket = c("[", "(", "|", ""), include_names = TRUE)
 \arguments{
 \item{x}{a matrix}
 
-\item{bracket}{type of bracket: bmatrix, Bmatrix, pmatrix, vmatrix, Vmatrix, , matrix}
+\item{bracket}{bracket around the matrix: \code{"["} (default) for square brackets, \code{"("} for parentheses, \code{"|"} for vertical bars (as for a determinant), or \code{""} for none}
 
 \item{include_names}{if \code{TRUE} (default), the matrix's row and column names are displayed above and to the left of the matrix}
 }

@@ -5,29 +5,38 @@
 \title{Add break columns}
 \usage{
 add_break_columns(
-  d,
+  data,
   ...,
   .before = FALSE,
   omit_first = FALSE,
-  omit_last = FALSE
+  omit_last = FALSE,
+  d
 )
 }
 \arguments{
-\item{d}{data.frame or tibble}
+\item{data}{data.frame or tibble}
 
-\item{...}{Column name or tidyselect function. Select columns}
+\item{...}{columns after which break columns are inserted: unquoted or
+quoted names, or tidyselect helpers (e.g., \code{ends_with("_mean")})}
 
-\item{.before}{insert break columns before selected columns (defaults to FALSE)}
+\item{.before}{if \code{TRUE}, break columns are inserted before the selected
+columns instead of after them (default: \code{FALSE})}
 
-\item{omit_first}{omit the first break column}
+\item{omit_first}{if \code{TRUE}, no break column is inserted at the first
+selected column}
 
-\item{omit_last}{omit the last break column}
+\item{omit_last}{if \code{TRUE}, no break column is inserted at the last
+selected column}
+
+\item{d}{deprecated; use \code{data}}
 }
 \value{
 data.frame or tibble
 }
 \description{
-Add break columns
+Inserts an empty column after (or before) each selected column. In
+\code{\link[=apa_flextable]{apa_flextable()}}, empty columns separate groups of columns, such as
+those under different column spanners.
 }
 \examples{
 d <- data.frame(x_n = 3, x_mean = 4,

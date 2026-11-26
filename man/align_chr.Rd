@@ -24,11 +24,11 @@ align_chr(
 
 \item{accuracy}{number to round to. If NULL, the current default accuracy set with \code{\link[=apa7_defaults]{apa7_defaults()}} will be used.}
 
-\item{trim_leading_zeros}{if TRUE (default), trims leading zeros, otherwise keeps them}
+\item{trim_leading_zeros}{if \code{TRUE}, leading zeros are removed (e.g., .45 instead of 0.45), as APA style requires for values that cannot exceed 1 (correlations, proportions, \emph{p}-values). If \code{FALSE} (default), they are kept.}
 
 \item{drop0trailing}{Drop trailing zeros}
 
-\item{add_plusses}{if TRUE (default), adds a plus to positive numbers}
+\item{add_plusses}{if \code{TRUE}, positive numbers get a plus sign. If \code{FALSE} (default), they do not.}
 
 \item{padding_character}{character to use for padding, default is \verb{&numsp;} (figure space). With the default, text is padded to equal rendered width in the default font family (see \code{\link[=num_pad]{num_pad()}} and the \code{width_aware_padding} argument of \code{\link[=apa7_defaults]{apa7_defaults()}}).}
 

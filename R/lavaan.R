@@ -351,7 +351,7 @@ and_list <- function(x) {
 }
 
 #' @param standardize for `lavaan` models, if `TRUE` (default), fully standardized estimates (\eqn{\beta}{beta}) are displayed with their standard errors and *p*-values. If `FALSE`, unstandardized estimates (*B*) are displayed.
-#' @param variances,intercepts for `lavaan` models, if `TRUE`, sections for (residual) variances or intercepts are added. Both are `FALSE` by default.
+#' @param variances,intercepts for `lavaan` models, if `TRUE`, sections for (residual) variances or intercepts are added. Both are `FALSE` by default. (The `variance` argument of [apa_loadings()] is different: it adds rows for the variance explained by each factor.)
 #' @param ci for `lavaan` models, confidence level of intervals shown when `predictor_parameters` includes `"CI"`
 #' @param groups for multiple-group `lavaan` models, `"columns"` (default) shows the groups side by side, each under a column spanner, and `"rows"` stacks them, each under a heading row.
 #' @details

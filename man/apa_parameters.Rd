@@ -26,8 +26,8 @@
 apa_parameters(
   fit,
   predictor_parameters = c("Coefficient", "SE", "Std_Coefficient", "t", "df_error", "p"),
-  starred = NULL,
-  bolded = NULL,
+  starred = NA,
+  bolded = NA,
   column_formats = NULL,
   t_with_df = TRUE,
   ...
@@ -256,17 +256,28 @@ apa_parameters(
 )
 }
 \arguments{
-\item{fit}{model fit object}
+\item{fit}{a fitted model: \code{lm}, \code{glm} (including \code{MASS::glm.nb}), \code{aov},
+\code{aovlist}, \code{afex_aov}, ordinal (\code{MASS::polr}, \code{ordinal::clm}), mixed
+(\code{lme4::lmer}, \code{lme4::glmer}, \code{glmmTMB::glmmTMB}, \code{nlme::lme}), generalized
+additive (\code{mgcv::gam}, \code{mgcv::bam}), structural equation (\code{lavaan}),
+meta-analysis (\code{metafor::rma}), multinomial (\code{nnet::multinom}), or
+zero-inflated and hurdle (\code{pscl::zeroinfl}, \code{pscl::hurdle}) models, or a
+named list of models of the same kind (see \code{performance_parameters})}
 
-\item{predictor_parameters}{predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., \code{t} for a model tested with \emph{z}) are silently dropped. For lists of models, \code{NULL} (default) uses the default for each model's class. Add \code{"CI"} to show confidence intervals as [\emph{LL}, \emph{UL}] (headed, e.g., "95\% CI"), and, for \code{glm}, \code{polr}, and \code{clm} models, \code{"Exp_CI"} to show confidence intervals of exponentiated coefficients (headed, e.g., "95\% CI for \emph{OR}"). Confidence intervals are not shown by default.}
+\item{predictor_parameters}{columns to display, in order, named as in
+\code{\link[parameters:model_parameters]{parameters::model_parameters()}}: \code{"Parameter"}, \code{"Coefficient"}, \code{"SE"},
+\code{"Std_Coefficient"} (standardized coefficient, \emph{β}), \code{"CI"}, \code{"t"},
+\code{"z"}, \code{"df_error"}, \code{"p"}, and, for models with a log or logit link,
+\code{"Exp_Coefficient"} and \code{"Exp_CI"}. If named vector, column names will be vector names. Columns not present in the model output (e.g., \code{t} for a model tested with \emph{z}) are silently dropped. For lists of models, \code{NULL} (default) uses the default for each model's class. Add \code{"CI"} to show confidence intervals as [\emph{LL}, \emph{UL}] (headed, e.g., "95\% CI"), and, for \code{glm}, \code{polr}, and \code{clm} models, \code{"Exp_CI"} to show confidence intervals of exponentiated coefficients (headed, e.g., "95\% CI for \emph{OR}"). Confidence intervals are not shown by default.}
 
-\item{starred}{columns to star with significant p_values}
+\item{starred}{columns to which significance stars are added (e.g., \code{"Coefficient"} or \code{"p"}). \code{NULL} or \code{NA} for none.}
 
-\item{bolded}{columns to bold, if significant}
+\item{bolded}{columns whose values are bolded when \emph{p} \eqn{\le}{<=} .05
+(e.g., \code{"Coefficient"}). \code{NULL} or \code{NA} (default) for none.}
 
-\item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
+\item{column_formats}{\code{\link[=column_formats]{column_formats()}} object to format columns. If \code{NULL} (default), the column formats set with \code{\link[=apa7_defaults]{apa7_defaults()}}.}
 
-\item{t_with_df}{if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.}
+\item{t_with_df}{if \code{TRUE} (default), the \emph{t} column header includes the degrees of freedom (e.g., \emph{t}(29)), and the \emph{df} column is dropped, when all rows have the same \emph{df}. If \code{FALSE}, \emph{t} and \emph{df} are separate columns.}
 
 \item{...}{arguments passed to methods. For \code{lm}, \code{glm}, \code{polr}, and \code{clm} models, further arguments are passed to \code{\link[parameters:model_parameters]{parameters::model_parameters()}}. For example, \code{vcov = "HC3"} gives heteroskedasticity-consistent (robust) standard errors, and the test statistics, \emph{p}-values, and confidence intervals are based on them. \code{ci = .90} sets the confidence level.}
 
@@ -278,7 +289,7 @@ under their own headings, \code{"parametric"}, or \code{"smooth"}}
 
 \item{standardize}{for \code{lavaan} models, if \code{TRUE} (default), fully standardized estimates (\eqn{\beta}{beta}) are displayed with their standard errors and \emph{p}-values. If \code{FALSE}, unstandardized estimates (\emph{B}) are displayed.}
 
-\item{variances, intercepts}{for \code{lavaan} models, if \code{TRUE}, sections for (residual) variances or intercepts are added. Both are \code{FALSE} by default.}
+\item{variances, intercepts}{for \code{lavaan} models, if \code{TRUE}, sections for (residual) variances or intercepts are added. Both are \code{FALSE} by default. (The \code{variance} argument of \code{\link[=apa_loadings]{apa_loadings()}} is different: it adds rows for the variance explained by each factor.)}
 
 \item{thresholds}{for ordinal models, if \code{TRUE} (default), threshold (cutpoint) rows are displayed below the predictors. For \code{lavaan} models, if \code{TRUE}, a section for the thresholds of ordinal indicators is added (\code{FALSE} by default).}
 

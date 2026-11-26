@@ -45,51 +45,70 @@ apa_flextable(
 \arguments{
 \item{data}{data.frame or tibble}
 
-\item{row_title_column}{Column name or tidyselect function. column to group rows}
+\item{row_title_column}{column whose values become heading rows that group
+the rows below them (unquoted or quoted name, or a tidyselect helper). The
+column itself is not displayed. Rows should already be sorted by it.}
 
-\item{row_title_align}{alignment of row title ("left", "center", "right")}
+\item{row_title_align}{alignment of the heading rows: \code{"left"} (default),
+\code{"center"}, or \code{"right"}}
 
-\item{row_title_prefix}{text to be added to each title}
+\item{row_title_prefix}{text placed before each heading (e.g., \code{"Group"}
+gives "Group A")}
 
-\item{row_title_sep}{separator for prefix}
+\item{row_title_sep}{text between \code{row_title_prefix} and the heading
+(default: a space)}
 
-\item{row_title_border}{list of flextable styles}
+\item{row_title_border}{border drawn around each group of rows: a list of
+\code{color}, \code{style}, and \code{width} (in points), as in \code{\link[officer:fp_border]{officer::fp_border()}}}
 
-\item{left_column_padding}{Number of points the left column is padded (only relevant when there is a \code{row_title_column} and \code{row_title_align = "left"})}
+\item{left_column_padding}{left padding of the first column's body rows, in points, which indents them under left-aligned heading rows (only used with \code{row_title_column} and \code{row_title_align = "left"})}
 
-\item{col_keys}{column keys passed to flextable (defaults data column names)}
+\item{col_keys}{columns to display, in order (default: all columns of
+\code{data}), passed to \code{\link[flextable:flextable]{flextable::flextable()}}}
 
-\item{cwidth}{initial cell width in inches}
+\item{cwidth, cheight}{initial cell width and height in inches, passed to
+\code{\link[flextable:flextable]{flextable::flextable()}}. With \code{pretty_widths = TRUE} (default), the
+widths are then fitted to the contents and \code{table_width}.}
 
-\item{cheight}{initial cell height in inches}
+\item{header_align_vertical}{vertical alignment of header text when header
+cells differ in height: \code{"top"} (default), \code{"middle"}, or \code{"bottom"}}
 
-\item{header_align_vertical}{vertical alignment of headers. Can be "top", "middle", or "bottom"}
+\item{separate_headers}{if \code{TRUE} (default), column names with an
+underscore become two header rows: the part before it is a column
+spanner over the columns that share it (e.g., \verb{Model 1_B} and
+\verb{Model 1_SE} share a "Model 1" spanner)}
 
-\item{separate_headers}{separate header rows (default: \code{TRUE})}
+\item{apa_style}{if \code{TRUE} (default), \code{\link[=apa_style]{apa_style()}} is applied (fonts,
+borders, spacing, and markdown)}
 
-\item{apa_style}{apply \code{apa_style} function (default: \code{TRUE})}
-
-\item{font_family}{font family}
+\item{font_family}{font family (e.g., \code{"Times New Roman"} or \code{"Arial"}). If
+\code{NULL} (default), the font set with \code{apa7_defaults(font_family = )}
+(Times New Roman unless changed).}
 
 \item{font_size}{font size, in points. If \code{NULL} (default), the size set
 with \code{apa7_defaults(font_size = )} (12 unless changed).}
 
-\item{text_color}{text color}
+\item{text_color}{color of the text: an R color name (e.g., \code{"black"}, the
+default) or a hex code (e.g., \code{"#333333"})}
 
-\item{border_color}{border color}
+\item{border_color}{color of the rules, in the same forms as \code{text_color}}
 
-\item{border_width}{border width in pixels}
+\item{border_width}{width of the rules, in points (default: 0.5)}
 
 \item{line_spacing}{spacing between lines of the header and body (e.g., 2
 for double spacing or 1 for single spacing). If \code{NULL} (default), the
 spacing set with \code{apa7_defaults(line_spacing = )} (2 unless changed). Table
 notes are single-spaced.}
 
-\item{horizontal_padding}{horizontal padding (in pixels)}
+\item{horizontal_padding}{space to the left and right of each cell's
+contents, in points (default: 3)}
 
-\item{table_align}{table alignment ("left", "center", "right")}
+\item{table_align}{alignment of the table on the page: \code{"left"} (default),
+\code{"center"}, or \code{"right"}}
 
-\item{layout}{table layout ("autofit", "fixed")}
+\item{layout}{\code{"autofit"} (default) lets the column widths adjust to the
+contents in Word; \code{"fixed"} keeps the widths as set (see
+\code{\link[flextable:set_table_properties]{flextable::set_table_properties()}})}
 
 \item{table_width}{width of the table, in the same forms in every apa7
 function: a proportion from 0 to 1 of the default width (the full width
@@ -109,29 +128,41 @@ the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments
 \code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
 warning to write it as \code{c(inches = )}.}
 
-\item{markdown}{apply markdown formatting to header and body}
+\item{markdown}{if \code{TRUE} (default), text in the header and body is
+converted from markdown (e.g., \verb{*p*} becomes an italic \emph{p})}
 
-\item{markdown_header}{apply markdown formatting to header}
+\item{markdown_header, markdown_body}{whether the header or the body is
+converted from markdown (both default to \code{markdown})}
 
-\item{markdown_body}{apply markdown formatting to body}
+\item{no_markdown_columns}{body columns whose text is shown as it is, not
+converted from markdown (unquoted or quoted names, or tidyselect helpers)}
 
-\item{no_markdown_columns}{body columns that should not be treated as markdown}
-
-\item{no_markdown_columns_header}{column headers that should not be treated as markdown}
+\item{no_markdown_columns_header}{column headers that are not treated as
+markdown. If \code{NULL} (default), every header is treated as markdown. (In
+\code{\link[=apa_style]{apa_style()}}, the default is \code{no_markdown_columns}. Here it differs
+because numeric columns are added to \code{no_markdown_columns}, and their
+headers still need markdown.)}
 
 \item{no_format_columns}{Column name or tidyselect function. selected columns are not formatted. Columns named in a \code{"no_format_columns"} attribute of \code{data} (set by functions such as \code{\link[=apa_loadings]{apa_loadings()}}) are not formatted either. Likewise, a rule is drawn above the first body row whose first-column text matches a \code{"rule_above"} attribute of \code{data}.}
 
-\item{auto_format_columns}{if true, will attempt to format some columns automatically}
+\item{auto_format_columns}{if \code{TRUE} (default), columns whose names have a
+format in \code{column_formats} (e.g., \code{p}, \code{SE}, or \code{R2}) are formatted and
+given APA headers with \code{\link[=apa_format_columns]{apa_format_columns()}}}
 
-\item{column_formats}{a column_formats object}
+\item{column_formats}{a \code{\link[=column_formats]{column_formats()}} object. If \code{NULL} (default), the
+column formats set with \code{\link[=apa7_defaults]{apa7_defaults()}}.}
 
-\item{pretty_widths}{apply \code{pretty_widths} function}
+\item{pretty_widths}{if \code{TRUE} (default), column widths are fitted to the
+contents and to \code{table_width} with \code{\link[=pretty_widths]{pretty_widths()}}}
 
-\item{add_breaks_between_spanners}{add breaks between spanners if TRUE}
+\item{add_breaks_between_spanners}{if \code{TRUE} (default), a narrow empty
+column separates adjacent column spanners (see \code{separate_headers}), so
+that their rules do not touch}
 
 \item{note}{table note placed below the table, after "\emph{Note}.". The note is single-spaced. If \code{TRUE}, the note is written by \code{\link[=apa_note]{apa_note()}} from what a table function such as \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_parameters]{apa_parameters()}}, or \code{\link[=apa_loadings]{apa_loadings()}} recorded. A character string is used as the note (markdown is allowed), and \code{NULL} or \code{FALSE} (default) adds no note. Use this for documents that are not made with apaquarto. With apaquarto, use the \code{apa-note} chunk option instead (e.g., \verb{#| apa-note: !expr apa7::apa_note(tbl)}), so that the note is placed and styled by apaquarto and is not added twice.}
 
-\item{...}{arguments passed to \code{apa_style}}
+\item{...}{passed to \code{\link[=apa_style]{apa_style()}}. Every argument of \code{\link[=apa_style]{apa_style()}} is also
+an argument of \code{apa_flextable()}, so this is rarely needed.}
 }
 \value{
 flextable::flextable

@@ -16,15 +16,15 @@ column_formats(
 \arguments{
 \item{.data}{list of \code{column_format} objects}
 
-\item{accuracy}{numeric (passed to scales::number)}
+\item{accuracy}{rounding accuracy of the formatters (e.g., \code{.01} for two decimals). If \code{NULL} (default), the \code{accuracy} set with \code{\link[=apa7_defaults]{apa7_defaults()}}.}
 
-\item{intercept_text}{describe intercept}
+\item{intercept_text}{label of the intercept row (e.g., \code{"Constant"} or \code{"Intercept"})}
 
-\item{starred_columns}{which columns get p-value stars}
+\item{starred_columns}{names of columns to which significance stars are added}
 
-\item{variable_labels}{named vector of variable names (with vector names as labels). For example, c(\verb{Parental Income} = "parental_income", \verb{Number of Siblings} = "n_siblings")}
+\item{variable_labels}{named character vector that relabels variables: the names are the labels and the values are the variable names (e.g., \code{c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")})}
 
-\item{custom_columns}{named list of column_formats to add or replace existing columns}
+\item{custom_columns}{named list of \code{\link[=column_format]{column_format()}} objects that are added, or that replace the formats of the same name}
 }
 \value{
 column_formats

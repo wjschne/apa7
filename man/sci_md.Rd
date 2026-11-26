@@ -7,15 +7,13 @@
 sci_md(x, digits = 2, lb = 0.0095, ub = 99.5, align = FALSE)
 }
 \arguments{
-\item{x}{Numeric vector}
+\item{x}{numeric vector}
 
-\item{digits}{number of digits of precision}
+\item{digits}{number of decimal places (of the mantissa, for numbers in scientific notation)}
 
-\item{lb}{lower bound where scientific notation is turned on}
+\item{lb, ub}{numbers at or below \code{lb} or at or above \code{ub} are written in scientific notation (e.g., 2.46 × 10^7^); numbers between them are written as usual}
 
-\item{ub}{upper bound where scientific notation is turned on}
-
-\item{align}{decimal align}
+\item{align}{if \code{TRUE}, the numbers are aligned on the decimal point with \code{\link[=align_chr]{align_chr()}}}
 }
 \value{
 A character vector

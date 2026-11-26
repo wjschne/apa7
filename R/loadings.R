@@ -47,13 +47,17 @@
 #' @param sort_loading sort the rows so that variables are grouped by the factor with their largest loading, and by the size of that loading within each factor (as in [psych::fa.sort()]). If `FALSE`, the rows keep the order of the model (for `lavaan` models, the order of the model syntax).
 #' @param min_loading minimum absolute loading to display. Use `NA` or 0 to show all loadings. Defaults to .2, except for `lavaan` models, whose estimated loadings are all shown.
 #' @param factor_names names for the factors. Either an unnamed character vector in the order the factors appear in the table (psych orders factors by variance explained), or a named vector that maps the original names to new names (e.g., `c(PA1 = "Verbal")`). The unnamed form is safer: after an oblimin rotation, the labels psych assigns (PA1, PA2, ...) can change from one run to the next, but the order of the factors does not.
-#' @param variance add rows for the variance explained by each factor
+#' @param variance if `TRUE`, rows are added for the variance explained by
+#'   each factor (sums of squared loadings, proportion, and cumulative
+#'   proportion). Not to be confused with the `variances` argument of
+#'   [apa_parameters()] for `lavaan` models, which adds residual variances.
 #' @param communality add a communality (*h*^2^) column
 #' @param uniqueness add a uniqueness (*u*^2^) column
 #' @param complexity add a column with Hofmann's complexity index
 #' @param bold_max bold the largest displayed loading (in absolute value) in each row
 #' @param format_variable_names format the variable names with the `Variable` column format. Set to `FALSE` to keep item text exactly as it is.
-#' @param digits number of decimal places for loadings
+#' @param digits number of decimal places for loadings (unaffected by
+#'   `apa7_defaults(accuracy = )`)
 #'
 #' @returns `apa7_tbl` (tibble)
 #' @export
@@ -232,7 +236,8 @@ apa_loadings <- function(
 #' same order as in [apa_loadings()].
 #'
 #' @inheritParams apa_loadings
-#' @param digits number of decimal places
+#' @param digits number of decimal places (unaffected by
+#'   `apa7_defaults(accuracy = )`)
 #'
 #' @returns `apa7_tbl` (tibble)
 #' @export

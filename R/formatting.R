@@ -2,9 +2,9 @@
 #'
 #' @param x vector (numeric or character)
 #' @param accuracy number to round to. If NULL, the current default accuracy set with [apa7_defaults()] will be used.
-#' @param trim_leading_zeros if TRUE (default), trims leading zeros, otherwise keeps them
+#' @param trim_leading_zeros if `TRUE`, leading zeros are removed (e.g., .45 instead of 0.45), as APA style requires for values that cannot exceed 1 (correlations, proportions, *p*-values). If `FALSE` (default), they are kept.
 #' @param drop0trailing Drop trailing zeros
-#' @param add_plusses if TRUE (default), adds a plus to positive numbers
+#' @param add_plusses if `TRUE`, positive numbers get a plus sign. If `FALSE` (default), they do not.
 #' @param padding_character character to use for padding, default is `&numsp;` (figure space). With the default, text is padded to equal rendered width in the default font family (see [num_pad()] and the `width_aware_padding` argument of [apa7_defaults()]).
 #' @param center text on which to align text. Center on decimal by default, but can be any text.
 #' @param format_integers If TRUE, integers will be formatted with digits
@@ -155,8 +155,8 @@ align_chr <- function(
 #' p-value in APA format
 #'
 #' @param p probability
-#' @param inline If TRUE (default), returns statistic (e.g., p = .04), otherwise just the number (e.g., .04)
-#' @param markdown By default, outputs text compatible with markdown if TRUE, otherwise prints plain text compatible with latex.
+#' @param inline if `TRUE`, the symbol and relation are included (e.g., *p* = .04 or *p* < .001), for use in running text (one *p*-value at a time). If `FALSE` (default), only the number is returned (e.g., .04 or <.001), for use in tables.
+#' @param markdown if `TRUE` (default), the output is markdown (e.g., `*p*` in italics). If `FALSE`, it is plain text, which can be used in LaTeX.
 #' @param min_digits minimum number of digits to round to. Default is 2.
 #' @param max_digits maximum number of digits to round to. Default is 3.
 #' @param align decimal alignment if `TRUE`
@@ -268,9 +268,24 @@ apa_p <- function(
   pv
 }
 
+#' Warn about a renamed argument
+#'
+#' @param old,new old and new argument names
+#' @param fn function name
+#' @noRd
+warn_renamed_arg <- function(old, new, fn) {
+  rlang::warn(
+    paste0("The `", old, "` argument of `", fn, "()` is deprecated. Use `", new, "` instead."),
+    .frequency = "regularly",
+    .frequency_id = paste0("apa7_", fn, "_", old)
+  )
+}
+
 #' Make star notes for p-values
 #'
-#' @param x vector of alpha values (p-value thresholds)
+#' @param alpha vector of alpha values (*p*-value thresholds), from largest to
+#'   smallest. Each gets one more star.
+#' @param x deprecated; use `alpha`
 #' @inheritParams p2stars
 #'
 #' @return character vector
@@ -278,12 +293,18 @@ apa_p <- function(
 #'
 #' @examples
 #' apa_p_star_note()
-#' apa_p_star_note(x = c(0.10, 0.05, 0.01, 0.001),
+#' apa_p_star_note(alpha = c(0.10, 0.05, 0.01, 0.001),
 #'                 first_alpha_marginal = TRUE)
 apa_p_star_note <- function(
-  x = c(0.05, 0.01, 0.001),
-  first_alpha_marginal = FALSE
+  alpha = c(0.05, 0.01, 0.001),
+  first_alpha_marginal = FALSE,
+  x
 ) {
+  if (!missing(x)) {
+    warn_renamed_arg("x", "alpha", "apa_p_star_note")
+    alpha <- x
+  }
+  x <- alpha
   paste0(
     p2stars(
       x,
@@ -306,12 +327,12 @@ apa_p_star_note <- function(
 #' Return markdown text with hanging indent
 #'
 #' @param x text
-#' @param indent number of spaces to indent
-#' @param width number of characters to break lines
-#' @param space indenting space character (defaults to non-breaking space)
-#' @param newline text for creating new line
-#' @param whitespace_only wrapping spaces only
-#' @param wrap_equal_width Attempts to split lines to make them of approximately equal width
+#' @param indent number of `space` characters that indent the second and later lines
+#' @param width maximum number of characters per line
+#' @param space indenting character. If `NULL` (default), a non-breaking space.
+#' @param newline text inserted at each line break (default: a markdown hard line break, a backslash followed by a newline)
+#' @param whitespace_only if `TRUE`, lines break only at spaces. If `FALSE` (default), they can also break after hyphens and slashes (see [stringr::str_wrap()]).
+#' @param wrap_equal_width if `TRUE`, lines are made roughly equal in width (see [str_wrap_equal()]). If `FALSE` (default), each line is filled up to `width`.
 #'
 #' @return character vector
 #' @export
@@ -348,8 +369,8 @@ hanging_indent <- function(
 #' Like `stringr::str_wrap`, but attempts to create lines of equal width
 #'
 #' @param x character
-#' @param max_width maximum line width
-#' @param sep separation character
+#' @param max_width maximum number of characters per line
+#' @param sep text inserted at each line break
 #'
 #' @return character
 #' @export
@@ -445,7 +466,7 @@ is_numeric_like <- function(x, elementwise = FALSE) {
 #' @examples
 #' num_pad(c("a", "bb"))
 #' # A minus sign (U+2212) and a figure-space-padded 1 have the same width
-#' num_pad(c("−1", "1"), font_family = "Times New Roman")
+#' num_pad(c("\u22121", "1"), font_family = "Times New Roman")
 num_pad <- function(
   x,
   pad_left = TRUE,
@@ -624,11 +645,10 @@ space_fill <- function(deficit, font_family) {
 
 #' Scientific notation for markdown
 #'
-#' @param x Numeric vector
-#' @param digits number of digits of precision
-#' @param lb lower bound where scientific notation is turned on
-#' @param ub upper bound where scientific notation is turned on
-#' @param align decimal align
+#' @param x numeric vector
+#' @param digits number of decimal places (of the mantissa, for numbers in scientific notation)
+#' @param lb,ub numbers at or below `lb` or at or above `ub` are written in scientific notation (e.g., 2.46 × 10^7^); numbers between them are written as usual
+#' @param align if `TRUE`, the numbers are aligned on the decimal point with [align_chr()]
 #'
 #' @returns A character vector
 #' @export
@@ -759,8 +779,8 @@ p2stars <- function(
 #' Surrounds text with tags unless empty
 #'
 #' @param x character vector
-#' @param tag opening tag, e.g., `<span>`
-#' @param right_tag closing tag, e.g., `</span>`. Defaults to the same value as the opening tag.
+#' @param tag opening tag, e.g., `<span>` or `**`
+#' @param right_tag closing tag. By default, the opening tag with `<` replaced by `</` (e.g., `<span>` becomes `</span>`), so markdown tags such as `**` close with themselves.
 #'
 #' @return character vector
 #' @export
@@ -1714,11 +1734,11 @@ the$columns <- list(
 #'
 #' Returns an S7 object that contains a list of `column_format` objects that can be used to format parameters in APA style.
 #' @param .data list of `column_format` objects
-#' @param accuracy numeric (passed to scales::number)
-#' @param intercept_text describe intercept
-#' @param starred_columns which columns get p-value stars
-#' @param variable_labels named vector of variable names (with vector names as labels). For example, c(`Parental Income` = "parental_income", `Number of Siblings` = "n_siblings")
-#' @param custom_columns named list of column_formats to add or replace existing columns
+#' @param accuracy rounding accuracy of the formatters (e.g., `.01` for two decimals). If `NULL` (default), the `accuracy` set with [apa7_defaults()].
+#' @param intercept_text label of the intercept row (e.g., `"Constant"` or `"Intercept"`)
+#' @param starred_columns names of columns to which significance stars are added
+#' @param variable_labels named character vector that relabels variables: the names are the labels and the values are the variable names (e.g., `c("Parental Income" = "parental_income", "Number of Siblings" = "n_siblings")`)
+#' @param custom_columns named list of [column_format()] objects that are added, or that replace the formats of the same name
 #' @slot get_column_names getter for column names
 #' @slot get_headers getter for column headers
 #' @slot get_latex getter for column latex headers
@@ -1907,17 +1927,20 @@ the$column_formats <- column_formats()
 #' formats' own accuracy the `accuracy` setting.
 #'
 #' @param accuracy rounding accuracy of numbers in tables (default: .01, for
-#'   two decimals)
+#'   two decimals). Model tables such as [apa_parameters()] and [apa_anova()]
+#'   use it. Descriptive tables such as [apa_descriptives()], [apa_cor()], and
+#'   [apa_loadings()] have their own `digits` argument instead (`digits = 2`
+#'   is the same as `accuracy = .01`).
 #' @param font_family font family
 #' @param font_size font size of tables and their notes, in points (default: 12)
 #' @param line_spacing spacing between the lines of tables' headers and
 #'   bodies: 2 (default) for double spacing, 1.5, or 1 for single spacing.
 #'   APA style allows any of these in tables. Table notes are always
 #'   single-spaced.
-#' @param intercept_text what to call the intercept
-#' @param column_formats column formatting functions
-#' @param number_formatter default function to format numbers
-#' @param trim_leading_zero default function to trim leading zeros from numbers
+#' @param intercept_text label of the intercept row in regression tables (default: `"Constant"`)
+#' @param column_formats a [column_formats()] object: the headers, formatters, and note definitions of table columns
+#' @param number_formatter function that formats numbers that can exceed 1 in absolute value (e.g., coefficients, standard errors, and test statistics). It takes a numeric vector and `accuracy` and returns a character vector. By default, [align_chr()] with the `accuracy` setting.
+#' @param trim_leading_zero function that formats numbers that cannot exceed 1 in absolute value (e.g., correlations, standardized coefficients, and *R*^2^), which APA style writes without a leading zero. By default, [align_chr()] with `trim_leading_zeros = TRUE`. Note that this is a function, unlike the `TRUE`/`FALSE` `trim_leading_zeros` argument of [align_chr()].
 #' @param width_aware_padding if `TRUE` (default), [align_chr()] pads text to equal rendered width in `font_family` (when the font is installed). If `FALSE`, text is padded with one figure space per missing character.
 #' @param page_width width of the text area of a portrait page, which tables
 #'   fill with `table_width = "page"` (or `1`, by default): a number (in

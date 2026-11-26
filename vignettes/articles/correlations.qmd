@@ -106,14 +106,14 @@ apa_cor(d_personality, summary_functions = my_summaries)
 
 Your styling options include:
 
-* `note` A custom markdown formatted note. Overrides automatic note about bolded correlations being significant. Default: `NULL`
-* `p_value` Significance value. Default: `0.05`
-* `digits` Number of digits for rounding. Default: `2`
-* `bold_significant` Whether to bold significant correlations. Default:  `FALSE`
+* `note` A custom markdown formatted note. Overrides the automatic note. Default: `NULL`
+* `alpha` *p*-value thresholds for one, two, and three stars (with `bold_significant = TRUE`, only the first is used). Default: `c(.05, .01, .001)`
+* `digits` Number of decimal places. Default: `2`
+* `bold_significant` Whether to bold significant correlations instead of starring them. Default:  `FALSE`
 * `star_significant` Whether to star significant correlations. Default: `TRUE`
-* `significance_note` Whether note about bolding correlations appears. Overridden by a custom note. Also, the automatic note will not appear if no correlations are significant. Default:  `TRUE`
+* `significance_note` Whether the note explains the stars (or bolding). Overridden by a custom note. Also, the automatic note will not appear if no correlations are significant. Default:  `TRUE`
 * `output` Options are `flextable` or `tibble`. Default: `flextable`
-* `family` Font family (typeface). Default: `Times New Roman`
+* `font_family` Font family (typeface). Default: `Times New Roman`
 * `font_size` Font size (in points). Default: `12`
 * `text_color` Text color. Default: `black`
 * `border_color` Table border color. Default: `black`
@@ -129,7 +129,7 @@ For example,
 
 d_personality |>
   apa_cor(
-    p_value = 0.001,
+    alpha = 0.001,
     digits = 2,
     bold_significant = TRUE,
     significance_note = TRUE,

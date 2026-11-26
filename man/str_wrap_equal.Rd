@@ -9,9 +9,9 @@ str_wrap_equal(x, max_width = 30L, sep = "\\n")
 \arguments{
 \item{x}{character}
 
-\item{max_width}{maximum line width}
+\item{max_width}{maximum number of characters per line}
 
-\item{sep}{separation character}
+\item{sep}{text inserted at each line break}
 }
 \value{
 character

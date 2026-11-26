@@ -49,15 +49,17 @@
 #'   \eqn{\omega_{\text{total}}}{omega total} is shown
 #' @param ci confidence level of the interval of \eqn{\alpha}{alpha}
 #' @param score `"mean"` (default) or `"sum"`: how scale scores are computed
-#' @param flag if `TRUE`, item-total correlations below `min_item_total` and
-#'   \eqn{\alpha}{alpha}-if-deleted values above the scale's
-#'   \eqn{\alpha}{alpha} are bolded
-#' @param min_item_total cutoff for flagging item-total correlations
+#' @param flag `NULL` (default) or a number: item-total correlations below
+#'   it, and \eqn{\alpha}{alpha}-if-deleted values above the scale's
+#'   \eqn{\alpha}{alpha}, are bolded (e.g., `flag = .30`), and the note says
+#'   so. `TRUE` is the same as `.30`. This works like `flag` in
+#'   [apa_collinearity()].
 #' @param format_variable_names if `TRUE` (default), item and scale names are
 #'   lightly formatted: underscores become spaces, and the first letter is
 #'   capitalized (item codes such as "A1" stay intact). Set to `FALSE` to keep
 #'   names exactly as they are.
-#' @param digits number of decimal places
+#' @param digits number of decimal places (unaffected by
+#'   `apa7_defaults(accuracy = )`)
 #'
 #' @returns `apa7_tbl` (tibble)
 #' @export
@@ -93,8 +95,7 @@ apa_reliability <- function(
   omega = TRUE,
   ci = 0.95,
   score = c("mean", "sum"),
-  flag = FALSE,
-  min_item_total = 0.30,
+  flag = NULL,
   format_variable_names = TRUE,
   digits = 2
 ) {
@@ -105,6 +106,14 @@ apa_reliability <- function(
   }
   if (!is.numeric(ci) || length(ci) != 1 || is.na(ci) || ci <= 0 || ci >= 1) {
     cli::cli_abort("{.arg ci} must be a number between 0 and 1.")
+  }
+  if (isTRUE(flag)) {
+    flag <- 0.30
+  } else if (isFALSE(flag)) {
+    flag <- NULL
+  }
+  if (!is.null(flag) && (!is.numeric(flag) || length(flag) != 1 || is.na(flag))) {
+    cli::cli_abort("{.arg flag} must be {.code NULL} or a number (e.g., {.code flag = .30}).")
   }
   # Items can be given unquoted, quoted, or with tidyselect helpers
   scales <- reliability_scales(rlang::enquo(scales), data)
@@ -176,8 +185,8 @@ apa_reliability <- function(
       item_label[r$reversed] <- paste0(item_label[r$reversed], " (R)")
       rit <- bounded(r$item_total)
       drop <- bounded(r$alpha_drop)
-      if (flag) {
-        low <- r$item_total < min_item_total
+      if (!is.null(flag)) {
+        low <- r$item_total < flag
         rit[low] <- bold_padded(rit[low])
         high <- r$alpha_drop > r$alpha
         drop[high] <- bold_padded(drop[high])
@@ -230,8 +239,8 @@ apa_reliability <- function(
     omega = omega,
     ci = ci,
     score = score,
-    flag = flag,
-    min_item_total = min_item_total
+    flag = !is.null(flag),
+    min_item_total = flag
   )
   as_apa7_tbl(d)
 }

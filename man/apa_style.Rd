@@ -26,31 +26,39 @@ apa_style(
 )
 }
 \arguments{
-\item{x}{object}
+\item{x}{a \code{\link[flextable:flextable]{flextable::flextable()}}}
 
-\item{font_family}{font family}
+\item{font_family}{font family (e.g., \code{"Times New Roman"} or \code{"Arial"}). If
+\code{NULL} (default), the font set with \code{apa7_defaults(font_family = )}
+(Times New Roman unless changed).}
 
 \item{font_size}{font size, in points. If \code{NULL} (default), the size set
 with \code{apa7_defaults(font_size = )} (12 unless changed).}
 
-\item{text_color}{text color}
+\item{text_color}{color of the text: an R color name (e.g., \code{"black"}, the
+default) or a hex code (e.g., \code{"#333333"})}
 
-\item{border_color}{border color}
+\item{border_color}{color of the rules, in the same forms as \code{text_color}}
 
-\item{border_width}{border width in pixels}
+\item{border_width}{width of the rules, in points (default: 0.5)}
 
 \item{line_spacing}{spacing between lines of the header and body (e.g., 2
 for double spacing or 1 for single spacing). If \code{NULL} (default), the
 spacing set with \code{apa7_defaults(line_spacing = )} (2 unless changed). Table
 notes are single-spaced.}
 
-\item{horizontal_padding}{horizontal padding (in pixels)}
+\item{horizontal_padding}{space to the left and right of each cell's
+contents, in points (default: 3)}
 
-\item{table_align}{table alignment ("left", "center", "right")}
+\item{table_align}{alignment of the table on the page: \code{"left"} (default),
+\code{"center"}, or \code{"right"}}
 
-\item{header_align_vertical}{vertical alignment of headers. Can be "top", "middle", or "bottom"}
+\item{header_align_vertical}{vertical alignment of header text when header
+cells differ in height: \code{"top"} (default), \code{"middle"}, or \code{"bottom"}}
 
-\item{layout}{table layout ("autofit", "fixed")}
+\item{layout}{\code{"autofit"} (default) lets the column widths adjust to the
+contents in Word; \code{"fixed"} keeps the widths as set (see
+\code{\link[flextable:set_table_properties]{flextable::set_table_properties()}})}
 
 \item{table_width}{width of the table, in the same forms in every apa7
 function: a proportion from 0 to 1 of the default width (the full width
@@ -70,20 +78,24 @@ the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments
 \code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
 warning to write it as \code{c(inches = )}.}
 
-\item{markdown}{apply markdown formatting to header and body}
+\item{markdown}{if \code{TRUE} (default), text in the header and body is
+converted from markdown (e.g., \verb{*p*} becomes an italic \emph{p})}
 
-\item{markdown_header}{apply markdown formatting to header}
+\item{markdown_header, markdown_body}{whether the header or the body is
+converted from markdown (both default to \code{markdown})}
 
-\item{markdown_body}{apply markdown formatting to body}
+\item{no_markdown_columns}{body columns whose text is shown as it is, not
+converted from markdown (unquoted or quoted names, or tidyselect helpers)}
 
-\item{no_markdown_columns}{body columns that should not be treated as markdown}
+\item{no_markdown_columns_header}{column headers that are not converted
+from markdown. By default, the same columns as \code{no_markdown_columns}.}
 
-\item{no_markdown_columns_header}{column headers that should not be treated as markdown}
-
-\item{separate_headers}{separate headers into column spanner labels}
+\item{separate_headers}{if \code{TRUE} (default) and the table has one header
+row, column names with an underscore are split into a column spanner and
+a header (e.g., \verb{Model 1_B} becomes "B" under a "Model 1" spanner)}
 }
 \value{
-object
+flextable::flextable
 }
 \description{
 Style \code{flextable::flextable} object according to APA style

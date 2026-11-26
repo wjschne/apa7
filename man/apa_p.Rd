@@ -16,9 +16,9 @@ apa_p(
 \arguments{
 \item{p}{probability}
 
-\item{inline}{If TRUE (default), returns statistic (e.g., p = .04), otherwise just the number (e.g., .04)}
+\item{inline}{if \code{TRUE}, the symbol and relation are included (e.g., \emph{p} = .04 or \emph{p} < .001), for use in running text (one \emph{p}-value at a time). If \code{FALSE} (default), only the number is returned (e.g., .04 or <.001), for use in tables.}
 
-\item{markdown}{By default, outputs text compatible with markdown if TRUE, otherwise prints plain text compatible with latex.}
+\item{markdown}{if \code{TRUE} (default), the output is markdown (e.g., \verb{*p*} in italics). If \code{FALSE}, it is plain text, which can be used in LaTeX.}
 
 \item{min_digits}{minimum number of digits to round to. Default is 2.}
 

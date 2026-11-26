@@ -52,7 +52,10 @@
 #'   "Age (years)")`). Variables without a label are named by their formatted
 #'   names.
 #' @param test if `TRUE`, a column of *p*-values tests the differences
-#'   between groups (requires `by`)
+#'   between groups (requires `by`). Unlike the `test` argument of
+#'   [apa_chisq()] and [apa_htest()], which names a test, this one is `TRUE`
+#'   or `FALSE`; the test of categorical variables is chosen with
+#'   `categorical_test`.
 #' @param categorical_test test of categorical variables when `test = TRUE`:
 #'   `"auto"` (default) for Fisher's exact test when an expected count is
 #'   below 5 and the chi-square test otherwise, `"chisq"` for the chi-square
@@ -63,7 +66,8 @@
 #' @param range if `TRUE`, a "Range" row with the minimum and maximum is
 #'   added below each continuous variable
 #' @param digits number of decimal places of means, standard deviations,
-#'   medians, interquartile ranges, and ranges
+#'   medians, interquartile ranges, and ranges (unaffected by
+#'   `apa7_defaults(accuracy = )`)
 #' @param percent_digits number of decimal places of percentages
 #' @param format_variable_names format variable names that have no label with
 #'   the `Variable` column format

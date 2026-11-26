@@ -1,10 +1,19 @@
 #' Add break columns
 #'
-#' @param d data.frame or tibble
-#' @param ... Column name or tidyselect function. Select columns
-#' @param .before insert break columns before selected columns (defaults to FALSE)
-#' @param omit_first omit the first break column
-#' @param omit_last omit the last break column
+#' Inserts an empty column after (or before) each selected column. In
+#' [apa_flextable()], empty columns separate groups of columns, such as
+#' those under different column spanners.
+#'
+#' @param data data.frame or tibble
+#' @param ... columns after which break columns are inserted: unquoted or
+#'   quoted names, or tidyselect helpers (e.g., `ends_with("_mean")`)
+#' @param .before if `TRUE`, break columns are inserted before the selected
+#'   columns instead of after them (default: `FALSE`)
+#' @param omit_first if `TRUE`, no break column is inserted at the first
+#'   selected column
+#' @param omit_last if `TRUE`, no break column is inserted at the last
+#'   selected column
+#' @param d deprecated; use `data`
 #'
 #' @return data.frame or tibble
 #' @export
@@ -27,24 +36,30 @@
 #'                   dplyr::ends_with("_mean"),
 #'                   omit_last = TRUE)
 add_break_columns <- function(
-  d,
+  data,
   ...,
   .before = FALSE,
   omit_first = FALSE,
-  omit_last = FALSE
+  omit_last = FALSE,
+  d
 ) {
-  .dots <- rlang::exprs(...)
-
-  if (all(purrr::map_lgl(as.list(.dots), is.character))) {
-    where_names <- colnames(d)[colnames(d) %in% unlist(.dots)]
-  } else {
-    v <- deparse(substitute(...))
-    if (all(v %in% colnames(d))) {
-      where_names <- v
-    } else {
-      where_names <- colnames(dplyr::select(d, ...))
+  selection <- rlang::enquos(...)
+  if (!missing(d)) {
+    warn_renamed_arg("d", "data", "add_break_columns")
+    # With `d` named, the first unnamed argument (a selection) went to `data`
+    if (!missing(data)) {
+      selection <- c(list(rlang::enquo(data)), selection)
     }
+    data <- d
   }
+  # Columns that do not exist are ignored; break columns follow the column order
+  selected <- names(tidyselect::eval_select(
+    rlang::expr(c(!!!selection)),
+    data,
+    allow_rename = FALSE,
+    strict = FALSE
+  ))
+  where_names <- colnames(data)[colnames(data) %in% selected]
 
   if (omit_first && length(where_names) > 0) {
     where_names <- where_names[-1]
@@ -55,20 +70,20 @@ add_break_columns <- function(
   }
 
   if (length(where_names) == 0) {
-    return(d)
+    return(data)
   }
 
   blank_names <- paste0("apa7breakcolumn", seq_along(where_names))
 
-  where_numbers <- seq(1, ncol(d))[colnames(d) %in% where_names]
+  where_numbers <- seq(1, ncol(data))[colnames(data) %in% where_names]
   shifter <- 1L - .before * 1L
   keys <- insert_at(
-    colnames(d),
+    colnames(data),
     ats = where_numbers + shifter,
     values = blank_names
   )
-  d[, blank_names] <- NA
-  d[, keys]
+  data[, blank_names] <- NA
+  data[, keys]
 }
 
 #' Insert values into a vector
@@ -88,8 +103,8 @@ insert_at <- function(x, ats, values) {
 #'
 #' @param data data.frame or tibble
 #' @param ... Column name or tidyselect function. Select columns. Default is first column
-#' @param type list type. Can be "1" (numeric), "a" (lowercase alphabetical), or "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I" (uppercase Roman numerals)
-#' @param sep separator
+#' @param type list type: `"1"` (default) for 1, 2, 3; `"a"` for a, b, c; `"A"` for A, B, C; `"i"` for i, ii, iii; or `"I"` for I, II, III
+#' @param sep text between the list label and the item (default: `". "`, as in "1. ")
 #' @param merge If `TRUE`, list columns will be united with their respective text columns.
 #'
 #' @return data.frame
@@ -342,16 +357,30 @@ separate_star_column <- function(
 #'
 #' @param data data.frame or tibble with variables to be correlated, or the
 #'   output of [correlation::correlation()] (see Details)
-#' @param note Custom note to appear below table. (Overrides automatic note.)
-#' @param p_value p-value needed to be flagged as significant
-#' @param digits Number of digits for rounding
-#' @param bold_significant bold significant correlations
-#' @param star_significant start significant correlations
-#' @param significance_note If TRUE, place note at bottom of table that significant correlations are bolded.
-#' @param output output type. Can be "flextable" or "tibble"
+#' @param note note placed below the table, replacing the automatic note
+#'   (for `output = "flextable"`)
+#' @param alpha *p*-value thresholds for significance stars, from largest to
+#'   smallest (default: `c(.05, .01, .001)`, for one, two, and three stars).
+#'   With `bold_significant = TRUE`, only the first is used.
+#' @param digits number of decimal places of the correlations (unaffected by
+#'   `apa7_defaults(accuracy = )`)
+#' @param bold_significant if `TRUE`, correlations with *p* below the first
+#'   `alpha` are bolded instead of starred. If `FALSE` (default), they are not.
+#' @param star_significant if `TRUE` (default), significant correlations get
+#'   stars (one for each `alpha` they are below). Ignored when
+#'   `bold_significant = TRUE`. Model tables such as [apa_parameters()] do the
+#'   same with their `starred` and `bolded` arguments.
+#' @param significance_note if `TRUE` (default), the note explains the stars
+#'   (or the bolding) when any correlation is significant
+#' @param output `"flextable"` (default) for a formatted table, or `"tibble"`
+#'   for a tibble of the formatted values (without a note)
+#' @param p_value deprecated; use `alpha`
 #' @param summary_functions Any named list of functions that summarize data columns (e.g., `list(Mean = mean, SD = sd)`). Can also be a character vector of function names (e.g., `c("n", "M", "SD")`). Functions available in a character vector: IQR, Interquartile Range, Kurtosis, MAD, Median Absolute Deviation, M, Mean, Med, Median, n, N, Quantile, Range, SD, Skewness, Var, Variance
-#' @param keep_empty_star_columns Keep remove empty star columns (Default: `TRUE`)
-#' @param column_formats column_formats object
+#' @param keep_empty_star_columns if `TRUE` (default), every correlation
+#'   column keeps its star column, even when no correlation in it is
+#'   significant, so that the columns have the same width. If `FALSE`, empty
+#'   star columns are removed.
+#' @param column_formats [column_formats()] object. If `NULL` (default), the default column formats are used.
 #' @inheritParams apa_flextable
 #' @inheritParams apa_style
 #' @param method kind of correlation (e.g., `"pearson"`, `"spearman"`,
@@ -419,7 +448,7 @@ separate_star_column <- function(
 apa_cor <- function(
   data,
   note = NULL,
-  p_value = c(.05, .01, .001),
+  alpha = c(.05, .01, .001),
   digits = 2,
   bold_significant = FALSE,
   star_significant = TRUE,
@@ -438,8 +467,13 @@ apa_cor <- function(
   method = "pearson",
   p_adjust = "none",
   partial = FALSE,
-  ...
+  ...,
+  p_value
 ) {
+  if (!missing(p_value)) {
+    warn_renamed_arg("p_value", "alpha", "apa_cor")
+    alpha <- p_value
+  }
   if (is.null(line_spacing)) {
     line_spacing <- the$line_spacing
   }
@@ -497,7 +531,7 @@ apa_cor <- function(
   )
 
   if (bold_significant) {
-    p <- ifelse(c(ct$p) <= p_value[1], "**", "")
+    p <- ifelse(c(ct$p) <= alpha[1], "**", "")
     R <- matrix(paste0(p, c(R), p), nrow = length(v_names))
     colnames(R) <- v_names
     rownames(R) <- v_names
@@ -519,9 +553,9 @@ apa_cor <- function(
     my_p <- c(ct$p)
     p <- character(length = length(my_p))
 
-    p_note <- character(length(p_value))
+    p_note <- character(length(alpha))
     ii <- 0
-    for (pv in p_value) {
+    for (pv in alpha) {
       ii <- ii + 1
       p_note[ii] <- paste0(
         "^",
@@ -568,7 +602,7 @@ apa_cor <- function(
     kP[upper.tri(kP)] <- NA
     k_p <- c(kP)
     k_p <- k_p[!is.na(k_p)]
-    k_p <- k_p[k_p <= p_value[1]]
+    k_p <- k_p[k_p <= alpha[1]]
     k_p <- (length(k_p) > 0) * 1
   }
 
@@ -676,7 +710,7 @@ apa_cor <- function(
       show_significance <- significance_note &&
         (bold_significant || star_significant) &&
         length(k_p) > 0
-      cutoff <- formatC(p_value[1], digits = 2, format = "fg") |>
+      cutoff <- formatC(alpha[1], digits = 2, format = "fg") |>
         gsub(pattern = "^0", replacement = "")
       # General note (e.g., the kind of correlation and the p-value
       # adjustment from correlation::correlation()), then probability notes
@@ -841,26 +875,50 @@ apa_cor <- function(
 #' 5. Apply the `apa_style` function (table formatting and markdown conversion) if `apa_style = TRUE`
 #' 6. Apply `pretty_widths` if `pretty_widths = TRUE`
 #' @param data data.frame or tibble
-#' @param row_title_column Column name or tidyselect function. column to group rows
-#' @param row_title_align alignment of row title ("left", "center", "right")
-#' @param row_title_prefix text to be added to each title
-#' @param row_title_sep separator for prefix
-#' @param row_title_border list of flextable styles
-#' @param left_column_padding Number of points the left column is padded (only relevant when there is a `row_title_column` and `row_title_align = "left"`)
-#' @param col_keys column keys passed to flextable (defaults data column names)
-#' @param cwidth initial cell width in inches
-#' @param cheight initial cell height in inches
-#' @param apa_style apply `apa_style` function (default: `TRUE`)
-#' @param separate_headers separate header rows (default: `TRUE`)
-#' @param auto_format_columns if true, will attempt to format some columns automatically
-#' @param column_formats a column_formats object
-#' @param pretty_widths apply `pretty_widths` function
+#' @param row_title_column column whose values become heading rows that group
+#'   the rows below them (unquoted or quoted name, or a tidyselect helper). The
+#'   column itself is not displayed. Rows should already be sorted by it.
+#' @param row_title_align alignment of the heading rows: `"left"` (default),
+#'   `"center"`, or `"right"`
+#' @param row_title_prefix text placed before each heading (e.g., `"Group"`
+#'   gives "Group A")
+#' @param row_title_sep text between `row_title_prefix` and the heading
+#'   (default: a space)
+#' @param row_title_border border drawn around each group of rows: a list of
+#'   `color`, `style`, and `width` (in points), as in [officer::fp_border()]
+#' @param left_column_padding left padding of the first column's body rows, in points, which indents them under left-aligned heading rows (only used with `row_title_column` and `row_title_align = "left"`)
+#' @param col_keys columns to display, in order (default: all columns of
+#'   `data`), passed to [flextable::flextable()]
+#' @param cwidth,cheight initial cell width and height in inches, passed to
+#'   [flextable::flextable()]. With `pretty_widths = TRUE` (default), the
+#'   widths are then fitted to the contents and `table_width`.
+#' @param apa_style if `TRUE` (default), [apa_style()] is applied (fonts,
+#'   borders, spacing, and markdown)
+#' @param separate_headers if `TRUE` (default), column names with an
+#'   underscore become two header rows: the part before it is a column
+#'   spanner over the columns that share it (e.g., `Model 1_B` and
+#'   `Model 1_SE` share a "Model 1" spanner)
+#' @param auto_format_columns if `TRUE` (default), columns whose names have a
+#'   format in `column_formats` (e.g., `p`, `SE`, or `R2`) are formatted and
+#'   given APA headers with [apa_format_columns()]
+#' @param column_formats a [column_formats()] object. If `NULL` (default), the
+#'   column formats set with [apa7_defaults()].
+#' @param pretty_widths if `TRUE` (default), column widths are fitted to the
+#'   contents and to `table_width` with [pretty_widths()]
 #' @param no_format_columns Column name or tidyselect function. selected columns are not formatted. Columns named in a `"no_format_columns"` attribute of `data` (set by functions such as [apa_loadings()]) are not formatted either. Likewise, a rule is drawn above the first body row whose first-column text matches a `"rule_above"` attribute of `data`.
-#' @param add_breaks_between_spanners add breaks between spanners if TRUE
+#' @param add_breaks_between_spanners if `TRUE` (default), a narrow empty
+#'   column separates adjacent column spanners (see `separate_headers`), so
+#'   that their rules do not touch
 #' @param note table note placed below the table, after "*Note*.". The note is single-spaced. If `TRUE`, the note is written by [apa_note()] from what a table function such as [apa_anova()], [apa_parameters()], or [apa_loadings()] recorded. A character string is used as the note (markdown is allowed), and `NULL` or `FALSE` (default) adds no note. Use this for documents that are not made with apaquarto. With apaquarto, use the `apa-note` chunk option instead (e.g., `#| apa-note: !expr apa7::apa_note(tbl)`), so that the note is placed and styled by apaquarto and is not added twice.
 #' @inheritParams apa_style
-#' @param ... arguments passed to `apa_style`
-
+#' @param no_markdown_columns_header column headers that are not treated as
+#'   markdown. If `NULL` (default), every header is treated as markdown. (In
+#'   [apa_style()], the default is `no_markdown_columns`. Here it differs
+#'   because numeric columns are added to `no_markdown_columns`, and their
+#'   headers still need markdown.)
+#' @param ... passed to [apa_style()]. Every argument of [apa_style()] is also
+#'   an argument of `apa_flextable()`, so this is rarely needed.
+#'
 #' @return flextable::flextable
 #' @export
 #'
@@ -1291,12 +1349,23 @@ align_padded_columns <- function(
 
 #' format model parameters in APA style
 #'
-#' @param fit model fit object
-#' @param predictor_parameters predictor parameters to display. If named vector, column names will be vector names. Columns not present in the model output (e.g., `t` for a model tested with *z*) are silently dropped. For lists of models, `NULL` (default) uses the default for each model's class. Add `"CI"` to show confidence intervals as \[*LL*, *UL*\] (headed, e.g., "95% CI"), and, for `glm`, `polr`, and `clm` models, `"Exp_CI"` to show confidence intervals of exponentiated coefficients (headed, e.g., "95% CI for *OR*"). Confidence intervals are not shown by default.
-#' @param starred columns to star with significant p_values
-#' @param bolded columns to bold, if significant
-#' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
-#' @param t_with_df if TRUE, the t column will be displayed with degrees of freedom in parentheses. If FALSE, only the t value is displayed.
+#' @param fit a fitted model: `lm`, `glm` (including `MASS::glm.nb`), `aov`,
+#'   `aovlist`, `afex_aov`, ordinal (`MASS::polr`, `ordinal::clm`), mixed
+#'   (`lme4::lmer`, `lme4::glmer`, `glmmTMB::glmmTMB`, `nlme::lme`), generalized
+#'   additive (`mgcv::gam`, `mgcv::bam`), structural equation (`lavaan`),
+#'   meta-analysis (`metafor::rma`), multinomial (`nnet::multinom`), or
+#'   zero-inflated and hurdle (`pscl::zeroinfl`, `pscl::hurdle`) models, or a
+#'   named list of models of the same kind (see `performance_parameters`)
+#' @param predictor_parameters columns to display, in order, named as in
+#'   [parameters::model_parameters()]: `"Parameter"`, `"Coefficient"`, `"SE"`,
+#'   `"Std_Coefficient"` (standardized coefficient, *&beta;*), `"CI"`, `"t"`,
+#'   `"z"`, `"df_error"`, `"p"`, and, for models with a log or logit link,
+#'   `"Exp_Coefficient"` and `"Exp_CI"`. If named vector, column names will be vector names. Columns not present in the model output (e.g., `t` for a model tested with *z*) are silently dropped. For lists of models, `NULL` (default) uses the default for each model's class. Add `"CI"` to show confidence intervals as \[*LL*, *UL*\] (headed, e.g., "95% CI"), and, for `glm`, `polr`, and `clm` models, `"Exp_CI"` to show confidence intervals of exponentiated coefficients (headed, e.g., "95% CI for *OR*"). Confidence intervals are not shown by default.
+#' @param starred columns to which significance stars are added (e.g., `"Coefficient"` or `"p"`). `NULL` or `NA` for none.
+#' @param bolded columns whose values are bolded when *p* \eqn{\le}{<=} .05
+#'   (e.g., `"Coefficient"`). `NULL` or `NA` (default) for none.
+#' @param column_formats [column_formats()] object to format columns. If `NULL` (default), the column formats set with [apa7_defaults()].
+#' @param t_with_df if `TRUE` (default), the *t* column header includes the degrees of freedom (e.g., *t*(29)), and the *df* column is dropped, when all rows have the same *df*. If `FALSE`, *t* and *df* are separate columns.
 #' @param ... arguments passed to methods. For `lm`, `glm`, `polr`, and `clm` models, further arguments are passed to [parameters::model_parameters()]. For example, `vcov = "HC3"` gives heteroskedasticity-consistent (robust) standard errors, and the test statistics, *p*-values, and confidence intervals are based on them. `ci = .90` sets the confidence level.
 #' @param performance_parameters for lists of models, model comparison metrics passed to [apa_performance_comparison()]. If `NULL`, no metrics are added. By default, `R2` and `deltaR2`; for lists of mixed models (`lme4`), the default also includes the conditional *R*^2^ and its change (`R2_conditional`, `deltaR2_conditional`), and `R2` is the marginal *R*^2^.
 #' @param performance_layout for lists of models, where the model comparison metrics go: `"columns"` (default) adds a column for each metric, with its value on the model's heading row; `"rows"` adds a row for each metric below the model's parameters (and random effects), labeled in the variable column (e.g., *R*^2^ and &Delta;*R*^2^) with its value in the first value column, as in many hierarchical regression tables. Metrics without a value (e.g., the change in *R*^2^ of the first model) are left out.
@@ -1337,8 +1406,8 @@ apa_parameters <- function(
     "df_error",
     "p"
   ),
-  starred = NULL,
-  bolded = NULL,
+  starred = NA,
+  bolded = NA,
   column_formats = NULL,
   t_with_df = TRUE,
   ...
@@ -2796,8 +2865,18 @@ performance_rows <- function(d_fit, comparison) {
 
 #' format model performance metrics in APA style
 #'
-#' @param fit model fit object
-#' @param metrics performance metrics. Default is R2 and Sigma
+#' @param fit a fitted model of any class that [apa_parameters()] accepts
+#'   (except `aov`, `aovlist`, and `afex_aov`), or a named list of models
+#' @param metrics fit statistics to display, named as in
+#'   [performance::model_performance()] (e.g., `"R2"`, `"R2_adjusted"`,
+#'   `"AIC"`, `"BIC"`, `"RMSE"`, `"Sigma"`). The defaults depend on the
+#'   model: `R2` and `Sigma` for `lm`; `R2` (a pseudo-*R*^2^) and `AIC` for
+#'   `glm`, ordinal, multinomial, zero-inflated, and hurdle models;
+#'   `R2_marginal`, `R2_conditional`, and `ICC` for mixed models;
+#'   `R2_adjusted`, `Deviance_explained`, and `AIC` for generalized additive
+#'   models; and the fit indices listed under `apa_performance.lavaan()` for
+#'   `lavaan` models. For meta-analyses and lists, `NULL` (default) chooses
+#'   them.
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
 #' @return tibble
@@ -3055,7 +3134,7 @@ has_fixed_dispersion <- function(fit) {
 #'
 #' @param ... model fit objects, or a list of them. Models are labeled by the list's names (or the argument names), and "Model 1", "Model 2", ... for unnamed models.
 #' @param metrics performance metrics. If `NULL` (default), R2, deltaR2, F, and p for models with an estimated dispersion parameter (e.g., `lm`, Gaussian or quasi-family `glm`), and R2, deltaR2, Chi2, df, and p for GLMs with a fixed dispersion parameter (binomial, Poisson, negative binomial). Use "all" for all available metrics.
-#' @param starred columns to star with significant p_values
+#' @param starred columns to which significance stars are added (e.g., `"Coefficient"` or `"p"`). `NULL` or `NA` for none.
 #' @details
 #' Nested models are compared with *F* tests ([performance::test_wald()]) unless every model is a GLM with a fixed dispersion parameter, in which case likelihood ratio tests ([performance::test_likelihoodratio()]) are used. For GLMs, `R2` is the pseudo-*R*^2^ that [performance::r2()] selects for the model family, and the header names it (e.g., *R*^2^~Tjur~).
 #'
@@ -3194,22 +3273,20 @@ apa_performance_comparison <- function(
   }
 
   starred <- starred[starred %in% colnames(cp)]
-  if (length(starred > 0) && !is.na(starred) && (starred != "")) {
+  starred <- starred[!is.na(starred) & starred != ""]
+  if (length(starred) > 0) {
     p_empty <- is.na(cp$p)
-    cp <- cp |>
-      dplyr::mutate(pstar = p2stars(cp$p, superscript = TRUE)) |>
-      dplyr::mutate(
-        dplyr::across(
-          dplyr::any_of(starred),
-          column_formats[[starred]]@formatter
-        )
-      ) |>
-      tidyr::unite(
-        {{ starred }},
-        c({{ starred }}, pstar),
-        na.rm = TRUE,
-        sep = ""
-      )
+    pstar <- p2stars(cp$p, superscript = TRUE)
+    pstar[is.na(pstar)] <- ""
+    # Each starred column is formatted, and then the stars are appended
+    for (s_col in starred) {
+      formatted <- if (is.null(column_formats[[s_col]])) {
+        as.character(cp[[s_col]])
+      } else {
+        column_formats[[s_col]]@formatter(cp[[s_col]])
+      }
+      cp[[s_col]] <- ifelse(is.na(formatted), pstar, paste0(formatted, pstar))
+    }
     cp[p_empty, starred] <- NA
     # Leave every change column blank where there is no test of the change
     delta_columns <- intersect(c("deltaR2", "deltaR2_conditional"), colnames(cp))
@@ -3395,24 +3472,33 @@ model_names <- function(models) {
 
 #' Style `flextable::flextable` object according to APA style
 #'
-#' @param x object
-#' @param font_family font family
+#' @param x a [flextable::flextable()]
+#' @param font_family font family (e.g., `"Times New Roman"` or `"Arial"`). If
+#'   `NULL` (default), the font set with `apa7_defaults(font_family = )`
+#'   (Times New Roman unless changed).
 #' @param font_size font size, in points. If `NULL` (default), the size set
 #'   with `apa7_defaults(font_size = )` (12 unless changed).
-#' @param text_color text color
-#' @param border_color border color
-#' @param border_width border width in pixels
+#' @param text_color color of the text: an R color name (e.g., `"black"`, the
+#'   default) or a hex code (e.g., `"#333333"`)
+#' @param border_color color of the rules, in the same forms as `text_color`
+#' @param border_width width of the rules, in points (default: 0.5)
 #' @param line_spacing spacing between lines of the header and body (e.g., 2
 #'   for double spacing or 1 for single spacing). If `NULL` (default), the
 #'   spacing set with `apa7_defaults(line_spacing = )` (2 unless changed). Table
 #'   notes are single-spaced.
-#' @param horizontal_padding horizontal padding (in pixels)
-#' @param markdown apply markdown formatting to header and body
-#' @param markdown_header apply markdown formatting to header
-#' @param markdown_body apply markdown formatting to body
-#' @param table_align table alignment ("left", "center", "right")
-#' @param header_align_vertical vertical alignment of headers. Can be "top", "middle", or "bottom"
-#' @param layout table layout ("autofit", "fixed")
+#' @param horizontal_padding space to the left and right of each cell's
+#'   contents, in points (default: 3)
+#' @param markdown if `TRUE` (default), text in the header and body is
+#'   converted from markdown (e.g., `*p*` becomes an italic *p*)
+#' @param markdown_header,markdown_body whether the header or the body is
+#'   converted from markdown (both default to `markdown`)
+#' @param table_align alignment of the table on the page: `"left"` (default),
+#'   `"center"`, or `"right"`
+#' @param header_align_vertical vertical alignment of header text when header
+#'   cells differ in height: `"top"` (default), `"middle"`, or `"bottom"`
+#' @param layout `"autofit"` (default) lets the column widths adjust to the
+#'   contents in Word; `"fixed"` keeps the widths as set (see
+#'   [flextable::set_table_properties()])
 #' @param table_width width of the table, in the same forms in every apa7
 #'   function: a proportion from 0 to 1 of the default width (the full width
 #'   of a portrait page unless changed with `apa7_defaults(table_width = )`),
@@ -3430,11 +3516,15 @@ model_names <- function(models) {
 #'   the `page_width`, `landscape_width`, and `column_width` arguments of
 #'   [apa7_defaults()]. A number greater than 1 is read as inches, with a
 #'   warning to write it as `c(inches = )`.
-#' @param no_markdown_columns body columns that should not be treated as markdown
-#' @param no_markdown_columns_header column headers that should not be treated as markdown
-#' @param separate_headers separate headers into column spanner labels
+#' @param no_markdown_columns body columns whose text is shown as it is, not
+#'   converted from markdown (unquoted or quoted names, or tidyselect helpers)
+#' @param no_markdown_columns_header column headers that are not converted
+#'   from markdown. By default, the same columns as `no_markdown_columns`.
+#' @param separate_headers if `TRUE` (default) and the table has one header
+#'   row, column names with an underscore are split into a column spanner and
+#'   a header (e.g., `Model 1_B` becomes "B" under a "Model 1" spanner)
 #' @name apa_style
-#' @return object
+#' @return flextable::flextable
 #' @export
 #'
 #' @examples

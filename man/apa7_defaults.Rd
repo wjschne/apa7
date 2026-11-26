@@ -25,7 +25,10 @@ apa7_defaults(
 }
 \arguments{
 \item{accuracy}{rounding accuracy of numbers in tables (default: .01, for
-two decimals)}
+two decimals). Model tables such as \code{\link[=apa_parameters]{apa_parameters()}} and \code{\link[=apa_anova]{apa_anova()}}
+use it. Descriptive tables such as \code{\link[=apa_descriptives]{apa_descriptives()}}, \code{\link[=apa_cor]{apa_cor()}}, and
+\code{\link[=apa_loadings]{apa_loadings()}} have their own \code{digits} argument instead (\code{digits = 2}
+is the same as \code{accuracy = .01}).}
 
 \item{font_family}{font family}
 
@@ -36,13 +39,13 @@ bodies: 2 (default) for double spacing, 1.5, or 1 for single spacing.
 APA style allows any of these in tables. Table notes are always
 single-spaced.}
 
-\item{intercept_text}{what to call the intercept}
+\item{intercept_text}{label of the intercept row in regression tables (default: \code{"Constant"})}
 
-\item{column_formats}{column formatting functions}
+\item{column_formats}{a \code{\link[=column_formats]{column_formats()}} object: the headers, formatters, and note definitions of table columns}
 
-\item{number_formatter}{default function to format numbers}
+\item{number_formatter}{function that formats numbers that can exceed 1 in absolute value (e.g., coefficients, standard errors, and test statistics). It takes a numeric vector and \code{accuracy} and returns a character vector. By default, \code{\link[=align_chr]{align_chr()}} with the \code{accuracy} setting.}
 
-\item{trim_leading_zero}{default function to trim leading zeros from numbers}
+\item{trim_leading_zero}{function that formats numbers that cannot exceed 1 in absolute value (e.g., correlations, standardized coefficients, and \emph{R}^2^), which APA style writes without a leading zero. By default, \code{\link[=align_chr]{align_chr()}} with \code{trim_leading_zeros = TRUE}. Note that this is a function, unlike the \code{TRUE}/\code{FALSE} \code{trim_leading_zeros} argument of \code{\link[=align_chr]{align_chr()}}.}
 
 \item{width_aware_padding}{if \code{TRUE} (default), \code{\link[=align_chr]{align_chr()}} pads text to equal rendered width in \code{font_family} (when the font is installed). If \code{FALSE}, text is padded with one figure space per missing character.}
 

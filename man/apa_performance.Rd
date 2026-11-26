@@ -77,9 +77,19 @@ apa_performance(fit, metrics = c("R2", "Sigma"), column_formats = NULL)
 \method{apa_performance}{list}(fit, metrics = NULL, column_formats = NULL)
 }
 \arguments{
-\item{fit}{model fit object}
+\item{fit}{a fitted model of any class that \code{\link[=apa_parameters]{apa_parameters()}} accepts
+(except \code{aov}, \code{aovlist}, and \code{afex_aov}), or a named list of models}
 
-\item{metrics}{performance metrics. Default is R2 and Sigma}
+\item{metrics}{fit statistics to display, named as in
+\code{\link[performance:model_performance]{performance::model_performance()}} (e.g., \code{"R2"}, \code{"R2_adjusted"},
+\code{"AIC"}, \code{"BIC"}, \code{"RMSE"}, \code{"Sigma"}). The defaults depend on the
+model: \code{R2} and \code{Sigma} for \code{lm}; \code{R2} (a pseudo-\emph{R}^2^) and \code{AIC} for
+\code{glm}, ordinal, multinomial, zero-inflated, and hurdle models;
+\code{R2_marginal}, \code{R2_conditional}, and \code{ICC} for mixed models;
+\code{R2_adjusted}, \code{Deviance_explained}, and \code{AIC} for generalized additive
+models; and the fit indices listed under \code{apa_performance.lavaan()} for
+\code{lavaan} models. For meta-analyses and lists, \code{NULL} (default) chooses
+them.}
 
 \item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 }

@@ -24,9 +24,9 @@ header_md(x, level = 1)
 \arguments{
 \item{x}{character vector}
 
-\item{tag}{opening tag, e.g., \verb{<span>}}
+\item{tag}{opening tag, e.g., \verb{<span>} or \verb{**}}
 
-\item{right_tag}{closing tag, e.g., \verb{</span>}. Defaults to the same value as the opening tag.}
+\item{right_tag}{closing tag. By default, the opening tag with \code{<} replaced by \verb{</} (e.g., \verb{<span>} becomes \verb{</span>}), so markdown tags such as \verb{**} close with themselves.}
 
 \item{level}{heading level}
 }

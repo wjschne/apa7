@@ -17,9 +17,9 @@ add_list_column(
 
 \item{...}{Column name or tidyselect function. Select columns. Default is first column}
 
-\item{type}{list type. Can be "1" (numeric), "a" (lowercase alphabetical), or "ABC" (uppercase alphabetical), "i" (lowercase Roman numerals), "I" (uppercase Roman numerals)}
+\item{type}{list type: \code{"1"} (default) for 1, 2, 3; \code{"a"} for a, b, c; \code{"A"} for A, B, C; \code{"i"} for i, ii, iii; or \code{"I"} for I, II, III}
 
-\item{sep}{separator}
+\item{sep}{text between the list label and the item (default: \code{". "}, as in "1. ")}
 
 \item{merge}{If \code{TRUE}, list columns will be united with their respective text columns.}
 }

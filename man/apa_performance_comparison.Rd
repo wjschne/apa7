@@ -16,7 +16,7 @@ apa_performance_comparison(
 
 \item{metrics}{performance metrics. If \code{NULL} (default), R2, deltaR2, F, and p for models with an estimated dispersion parameter (e.g., \code{lm}, Gaussian or quasi-family \code{glm}), and R2, deltaR2, Chi2, df, and p for GLMs with a fixed dispersion parameter (binomial, Poisson, negative binomial). Use "all" for all available metrics.}
 
-\item{starred}{columns to star with significant p_values}
+\item{starred}{columns to which significance stars are added (e.g., \code{"Coefficient"} or \code{"p"}). \code{NULL} or \code{NA} for none.}
 
 \item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 }

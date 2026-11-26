@@ -2,7 +2,7 @@
 % Please edit documentation in R/apaquarto.R
 \name{install_apaquarto}
 \alias{install_apaquarto}
-\title{Installs the apaquarto extension.}
+\title{Install the apaquarto extension}
 \usage{
 install_apaquarto(
   no_prompt = FALSE,
@@ -12,19 +12,24 @@ install_apaquarto(
 )
 }
 \arguments{
-\item{no_prompt}{Do not prompt to confirm approval to download external extension.}
+\item{no_prompt}{if \code{TRUE}, Quarto installs the extension without asking
+you to confirm the download. If \code{FALSE} (default), it asks.}
 
-\item{quiet}{Suppress warning and other messages}
+\item{quiet}{if \code{TRUE}, Quarto's messages and warnings are suppressed}
 
-\item{quarto_args}{Character vector of other quarto CLI arguments to append to the Quarto command executed by this function.}
+\item{quarto_args}{character vector of other Quarto command-line arguments, appended to the \verb{quarto add} command}
 
-\item{ask}{if \code{TRUE} (default), ask before installing missing packages. If \code{FALSE}, install missing packages without asking.}
+\item{ask}{if \code{TRUE} (default), ask before installing missing R packages (quarto, ragg, and svglite). If \code{FALSE}, install them without asking.}
 }
 \value{
 installs the apaquarto Quarto extension
 }
 \description{
 A wrapper for \code{quarto::quarto_add_extension}
+Two separate questions can be asked: whether to install R packages that
+apaquarto needs (quarto, ragg, and svglite), controlled by \code{ask}, and
+whether to trust and download the extension from GitHub, a question Quarto
+itself asks, controlled by \code{no_prompt}.
 }
 \examples{
 \dontrun{

@@ -1136,3 +1136,38 @@ test_that("muffle_backtick_warning() lets other warnings through", {
   expect_no_warning(muffle_backtick_warning(warning("using syntactically invalid variable names")))
   expect_identical(muffle_backtick_warning(1 + 1), 2)
 })
+
+test_that("renamed arguments still work, with a warning", {
+  d <- data.frame(x_n = 3, x_mean = 4, y_n = 5, y_mean = 6)
+  expect_warning(
+    old <- add_break_columns(d = d, x_mean),
+    "`d` argument of `add_break_columns()` is deprecated",
+    fixed = TRUE
+  )
+  expect_identical(old, add_break_columns(d, x_mean))
+  expect_identical(add_break_columns(data = d, x_mean), add_break_columns(d, x_mean))
+
+  expect_warning(
+    old <- apa_p_star_note(x = c(.01, .001)),
+    "`x` argument of `apa_p_star_note()` is deprecated",
+    fixed = TRUE
+  )
+  expect_identical(old, apa_p_star_note(alpha = c(.01, .001)))
+  expect_identical(apa_p_star_note(c(.01, .001)), apa_p_star_note(alpha = c(.01, .001)))
+
+  d_cor <- mtcars[, c("mpg", "wt", "qsec")]
+  expect_warning(
+    old <- apa_cor(d_cor, p_value = .001, output = "tibble"),
+    "`p_value` argument of `apa_cor()` is deprecated",
+    fixed = TRUE
+  )
+  expect_identical(old, apa_cor(d_cor, alpha = .001, output = "tibble"))
+})
+
+test_that("apa_performance_comparison() stars several columns", {
+  m1 <- lm(mpg ~ cyl, data = mtcars)
+  m2 <- lm(mpg ~ cyl + wt, data = mtcars)
+  cp <- apa_performance_comparison(list(A = m1, B = m2), starred = c("deltaR2", "F"))
+  expect_true(grepl("*", cp[[grep("Delta", names(cp))[1]]][2], fixed = TRUE))
+  expect_true(grepl("*", cp[[grep("F", names(cp), fixed = TRUE)[1]]][2], fixed = TRUE))
+})

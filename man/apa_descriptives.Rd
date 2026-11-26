@@ -46,7 +46,10 @@ like \code{variables}}
 names.}
 
 \item{test}{if \code{TRUE}, a column of \emph{p}-values tests the differences
-between groups (requires \code{by})}
+between groups (requires \code{by}). Unlike the \code{test} argument of
+\code{\link[=apa_chisq]{apa_chisq()}} and \code{\link[=apa_htest]{apa_htest()}}, which names a test, this one is \code{TRUE}
+or \code{FALSE}; the test of categorical variables is chosen with
+\code{categorical_test}.}
 
 \item{categorical_test}{test of categorical variables when \code{test = TRUE}:
 \code{"auto"} (default) for Fisher's exact test when an expected count is
@@ -61,7 +64,8 @@ missing values}
 added below each continuous variable}
 
 \item{digits}{number of decimal places of means, standard deviations,
-medians, interquartile ranges, and ranges}
+medians, interquartile ranges, and ranges (unaffected by
+\code{apa7_defaults(accuracy = )})}
 
 \item{percent_digits}{number of decimal places of percentages}
 

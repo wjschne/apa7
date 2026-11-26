@@ -13,8 +13,7 @@ apa_reliability(
   omega = TRUE,
   ci = 0.95,
   score = c("mean", "sum"),
-  flag = FALSE,
-  min_item_total = 0.3,
+  flag = NULL,
   format_variable_names = TRUE,
   digits = 2
 )
@@ -46,18 +45,19 @@ statistics, or \code{"scales"} for one row per scale.}
 
 \item{score}{\code{"mean"} (default) or \code{"sum"}: how scale scores are computed}
 
-\item{flag}{if \code{TRUE}, item-total correlations below \code{min_item_total} and
-\eqn{\alpha}{alpha}-if-deleted values above the scale's
-\eqn{\alpha}{alpha} are bolded}
-
-\item{min_item_total}{cutoff for flagging item-total correlations}
+\item{flag}{\code{NULL} (default) or a number: item-total correlations below
+it, and \eqn{\alpha}{alpha}-if-deleted values above the scale's
+\eqn{\alpha}{alpha}, are bolded (e.g., \code{flag = .30}), and the note says
+so. \code{TRUE} is the same as \code{.30}. This works like \code{flag} in
+\code{\link[=apa_collinearity]{apa_collinearity()}}.}
 
 \item{format_variable_names}{if \code{TRUE} (default), item and scale names are
 lightly formatted: underscores become spaces, and the first letter is
 capitalized (item codes such as "A1" stay intact). Set to \code{FALSE} to keep
 names exactly as they are.}
 
-\item{digits}{number of decimal places}
+\item{digits}{number of decimal places (unaffected by
+\code{apa7_defaults(accuracy = )})}
 }
 \value{
 \code{apa7_tbl} (tibble)

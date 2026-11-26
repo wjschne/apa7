@@ -93,13 +93,19 @@ make_apaquarto <- function(launch.browser = TRUE, ask = TRUE) {
   )
 } # nocov end
 
-#' Installs the apaquarto extension.
+#' Install the apaquarto extension
 #'
 #' A wrapper for `quarto::quarto_add_extension`
-#' @param no_prompt Do not prompt to confirm approval to download external extension.
-#' @param quiet Suppress warning and other messages
-#' @param quarto_args Character vector of other quarto CLI arguments to append to the Quarto command executed by this function.
-#' @param ask if `TRUE` (default), ask before installing missing packages. If `FALSE`, install missing packages without asking.
+#' Two separate questions can be asked: whether to install R packages that
+#' apaquarto needs (quarto, ragg, and svglite), controlled by `ask`, and
+#' whether to trust and download the extension from GitHub, a question Quarto
+#' itself asks, controlled by `no_prompt`.
+#'
+#' @param no_prompt if `TRUE`, Quarto installs the extension without asking
+#'   you to confirm the download. If `FALSE` (default), it asks.
+#' @param quiet if `TRUE`, Quarto's messages and warnings are suppressed
+#' @param quarto_args character vector of other Quarto command-line arguments, appended to the `quarto add` command
+#' @param ask if `TRUE` (default), ask before installing missing R packages (quarto, ragg, and svglite). If `FALSE`, install them without asking.
 #'
 #' @returns installs the apaquarto Quarto extension
 #' @export

@@ -4,12 +4,15 @@
 \alias{apa_p_star_note}
 \title{Make star notes for p-values}
 \usage{
-apa_p_star_note(x = c(0.05, 0.01, 0.001), first_alpha_marginal = FALSE)
+apa_p_star_note(alpha = c(0.05, 0.01, 0.001), first_alpha_marginal = FALSE, x)
 }
 \arguments{
-\item{x}{vector of alpha values (p-value thresholds)}
+\item{alpha}{vector of alpha values (\emph{p}-value thresholds), from largest to
+smallest. Each gets one more star.}
 
 \item{first_alpha_marginal}{if TRUE, the first alpha value is treated as marginal and gets a dagger instead of a star}
+
+\item{x}{deprecated; use \code{alpha}}
 }
 \value{
 character vector
@@ -19,6 +22,6 @@ Make star notes for p-values
 }
 \examples{
 apa_p_star_note()
-apa_p_star_note(x = c(0.10, 0.05, 0.01, 0.001),
+apa_p_star_note(alpha = c(0.10, 0.05, 0.01, 0.001),
                 first_alpha_marginal = TRUE)
 }

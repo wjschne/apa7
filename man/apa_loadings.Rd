@@ -27,7 +27,10 @@ apa_loadings(
 
 \item{factor_names}{names for the factors. Either an unnamed character vector in the order the factors appear in the table (psych orders factors by variance explained), or a named vector that maps the original names to new names (e.g., \code{c(PA1 = "Verbal")}). The unnamed form is safer: after an oblimin rotation, the labels psych assigns (PA1, PA2, ...) can change from one run to the next, but the order of the factors does not.}
 
-\item{variance}{add rows for the variance explained by each factor}
+\item{variance}{if \code{TRUE}, rows are added for the variance explained by
+each factor (sums of squared loadings, proportion, and cumulative
+proportion). Not to be confused with the \code{variances} argument of
+\code{\link[=apa_parameters]{apa_parameters()}} for \code{lavaan} models, which adds residual variances.}
 
 \item{communality}{add a communality (\emph{h}^2^) column}
 
@@ -39,7 +42,8 @@ apa_loadings(
 
 \item{format_variable_names}{format the variable names with the \code{Variable} column format. Set to \code{FALSE} to keep item text exactly as it is.}
 
-\item{digits}{number of decimal places for loadings}
+\item{digits}{number of decimal places for loadings (unaffected by
+\code{apa7_defaults(accuracy = )})}
 }
 \value{
 \code{apa7_tbl} (tibble)

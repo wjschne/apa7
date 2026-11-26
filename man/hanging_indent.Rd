@@ -17,17 +17,17 @@ hanging_indent(
 \arguments{
 \item{x}{text}
 
-\item{indent}{number of spaces to indent}
+\item{indent}{number of \code{space} characters that indent the second and later lines}
 
-\item{width}{number of characters to break lines}
+\item{width}{maximum number of characters per line}
 
-\item{space}{indenting space character (defaults to non-breaking space)}
+\item{space}{indenting character. If \code{NULL} (default), a non-breaking space.}
 
-\item{newline}{text for creating new line}
+\item{newline}{text inserted at each line break (default: a markdown hard line break, a backslash followed by a newline)}
 
-\item{whitespace_only}{wrapping spaces only}
+\item{whitespace_only}{if \code{TRUE}, lines break only at spaces. If \code{FALSE} (default), they can also break after hyphens and slashes (see \code{\link[stringr:str_wrap]{stringr::str_wrap()}}).}
 
-\item{wrap_equal_width}{Attempts to split lines to make them of approximately equal width}
+\item{wrap_equal_width}{if \code{TRUE}, lines are made roughly equal in width (see \code{\link[=str_wrap_equal]{str_wrap_equal()}}). If \code{FALSE} (default), each line is filled up to \code{width}.}
 }
 \value{
 character vector
