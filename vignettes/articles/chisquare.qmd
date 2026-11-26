@@ -1,6 +1,15 @@
 ---
 title: "Contingency Tables"
 format: html
+execute: 
+  cache: true
+knitr: 
+  opts_chunk: 
+    fig-cap-location: top
+    dev: "ragg_png"
+    fig-width: 7
+    fig-height: 7
+    out-width: 100%
 ---
 
 ```{r}
@@ -16,6 +25,8 @@ knitr::knit_meta_add(list(gdtools::gfontHtmlDependency("Open Sans", subset = c("
 #| include: false
 library(apa7)
 library(dplyr)
+library(ggplot2)
+library(forcats)
 apa7_defaults(font_family = "Open Sans", line_spacing = 1.5)
 ```
 
@@ -53,7 +64,9 @@ d_survey <- MASS::survey |>
   )
 ```
 
-`variable` gives the rows of the table, and `by` gives the columns:
+
+
+The `variable` parameter gives the rows of the table, and `by` gives the columns:
 
 ```{r}
 #| label: tbl-exercise
@@ -95,6 +108,32 @@ Without apaquarto, `apa_flextable(note = TRUE)` puts the same note below the tab
 #| tbl-cap: "Exercise by Sex With a Generated Note"
 apa_flextable(tbl_exercise, note = TRUE)
 ```
+
+An informal inspection of @fig-exercise suggests that compared to females, males are more likely to exercise frequently. The formal test of the comparison in @tbl-exercise-flextable reveals the apparent difference in proportions is not statistically significant.
+
+```{r}
+#| label: fig-exercise
+#| fig-cap: Exercise Frequency by Participant Sex
+#| fig-width: 4.5
+#| fig-height: 6.5
+#| out-width: 50%
+#| code-fold: true
+d_survey |> 
+  filter_out(is.na(Sex)) |> 
+  mutate(Exercise = fct_rev(Exercise)) |> 
+  count(Sex, Exercise) |> 
+  mutate(Proportion = n / sum(n), .by = Sex) |> 
+  mutate(p = formatC(100 * Proportion, digits = 1, format = "f")) |> 
+  ggplot(aes(Sex, Proportion)) + 
+  geom_col(aes(fill = Exercise)) + 
+  geom_text(aes(label = paste0(Exercise, ": ", p, "%"), group = Exercise), position = position_stack(vjust = .5, reverse = F), size = 16 * .8, size.unit = "pt") + 
+  scale_x_discrete(expand = expansion()) +
+  scale_y_continuous("Exercise Frequency", breaks = NULL, expand = expansion()) + 
+  scale_fill_viridis_d(begin = .2, end = .7, direction = -1, alpha = .7) +
+  theme_minimal(base_family = "Open Sans", base_size = 16) + 
+  theme(legend.position = "none", panel.grid = element_blank())
+```
+
 
 # Percentages
 
