@@ -47,9 +47,9 @@ rd_section <- function(rd, tag) {
   paste(unlist(lapply(parts, \(p) paste(unlist(p), collapse = ""))), collapse = " ")
 }
 
-test_that("ARG-1: the first argument of a table function is fit, data, or x", {
+test_that("ARG-1: the first argument of a table function is fit or data", {
   for (f in table_functions) {
-    expect_true(arg_names(f)[1] %in% c("fit", "data", "x", "..."), label = f)
+    expect_true(arg_names(f)[1] %in% c("fit", "data", "..."), label = f)
   }
 })
 

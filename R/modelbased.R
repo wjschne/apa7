@@ -5,7 +5,7 @@
 #' probe a moderation effect), computed with the
 #' [modelbased](https://easystats.github.io/modelbased/) package.
 #'
-#' `x` is either a model or the output of [modelbased::estimate_means()],
+#' `fit` is either a model or the output of [modelbased::estimate_means()],
 #' [modelbased::estimate_contrasts()], or [modelbased::estimate_slopes()].
 #' With a model, `by`, `contrast`, `trend`, and the arguments in `...` (e.g.,
 #' `p_adjust`) are passed to the modelbased function, so
@@ -63,7 +63,7 @@
 #'
 #' Bayesian models are not yet supported.
 #'
-#' @param x a model, or output of [modelbased::estimate_means()] (for
+#' @param fit a model, or output of [modelbased::estimate_means()] (for
 #'   `apa_means()`), [modelbased::estimate_contrasts()] (for
 #'   `apa_contrasts()`), or [modelbased::estimate_slopes()] (for
 #'   `apa_slopes()`)
@@ -79,7 +79,7 @@
 #'   [modelbased::estimate_contrasts()].
 #' @param trend predictor whose slopes are estimated (e.g., `trend = wt`),
 #'   quoted or unquoted. Passed to [modelbased::estimate_slopes()].
-#' @param ... other arguments passed to the modelbased function when `x` is a
+#' @param ... other arguments passed to the modelbased function when `fit` is a
 #'   model (e.g., `p_adjust = "holm"`, `predict = "link"`, or
 #'   `estimate = "average"`)
 #' @param starred columns to which significance stars are added (e.g., `"p"`
@@ -145,7 +145,7 @@
 #'     apa_note()
 #' }
 apa_means <- function(
-  x,
+  fit,
   by = NULL,
   ...,
   starred = NA,
@@ -153,7 +153,7 @@ apa_means <- function(
   column_formats = NULL,
   format_variable_names = TRUE
 ) {
-  x <- modelbased_call(x, "estimate_means", list(by = rlang::enquo(by)), ...)
+  x <- modelbased_call(fit, "estimate_means", list(by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
     kind = "means",
@@ -167,7 +167,7 @@ apa_means <- function(
 #' @rdname apa_means
 #' @export
 apa_contrasts <- function(
-  x,
+  fit,
   contrast = NULL,
   by = NULL,
   ...,
@@ -184,7 +184,7 @@ apa_contrasts <- function(
   if (!is.null(sd) && !(is.numeric(sd) && length(sd) == 1 && !is.na(sd) && sd > 0)) {
     cli::cli_abort("{.arg sd} must be {.code NULL} or a single positive number.")
   }
-  x <- modelbased_call(x, "estimate_contrasts", list(contrast = rlang::enquo(contrast), by = rlang::enquo(by)), ...)
+  x <- modelbased_call(fit, "estimate_contrasts", list(contrast = rlang::enquo(contrast), by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
     kind = "contrasts",
@@ -200,7 +200,7 @@ apa_contrasts <- function(
 #' @rdname apa_means
 #' @export
 apa_slopes <- function(
-  x,
+  fit,
   trend = NULL,
   by = NULL,
   ...,
@@ -213,7 +213,7 @@ apa_slopes <- function(
   if (!is.null(johnson_neyman) && !(isTRUE(johnson_neyman) || isFALSE(johnson_neyman))) {
     cli::cli_abort("{.arg johnson_neyman} must be {.code NULL}, {.code TRUE}, or {.code FALSE}.")
   }
-  x <- modelbased_call(x, "estimate_slopes", list(trend = rlang::enquo(trend), by = rlang::enquo(by)), ...)
+  x <- modelbased_call(fit, "estimate_slopes", list(trend = rlang::enquo(trend), by = rlang::enquo(by)), ...)
   modelbased_table(
     x,
     kind = "slopes",
@@ -239,7 +239,7 @@ modelbased_call <- function(x, fun, variable_args, ...) {
     # variable names cannot be found without the model's data
     if ((length(args) > 0 || length(variable_args) > 0) && inherits(x, fun)) {
       cli::cli_warn(
-        "Arguments in {.arg ...} are ignored because {.arg x} is already output of {.fn modelbased::{fun}}."
+        "Arguments in {.arg ...} are ignored because {.arg fit} is already output of {.fn modelbased::{fun}}."
       )
     }
     return(modelbased_estimates(x, fun))
@@ -510,7 +510,7 @@ modelbased_estimates <- function(x, fun, ...) {
   if (inherits(x, fun)) {
     if (...length() > 0) {
       cli::cli_warn(
-        "Arguments in {.arg ...} are ignored because {.arg x} is already output of {.fn modelbased::{fun}}."
+        "Arguments in {.arg ...} are ignored because {.arg fit} is already output of {.fn modelbased::{fun}}."
       )
     }
     return(x)
@@ -523,12 +523,12 @@ modelbased_estimates <- function(x, fun, ...) {
   other <- intersect(names(functions), class(x))
   if (length(other) > 0) {
     cli::cli_abort(
-      "{.arg x} is output of {.fn modelbased::{other[1]}}. Use {.fn {functions[[other[1]]]}} instead."
+      "{.arg fit} is output of {.fn modelbased::{other[1]}}. Use {.fn {functions[[other[1]]]}} instead."
     )
   }
   if (is.data.frame(x)) {
     cli::cli_abort(
-      "{.arg x} must be a model or output of {.fn modelbased::{fun}}, not a plain data frame."
+      "{.arg fit} must be a model or output of {.fn modelbased::{fun}}, not a plain data frame."
     )
   }
   rlang::check_installed(
@@ -709,7 +709,7 @@ modelbased_table <- function(
     colnames(d)
   )[1]
   if (is.na(coef_col)) {
-    cli::cli_abort("Cannot find the estimates in {.arg x}.") # nocov
+    cli::cli_abort("Cannot find the estimates in {.arg fit}.") # nocov
   }
   focal <- intersect(a$focal_terms, colnames(d))
   # Labels of a variable's levels, naming shortcut values (e.g., "+1*SD*")
@@ -728,7 +728,7 @@ modelbased_table <- function(
 
   if (kind == "means") {
     if (length(focal) == 0) {
-      cli::cli_abort("Cannot find the focal variables of the means in {.arg x}.") # nocov
+      cli::cli_abort("Cannot find the focal variables of the means in {.arg fit}.") # nocov
     }
     row_var <- focal[length(focal)]
     heading_vars <- focal[-length(focal)]

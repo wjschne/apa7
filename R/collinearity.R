@@ -25,7 +25,7 @@
 #' `pscl::zeroinfl()` or `glmmTMB::glmmTMB()`) get a heading row for each
 #' part.
 #'
-#' @param x a regression model with at least two predictors (any model that
+#' @param fit a regression model with at least two predictors (any model that
 #'   [performance::check_collinearity()] accepts, e.g., `lm`, `glm`, `lme4`,
 #'   `glmmTMB`, or `pscl` models), or the output of
 #'   [performance::check_collinearity()]
@@ -58,7 +58,7 @@
 #' apa_collinearity(fit, flag = 10) |>
 #'   apa_note()
 apa_collinearity <- function(
-  x,
+  fit,
   columns = c("VIF", "VIF_CI", "Tolerance"),
   flag = NULL,
   ci = 0.95,
@@ -77,11 +77,10 @@ apa_collinearity <- function(
     cli::cli_abort("{.arg flag} must be {.code NULL} or a single number (e.g., {.code flag = 10}).")
   }
 
-  if (inherits(x, "check_collinearity")) {
-    cc <- x
+  if (inherits(fit, "check_collinearity")) {
+    cc <- fit
     fit <- NULL
   } else {
-    fit <- x
     cc <- tryCatch(
       suppressMessages(performance::check_collinearity(fit, ci = ci, ...)),
       warning = function(w) {

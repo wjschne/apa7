@@ -241,9 +241,9 @@ test_that("by, contrast, and trend take unquoted variable names", {
 })
 
 test_that("by, contrast, and trend are named arguments that can be given by position", {
-  expect_equal(names(formals(apa_means))[1:3], c("x", "by", "..."))
-  expect_equal(names(formals(apa_contrasts))[1:4], c("x", "contrast", "by", "..."))
-  expect_equal(names(formals(apa_slopes))[1:4], c("x", "trend", "by", "..."))
+  expect_equal(names(formals(apa_means))[1:3], c("fit", "by", "..."))
+  expect_equal(names(formals(apa_contrasts))[1:4], c("fit", "contrast", "by", "..."))
+  expect_equal(names(formals(apa_slopes))[1:4], c("fit", "trend", "by", "..."))
   d <- cars_data()
   fit <- lm(mpg ~ cyl * am + wt, data = d)
   expect_equal(apa_means(fit, cyl), apa_means(fit, by = "cyl"))

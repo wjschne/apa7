@@ -7,7 +7,7 @@
 \title{Estimated marginal means, contrasts, and slopes tables}
 \usage{
 apa_means(
-  x,
+  fit,
   by = NULL,
   ...,
   starred = NA,
@@ -17,7 +17,7 @@ apa_means(
 )
 
 apa_contrasts(
-  x,
+  fit,
   contrast = NULL,
   by = NULL,
   ...,
@@ -30,7 +30,7 @@ apa_contrasts(
 )
 
 apa_slopes(
-  x,
+  fit,
   trend = NULL,
   by = NULL,
   ...,
@@ -42,7 +42,7 @@ apa_slopes(
 )
 }
 \arguments{
-\item{x}{a model, or output of \code{\link[modelbased:estimate_means]{modelbased::estimate_means()}} (for
+\item{fit}{a model, or output of \code{\link[modelbased:estimate_means]{modelbased::estimate_means()}} (for
 \code{apa_means()}), \code{\link[modelbased:estimate_contrasts]{modelbased::estimate_contrasts()}} (for
 \code{apa_contrasts()}), or \code{\link[modelbased:estimate_slopes]{modelbased::estimate_slopes()}} (for
 \code{apa_slopes()})}
@@ -55,7 +55,7 @@ be quoted. In \code{apa_means()} and \code{apa_slopes()}, the last variable labe
 the rows and the others get heading rows; in \code{apa_contrasts()}, all of
 them get heading rows. Passed to the modelbased function.}
 
-\item{...}{other arguments passed to the modelbased function when \code{x} is a
+\item{...}{other arguments passed to the modelbased function when \code{fit} is a
 model (e.g., \code{p_adjust = "holm"}, \code{predict = "link"}, or
 \code{estimate = "average"})}
 
@@ -103,7 +103,7 @@ probe a moderation effect), computed with the
 \href{https://easystats.github.io/modelbased/}{modelbased} package.
 }
 \details{
-\code{x} is either a model or the output of \code{\link[modelbased:estimate_means]{modelbased::estimate_means()}},
+\code{fit} is either a model or the output of \code{\link[modelbased:estimate_means]{modelbased::estimate_means()}},
 \code{\link[modelbased:estimate_contrasts]{modelbased::estimate_contrasts()}}, or \code{\link[modelbased:estimate_slopes]{modelbased::estimate_slopes()}}.
 With a model, \code{by}, \code{contrast}, \code{trend}, and the arguments in \code{...} (e.g.,
 \code{p_adjust}) are passed to the modelbased function, so

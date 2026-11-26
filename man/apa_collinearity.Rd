@@ -5,7 +5,7 @@
 \title{Collinearity diagnostics table}
 \usage{
 apa_collinearity(
-  x,
+  fit,
   columns = c("VIF", "VIF_CI", "Tolerance"),
   flag = NULL,
   ci = 0.95,
@@ -15,7 +15,7 @@ apa_collinearity(
 )
 }
 \arguments{
-\item{x}{a regression model with at least two predictors (any model that
+\item{fit}{a regression model with at least two predictors (any model that
 \code{\link[performance:check_collinearity]{performance::check_collinearity()}} accepts, e.g., \code{lm}, \code{glm}, \code{lme4},
 \code{glmmTMB}, or \code{pscl} models), or the output of
 \code{\link[performance:check_collinearity]{performance::check_collinearity()}}}

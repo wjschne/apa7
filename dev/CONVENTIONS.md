@@ -34,8 +34,11 @@ For a new table function (or a new method of an existing one):
 ## Arguments
 
 **ARG-1: The first argument names what the function takes.**
-`fit` for a fitted model (or a list of models), `data` for a data frame,
-`x` for a vector, a flextable, an `apa7_tbl`, or a matrix.
+`fit` for a fitted model, a list of models, or the output of an analysis
+(e.g., `parameters::n_factors()`); `data` for a data frame of raw data;
+`x` for a vector, a flextable, an `apa7_tbl`, or a matrix. Table functions
+take `fit` or `data`, never `x`, even when they also accept other input
+(e.g., `apa_n_factors()` runs `parameters::n_factors()` on a data frame).
 *Why:* the name tells users what to pipe in. *Checked.*
 
 **ARG-2: The same idea has the same name, and the same default, everywhere.**
@@ -256,7 +259,6 @@ fix it, or record it as an exception to the rule.
 
 | # | Rule | Departure | Suggested resolution |
 |---|---|---|---|
-| 1 | ARG-1 | `apa_collinearity()`, `apa_means()`, `apa_contrasts()`, and `apa_slopes()` take a model as `x`, not `fit`. `apa_n_factors()` takes data as `x`. | Rename to `fit` (and `data`) with ARG-7 deprecation, after 0.3.0 |
 | 2 | RET-1 | `apa_cor()` returns a flextable by default (`output = "flextable"`), takes `note` and styling arguments, and writes its own note. | Make it return an `apa7_tbl` with a note record, keeping `output = "flextable"` for one release |
 | 3 | ARG-2 | `apa_cor()` uses `star_significant` and `bold_significant` instead of `starred` and `bolded`. | Exception: they are switches over every correlation, not column selections |
 | 4 | ARG-2 | Variable relabeling is `labels` (`apa_chisq()`, `apa_descriptives()`), `variable_labels` (`column_formats()`), and `factor_names` (`apa_loadings()`). | Decide whether `factor_names` is a different idea; align the other two |

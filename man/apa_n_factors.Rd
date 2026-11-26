@@ -5,7 +5,7 @@
 \title{Factor retention table}
 \usage{
 apa_n_factors(
-  x,
+  fit,
   table = c("methods", "agreement"),
   bold_consensus = TRUE,
   format_method_names = TRUE,
@@ -14,7 +14,7 @@ apa_n_factors(
 )
 }
 \arguments{
-\item{x}{the output of \code{\link[parameters:n_factors]{parameters::n_factors()}}, or a data frame passed to
+\item{fit}{the output of \code{\link[parameters:n_factors]{parameters::n_factors()}}, or a data frame passed to
 it}
 
 \item{table}{\code{"methods"} (default) for a row per method, or \code{"agreement"}
@@ -29,13 +29,13 @@ out (e.g., "Velicer's MAP" becomes "Velicer's minimum average partial
 to keep the names exactly as \code{\link[parameters:n_factors]{parameters::n_factors()}} gives them.}
 
 \item{components}{if \code{TRUE}, the table and note speak of components rather
-than factors. If \code{NULL} (default), components are assumed when \code{x} is a
+than factors. If \code{NULL} (default), components are assumed when \code{fit} is a
 data frame and \code{type = "PCA"} is passed in \code{...}. The output of
 \code{\link[parameters:n_factors]{parameters::n_factors()}} and \code{\link[parameters:n_components]{parameters::n_components()}} does not record
 which was estimated, so set \code{components = TRUE} for the output of
 \code{\link[parameters:n_components]{parameters::n_components()}}.}
 
-\item{...}{arguments passed to \code{\link[parameters:n_factors]{parameters::n_factors()}} when \code{x} is a data
+\item{...}{arguments passed to \code{\link[parameters:n_factors]{parameters::n_factors()}} when \code{fit} is a data
 frame (e.g., \code{type}, \code{rotation}, \code{algorithm}, and \code{package})}
 }
 \value{
@@ -46,7 +46,7 @@ Makes an APA-style table of how many factors (or components) each method
 suggests retaining, as computed by \code{\link[parameters:n_factors]{parameters::n_factors()}}.
 }
 \details{
-\code{x} can be the output of \code{\link[parameters:n_factors]{parameters::n_factors()}}, or a data frame, in
+\code{fit} can be the output of \code{\link[parameters:n_factors]{parameters::n_factors()}}, or a data frame, in
 which case \code{\link[parameters:n_factors]{parameters::n_factors()}} is run with the arguments in \code{...}
 (e.g., \code{type = "PCA"} for components, or \code{package} to choose the packages
 whose methods are used: by default nFactors and psych, which must be

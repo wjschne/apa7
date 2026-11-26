@@ -3,7 +3,7 @@
 #' Makes an APA-style table of how many factors (or components) each method
 #' suggests retaining, as computed by [parameters::n_factors()].
 #'
-#' `x` can be the output of [parameters::n_factors()], or a data frame, in
+#' `fit` can be the output of [parameters::n_factors()], or a data frame, in
 #' which case [parameters::n_factors()] is run with the arguments in `...`
 #' (e.g., `type = "PCA"` for components, or `package` to choose the packages
 #' whose methods are used: by default nFactors and psych, which must be
@@ -24,7 +24,7 @@
 #' Lawley's) tend to suggest too many factors. The number of methods that
 #' agree is not by itself a good reason to retain a number of factors.
 #'
-#' @param x the output of [parameters::n_factors()], or a data frame passed to
+#' @param fit the output of [parameters::n_factors()], or a data frame passed to
 #'   it
 #' @param table `"methods"` (default) for a row per method, or `"agreement"`
 #'   for a row per suggested number of factors
@@ -35,12 +35,12 @@
 #'   (MAP)" and "beta" becomes "Multiple regression (*&beta;*)"). Set to `FALSE`
 #'   to keep the names exactly as [parameters::n_factors()] gives them.
 #' @param components if `TRUE`, the table and note speak of components rather
-#'   than factors. If `NULL` (default), components are assumed when `x` is a
+#'   than factors. If `NULL` (default), components are assumed when `fit` is a
 #'   data frame and `type = "PCA"` is passed in `...`. The output of
 #'   [parameters::n_factors()] and [parameters::n_components()] does not record
 #'   which was estimated, so set `components = TRUE` for the output of
 #'   [parameters::n_components()].
-#' @param ... arguments passed to [parameters::n_factors()] when `x` is a data
+#' @param ... arguments passed to [parameters::n_factors()] when `fit` is a data
 #'   frame (e.g., `type`, `rotation`, `algorithm`, and `package`)
 #'
 #' @references
@@ -71,7 +71,7 @@
 #' }
 #' }
 apa_n_factors <- function(
-  x,
+  fit,
   table = c("methods", "agreement"),
   bold_consensus = TRUE,
   format_method_names = TRUE,
@@ -82,13 +82,13 @@ apa_n_factors <- function(
   if (!(is.logical(bold_consensus) && length(bold_consensus) == 1 && !is.na(bold_consensus))) {
     cli::cli_abort("{.arg bold_consensus} must be {.code TRUE} or {.code FALSE}.")
   }
-  if (inherits(x, "n_factors")) {
-    nf <- x
-  } else if (is.data.frame(x)) {
-    nf <- parameters::n_factors(x, ...)
+  if (inherits(fit, "n_factors")) {
+    nf <- fit
+  } else if (is.data.frame(fit)) {
+    nf <- parameters::n_factors(fit, ...)
   } else {
     cli::cli_abort(
-      "{.arg x} must be the output of {.fn parameters::n_factors} or a data frame, not {.obj_type_friendly {x}}."
+      "{.arg fit} must be the output of {.fn parameters::n_factors} or a data frame, not {.obj_type_friendly {fit}}."
     )
   }
 
@@ -108,7 +108,7 @@ apa_n_factors <- function(
   # Components or factors
   dots <- list(...)
   if (is.null(components)) {
-    components <- !inherits(x, "n_factors") && !is.null(dots$type) && toupper(dots$type[1]) == "PCA"
+    components <- !inherits(fit, "n_factors") && !is.null(dots$type) && toupper(dots$type[1]) == "PCA"
   }
   if (!(is.logical(components) && length(components) == 1 && !is.na(components))) {
     cli::cli_abort("{.arg components} must be {.code NULL}, {.code TRUE}, or {.code FALSE}.")
