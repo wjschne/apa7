@@ -145,8 +145,11 @@ test_that("correlations line up on the decimal point without star columns", {
     expect_true(all(grepl("^[ - ]+", plain[c(1, 4)])))
     expect_true(all(startsWith(plain[2:3], "−")))
     # Cells are padded to equal width and centered, like the summary columns
-    # (to within the width of the narrowest padding space, in ems)
-    expect_lt(diff(range(apa7:::md_text_width(values, "Times New Roman"))), .05)
+    # (to within the width of the narrowest padding space, in ems). Without
+    # the font, padding falls back to character counts.
+    if (apa7:::font_available("Times New Roman")) {
+      expect_lt(diff(range(apa7:::md_text_width(values, "Times New Roman"))), .05)
+    }
     expect_equal(
       unname(ft$body$styles$pars$text.align$data[2, c("1", "2", "3")]),
       rep("center", 3)
