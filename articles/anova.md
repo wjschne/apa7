@@ -75,8 +75,7 @@ Code
 
 d_recall |> 
   ggplot(aes(`Presentation Format`, `Words Recalled`, color = `Presentation Format`)) + 
-  # geom_violin() +
-  stat_summary(fun.data = mean_cl_normal, position = position_nudge(.1)) +
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal, position = position_nudge(.1)) +
   stat_summary(fun = mean, geom = "text", aes(label = after_stat(y)), position = position_nudge(.15), hjust = 0, family = my_font) +
   ggbeeswarm::geom_beeswarm(alpha = .5, pch = 16) + 
   theme_minimal(base_family = my_font, base_size = 16) +

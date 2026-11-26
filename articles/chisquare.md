@@ -23,7 +23,7 @@ apa7 has three ways to report categorical variables:
 | `apa_htest(test = "chisq")` | One row per test, for several variables tested against the same grouping variable | [Hypothesis tests](https://wjschne.github.io/apa7/articles/htest.html#chi-square-tests-of-independence) |
 | `apa_descriptives` | Counts and percentages of categorical variables, with continuous variables, in a sample description (“Table 1”) | [Descriptive statistics](https://wjschne.github.io/apa7/articles/descriptives.md) |
 
-## A Contingency Table
+## The Data
 
 The `survey` data set in the MASS package ([Venables & Ripley,
 2002](#ref-ripleyModernApplied2002)) has the answers of 237 statistics
@@ -44,6 +44,42 @@ d_survey <- MASS::survey |>
                      labels = c("Never", "Occasionally", "Regularly", "Heavily"))
   )
 ```
+
+## Plot
+
+First, we visualize the data. An informal inspection of
+[Figure 1](#fig-exercise) suggests that compared to females, males are
+more likely to exercise frequently. The formal test of the comparison in
+[Table 3](#tbl-exercise-flextable) will reveal that the apparent
+difference in proportions is not statistically significant.
+
+Code
+
+``` r
+
+d_survey |> 
+  filter_out(is.na(Sex)) |> 
+  mutate(Exercise = fct_rev(Exercise)) |> 
+  count(Sex, Exercise) |> 
+  mutate(Proportion = n / sum(n), .by = Sex) |> 
+  mutate(p = formatC(100 * Proportion, digits = 1, format = "f")) |> 
+  ggplot(aes(Sex, Proportion)) + 
+  geom_col(aes(fill = Exercise)) + 
+  geom_text(aes(label = paste0(Exercise, ": ", p, "%"), group = Exercise), position = position_stack(vjust = .5, reverse = F), size = 16 * .8, size.unit = "pt", color = "white") + 
+  scale_x_discrete(expand = expansion()) +
+  scale_y_continuous("Exercise Proportions", breaks = NULL, expand = expansion()) + 
+  scale_fill_viridis_d(begin = .3, end = .7, direction = -1, alpha = .9) +
+  theme_minimal(base_family = "Open Sans", base_size = 16) + 
+  theme(legend.position = "none", panel.grid = element_blank())
+```
+
+![](chisquare_files/figure-html/fig-exercise-1.png)
+
+Figure 1
+
+Exercise Frequency by Participant Sex
+
+## Contingency Table
 
 The `variable` parameter gives the rows of the table, and `by` gives the
 columns:
@@ -146,38 +182,6 @@ apa_flextable(tbl_exercise, note = TRUE)
 Table 3
 
 Exercise by Sex With a Generated Note
-
-An informal inspection of [Figure 1](#fig-exercise) suggests that
-compared to females, males are more likely to exercise frequently. The
-formal test of the comparison in [Table 3](#tbl-exercise-flextable)
-reveals the apparent difference in proportions is not statistically
-significant.
-
-Code
-
-``` r
-
-d_survey |> 
-  filter_out(is.na(Sex)) |> 
-  mutate(Exercise = fct_rev(Exercise)) |> 
-  count(Sex, Exercise) |> 
-  mutate(Proportion = n / sum(n), .by = Sex) |> 
-  mutate(p = formatC(100 * Proportion, digits = 1, format = "f")) |> 
-  ggplot(aes(Sex, Proportion)) + 
-  geom_col(aes(fill = Exercise)) + 
-  geom_text(aes(label = paste0(Exercise, ": ", p, "%"), group = Exercise), position = position_stack(vjust = .5, reverse = F), size = 16 * .8, size.unit = "pt", color = "white") + 
-  scale_x_discrete(expand = expansion()) +
-  scale_y_continuous("Exercise Proportions", breaks = NULL, expand = expansion()) + 
-  scale_fill_viridis_d(begin = .3, end = .7, direction = -1, alpha = .9) +
-  theme_minimal(base_family = "Open Sans", base_size = 16) + 
-  theme(legend.position = "none", panel.grid = element_blank())
-```
-
-![](chisquare_files/figure-html/fig-exercise-1.png)
-
-Figure 1
-
-Exercise Frequency by Participant Sex
 
 ## Percentages
 
