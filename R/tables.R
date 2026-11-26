@@ -219,11 +219,11 @@ add_star_column <- function(
   where_names <- colnames(dplyr::select(data, ...))
 
   if (length(p_names) == 0) {
-    stop("There is no column of that name supplied to p") # nocov
+    cli::cli_abort("{.arg p} must select a column of {.arg data}.") # nocov
   }
 
   if (length(where_names) == 0) {
-    stop("There is no column of that name supplied to col") # nocov
+    cli::cli_abort("{.arg ...} must select at least one column of {.arg data}.") # nocov
   }
 
   star_names <- paste0(where_names, "apa7starcolumn")
@@ -357,8 +357,6 @@ separate_star_column <- function(
 #'
 #' @param data data.frame or tibble with variables to be correlated, or the
 #'   output of [correlation::correlation()] (see Details)
-#' @param note note placed below the table, replacing the automatic note
-#'   (for `output = "flextable"`)
 #' @param alpha *p*-value thresholds for significance stars, from largest to
 #'   smallest (default: `c(.05, .01, .001)`, for one, two, and three stars).
 #'   With `bold_significant = TRUE`, only the first is used.
@@ -372,17 +370,21 @@ separate_star_column <- function(
 #'   same with their `starred` and `bolded` arguments.
 #' @param significance_note if `TRUE` (default), the note explains the stars
 #'   (or the bolding) when any correlation is significant
-#' @param output `"flextable"` (default) for a formatted table, or `"tibble"`
-#'   for a tibble of the formatted values (without a note)
+#' @param output,note,font_family,font_size,text_color,border_color,border_width,line_spacing,table_width
+#'   deprecated. If any is given, a flextable is returned as in apa7 0.2.0,
+#'   with a warning (except `output = "tibble"`, which returns the table).
+#'   Pass the table to [apa_flextable()] instead, which takes the same styling
+#'   arguments, with `note = TRUE` for the note or a character string for a
+#'   note of your own.
 #' @param p_value deprecated; use `alpha`
 #' @param summary_functions Any named list of functions that summarize data columns (e.g., `list(Mean = mean, SD = sd)`). Can also be a character vector of function names (e.g., `c("n", "M", "SD")`). Functions available in a character vector: IQR, Interquartile Range, Kurtosis, MAD, Median Absolute Deviation, M, Mean, Med, Median, n, N, Quantile, Range, SD, Skewness, Var, Variance
 #' @param keep_empty_star_columns if `TRUE` (default), every correlation
 #'   column keeps its star column, even when no correlation in it is
 #'   significant, so that the columns have the same width. If `FALSE`, empty
 #'   star columns are removed.
-#' @param column_formats [column_formats()] object. If `NULL` (default), the default column formats are used.
-#' @inheritParams apa_flextable
-#' @inheritParams apa_style
+#' @param column_formats [column_formats()] object that formats the summary
+#'   columns (e.g., *M* and *SD*). If `NULL` (default), the column formats
+#'   set with [apa7_defaults()].
 #' @param method kind of correlation (e.g., `"pearson"`, `"spearman"`,
 #'   `"kendall"`, `"biweight"`, or `"percentage"`), passed to
 #'   [correlation::correlation()]. Not used for [correlation::correlation()]
@@ -417,15 +419,22 @@ separate_star_column <- function(
 #' not accept variable names with spaces. For those, use
 #' `apa_cor(data, partial = TRUE)` instead.
 #'
-#' The note says what kind of correlations are shown (unless they are
-#' ordinary Pearson correlations) and how the *p*-values were adjusted for
-#' multiple comparisons. Correlations computed by group, between two sets of
-#' variables, or with Bayesian methods are not yet supported.
+#' `apa_cor()` returns an `apa7_tbl`, which is displayed as an APA-style
+#' table in documents (see [apa7_tbl]). [apa_note()] writes its note: what
+#' kind of correlations are shown (unless they are ordinary Pearson
+#' correlations), how the *p*-values were adjusted for multiple comparisons,
+#' and what the stars or bold values mean. With apaquarto, use the
+#' `apa-note` chunk option (e.g., `#| apa-note: !expr apa7::apa_note(tbl)`).
+#' Otherwise, use `apa_flextable(tbl, note = TRUE)`. Correlations computed by
+#' group, between two sets of variables, or with Bayesian methods are not yet
+#' supported.
 #'
 #' In apa7 0.2.0 and earlier, `apa_cor()` computed the correlations with
 #' [psych::corTest()]. Its `adjust` argument is still accepted as
 #' `p_adjust`, with a warning, and `use = "complete"` removes incomplete
-#' rows, with a warning.
+#' rows, with a warning. Until apa7 0.3.0, `apa_cor()` returned a flextable
+#' with the note below it, and it took the arguments that style a flextable.
+#' These arguments still work, with a warning.
 #' @importFrom rlang .data
 #'
 #' @references
@@ -436,14 +445,19 @@ separate_star_column <- function(
 #'
 #' Holm, S. (1979). A simple sequentially rejective multiple test
 #' procedure. *Scandinavian Journal of Statistics, 6*(2), 65--70.
-#' @return flextable::flextable
+#' @return `apa7_tbl` (tibble)
 #' @export
 #'
 #' @examples
-#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
-#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")],
-#'         output = "tibble",
-#'         star_significant = FALSE)
+#' tbl <- apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
+#' tbl
+#' apa_note(tbl)
+#'
+#' # A flextable with the note below it, for documents without apaquarto
+#' apa_flextable(tbl, note = TRUE)
+#'
+#' # Significant correlations in bold instead of starred
+#' apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], bold_significant = TRUE)
 #'
 #' # Partial Spearman correlations, with variable names that have spaces
 #' d <- mtcars[, c("mpg", "wt", "hp")]
@@ -455,20 +469,11 @@ separate_star_column <- function(
 #'   apa_cor()
 apa_cor <- function(
   data,
-  note = NULL,
   alpha = c(.05, .01, .001),
   digits = 2,
   bold_significant = FALSE,
   star_significant = TRUE,
   significance_note = TRUE,
-  output = c("flextable", "tibble"),
-  font_family = NULL,
-  font_size = NULL,
-  text_color = "black",
-  border_color = "black",
-  border_width = 0.5,
-  line_spacing = NULL,
-  table_width = NULL,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
@@ -476,29 +481,35 @@ apa_cor <- function(
   p_adjust = "none",
   partial = FALSE,
   ...,
+  output,
+  note,
+  font_family,
+  font_size,
+  text_color,
+  border_color,
+  border_width,
+  line_spacing,
+  table_width,
   p_value
 ) {
   if (!missing(p_value)) {
     warn_renamed_arg("p_value", "alpha", "apa_cor")
     alpha <- p_value
   }
-  if (is.null(line_spacing)) {
-    line_spacing <- the$line_spacing
-  }
-  if (is.null(font_size)) {
-    font_size <- the$font_size
-  }
-  value <- name <- Variable <- k <- group <- width <- NULL
-  if (is.null(font_family)) {
-    font_family <- the$font_family
-  }
-  output <- match.arg(output)
+  # Arguments of apa7 0.2.0, when apa_cor() returned a flextable
+  styling_args <- c(
+    "font_family", "font_size", "text_color", "border_color", "border_width",
+    "line_spacing", "table_width"
+  )
+  given <- c("output", "note", styling_args)[c(
+    !missing(output), !missing(note), !missing(font_family),
+    !missing(font_size), !missing(text_color), !missing(border_color),
+    !missing(border_width), !missing(line_spacing), !missing(table_width)
+  )]
+  value <- name <- Variable <- k <- NULL
   if (is.null(column_formats)) {
-    column_formats <- column_formats()
+    column_formats <- the$column_formats
   }
-  # The same widths as in apa_flextable() (see resolve_table_width())
-  table_width <- resolve_table_width(table_width)
-  table_width_in <- table_width$inches
 
   if (bold_significant) {
     star_significant <- FALSE
@@ -517,8 +528,6 @@ apa_cor <- function(
   }
   parts <- correlation_parts(data)
   ct <- parts$ct
-  # apa_cor() writes its note itself, so citations are resolved here
-  cor_sentences <- resolve_citations(parts$sentences, citations_mode())
   data <- parts$data
   if (is.null(data)) {
     # Without the data, there is nothing to summarize
@@ -693,179 +702,170 @@ apa_cor <- function(
 
   d_R <- dplyr::bind_cols(d_msd, R)
 
+  # Summary columns get their formats and headers (e.g., *M*), and the
+  # variable names are kept as they are
+  cf <- column_formats
+  cf$Variable <- NULL
+  d_R <- apa_format_columns(d_R, column_formats = cf)
+
   attr(d_R, "cortest") <- ct
+  attr(d_R, "no_format_columns") <- "Variable"
+  # apa_flextable() lays out the table with cor_layout()
+  attr(d_R, "apa7_cor_layout") <- list(
+    starred = star_significant && !bold_significant,
+    number_chars = max(nchar(d_msd[["apa7listcolumn"]]))
+  )
+  attr(d_R, "apa_note") <- list(
+    table = "cor",
+    sentences = parts$sentences,
+    show_significance = significance_note &&
+      (bold_significant || star_significant) &&
+      any(k_p > 0),
+    bolded = bold_significant,
+    cutoff = sub("^0", "", formatC(alpha[1], digits = 2, format = "fg")),
+    star_note = if (star_significant && !bold_significant && any(k_p > 0)) {
+      paste0(p_note[k_p], collapse = ". ")
+    }
+  )
+  d_R <- as_apa7_tbl(d_R)
 
-  if (output == "flextable") {
-    cf <- column_formats()
-    cf$Variable <- NULL
-    d_R <- d_R |>
-      apa_format_columns(column_formats = cf)
-    d_tbl <- d_R
-
-    d <- apa_flextable(
+  if (length(given) > 0) {
+    d_R <- cor_deprecated_flextable(
       d_R,
-      font_family = font_family,
-      font_size = font_size,
-      text_color = text_color,
-      border_color = border_color,
-      border_width = border_width,
-      line_spacing = line_spacing,
-      table_width = table_width,
-      auto_format_columns = FALSE
+      given = given,
+      output = if (missing(output)) "flextable" else output,
+      note = if (missing(note)) TRUE else note,
+      styling = mget(intersect(given, styling_args))
     )
+  }
+  d_R
+}
 
-    if (is.null(note)) {
-      show_significance <- significance_note &&
-        (bold_significant || star_significant) &&
-        length(k_p) > 0
-      cutoff <- formatC(alpha[1], digits = 2, format = "fg") |>
-        gsub(pattern = "^0", replacement = "")
-      # General note (e.g., the kind of correlation and the p-value
-      # adjustment from correlation::correlation()), then probability notes
-      paragraphs <- list()
-      general <- if (length(cor_sentences) > 0) paste(cor_sentences, collapse = " ")
-      if (bold_significant && show_significance) {
-        if (is.null(general)) {
-          paragraphs <- list(flextable::as_paragraph(
-            flextable::as_i("Note. "),
-            "Correlations significant at ",
-            flextable::as_i("p"),
-            " \u2264 ",
-            cutoff,
-            " are ",
-            flextable::as_b("bolded"),
-            "."
-          ))
-        } else {
-          paragraphs <- list(ftExtra::as_paragraph_md(paste0(
-            "*Note*. ", general,
-            " Correlations significant at *p* \u2264 ", cutoff, " are **bolded**."
-          )))
-        }
-      } else {
-        if (!is.null(general)) {
-          paragraphs <- c(paragraphs, list(ftExtra::as_paragraph_md(paste0("*Note*. ", general))))
-        }
-        if (show_significance && any(k_p > 0)) {
-          paragraphs <- c(paragraphs, list(ftExtra::as_paragraph_md(
-            paste0(p_note[k_p], collapse = ". ")
-          )))
-        }
-      }
+#' Flextable for the deprecated arguments of apa_cor()
+#' @param given names of the deprecated arguments that were given
+#' @param styling named list of the styling arguments that were given
+#' @keywords internal
+#' @noRd
+cor_deprecated_flextable <- function(d, given, output, note, styling, call = rlang::caller_env()) {
+  output <- rlang::arg_match0(output, c("flextable", "tibble"), arg_nm = "output", error_call = call)
+  cli::cli_warn(
+    c(
+      "{.fn apa_cor} now returns a table that is displayed automatically, and its note comes from {.fn apa_note}. These arguments are deprecated: {.arg {given}}.",
+      i = "Pass the table to {.fn apa_flextable} to style it, with {.code note = TRUE} for the note."
+    ),
+    call = call,
+    .frequency = "regularly",
+    .frequency_id = "apa7_cor_deprecated"
+  )
+  if (output == "tibble") {
+    return(d)
+  }
+  if (is.null(note) || (length(note) == 1 && is.na(note))) {
+    note <- TRUE
+  }
+  do.call(apa_flextable, c(list(d, note = note), styling))
+}
 
-      if (length(paragraphs) > 0) {
-        for (paragraph in paragraphs) {
-          d <- flextable::add_footer_lines(d, values = paragraph)
-        }
-        d <- d |>
-          flextable::font(
-            part = "footer",
-            fontname = font_family
-          ) |>
-          flextable::fontsize(
-            part = "footer",
-            size = font_size
-          ) |>
-          flextable::line_spacing(
-            part = "footer",
-            space = 1
-          ) |>
-          flextable::color(
-            part = "footer",
-            color = text_color
-          )
-      }
-    } else {
-      d <- flextable::add_footer_lines(
-        x = d,
-        values = ftExtra::as_paragraph_md(
-          paste0("*Note*. ", note)
-        )
-      ) |>
-        flextable::font(part = "footer", fontname = font_family) |>
-        flextable::fontsize(part = "footer", size = font_size) |>
-        flextable::line_spacing(part = "footer", space = 1) |>
-        flextable::color(part = "footer", color = text_color)
-    }
-
-    # Summary columns (e.g., M and SD) hold plain numbers padded with figure
-    # spaces to equal width, so centering them keeps the decimals aligned.
-    # apa_flextable() instead left-aligns padded columns with a left padding
-    # computed from the column width, which is off once the widths change
-    # below, and in HTML, where browsers size columns to their contents.
-    # Correlation columns without star columns are padded the same way.
-    summary_keys <- setdiff(
-      intersect(colnames(d_tbl), d$col_keys),
-      c(
-        "apa7listcolumn",
-        "Variable",
-        if (star_significant && !bold_significant) as.character(v_seq),
-        star_names
-      )
-    )
-    if (length(summary_keys) > 0) {
-      d <- d |>
-        flextable::align(j = summary_keys, align = "center", part = "body") |>
-        flextable::padding(
-          j = summary_keys,
-          padding.left = 3,
-          padding.right = 3,
-          part = "body"
-        )
-    }
-
-    d_R <- d |>
+#' Lay out an apa_cor() table
+#'
+#' The numbers of the variables are in a column of their own, under a
+#' "Variable" header that spans them and the names. The correlation columns
+#' (and their star columns) have equal widths, and the summary columns are
+#' centered.
+#' @param ft flextable made by apa_flextable()
+#' @param layout the `apa7_cor_layout` attribute set by apa_cor()
+#' @param table_width resolved table width (see resolve_table_width())
+#' @keywords internal
+#' @noRd
+cor_layout <- function(ft, layout, table_width, font_size) {
+  value <- name <- group <- width <- NULL
+  keys <- ft$col_keys
+  # A table changed after apa_cor() (e.g., with the numbers and names united
+  # in one column) keeps the layout of apa_flextable()
+  if (!all(c("apa7listcolumn", "Variable") %in% keys)) {
+    return(ft)
+  }
+  star_keys <- keys[endsWith(keys, "apa7starcolumn")]
+  r_keys <- keys[!is.na(suppressWarnings(as.integer(keys)))]
+  # Summary columns (e.g., M and SD) hold plain numbers padded with figure
+  # spaces to equal width, so centering them keeps the decimals aligned.
+  # apa_flextable() instead left-aligns padded columns with a left padding
+  # computed from the column width, which is off once the widths change
+  # below, and in HTML, where browsers size columns to their contents.
+  # Correlation columns without star columns are padded the same way.
+  summary_keys <- setdiff(
+    keys,
+    c("apa7listcolumn", "Variable", if (isTRUE(layout$starred)) r_keys, star_keys)
+  )
+  if (length(summary_keys) > 0) {
+    ft <- ft |>
+      flextable::align(j = summary_keys, align = "center", part = "body") |>
       flextable::padding(
-        j = "apa7listcolumn",
-        padding.right = 0,
-        padding.left = 0
-      ) |>
-      flextable::padding(j = "Variable", padding.left = 0) |>
-      flextable::align(align = "left", j = "Variable", part = "body") |>
-      flextable::align(align = "left", part = "footer") |>
-      flextable::align(align = "right", j = "apa7listcolumn") |>
-      flextable::set_header_labels(apa7listcolumn = "Variable") |>
-      flextable::merge_h_range(
-        j1 = "apa7listcolumn",
-        j2 = "Variable",
-        part = "header"
-      ) |>
-      flextable::autofit(add_w = 0, add_h = 0) |>
-      pretty_widths()
-
-    w <- d_R$body$colwidths |>
-      tibble::enframe() |>
-      dplyr::mutate(
-        group = dplyr::case_when(
-          !is.na(suppressWarnings(as.integer(name))) ~ "r",
-          stringr::str_ends(name, "apa7starcolumn") ~ "apa7starcolumn",
-          name == "apa7listcolumn" ~ "apa7listcolumn",
-          name == "Variable" ~ "Variable",
-          TRUE ~ name
-        )
-      ) |>
-      dplyr::mutate(width = max(value, na.rm = TRUE), .by = group) |>
-      dplyr::pull(width)
-
-    # With table_width = 0, the widths from pretty_widths() are kept
-    if (table_width_in > 0) {
-      # The number column is as wide as its labels need, and the other
-      # columns share the rest of the width in proportion to their widths,
-      # so the total is the requested width
-      number_width <- (.444 * font_size * max(nchar(d_msd[["apa7listcolumn"]])) + 4) / 72
-      rest <- max(table_width_in - number_width, 0)
-      w[-1] <- rest * w[-1] / sum(w[-1])
-      w[1] <- number_width
-
-      d_R <- flextable::width(d_R, width = w)
-    }
-    # Proportion of the container's width (autofit() and pretty_widths()
-    # reset it)
-    d_R$properties$width <- table_width$proportion
+        j = summary_keys,
+        padding.left = 3,
+        padding.right = 3,
+        part = "body"
+      )
   }
 
-  # References cited in the note go in the document's reference list
-  add_note_citations(d_R, if (is.null(note)) cor_sentences else note)
+  ft <- ft |>
+    flextable::padding(j = "apa7listcolumn", padding.right = 0, padding.left = 0) |>
+    flextable::padding(j = "Variable", padding.left = 0) |>
+    flextable::align(align = "left", j = "Variable", part = "body") |>
+    flextable::align(align = "right", j = "apa7listcolumn") |>
+    flextable::set_header_labels(apa7listcolumn = "Variable") |>
+    flextable::merge_h_range(j1 = "apa7listcolumn", j2 = "Variable", part = "header") |>
+    flextable::autofit(add_w = 0, add_h = 0) |>
+    pretty_widths(table_width = table_width)
+
+  w <- ft$body$colwidths |>
+    tibble::enframe() |>
+    dplyr::mutate(
+      group = dplyr::case_when(
+        name %in% r_keys ~ "r",
+        name %in% star_keys ~ "apa7starcolumn",
+        TRUE ~ name
+      )
+    ) |>
+    dplyr::mutate(width = max(value, na.rm = TRUE), .by = group) |>
+    dplyr::pull(width)
+
+  # With table_width = 0, the widths that fit the contents are kept
+  if (table_width$inches > 0) {
+    # The number column is as wide as its labels need, and the other
+    # columns share the rest of the width in proportion to their widths,
+    # so the total is the requested width
+    number_width <- (.444 * font_size * layout$number_chars + 4) / 72
+    rest <- max(table_width$inches - number_width, 0)
+    w[-1] <- rest * w[-1] / sum(w[-1])
+    w[1] <- number_width
+  }
+  ft <- flextable::width(ft, width = w)
+  # Proportion of the container's width (autofit() and pretty_widths()
+  # reset it)
+  ft$properties$width <- table_width$proportion
+  ft
+}
+
+#' @keywords internal
+#' @noRd
+cor_note_sentences <- function(record) {
+  sentences <- record$sentences
+  if (isTRUE(record$show_significance)) {
+    sentences <- c(
+      sentences,
+      if (isTRUE(record$bolded)) {
+        paste0(
+          "Correlations significant at *p* \u2264 ",
+          record$cutoff,
+          " are **bolded**."
+        )
+      } else {
+        paste0(record$star_note, ".")
+      }
+    )
+  }
+  sentences
 }
 
 #' Convert data to flextable consistent with APA style
@@ -1012,6 +1012,8 @@ apa_flextable <- function(
   note = NULL,
   ...
 ) {
+  # Correlation tables from apa_cor() are laid out by cor_layout()
+  cor_layout_record <- attr(data, "apa7_cor_layout", exact = TRUE)
   table_width <- resolve_table_width(table_width)
   if (is.null(line_spacing)) {
     line_spacing <- the$line_spacing
@@ -1133,15 +1135,20 @@ apa_flextable <- function(
 
   if (auto_format_columns) {
     cn_before <- colnames(data)
-    data <- apa_format_columns(
+    formatted <- format_columns(
       data,
       column_formats = column_formats,
       no_format_columns = no_format_columns
     )
-    cn_after <- colnames(data)
-    kv <- tibble::tibble(name = cn_before, newname = cn_after)
+    data <- formatted$data
+    kv <- tibble::tibble(
+      name = names(formatted$names),
+      newname = unname(formatted$names)
+    )
 
-    col_keys <- tibble::tibble(name = col_keys) |>
+    # Columns that formatting combined or dropped (e.g., CI_low and CI_high)
+    dropped <- setdiff(cn_before, names(formatted$names))
+    col_keys <- tibble::tibble(name = setdiff(col_keys, dropped)) |>
       dplyr::left_join(kv, by = dplyr::join_by(name)) |>
       dplyr::mutate(newname = ifelse(is.na(newname), name, newname)) |>
       dplyr::pull(newname)
@@ -1290,6 +1297,16 @@ apa_flextable <- function(
     border_color = border_color,
     border_width = border_width
   )
+
+  # Correlation tables from apa_cor() have a layout of their own
+  if (!is.null(cor_layout_record)) {
+    ft <- cor_layout(
+      ft,
+      cor_layout_record,
+      table_width = table_width,
+      font_size = if (is.null(font_size)) the$font_size else font_size
+    )
+  }
 
   # Added last so that the note does not affect column widths
   text <- note_text(data, note)
@@ -2093,10 +2110,10 @@ apa_parameters.lme <- function(
   ...
 ) {
   if (inherits(fit, "glmmPQL")) {
-    stop(
-      "apa_parameters() does not support glmmPQL models. ",
-      "Fit generalized linear mixed models with lme4::glmer() or glmmTMB::glmmTMB()."
-    )
+    cli::cli_abort(c(
+      "{.fn apa_parameters} does not support {.cls glmmPQL} models.",
+      i = "Fit generalized linear mixed models with {.fn lme4::glmer} or {.fn glmmTMB::glmmTMB}."
+    ))
   }
   if (is.null(column_formats)) {
     column_formats <- the$column_formats

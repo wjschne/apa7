@@ -220,9 +220,9 @@ test_that("flextables whose notes cite references record the keys", {
   # apa_flextable(note = TRUE) and apa_cor() record the keys of their notes
   withr::local_options(apa7.citations = "keys")
   skip_if_not_installed("correlation")
-  tbl <- apa_cor(correlation::correlation(mtcars[, c("mpg", "wt", "hp")]))
+  tbl <- apa_flextable(apa_cor(correlation::correlation(mtcars[, c("mpg", "wt", "hp")])), note = TRUE)
   expect_equal(attr(tbl, "apa7_citations"), "holmSimpleSequentiallyRejective1979")
-  tbl_text <- apa_cor(mtcars[, c("mpg", "wt")], note = "Custom note.")
+  tbl_text <- apa_flextable(apa_cor(mtcars[, c("mpg", "wt")]), note = "Custom note.")
   expect_false(inherits(tbl_text, "apa7_cited"))
   ft_note <- apa_flextable(head(cars, 2), note = "As in [@lakensCalculatingReportingEffect2013].")
   expect_equal(attr(ft_note, "apa7_citations"), "lakensCalculatingReportingEffect2013")

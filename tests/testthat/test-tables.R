@@ -3,28 +3,31 @@ library(testthat)
 
 # apa_cor ----
 
-test_that("apa_cor returns a flextable by default", {
+test_that("apa_cor returns an apa7_tbl with a note record", {
   result <- apa_cor(
     mtcars[, c("mpg", "am", "gear")],
     keep_empty_star_columns = FALSE
   )
-  expect_true(inherits(result, "flextable"))
+  expect_s3_class(result, "apa7_tbl")
+  expect_match(apa_note(result), "\u2264&nbsp;[.]001")
+  expect_s3_class(apa_flextable(result, note = TRUE), "flextable")
 })
 
-test_that("apa_cor returns a tibble when output = 'tibble'", {
-  result <- apa_cor(
-    mtcars[, c("mpg", "am", "gear")],
-    output = "tibble",
-    star_significant = FALSE
-  )
-  expect_true(tibble::is_tibble(result) || is.data.frame(result))
+test_that("apa_cor's flextable arguments still work, with a warning", {
+  d <- mtcars[, c("mpg", "am", "gear")]
+  withr::local_options(rlib_warning_verbosity = "verbose")
+  expect_warning(ft <- apa_cor(d, note = "My note"), "deprecated")
+  expect_s3_class(ft, "flextable")
+  expect_warning(ft <- apa_cor(d, font_size = 10), "font_size")
+  expect_s3_class(ft, "flextable")
+  expect_warning(tbl <- apa_cor(d, output = "tibble"), "output")
+  expect_s3_class(tbl, "apa7_tbl")
 })
 
 test_that("apa_cor tibble output has expected variable column", {
   skip_on_cran()
   result <- apa_cor(
     mtcars[, c("mpg", "am", "gear")],
-    output = "tibble",
     bold_significant = TRUE
   )
   expect_true("Variable" %in% colnames(result))
@@ -34,12 +37,6 @@ test_that("apa_cor tibble output has expected variable column", {
   )
   expect_no_error(result)
 
-  result <- apa_cor(
-    mtcars[, c("mpg", "am", "gear")],
-    bold_significant = TRUE,
-    note = "My note"
-  )
-  expect_no_error(result)
 })
 
 test_that("apa_cor tibble output has one row per variable", {
@@ -47,7 +44,6 @@ test_that("apa_cor tibble output has one row per variable", {
   vars <- c("mpg", "am", "gear", "carb")
   result <- apa_cor(
     mtcars[, vars],
-    output = "tibble",
     star_significant = FALSE
   )
   expect_equal(nrow(result), length(vars))
@@ -62,8 +58,7 @@ test_that("apa_cor tibble output has one row per variable", {
   expect_equal(
     apa_cor(
       mtcars[, vars],
-      output = "tibble",
-      star_significant = FALSE,
+        star_significant = FALSE,
       summary_functions = c("Mean")
     ) |>
       ncol(),
@@ -73,8 +68,7 @@ test_that("apa_cor tibble output has one row per variable", {
   expect_equal(
     apa_cor(
       mtcars[, vars],
-      output = "tibble",
-      star_significant = FALSE,
+        star_significant = FALSE,
       summary_functions = NULL,
       keep_empty_star_columns = TRUE
     ) |>
@@ -993,15 +987,15 @@ test_that("apa_cor centers every summary column", {
       balanced = all(body$padding.left == body$padding.right)
     )
   }
-  a <- summary_alignment(apa_cor(trees))
+  a <- summary_alignment(apa_flextable(apa_cor(trees)))
   expect_equal(a$keys, c("*M*", "*SD*"))
   expect_equal(a$align, "center")
   expect_true(a$balanced)
 
-  b <- summary_alignment(apa_cor(
+  b <- summary_alignment(apa_flextable(apa_cor(
     mtcars[, c("mpg", "hp", "wt")],
     summary_functions = c("n", "M", "SD", "Skewness", "Kurtosis", "Median", "IQR", "Var")
-  ))
+  )))
   expect_length(b$keys, 8)
   expect_equal(b$align, "center")
   expect_true(b$balanced)
@@ -1092,30 +1086,33 @@ test_that("each cluster gets a subheading; nested clusters are spelled out", {
   expect_equal(sum(labels == "\u2003\u2003Constant"), 2)
 })
 
-test_that("apa_cor() table_width is a proportion, with inches still accepted", {
+test_that("apa_cor() tables fill the table width, with inches still accepted", {
   skip_on_cran()
-  d <- mtcars[, c("mpg", "wt", "hp")]
+  d <- apa_cor(mtcars[, c("mpg", "wt", "hp")])
   total_width <- function(ft) sum(ft$body$colwidths)
 
   # Default: the full width of 6.5 inches, as before
-  full <- apa_cor(d)
+  full <- apa_flextable(d)
   expect_equal(total_width(full), 6.5, tolerance = 1e-6)
   expect_equal(full$properties$width, 1)
+  # The correlation columns have equal widths
+  w <- full$body$colwidths
+  expect_equal(unname(w[c("1", "2", "3")]), rep(w[["1"]], 3))
 
-  half <- apa_cor(d, table_width = .5)
+  half <- apa_flextable(d, table_width = .5)
   expect_equal(total_width(half), 3.25, tolerance = 1e-6)
   expect_equal(half$properties$width, .5)
 
   # Values above 1 are read as inches, with a warning
-  expect_warning(inches <- apa_cor(d, table_width = 5), "read as a width in inches")
+  expect_warning(inches <- apa_flextable(d, table_width = 5), "read as a width in inches")
   expect_equal(total_width(inches), 5, tolerance = 1e-6)
   expect_equal(inches$properties$width, 5 / 6.5)
 
-  # 0 keeps the widths from pretty_widths()
-  expect_no_error(apa_cor(d, table_width = 0))
+  # 0 keeps the widths that fit the contents
+  expect_lt(total_width(apa_flextable(d, table_width = 0)), 6.5)
 
-  expect_error(apa_cor(d, table_width = -1), "proportion")
-  expect_error(apa_cor(d, table_width = "wide"), "proportion")
+  expect_error(apa_flextable(d, table_width = -1), "proportion")
+  expect_error(apa_flextable(d, table_width = "wide"), "proportion")
 })
 
 test_that("backticked variable names give no insight warning and the same results", {
@@ -1168,11 +1165,11 @@ test_that("renamed arguments still work, with a warning", {
 
   d_cor <- mtcars[, c("mpg", "wt", "qsec")]
   expect_warning(
-    old <- apa_cor(d_cor, p_value = .001, output = "tibble"),
+    old <- apa_cor(d_cor, p_value = .001),
     "`p_value` argument of `apa_cor()` is deprecated",
     fixed = TRUE
   )
-  expect_identical(old, apa_cor(d_cor, alpha = .001, output = "tibble"))
+  expect_identical(old, apa_cor(d_cor, alpha = .001))
 })
 
 test_that("apa_performance_comparison() stars several columns", {

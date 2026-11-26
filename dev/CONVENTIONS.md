@@ -100,9 +100,10 @@ vectors are accepted with their names ignored.
 
 **RET-1: Table functions return an `apa7_tbl`.**
 An `apa7_tbl` is a tibble that prints as a tibble in the console and is
-rendered by `apa_flextable()` in knitr and Quarto. Functions that build a
-flextable directly are the exception, not the model (see the open
-inconsistencies). *Checked* (documented return value).
+rendered by `apa_flextable()` in knitr and Quarto. A table that needs a
+layout of its own records it in an attribute that `apa_flextable()` applies
+(e.g., `apa7_cor_layout` for `apa_cor()`), so that the table still renders
+when it is displayed automatically. *Checked.*
 
 **RET-2: The note record travels with the table.**
 Each table function stores what its note needs in the `"apa_note"`
@@ -234,8 +235,14 @@ the single assertion). Linux CI runners do not have Times New Roman.
 
 **CODE-1:** tidyverse style, roxygen2 with markdown.
 
-**CODE-2:** Errors and warnings use `cli::cli_abort()` and
-`cli::cli_warn()`, with `{.arg}` and `{.fn}` markup.
+**CODE-2: Errors, warnings, and messages use cli** (`cli::cli_abort()`,
+`cli::cli_warn()`, and `cli::cli_inform()`), never `stop()`, `warning()`,
+`message()`, or their rlang equivalents. Name arguments with `{.arg}`,
+functions with `{.fn}`, classes with `{.cls}`, and values with `{.val}`, and
+put hints in `i =` bullets. A helper that raises a condition takes
+`call = rlang::caller_env()` and passes it on, so the condition names the
+function the user called. Missing packages are reported by
+`rlang::check_installed()`. *Checked.*
 
 **CODE-3:** Packages used unconditionally are in Imports; model packages
 are in Suggests and checked with `rlang::check_installed()` or
@@ -259,9 +266,6 @@ fix it, or record it as an exception to the rule.
 
 | # | Rule | Departure | Suggested resolution |
 |---|---|---|---|
-| 2 | RET-1 | `apa_cor()` returns a flextable by default (`output = "flextable"`), takes `note` and styling arguments, and writes its own note. | Make it return an `apa7_tbl` with a note record, keeping `output = "flextable"` for one release |
 | 3 | ARG-2 | `apa_cor()` uses `star_significant` and `bold_significant` instead of `starred` and `bolded`. | Exception: they are switches over every correlation, not column selections |
 | 4 | ARG-2 | Variable relabeling is `labels` (`apa_chisq()`, `apa_descriptives()`), `variable_labels` (`column_formats()`), and `factor_names` (`apa_loadings()`). | Decide whether `factor_names` is a different idea; align the other two |
 | 5 | ARG-5 | `test` is logical in `apa_descriptives()` but a choice in `apa_chisq()` and `apa_htest()`. | Exception, or accept `test = "auto"` style values |
-| 8 | TAB-1 | `apa_format_columns()` looks for `Model 1_low`/`Model 1_high` rather than `Model 1_CI_low`/`Model 1_CI_high` for prefixed intervals (untested). | Test, then fix |
-| 9 | CODE-2 | 28 `stop()` and 3 `warning()` calls remain beside 125 `cli::cli_abort()` calls. | Convert when the code is next touched |

@@ -115,22 +115,20 @@ apa_anova.lm <- function(
   ...
 ) {
   if (inherits(fit, "glm")) {
-    stop(
-      "apa_anova() makes tables of F tests for linear models. ",
-      "For generalized linear models, use apa_parameters() or apa_performance_comparison()."
-    )
+    cli::cli_abort(c(
+      "{.fn apa_anova} makes tables of {.emph F} tests for linear models.",
+      i = "For generalized linear models, use {.fn apa_parameters} or {.fn apa_performance_comparison}."
+    ))
   }
   if (inherits(fit, "mlm")) {
-    stop("apa_anova() does not support multivariate linear models.")
+    cli::cli_abort("{.fn apa_anova} does not support multivariate linear models.")
   }
 
   type <- anova_ss_type(type)
   if (type == 1) {
     tab <- if (inherits(fit, "aov")) fit else stats::anova(fit)
   } else {
-    if (!requireNamespace("car", quietly = TRUE)) {
-      stop("Type 2 and 3 sums of squares require the car package. Install it with install.packages(\"car\").") # nocov
-    }
+    rlang::check_installed("car", reason = "for Type 2 and 3 sums of squares.")
     tab <- car::Anova(fit, type = type)
   }
 
@@ -175,10 +173,10 @@ apa_anova.aovlist <- function(
   ...
 ) {
   if (anova_ss_type(type) != 1) {
-    stop(
-      "Repeated-measures aov models use sequential (Type 1) sums of squares. ",
-      "For Type 2 or 3 tests, fit the model with afex::aov_car() or car::Anova()."
-    )
+    cli::cli_abort(c(
+      "Repeated-measures {.cls aov} models use sequential (Type 1) sums of squares.",
+      i = "For Type 2 or 3 tests, fit the model with {.fn afex::aov_car} or {.fn car::Anova}."
+    ))
   }
   apa_anova_table(
     fit,
@@ -221,19 +219,18 @@ apa_anova.anova <- function(
   ...
 ) {
   if ("RSS" %in% colnames(fit)) {
-    stop(
-      "This looks like a model comparison (e.g., anova(m1, m2)). ",
-      "Use apa_performance_comparison() for model comparisons."
-    )
+    cli::cli_abort(c(
+      "This looks like a model comparison (e.g., {.code anova(m1, m2)}).",
+      i = "Use {.fn apa_performance_comparison} for model comparisons."
+    ))
   }
   if (!any(grepl("^F", colnames(fit)))) {
-    stop(
-      "apa_anova() makes tables of F tests, but this ANOVA table has none ",
-      "(e.g., a deviance table from a generalized linear model)."
+    cli::cli_abort(
+      "{.fn apa_anova} makes tables of {.emph F} tests, but this ANOVA table has none (e.g., a deviance table from a generalized linear model)."
     )
   }
   if (!is.null(type)) {
-    warning("`type` is ignored for ANOVA tables, which already have a type of sums of squares.")
+    cli::cli_warn("{.arg type} is ignored for ANOVA tables, which already have a type of sums of squares.")
   }
   # lmerTest tables of linear mixed models
   if (all(c("NumDF", "DenDF") %in% colnames(fit))) {
@@ -312,7 +309,10 @@ apa_anova.afex_aov <- function(
   Parameter <- NULL
 
   if (!is.null(type)) {
-    warning("`type` is ignored for afex models. Set it when fitting the model (e.g., afex::aov_car(type = 2)).")
+    cli::cli_warn(c(
+      "{.arg type} is ignored for afex models.",
+      i = "Set it when fitting the model (e.g., {.code afex::aov_car(type = 2)})."
+    ))
   }
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
@@ -475,17 +475,18 @@ apa_anova.merMod <- function(
   ...
 ) {
   if (inherits(fit, "glmerMod")) {
-    stop(
-      "apa_anova() makes tables of F tests for linear mixed models. ",
-      "For generalized linear mixed models, use apa_parameters()."
-    )
+    cli::cli_abort(c(
+      "{.fn apa_anova} makes tables of {.emph F} tests for linear mixed models.",
+      i = "For generalized linear mixed models, use {.fn apa_parameters}."
+    ))
   }
-  if (!requireNamespace("lmerTest", quietly = TRUE)) {
-    stop("F tests for mixed models require the lmerTest package. Install it with install.packages(\"lmerTest\").") # nocov
-  }
+  rlang::check_installed("lmerTest", reason = "for F tests of mixed models.")
   ddf <- match.arg(ddf)
-  if (ddf == "Kenward-Roger" && !requireNamespace("pbkrtest", quietly = TRUE)) {
-    stop("Kenward-Roger degrees of freedom require the pbkrtest package. Install it with install.packages(\"pbkrtest\"), or use ddf = \"Satterthwaite\".") # nocov
+  if (ddf == "Kenward-Roger") {
+    rlang::check_installed(
+      "pbkrtest",
+      reason = "for Kenward-Roger degrees of freedom (or use `ddf = \"Satterthwaite\"`)."
+    )
   }
   type <- if (is.null(type)) 3L else anova_ss_type(type)
   if (!inherits(fit, "lmerModLmerTest")) {
@@ -558,10 +559,10 @@ apa_anova_mixed <- function(
   if (!is.null(effect_size)) {
     effect_size <- match.arg(effect_size, c("eta", "omega", "epsilon"))
     if (isTRUE(generalized)) {
-      stop("Generalized effect sizes are not available for mixed models.")
+      cli::cli_abort("Generalized effect sizes are not available for mixed models.")
     }
     if (!isTRUE(partial)) {
-      stop("Only partial effect sizes are available for mixed models.")
+      cli::cli_abort("Only partial effect sizes are available for mixed models.")
     }
   }
   column_formats <- es_ci_format(column_formats)
@@ -652,19 +653,16 @@ apa_anova_mixed <- function(
 #' @export
 #' @rdname apa_anova
 apa_anova.default <- function(fit, ...) {
-  stop(
-    "apa_anova() does not support objects of class ",
-    paste0("\"", class(fit), "\"", collapse = ", "),
-    ". Supported objects are aov and lm models, repeated-measures aov models, ",
-    "afex models, linear mixed models (lme4 and lmerTest), and ANOVA tables ",
-    "from stats::anova(), car::Anova(), or lmerTest."
-  )
+  cli::cli_abort(c(
+    "{.fn apa_anova} does not support objects of class {.cls {class(fit)}}.",
+    i = "Supported objects are {.cls aov} and {.cls lm} models, repeated-measures {.cls aov} models, afex models, linear mixed models (lme4 and lmerTest), and ANOVA tables from {.fn stats::anova}, {.fn car::Anova}, or lmerTest."
+  ))
 }
 
 #' Type of sums of squares as 1, 2, or 3
 #' @keywords internal
 #' @noRd
-anova_ss_type <- function(type) {
+anova_ss_type <- function(type, call = rlang::caller_env()) {
   if (is.null(type)) {
     return(1)
   }
@@ -673,7 +671,7 @@ anova_ss_type <- function(type) {
     type <- ((type - 1) %% 3) + 1
   }
   if (length(type) != 1 || is.na(type) || !(type %in% 1:3)) {
-    stop("`type` must be 1, 2, or 3.")
+    cli::cli_abort("{.arg type} must be 1, 2, or 3.", call = call)
   }
   as.integer(type)
 }
@@ -727,7 +725,8 @@ apa_anova_table <- function(
   bolded,
   column_formats,
   note = list(),
-  ...
+  ...,
+  call = rlang::caller_env()
 ) {
   # Prevent warnings
   Parameter <- Group <- NULL
@@ -742,9 +741,9 @@ apa_anova_table <- function(
     effect_size <- match.arg(effect_size, c("eta", "omega", "epsilon"))
   }
   if (isTRUE(generalized) && !identical(effect_size, "eta")) {
-    stop("Generalized effect sizes are available only for `effect_size = \"eta\"`.")
+    cli::cli_abort("Generalized effect sizes are available only for {.code effect_size = \"eta\"}.", call = call)
   }
-  anova_parameters <- drop_generalized_ci(anova_parameters, generalized)
+  anova_parameters <- drop_generalized_ci(anova_parameters, generalized, call = call)
   column_formats <- es_ci_format(column_formats)
   show_ci <- "CI" %in% anova_parameters && !is.null(effect_size)
 
@@ -767,15 +766,15 @@ apa_anova_table <- function(
 
   # Only F-test source tables are supported
   if ("RSS" %in% colnames(d)) {
-    stop(
-      "This looks like a model comparison (e.g., anova(m1, m2)). ",
-      "Use apa_performance_comparison() for model comparisons."
-    )
+    cli::cli_abort(c(
+      "This looks like a model comparison (e.g., {.code anova(m1, m2)}).",
+      i = "Use {.fn apa_performance_comparison} for model comparisons."
+    ), call = call)
   }
   if (!("F" %in% colnames(d))) {
-    stop(
-      "apa_anova() makes tables of F tests, but this ANOVA table has none ",
-      "(e.g., a deviance table from a generalized linear model)."
+    cli::cli_abort(
+      "{.fn apa_anova} makes tables of {.emph F} tests, but this ANOVA table has none (e.g., a deviance table from a generalized linear model).",
+      call = call
     )
   }
 
@@ -916,13 +915,12 @@ es_ci_format <- function(column_formats) {
 #' estimate, so they are not shown
 #' @keywords internal
 #' @noRd
-drop_generalized_ci <- function(anova_parameters, generalized) {
+drop_generalized_ci <- function(anova_parameters, generalized, call = rlang::caller_env()) {
   if (isTRUE(generalized) && "CI" %in% anova_parameters) {
-    warning(
-      "Confidence intervals are not shown for generalized eta squared, ",
-      "because those computed by effectsize can exclude the point estimate. ",
-      "Use `generalized = FALSE` for intervals of partial eta squared."
-    )
+    cli::cli_warn(c(
+      "Confidence intervals are not shown for generalized eta squared, because those computed by effectsize can exclude the point estimate.",
+      i = "Use {.code generalized = FALSE} for intervals of partial eta squared."
+    ), call = call)
     anova_parameters <- setdiff(anova_parameters, "CI")
   }
   anova_parameters

@@ -59,7 +59,10 @@ A few columns are matched by a pattern or combined:
 \itemize{
 \item \code{CI}, \code{CI_low}, and \code{CI_high} (e.g., from \code{\link[parameters:parameters]{parameters::parameters()}})
 become a single column of intervals, with a header such as "95\% CI" that
-gives the confidence level stored in \code{CI}.
+gives the confidence level stored in \code{CI}. Prefixed columns are combined
+the same way for each column spanner (e.g., \verb{Model 1_CI},
+\verb{Model 1_CI_low}, and \verb{Model 1_CI_high} become \verb{Model 1_95\% CI}). A \code{CI}
+column without its bounds is left as it is.
 \item If there are \code{t} and \code{df_error} columns, the degrees of freedom are moved
 into the \code{t} header (e.g., \emph{t}(28)), and \code{df_error} is dropped.
 \item A column named like \code{t(28)} is formatted with the \code{t_df} format (and

@@ -32,7 +32,7 @@ test_that("tables fill the page width set with apa7_defaults()", {
   half <- apa_flextable(apa_parameters(fit), table_width = .5)
   expect_equal(total_width(half), a4 / 2, tolerance = 1e-6)
   expect_equal(half$properties$width, .5)
-  expect_equal(total_width(apa_cor(mtcars[, c("mpg", "wt", "hp")])), a4, tolerance = 1e-6)
+  expect_equal(total_width(apa_flextable(apa_cor(mtcars[, c("mpg", "wt", "hp")]))), a4, tolerance = 1e-6)
   pw <- pretty_widths(flextable::flextable(head(mtcars[, 1:3])))
   expect_equal(total_width(pw), a4, tolerance = 1e-6)
 
@@ -125,7 +125,7 @@ test_that("every table function takes table_width in the same forms", {
   expect_equal(total_width(cm), 10 / 2.54, tolerance = 1e-6)
   expect_equal(cm$properties$width, 10 / 2.54 / 6.5)
 
-  cor_col <- apa_cor(mtcars[, c("mpg", "wt", "hp")], table_width = "column")
+  cor_col <- apa_flextable(apa_cor(mtcars[, c("mpg", "wt", "hp")]), table_width = "column")
   expect_equal(total_width(cor_col), col, tolerance = 1e-6)
 
   pw <- pretty_widths(flextable::flextable(d), table_width = c(landscape = .5))

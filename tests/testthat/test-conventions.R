@@ -79,7 +79,8 @@ test_that("ARG-2: shared arguments have the shared defaults", {
       d <- eval(default_of(f, sel))
       expect_true(identical(d, NA) || is.character(d), label = paste(f, sel))
     }
-    for (setting in intersect(c("column_formats", "table_width", "accuracy"), a)) {
+    # Deprecated arguments after `...` (ARG-7) have no default
+    for (setting in setdiff(intersect(c("column_formats", "table_width", "accuracy"), a), after_dots(f))) {
       expect_null(default_of(f, setting), label = paste(f, setting))
     }
   }
@@ -114,15 +115,14 @@ test_that("ARG-8: argument names are snake_case", {
 })
 
 test_that("RET-1: table functions document an apa7_tbl return value", {
-  known <- c(apa_cor = 2)
-  for (f in setdiff(table_generics, names(known))) {
+  for (f in table_generics) {
     expect_match(rd_section(rd_for(f), "\\value"), "apa7_tbl", label = f)
   }
 })
 
 test_that("RET-1: the apa7_tbl help page names every table function", {
   description <- rd_section(rd_for("apa7_tbl"), "\\description")
-  for (f in setdiff(table_generics, "apa_cor")) {
+  for (f in table_generics) {
     expect_match(description, f, fixed = TRUE, label = f)
   }
 })
@@ -163,5 +163,15 @@ test_that("DOC-5: every method cited in a note is in a help page's references", 
       perl = TRUE
     )
     expect_true(found, label = k)
+  }
+})
+
+test_that("CODE-2: errors, warnings, and messages use cli", {
+  base_call <- "(^|[^A-Za-z0-9_.:])(stop|warning|message)[(]|rlang::(abort|warn|inform)[(]"
+  for (f in ls(ns, all.names = TRUE)) {
+    obj <- get(f, ns)
+    if (!is.function(obj)) next
+    code <- deparse(obj)
+    expect_false(any(grepl(base_call, code)), label = f)
   }
 })

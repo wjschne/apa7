@@ -63,7 +63,7 @@ test_that("apa_p", {
   expect_equal(apa_p("<.001"), "<.001")
   expect_error(
     apa_p(c(.21, .45), inline = TRUE),
-    "Only one p can be processed for inline mode."
+    "must be a single value"
   )
 
   expect_equal(apa_p(c(.45, NA)), c(".45", NA))

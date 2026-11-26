@@ -263,7 +263,7 @@ test_that("methods for column_format", {
   expect_equal(class(my_formatter@get_header_rename_latex), "character")
   expect_error(
     column_formats(custom_columns = c(4)),
-    "custom_columns must be a named list"
+    "must be a named list"
   )
   expect_no_error(
     column_formats(
@@ -321,7 +321,7 @@ test_that("apa_format_columns", {
     column_formats = cf,
     no_format_columns = "p"
   )
-  expect_equal(colnames(d1), c("95% CI", "*t*", "*p*"))
+  expect_equal(colnames(d1), c("95% CI", "*t*(45)", "*p*"))
   cf$t@latex <- "t"
   d2 <- apa_format_columns(
     d,
@@ -331,7 +331,7 @@ test_that("apa_format_columns", {
     rename_headers = TRUE
   )
 
-  expect_equal(colnames(d2), c("95% CI", "t", "$p$"))
+  expect_equal(colnames(d2), c("95% CI", "t(45)", "$p$"))
 })
 
 test_that("simple settings are R options, which apa7_defaults() sets", {
@@ -445,7 +445,7 @@ test_that("font_size sets the font size of all tables", {
   ft <- apa_flextable(apa_parameters(fit), note = TRUE)
   expect_equal(size_of(ft), 10)
   expect_equal(unique(as.vector(ft$footer$styles$text$font.size$data)), 10)
-  expect_equal(size_of(apa_cor(mtcars[, c("mpg", "wt", "hp")])), 10)
+  expect_equal(size_of(apa_flextable(apa_cor(mtcars[, c("mpg", "wt", "hp")]))), 10)
   expect_equal(size_of(apa_flextable(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs)))), 10)
 
   # An explicit argument is used instead
@@ -479,7 +479,7 @@ test_that("line_spacing sets the spacing of all tables, but not of notes", {
   expect_equal(pad(ft), 0)
   expect_equal(pad(ft, "header"), 0)
   expect_equal(pad(ft, "footer"), footer_padding)
-  expect_equal(pad(apa_cor(mtcars[, c("mpg", "wt", "hp")])), 0)
+  expect_equal(pad(apa_flextable(apa_cor(mtcars[, c("mpg", "wt", "hp")]))), 0)
   expect_equal(pad(apa_flextable(apa_chisq(data.frame(a = mtcars$am, b = mtcars$vs)))), 0)
 
   # An explicit argument is used instead
@@ -492,4 +492,34 @@ test_that("line_spacing sets the spacing of all tables, but not of notes", {
   apa7_defaults(reset = TRUE)
   expect_equal(pad(apa_flextable(apa_parameters(fit))), 8)
   expect_error(apa7_defaults(line_spacing = .5), "at least 1")
+})
+
+test_that("apa_format_columns combines prefixed CI columns", {
+  d <- data.frame(
+    Parameter = c("a", "b"),
+    `Model 1_CI` = .95, `Model 1_CI_low` = c(.1, .2), `Model 1_CI_high` = c(.5, .6),
+    `Model 2_CI` = .90, `Model 2_CI_low` = c(.3, .4), `Model 2_CI_high` = c(.7, .8),
+    check.names = FALSE
+  )
+  f <- apa_format_columns(d)
+  expect_equal(colnames(f), c("Variable", "Model 1_95% CI", "Model 2_90% CI"))
+  expect_equal(f$`Model 1_95% CI`, c("[0.10, 0.50]", "[0.20, 0.60]"))
+  # A CI column without its bounds is left as it is
+  expect_equal(apa_format_columns(data.frame(Parameter = "a", CI = .95))$CI, .95)
+})
+
+test_that("apa_format_columns puts the degrees of freedom in the t header", {
+  d <- data.frame(Parameter = c("a", "b"), t = c(2.1, 3.3), df_error = 28, p = c(.04, .002))
+  expect_equal(colnames(apa_format_columns(d)), c("Variable", "*t*(28)", "*p*"))
+  expect_equal(colnames(apa_format_columns(d, latex_headers = TRUE))[2], "$t(28)$")
+})
+
+test_that("apa_flextable handles columns that formatting combines or drops", {
+  d_ci <- data.frame(Parameter = c("a", "b"), CI = .95, CI_low = c(.1, .2), CI_high = c(.5, .6))
+  expect_equal(apa_flextable(d_ci)$col_keys, c("Variable", "95% CI"))
+  d_t <- data.frame(Parameter = c("a", "b"), t = c(2.1, 3.3), df_error = 28, p = c(.04, .002))
+  expect_equal(apa_flextable(d_t)$col_keys, c("Variable", "*t*(28)", "*p*"))
+  skip_if_not_installed("parameters")
+  ft <- apa_flextable(parameters::parameters(lm(mpg ~ wt, data = mtcars)))
+  expect_equal(ft$col_keys, c("Variable", "*B*", "*SE*", "95% CI", "*t*(30)", "*p*"))
 })

@@ -264,15 +264,13 @@ chisq_deprecated_flextable <- function(d, dots, call = rlang::caller_env()) {
   if (length(unknown) > 0) {
     cli::cli_abort("Unknown argument{?s} to {.fn apa_chisq}: {.arg {unknown}}.", call = call)
   }
-  rlang::warn(
+  deprecated_args <- names(dots)
+  cli::cli_warn(
     c(
-      paste0(
-        "`apa_chisq()` now returns a table that is displayed automatically, ",
-        "and its note comes from `apa_note()`. These arguments are deprecated: ",
-        paste0("`", names(dots), "`", collapse = ", "), "."
-      ),
-      i = "Pass the table to `apa_flextable()` to style it, with `note = TRUE` for the note."
+      "{.fn apa_chisq} now returns a table that is displayed automatically, and its note comes from {.fn apa_note}. These arguments are deprecated: {.arg {deprecated_args}}.",
+      i = "Pass the table to {.fn apa_flextable} to style it, with {.code note = TRUE} for the note."
     ),
+    call = call,
     .frequency = "regularly",
     .frequency_id = "apa7_chisq_deprecated"
   )

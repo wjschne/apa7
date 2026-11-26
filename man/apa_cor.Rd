@@ -6,20 +6,11 @@
 \usage{
 apa_cor(
   data,
-  note = NULL,
   alpha = c(0.05, 0.01, 0.001),
   digits = 2,
   bold_significant = FALSE,
   star_significant = TRUE,
   significance_note = TRUE,
-  output = c("flextable", "tibble"),
-  font_family = NULL,
-  font_size = NULL,
-  text_color = "black",
-  border_color = "black",
-  border_width = 0.5,
-  line_spacing = NULL,
-  table_width = NULL,
   keep_empty_star_columns = TRUE,
   summary_functions = list(M = mean, SD = stats::sd),
   column_formats = NULL,
@@ -27,15 +18,21 @@ apa_cor(
   p_adjust = "none",
   partial = FALSE,
   ...,
+  output,
+  note,
+  font_family,
+  font_size,
+  text_color,
+  border_color,
+  border_width,
+  line_spacing,
+  table_width,
   p_value
 )
 }
 \arguments{
 \item{data}{data.frame or tibble with variables to be correlated, or the
 output of \code{\link[correlation:correlation]{correlation::correlation()}} (see Details)}
-
-\item{note}{note placed below the table, replacing the automatic note
-(for \code{output = "flextable"})}
 
 \item{alpha}{\emph{p}-value thresholds for significance stars, from largest to
 smallest (default: \code{c(.05, .01, .001)}, for one, two, and three stars).
@@ -55,46 +52,6 @@ same with their \code{starred} and \code{bolded} arguments.}
 \item{significance_note}{if \code{TRUE} (default), the note explains the stars
 (or the bolding) when any correlation is significant}
 
-\item{output}{\code{"flextable"} (default) for a formatted table, or \code{"tibble"}
-for a tibble of the formatted values (without a note)}
-
-\item{font_family}{font family (e.g., \code{"Times New Roman"} or \code{"Arial"}). If
-\code{NULL} (default), the font set with \code{apa7_defaults(font_family = )}
-(Times New Roman unless changed).}
-
-\item{font_size}{font size, in points. If \code{NULL} (default), the size set
-with \code{apa7_defaults(font_size = )} (12 unless changed).}
-
-\item{text_color}{color of the text: an R color name (e.g., \code{"black"}, the
-default) or a hex code (e.g., \code{"#333333"})}
-
-\item{border_color}{color of the rules, in the same forms as \code{text_color}}
-
-\item{border_width}{width of the rules, in points (default: 0.5)}
-
-\item{line_spacing}{spacing between lines of the header and body (e.g., 2
-for double spacing or 1 for single spacing). If \code{NULL} (default), the
-spacing set with \code{apa7_defaults(line_spacing = )} (2 unless changed). Table
-notes are single-spaced.}
-
-\item{table_width}{width of the table, in the same forms in every apa7
-function: a proportion from 0 to 1 of the default width (the full width
-of a portrait page unless changed with \code{apa7_defaults(table_width = )}),
-\code{"page"} (or \code{"portrait"}) for the full width of a portrait page,
-\code{"landscape"} for a landscape page, \code{"column"} for one column of a
-two-column page, or a named number: a proportion of one of these widths
-(e.g., \code{c(landscape = .8)}) or a width in \code{inches}, \code{cm}, or \code{mm} (e.g.,
-\code{c(inches = 5)}). With 0, the columns are only as wide as their contents
-need. If \code{NULL} (default), the width set by the code chunk's
-\code{apa7-width} option in Quarto (e.g., \verb{#| apa7-width: landscape}, or
-\verb{#| apa7-width: \{landscape: .8\}} for a named number) or \code{apa7.width}
-option in R Markdown, or \code{"page"} for a chunk with apaquarto's
-\code{apa-twocolumn: true}; otherwise, the \code{table_width} set with
-\code{\link[=apa7_defaults]{apa7_defaults()}} (1 unless changed). The widths of the pages and the column are set with
-the \code{page_width}, \code{landscape_width}, and \code{column_width} arguments of
-\code{\link[=apa7_defaults]{apa7_defaults()}}. A number greater than 1 is read as inches, with a
-warning to write it as \code{c(inches = )}.}
-
 \item{keep_empty_star_columns}{if \code{TRUE} (default), every correlation
 column keeps its star column, even when no correlation in it is
 significant, so that the columns have the same width. If \code{FALSE}, empty
@@ -102,7 +59,9 @@ star columns are removed.}
 
 \item{summary_functions}{Any named list of functions that summarize data columns (e.g., \code{list(Mean = mean, SD = sd)}). Can also be a character vector of function names (e.g., \code{c("n", "M", "SD")}). Functions available in a character vector: IQR, Interquartile Range, Kurtosis, MAD, Median Absolute Deviation, M, Mean, Med, Median, n, N, Quantile, Range, SD, Skewness, Var, Variance}
 
-\item{column_formats}{\code{\link[=column_formats]{column_formats()}} object. If \code{NULL} (default), the default column formats are used.}
+\item{column_formats}{\code{\link[=column_formats]{column_formats()}} object that formats the summary
+columns (e.g., \emph{M} and \emph{SD}). If \code{NULL} (default), the column formats
+set with \code{\link[=apa7_defaults]{apa7_defaults()}}.}
 
 \item{method}{kind of correlation (e.g., \code{"pearson"}, \code{"spearman"},
 \code{"kendall"}, \code{"biweight"}, or \code{"percentage"}), passed to
@@ -122,10 +81,16 @@ output.}
 \code{robust = TRUE}, \code{winsorize = .2}, or \code{multilevel = TRUE}). Not used for
 \code{\link[correlation:correlation]{correlation::correlation()}} output.}
 
+\item{output, note, font_family, font_size, text_color, border_color, border_width, line_spacing, table_width}{deprecated. If any is given, a flextable is returned as in apa7 0.2.0,
+with a warning (except \code{output = "tibble"}, which returns the table).
+Pass the table to \code{\link[=apa_flextable]{apa_flextable()}} instead, which takes the same styling
+arguments, with \code{note = TRUE} for the note or a character string for a
+note of your own.}
+
 \item{p_value}{deprecated; use \code{alpha}}
 }
 \value{
-flextable::flextable
+\code{apa7_tbl} (tibble)
 }
 \description{
 APA-formatted correlation table
@@ -150,21 +115,33 @@ default, so the stars are for adjusted \emph{p}-values unless
 not accept variable names with spaces. For those, use
 \code{apa_cor(data, partial = TRUE)} instead.
 
-The note says what kind of correlations are shown (unless they are
-ordinary Pearson correlations) and how the \emph{p}-values were adjusted for
-multiple comparisons. Correlations computed by group, between two sets of
-variables, or with Bayesian methods are not yet supported.
+\code{apa_cor()} returns an \code{apa7_tbl}, which is displayed as an APA-style
+table in documents (see \link{apa7_tbl}). \code{\link[=apa_note]{apa_note()}} writes its note: what
+kind of correlations are shown (unless they are ordinary Pearson
+correlations), how the \emph{p}-values were adjusted for multiple comparisons,
+and what the stars or bold values mean. With apaquarto, use the
+\code{apa-note} chunk option (e.g., \verb{#| apa-note: !expr apa7::apa_note(tbl)}).
+Otherwise, use \code{apa_flextable(tbl, note = TRUE)}. Correlations computed by
+group, between two sets of variables, or with Bayesian methods are not yet
+supported.
 
 In apa7 0.2.0 and earlier, \code{apa_cor()} computed the correlations with
 \code{\link[psych:corTest]{psych::corTest()}}. Its \code{adjust} argument is still accepted as
 \code{p_adjust}, with a warning, and \code{use = "complete"} removes incomplete
-rows, with a warning.
+rows, with a warning. Until apa7 0.3.0, \code{apa_cor()} returned a flextable
+with the note below it, and it took the arguments that style a flextable.
+These arguments still work, with a warning.
 }
 \examples{
-apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
-apa_cor(mtcars[, c("mpg", "am", "gear", "carb")],
-        output = "tibble",
-        star_significant = FALSE)
+tbl <- apa_cor(mtcars[, c("mpg", "am", "gear", "carb")])
+tbl
+apa_note(tbl)
+
+# A flextable with the note below it, for documents without apaquarto
+apa_flextable(tbl, note = TRUE)
+
+# Significant correlations in bold instead of starred
+apa_cor(mtcars[, c("mpg", "am", "gear", "carb")], bold_significant = TRUE)
 
 # Partial Spearman correlations, with variable names that have spaces
 d <- mtcars[, c("mpg", "wt", "hp")]

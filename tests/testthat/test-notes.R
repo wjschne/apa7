@@ -284,7 +284,7 @@ test_that("table notes are single-spaced in all table functions", {
   # apa_chisq() note
   expect_equal(footer_spacing(apa_flextable(apa_chisq(mtcars[, c("am", "vs")]), note = TRUE)), 1)
   # apa_cor() note
-  expect_equal(footer_spacing(apa_cor(mtcars[, 1:3])), 1)
+  expect_equal(footer_spacing(apa_flextable(apa_cor(mtcars[, 1:3]), note = TRUE)), 1)
   # apa_style() footer added by the user
   ft <- flextable::flextable(head(mtcars[, 1:3])) |>
     flextable::add_footer_lines("A note.") |>

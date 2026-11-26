@@ -51,15 +51,29 @@ d_personality <- psychTools::epi.bfi |>
   )
 ```
 
-By default, the output of `apa_cor` [flextable](https://davidgohel.github.io/flextable/), with significant correlations starred.
+`apa_cor` returns a table that is displayed in APA style in documents, with significant correlations starred. In the console, it is an ordinary tibble.
 
 ```{r}
 #| label: tbl-cor
 #| tbl-cap: Correlations Among Personality and Depression
 #| message: false
-d_personality |> 
-  apa_cor()
+tbl_cor <- apa_cor(d_personality)
+tbl_cor
+```
 
+`apa_note` writes the table's note. The text is in markdown, and it does not start with "*Note*." because apaquarto adds that:
+
+```{r}
+#| label: note
+apa_note(tbl_cor)
+```
+
+With [apaquarto](https://wjschne.github.io/apaquarto/), use `apa_note` in the `apa-note` chunk option (e.g., `#| apa-note: !expr apa7::apa_note(tbl_cor)`), with the table made in an earlier chunk. Without apaquarto, `apa_flextable(note = TRUE)` puts the note below the table, as in the rest of this article:
+
+```{r}
+#| label: tbl-cor-note
+#| tbl-cap: Correlations Among Personality and Depression With a Note
+apa_flextable(tbl_cor, note = TRUE)
 ```
 
 Significant correlations can be bolded instead.
@@ -69,7 +83,8 @@ Significant correlations can be bolded instead.
 #| tbl-cap: Correlations With Significant Correlations in Bold
 #| message: false
 d_personality |>
-  apa_cor(bold_significant = TRUE)
+  apa_cor(bold_significant = TRUE) |>
+  apa_flextable(note = TRUE)
 
 ```
 
@@ -83,9 +98,10 @@ You can include any named list of summary functions:
 # Named list of descriptive functions
 my_summaries <- list(Mdn = median, "*IQR*" = IQR)
 
-apa_cor(d_personality, 
-        summary_functions = my_summaries, 
-        star_significant = FALSE)
+apa_cor(d_personality,
+        summary_functions = my_summaries,
+        star_significant = FALSE) |>
+  apa_flextable(note = TRUE)
 ```
 
 
@@ -97,31 +113,35 @@ You can also use a plain vector of descriptive functions from these options: `"I
 #| tbl-cap: "Correlations Among Personality and Depression With Additional Summary Statistics"
 my_summaries <- c("n", "M", "SD", "Skewness", "Kurtosis")
 
-apa_cor(d_personality, summary_functions = my_summaries)
+apa_cor(d_personality, summary_functions = my_summaries) |>
+  apa_flextable(note = TRUE)
 
 ```
 
 
-# Styling options
+# Options
 
-Your styling options include:
+`apa_cor` decides what the table shows:
 
-* `note` A custom markdown formatted note. Overrides the automatic note. Default: `NULL`
 * `alpha` *p*-value thresholds for one, two, and three stars (with `bold_significant = TRUE`, only the first is used). Default: `c(.05, .01, .001)`
 * `digits` Number of decimal places. Default: `2`
 * `bold_significant` Whether to bold significant correlations instead of starring them. Default:  `FALSE`
 * `star_significant` Whether to star significant correlations. Default: `TRUE`
-* `significance_note` Whether the note explains the stars (or bolding). Overridden by a custom note. Also, the automatic note will not appear if no correlations are significant. Default:  `TRUE`
-* `output` Options are `flextable` or `tibble`. Default: `flextable`
+* `significance_note` Whether the note explains the stars (or bolding). The note does not explain them if no correlations are significant. Default:  `TRUE`
+* `keep_empty_star_columns` Whether correlation columns without significant correlations keep their star columns, so that all correlation columns have the same width. Default: `TRUE`
+
+`apa_flextable` decides how it looks:
+
+* `note` `TRUE` for the note from `apa_note`, or a markdown-formatted note of your own. Default: `NULL` (no note)
 * `font_family` Font family (typeface). Default: `Times New Roman`
 * `font_size` Font size (in points). Default: `12`
 * `text_color` Text color. Default: `black`
 * `border_color` Table border color. Default: `black`
-* `border_width` Table border width. Default: `0.5`
+* `border_width` Table border width (in points). Default: `0.5`
 * `line_spacing` Text line spacing. Default: `2`
+* `table_width` Width of the table (e.g., `.5` for half the page width). Default: the full width of the page
 
-
-For example, 
+The defaults of the styling options can be set for all tables with `apa7_defaults`. For example,
 
 ```{r}
 #| label: tbl-altstyle
@@ -133,7 +153,10 @@ d_personality |>
     digits = 2,
     bold_significant = TRUE,
     significance_note = TRUE,
-    summary_functions = my_summaries,
+    summary_functions = my_summaries
+  ) |>
+  apa_flextable(
+    note = TRUE,
     font_family = "Arial",
     font_size = 10,
     text_color = "darkred",
@@ -148,18 +171,20 @@ To remove summary statistics entirely, set `summary_functions` to `NA` or `NULL`
 ```{r}
 #| label: tbl-nosummary
 #| tbl-cap: Correlations Without Summary Statistics
-apa_cor(d_personality, summary_functions = NA)
+apa_cor(d_personality, summary_functions = NA) |>
+  apa_flextable(note = TRUE)
 ```
 
 # Customization
 
-The styling options for `apa_cor` are minimal, but flextable allows for all kinds of customization. Just place whatever code from flextable you want after `apa_cor`. Here I set the width to 50% and align the table to the left of the page. I place a footnote in a specific cell in the table body.
+The styling options of `apa_flextable` are minimal, but flextable allows for all kinds of customization. Just place whatever code from flextable you want after `apa_flextable`. Here I set the width to 50%, and I place a footnote in a specific cell in the table body.
 
 
 ```{r}
 #| label: tbl-altflextable
 #| tbl-cap: Correlations Styled With flextable Functions
-apa_cor(d_personality, table_width = .5) |>
+apa_cor(d_personality) |>
+  apa_flextable(table_width = .5) |>
   flextable::footnote(
     i = 2,
     j = "Variable",
@@ -169,14 +194,14 @@ apa_cor(d_personality, table_width = .5) |>
 
 ```
 
-# Output to tibble
+# Changing the tibble
 
-If you need to process the underlying data before converting to flextable (or use another table-creating function from another package), you can output a tibble and then process the table however you want. Here we add a row title.
+Because `apa_cor` returns a tibble, you can change it with dplyr and tidyr functions before passing it to `apa_flextable` (or to a table function from another package). Here we add a row title.
 
 ```{r}
 #| label: tbl-tibble
 #| tbl-cap: Correlations With a Row Title
-apa_cor(d_personality, output = "tibble") |>
+apa_cor(d_personality) |>
   mutate(apa7listcolumn = str_trim(apa7listcolumn)) |>
   unite(col = Variable, 
         apa7listcolumn, 
@@ -197,7 +222,8 @@ apa_cor(d_personality, output = "tibble") |>
 #| label: tbl-spearman
 #| tbl-cap: Spearman Rank Correlations Among Personality and  Depression
 #| message: false
-apa_cor(d_personality, method = "spearman")
+apa_cor(d_personality, method = "spearman") |>
+  apa_flextable(note = TRUE)
 ```
 
 The note says what kind of correlations are shown. Other options for `method` include:
@@ -225,7 +251,8 @@ To adjust the *p*-values (and so the stars) for multiple comparisons, use `p_adj
 #| label: tbl-partial
 #| tbl-cap: Partial Correlations Among Personality and Depression
 #| message: false
-apa_cor(d_personality, partial = TRUE)
+apa_cor(d_personality, partial = TRUE) |>
+  apa_flextable(note = TRUE)
 ```
 
 Partial correlations can differ considerably from ordinary correlations. With zero-order correlations, openness and extraversion correlate at .27, but once other personality variables are held constant, the partial correlation between them is close to zero.
@@ -239,7 +266,8 @@ The output of `correlation::correlation` can also be given to `apa_cor`:
 #| tbl-cap: Spearman Rank Correlations Computed by the correlation Package
 #| message: false
 correlation(d_personality, method = "spearman") |>
-  apa_cor()
+  apa_cor() |>
+  apa_flextable(note = TRUE)
 ```
 
 Here, `correlation::correlation` adjusted the *p*-values with Holm's method, its default, so the stars are for the adjusted *p*-values, and the note says so. The means and standard deviations come from the data that `correlation::correlation` keeps with its results. Correlations computed by group, between two sets of variables, or with Bayesian methods are not yet supported.

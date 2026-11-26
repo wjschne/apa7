@@ -31,9 +31,7 @@ apa_performance.lavaan <- function(
   metrics = c("Chi2", "Chi2_df", "p_Chi2", "CFI", "TLI", "RMSEA", "RMSEA_CI", "SRMR"),
   column_formats = NULL
 ) {
-  if (!requireNamespace("lavaan", quietly = TRUE)) {
-    stop("lavaan models require the lavaan package. Install it with install.packages(\"lavaan\").") # nocov
-  }
+  rlang::check_installed("lavaan", reason = "for lavaan models.")
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
   }
@@ -43,13 +41,10 @@ apa_performance.lavaan <- function(
   }
   unknown <- setdiff(metrics, lavaan_fit_metrics)
   if (length(unknown) > 0) {
-    stop(
-      "Unknown fit metrics for lavaan models: ",
-      paste(unknown, collapse = ", "),
-      ". Choose from ",
-      paste(lavaan_fit_metrics, collapse = ", "),
-      "."
-    )
+    cli::cli_abort(c(
+      "Unknown fit metric{?s} for lavaan models: {.val {unknown}}.",
+      i = "Choose from {.val {lavaan_fit_metrics}}."
+    ))
   }
 
   info <- lavaan_fit_info(fit)
@@ -395,9 +390,7 @@ apa_parameters.lavaan <- function(
   groups = c("columns", "rows"),
   ...
 ) {
-  if (!requireNamespace("lavaan", quietly = TRUE)) {
-    stop("lavaan models require the lavaan package. Install it with install.packages(\"lavaan\").") # nocov
-  }
+  rlang::check_installed("lavaan", reason = "for lavaan models.")
   groups <- match.arg(groups)
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
@@ -916,9 +909,7 @@ lavaan_change_metrics <- c(
 #' @keywords internal
 #' @noRd
 lavaan_performance_comparison <- function(models, metrics = NULL, column_formats = NULL) {
-  if (!requireNamespace("lavaan", quietly = TRUE)) {
-    stop("lavaan models require the lavaan package. Install it with install.packages(\"lavaan\").") # nocov
-  }
+  rlang::check_installed("lavaan", reason = "for lavaan models.")
   if (is.null(column_formats)) {
     column_formats <- the$column_formats
   }

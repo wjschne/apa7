@@ -241,7 +241,7 @@ apa_p <- function(
 
   if (inline) {
     if (length(p) > 1) {
-      stop("Only one p can be processed for inline mode.")
+      cli::cli_abort("With {.code inline = TRUE}, {.arg p} must be a single value.")
     }
 
     if (p < min_p) {
@@ -305,8 +305,8 @@ apa_p <- function(
 #' @param fn function name
 #' @noRd
 warn_renamed_arg <- function(old, new, fn) {
-  rlang::warn(
-    paste0("The `", old, "` argument of `", fn, "()` is deprecated. Use `", new, "` instead."),
+  cli::cli_warn(
+    "The {.arg {old}} argument of {.fn {fn}} is deprecated. Use {.arg {new}} instead.",
     .frequency = "regularly",
     .frequency_id = paste0("apa7_", fn, "_", old)
   )
@@ -1903,7 +1903,7 @@ column_formats <- new_class(
 
     if (!is.null(custom_columns)) {
       if (is.null(names(custom_columns))) {
-        stop("custom_columns must be a named list")
+        cli::cli_abort("{.arg custom_columns} must be a named list.")
       }
       .data[names(custom_columns)] <- custom_columns
     }
@@ -2302,7 +2302,10 @@ bind_option_settings <- function(env = the) {
 #'
 #' * `CI`, `CI_low`, and `CI_high` (e.g., from [parameters::parameters()])
 #'   become a single column of intervals, with a header such as "95% CI" that
-#'   gives the confidence level stored in `CI`.
+#'   gives the confidence level stored in `CI`. Prefixed columns are combined
+#'   the same way for each column spanner (e.g., `Model 1_CI`,
+#'   `Model 1_CI_low`, and `Model 1_CI_high` become `Model 1_95% CI`). A `CI`
+#'   column without its bounds is left as it is.
 #' * If there are `t` and `df_error` columns, the degrees of freedom are moved
 #'   into the `t` header (e.g., *t*(28)), and `df_error` is dropped.
 #' * A column named like `t(28)` is formatted with the `t_df` format (and
@@ -2331,6 +2334,39 @@ bind_option_settings <- function(env = the) {
 #'   apa_format_columns() |>
 #'   apa_flextable()
 apa_format_columns <- function(
+  data,
+  column_formats = NULL,
+  no_format_columns = NULL,
+  rename_headers = TRUE,
+  latex_headers = FALSE,
+  format_separated_headers = TRUE,
+  sep = "_",
+  accuracy = NULL
+) {
+  format_columns(
+    data,
+    column_formats = column_formats,
+    no_format_columns = no_format_columns,
+    rename_headers = rename_headers,
+    latex_headers = latex_headers,
+    format_separated_headers = format_separated_headers,
+    sep = sep,
+    accuracy = accuracy
+  )$data
+}
+
+#' Format data columns, and say which column became which
+#'
+#' The work of [apa_format_columns()]. Formatting can combine columns (e.g.,
+#' `CI_low` and `CI_high` into `CI`) and drop them (e.g., `df_error` moves into
+#' the `t` header), so the new names cannot be matched to the old ones by
+#' position.
+#' @inheritParams apa_format_columns
+#' @returns list of `data` (the formatted tibble) and `names` (the new column
+#'   names, named by the old names of the columns that remain)
+#' @keywords internal
+#' @noRd
+format_columns <- function(
   data,
   column_formats = NULL,
   no_format_columns = NULL,
@@ -2427,47 +2463,34 @@ apa_format_columns <- function(
     cls <- cls[!(cls %in% no_format_columns)]
   }
 
-  ci <- .95
-
-  if (
-    all(c("CI", "CI_low", "CI_high") %in% d_names$name) &&
-      !is.null(cf$CI) &
-      ("CI" %in% cls)
-  ) {
-    d_ci <- d_names |>
-      dplyr::mutate(
-        group = stringr::str_remove(column, paste0(sep, name, "$"))
-      ) |>
-      dplyr::filter(name == "CI") |>
-      dplyr::mutate(
-        CI_low = paste0(group, sep, "low"),
-        CI_high = paste0(group, sep, "high")
-      )
-
-    for (i in seq_len(nrow(d_ci))) {
-      ci_names <- d_ci[i, c("column", "CI_low", "CI_high")] |>
-        tidyr::pivot_longer(dplyr::everything()) |>
-        dplyr::pull(value)
-
-      ci_name <- ci_names[1]
-
-      if (all(ci_names %in% colnames(data))) {
-        ci <- max(data[, ci_names[1]], na.rm = TRUE)
-
-        d_names[d_names$column == d_ci[[i, "column"]], "header"] <- glue::glue(
+  # Each CI column (e.g., `CI` or `Model 1_CI`) holds the confidence level,
+  # and its bounds are in the columns of the same name ending in `_low` and
+  # `_high` (e.g., `Model 1_CI_low`). They become one column of intervals.
+  ci_columns <- d_names$column[d_names$name == "CI" & d_names$column %in% cls]
+  if (!is.null(cf$CI)) {
+    for (ci_column in ci_columns) {
+      ci_low <- paste0(ci_column, "_low")
+      ci_high <- paste0(ci_column, "_high")
+      if (all(c(ci_low, ci_high) %in% colnames(data))) {
+        # `ci` is used by the glue template of the header (e.g., "95% CI")
+        ci <- max(data[[ci_column]], na.rm = TRUE)
+        d_names[d_names$column == ci_column, "header"] <- glue::glue(
           cf$CI@header
         ) |>
           as.character()
-
-        data[, ci_names[1]] <- cf$CI@formatter(
-          dplyr::pull(data, dplyr::any_of(ci_names[2])),
-          dplyr::pull(data, dplyr::any_of(ci_names[3])),
+        data[[ci_column]] <- cf$CI@formatter(
+          data[[ci_low]],
+          data[[ci_high]],
           accuracy = cf@accuracy
         )
-        data[, ci_names[2]] <- NULL
-        data[, ci_names[3]] <- NULL
-        cls <- cls[cls != ci_names[1]]
+        data[[ci_low]] <- NULL
+        data[[ci_high]] <- NULL
+      } else {
+        # Without its bounds, a CI column holds only the confidence level,
+        # which the interval formatter cannot format, so it is left as it is
+        d_names <- d_names[d_names$column != ci_column, ]
       }
+      cls <- cls[cls != ci_column]
     }
   }
 
@@ -2488,6 +2511,9 @@ apa_format_columns <- function(
     } else {
       cf$t@latex <- paste0(cf$t@latex, df)
     }
+    # The headers were looked up before the degrees of freedom were known
+    d_names$header[d_names$column == "t"] <- cf$t@header
+    d_names$latex[d_names$column == "t"] <- cf$t@latex
 
     data <- dplyr::select(data, -df_error)
 
@@ -2506,6 +2532,9 @@ apa_format_columns <- function(
     }
   }
 
+  # Names of the columns that remain, before any are renamed
+  old_names <- colnames(data)
+  renamed <- character(0)
   if (rename_headers) {
     if (latex_headers) {
       rcls <- cf@get_latex
@@ -2566,9 +2595,13 @@ apa_format_columns <- function(
 
       data <- data |>
         dplyr::rename(dplyr::any_of(rcls))
+      renamed <- rcls[rcls %in% old_names]
     }
   }
-  data
+  # New names, named by old names (unchanged names map to themselves)
+  names_now <- stats::setNames(old_names, old_names)
+  names_now[unname(renamed)] <- names(renamed)
+  list(data = data, names = names_now)
 }
 
 #' Prefix text with figure spaces to balance star text

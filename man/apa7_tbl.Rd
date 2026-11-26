@@ -19,7 +19,7 @@
 \code{x}, invisibly, for \code{print}. A knit_asis or flextable output for \code{knit_print}.
 }
 \description{
-The tibbles returned by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_chisq]{apa_chisq()}}, \code{\link[=apa_descriptives]{apa_descriptives()}}, \code{\link[=apa_factor_cor]{apa_factor_cor()}}, \code{\link[=apa_htest]{apa_htest()}}, \code{\link[=apa_loadings]{apa_loadings()}}, \code{\link[=apa_means]{apa_means()}}, \code{\link[=apa_contrasts]{apa_contrasts()}}, \code{\link[=apa_slopes]{apa_slopes()}}, \code{\link[=apa_parameters]{apa_parameters()}},
+The tibbles returned by \code{\link[=apa_anova]{apa_anova()}}, \code{\link[=apa_chisq]{apa_chisq()}}, \code{\link[=apa_cor]{apa_cor()}}, \code{\link[=apa_descriptives]{apa_descriptives()}}, \code{\link[=apa_factor_cor]{apa_factor_cor()}}, \code{\link[=apa_htest]{apa_htest()}}, \code{\link[=apa_loadings]{apa_loadings()}}, \code{\link[=apa_means]{apa_means()}}, \code{\link[=apa_contrasts]{apa_contrasts()}}, \code{\link[=apa_slopes]{apa_slopes()}}, \code{\link[=apa_parameters]{apa_parameters()}},
 \code{\link[=apa_performance]{apa_performance()}}, \code{\link[=apa_performance_comparison]{apa_performance_comparison()}}, \code{\link[=apa_reliability]{apa_reliability()}}, \code{\link[=apa_collinearity]{apa_collinearity()}}, \code{\link[=apa_n_factors]{apa_n_factors()}}, \code{\link[=apa_publication_bias]{apa_publication_bias()}}, and \code{\link[=apa_subgroups]{apa_subgroups()}} have class
 \code{apa7_tbl}. They are ordinary
 tibbles for post-processing with dplyr, but in knitr and Quarto documents

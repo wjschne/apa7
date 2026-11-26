@@ -17,19 +17,12 @@ install_missing_packages <- function(pkgs, ask = TRUE) {
 
   if (ask) {
     if (!interactive()) {
-      stop(
-        "These packages are needed but not installed: ",
-        paste0(need, collapse = ", "),
-        "\nInstall them with:\n",
-        install_call,
-        call. = FALSE
-      )
+      cli::cli_abort(c(
+        "These packages are needed but not installed: {.pkg {need}}.",
+        i = "Install them with {.code {install_call}}."
+      ), call = NULL)
     }
-    message(
-      "These packages are needed but not installed:\n  ",
-      paste0(need, collapse = ", "),
-      "\n"
-    )
+    cli::cli_inform("These packages are needed but not installed: {.pkg {need}}.")
     response <- utils::askYesNo("Install them now?")
   } else {
     response <- TRUE
@@ -38,11 +31,10 @@ install_missing_packages <- function(pkgs, ask = TRUE) {
   if (isTRUE(response)) {
     utils::install.packages(need)
   } else {
-    stop(
-      "Installation cancelled. To install the missing packages, run:\n",
-      install_call,
-      call. = FALSE
-    )
+    cli::cli_abort(c(
+      "Installation cancelled.",
+      i = "To install the missing packages, run {.code {install_call}}."
+    ), call = NULL)
   }
   invisible(need)
 }
