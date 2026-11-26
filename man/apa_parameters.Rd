@@ -332,7 +332,7 @@ category and predictor (e.g., "Part time: Children").}
 \item{performance_layout}{for lists of models, where the model comparison metrics go: \code{"columns"} (default) adds a column for each metric, with its value on the model's heading row; \code{"rows"} adds a row for each metric below the model's parameters (and random effects), labeled in the variable column (e.g., \emph{R}^2^ and Δ\emph{R}^2^) with its value in the first value column, as in many hierarchical regression tables. Metrics without a value (e.g., the change in \emph{R}^2^ of the first model) are left out.}
 }
 \value{
-tibble
+\code{apa7_tbl} (tibble)
 }
 \description{
 format model parameters in APA style

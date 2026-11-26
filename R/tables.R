@@ -1404,7 +1404,7 @@ align_padded_columns <- function(
 #' @param performance_parameters for lists of models, model comparison metrics passed to [apa_performance_comparison()]. If `NULL`, no metrics are added. By default, `R2` and `deltaR2`; for lists of mixed models (`lme4`), the default also includes the conditional *R*^2^ and its change (`R2_conditional`, `deltaR2_conditional`), and `R2` is the marginal *R*^2^.
 #' @param performance_layout for lists of models, where the model comparison metrics go: `"columns"` (default) adds a column for each metric, with its value on the model's heading row; `"rows"` adds a row for each metric below the model's parameters (and random effects), labeled in the variable column (e.g., *R*^2^ and &Delta;*R*^2^) with its value in the first value column, as in many hierarchical regression tables. Metrics without a value (e.g., the change in *R*^2^ of the first model) are left out.
 #'
-#' @return tibble
+#' @return `apa7_tbl` (tibble)
 #' @export
 #'
 #' @examples
@@ -2939,7 +2939,7 @@ performance_rows <- function(d_fit, comparison) {
 #' Yuan, K.-H., & Bentler, P. M. (2000). Three likelihood-based methods
 #' for mean and covariance structure analysis with nonnormal missing data.
 #' *Sociological Methodology, 30*(1), 165--200. \doi{10.1111/0081-1750.00078}
-#' @return tibble
+#' @return `apa7_tbl` (tibble)
 #' @export
 #'
 #' @examples
@@ -3217,7 +3217,7 @@ has_fixed_dispersion <- function(fit) {
 #' Satorra, A., & Bentler, P. M. (2010). Ensuring positiveness of the
 #' scaled difference chi-square test statistic. *Psychometrika, 75*(2),
 #' 243--248. \doi{10.1007/s11336-009-9135-y}
-#' @return tibble
+#' @return `apa7_tbl` (tibble)
 #' @export
 #'
 #' @examples

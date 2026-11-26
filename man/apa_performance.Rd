@@ -94,7 +94,7 @@ them.}
 \item{column_formats}{column_formats object to format columns. If NULL, the default column_formats is used.}
 }
 \value{
-tibble
+\code{apa7_tbl} (tibble)
 }
 \description{
 format model performance metrics in APA style

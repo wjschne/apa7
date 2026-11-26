@@ -114,13 +114,25 @@ test_that("ARG-8: argument names are snake_case", {
 })
 
 test_that("RET-1: table functions document an apa7_tbl return value", {
-  known <- c(
-    apa_cor = 2,
-    apa_parameters = 6, apa_performance = 6, apa_performance_comparison = 6
-  )
+  known <- c(apa_cor = 2)
   for (f in setdiff(table_generics, names(known))) {
     expect_match(rd_section(rd_for(f), "\\value"), "apa7_tbl", label = f)
   }
+})
+
+test_that("RET-1: the apa7_tbl help page names every table function", {
+  description <- rd_section(rd_for("apa7_tbl"), "\\description")
+  for (f in setdiff(table_generics, "apa_cor")) {
+    expect_match(description, f, fixed = TRUE, label = f)
+  }
+})
+
+test_that("RET-1: regression tables are apa7_tbl objects", {
+  fit1 <- lm(mpg ~ wt, data = mtcars)
+  fit2 <- lm(mpg ~ wt + hp, data = mtcars)
+  expect_s3_class(apa_parameters(fit1), "apa7_tbl")
+  expect_s3_class(apa_performance(fit1), "apa7_tbl")
+  expect_s3_class(apa_performance_comparison(fit1, fit2), "apa7_tbl")
 })
 
 test_that("DOC-3: every exported function has examples", {
