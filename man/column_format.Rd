@@ -29,6 +29,13 @@ column_format object
 \description{
 This class is used to define the format of columns in tables, including the name, header, latex representation, a formatter function, and what the header abbreviates.
 }
+\details{
+A \code{column_format} is an S7 object. Its properties are read and changed with
+\code{@} (e.g., \code{R2@header}, or \code{R2@formatter <- my_function}). Formats are
+collected in a \code{\link[=column_formats]{column_formats()}} object, in which each format is read,
+added, or replaced with \code{$} (e.g., \code{column_formats()$p}). The table
+functions use a format for every column with the same name as the format.
+}
 \examples{
 R2 <- column_format(
          "R2",

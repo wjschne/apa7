@@ -1,5 +1,36 @@
 #' Align text on center text (default is decimal)
 #'
+#' `align_chr()` formats numbers and pads them on both sides of the decimal
+#' point (or another `center` character) so that every value has the same
+#' width. When the column is centered, the decimal points line up.
+#'
+#' @details
+#' With a few minor details omitted, `align_chr()` does roughly this:
+#'
+#' 1. If `format_numeric_character = TRUE`, converts text made only of digits,
+#'    minus signs, and periods to numbers.
+#' 2. Formats numbers with [signs::signs()]: rounds them to `accuracy`, replaces
+#'    hyphens with true minus signs, and adds commas to large numbers. Plus
+#'    signs are added if `add_plusses = TRUE`, leading zeros are removed if
+#'    `trim_leading_zeros = TRUE`, and trailing zeros are dropped if
+#'    `drop0trailing = TRUE`. Whole numbers are not given decimals unless
+#'    `format_integers = TRUE`.
+#' 3. Splits each value at the first `center` character, then pads the part
+#'    before it on the left and the part after it on the right (`side` limits
+#'    the padding to one side), so that every value has the same width on each
+#'    side of the center.
+#'
+#' By default, values are padded with figure spaces, which are as wide as a
+#' digit. With this default, if `width_aware_padding = TRUE` in
+#' [apa7_defaults()] (the default) and the default font is installed, values
+#' are instead padded to the same *rendered* width in that font (see
+#' [num_pad()]), so that values with minus signs, commas, or markdown still
+#' line up. Other `padding_character` values are counted in characters.
+#'
+#' The padded values line up only if every cell in the column is aligned the
+#' same way. [apa_flextable()] centers the columns of numbers and lines up
+#' padded values (see its Details).
+#'
 #' @param x vector (numeric or character)
 #' @param accuracy number to round to. If NULL, the current default accuracy set with [apa7_defaults()] will be used.
 #' @param trim_leading_zeros if `TRUE`, leading zeros are removed (e.g., .45 instead of 0.45), as APA style requires for values that cannot exceed 1 (correlations, proportions, *p*-values). If `FALSE` (default), they are kept.
@@ -452,6 +483,11 @@ is_numeric_like <- function(x, elementwise = FALSE) {
 
 #' Pads text on the left or right so that the width is the same for each element of the vector
 #'
+#' `num_pad()` adds spaces to the left or right of each element of a text
+#' vector so that all elements have the same width, counted in characters or
+#' measured in a font. [align_chr()] uses it to line up numbers.
+#'
+#' @details
 #' By default, text is padded with one `padding_character` per missing visible character. Markdown markup (e.g., `**`, `*`, `^`, `~`, and backslash escapes) is not counted. If `font_family` names an installed font, text is instead padded to equal *rendered* width in that font, using a combination of figure, punctuation, thin, and hair spaces (`padding_character` is then ignored). Superscripts and subscripts are measured at 2/3 of the font size.
 #'
 #' @param x vector of text
@@ -836,6 +872,14 @@ header_md <- function(x, level = 1) {
 #' Column format class
 #'
 #' This class is used to define the format of columns in tables, including the name, header, latex representation, a formatter function, and what the header abbreviates.
+#'
+#' @details
+#' A `column_format` is an S7 object. Its properties are read and changed with
+#' `@` (e.g., `R2@header`, or `R2@formatter <- my_function`). Formats are
+#' collected in a [column_formats()] object, in which each format is read,
+#' added, or replaced with `$` (e.g., `column_formats()$p`). The table
+#' functions use a format for every column with the same name as the format.
+#'
 #' @param name name of column
 #' @param header markdown representation of header name
 #' @param latex latex representation of header name
@@ -1733,6 +1777,20 @@ the$columns <- list(
 #' Create a set of column formats
 #'
 #' Returns an S7 object that contains a list of `column_format` objects that can be used to format parameters in APA style.
+#'
+#' @details
+#' Each [column_format()] in the list is named by the column it formats.
+#' Formats are read, added, replaced, and removed with `$` (e.g.,
+#' `my_formats$beta`, `my_formats$Predictor <- column_format("Predictor")`, or
+#' `my_formats$beta <- NULL`), and the properties of a single format are read
+#' and changed with `@` (e.g., `my_formats$p@header`). The `get_` properties
+#' listed under Slots return the names, headers, formatters, and so on of all
+#' the formats at once (e.g., `my_formats@get_tibble`).
+#'
+#' Use the object with the `column_formats` argument of [apa_flextable()],
+#' [apa_format_columns()], and the table functions, or set it for every table
+#' with `apa7_defaults(column_formats = my_formats)`.
+#'
 #' @param .data list of `column_format` objects
 #' @param accuracy rounding accuracy of the formatters (e.g., `.01` for two decimals). If `NULL` (default), the `accuracy` set with [apa7_defaults()].
 #' @param intercept_text label of the intercept row (e.g., `"Constant"` or `"Intercept"`)
@@ -2220,6 +2278,40 @@ bind_option_settings <- function(env = the) {
 }
 
 #' Format data columns
+#'
+#' `apa_format_columns()` formats the columns of a data frame of results and
+#' renames their headers in APA style, using a set of [column_formats()].
+#' [apa_flextable()] calls it when `auto_format_columns = TRUE`.
+#'
+#' @details
+#' Each column is matched by name to a [column_format()] in `column_formats`
+#' (e.g., `p`, `SE`, `beta`, or `R2`). The values of a matched column are
+#' formatted by the format's formatter, and its name is replaced by the
+#' format's markdown header (e.g., `beta` becomes `*&beta;*`), or by its LaTeX
+#' header if `latex_headers = TRUE`. Columns without a format, and columns
+#' named in `no_format_columns`, are left as they are.
+#'
+#' If `format_separated_headers = TRUE` (default), a column name with a
+#' separator (`sep`, an underscore by default) is matched by its last part, so
+#' `Model 1_R2` is formatted like `R2` and becomes `Model 1_*R*^2^`. In
+#' [apa_flextable()], the part before the separator becomes a column spanner.
+#' Format names that contain an underscore themselves (e.g., `R2_adjusted`) are
+#' matched whole.
+#'
+#' A few columns are matched by a pattern or combined:
+#'
+#' * `CI`, `CI_low`, and `CI_high` (e.g., from [parameters::parameters()])
+#'   become a single column of intervals, with a header such as "95% CI" that
+#'   gives the confidence level stored in `CI`.
+#' * If there are `t` and `df_error` columns, the degrees of freedom are moved
+#'   into the `t` header (e.g., *t*(28)), and `df_error` is dropped.
+#' * A column named like `t(28)` is formatted with the `t_df` format (and
+#'   gets the header *t*(28)), and one named like `90% CI` with the
+#'   `CI_percent` format.
+#'
+#' To see the default formats, run `column_formats()@get_tibble`. The article
+#' [Building Tables by Hand](https://wjschne.github.io/apa7/articles/summarize.html)
+#' shows how to change them.
 #'
 #' @param data data set (data.frame or tibble)
 #' @param column_formats `column_formats` object. If NULL, the current default formatter set with [apa7_defaults()] will be used.

@@ -27,6 +27,11 @@ num_pad(
 character vector
 }
 \description{
+\code{num_pad()} adds spaces to the left or right of each element of a text
+vector so that all elements have the same width, counted in characters or
+measured in a font. \code{\link[=align_chr]{align_chr()}} uses it to line up numbers.
+}
+\details{
 By default, text is padded with one \code{padding_character} per missing visible character. Markdown markup (e.g., \verb{**}, \code{*}, \code{^}, \code{~}, and backslash escapes) is not counted. If \code{font_family} names an installed font, text is instead padded to equal \emph{rendered} width in that font, using a combination of figure, punctuation, thin, and hair spaces (\code{padding_character} is then ignored). Superscripts and subscripts are measured at 2/3 of the font size.
 }
 \examples{

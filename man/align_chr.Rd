@@ -48,7 +48,37 @@ align_chr(
 character vector
 }
 \description{
-Align text on center text (default is decimal)
+\code{align_chr()} formats numbers and pads them on both sides of the decimal
+point (or another \code{center} character) so that every value has the same
+width. When the column is centered, the decimal points line up.
+}
+\details{
+With a few minor details omitted, \code{align_chr()} does roughly this:
+\enumerate{
+\item If \code{format_numeric_character = TRUE}, converts text made only of digits,
+minus signs, and periods to numbers.
+\item Formats numbers with \code{\link[signs:signs]{signs::signs()}}: rounds them to \code{accuracy}, replaces
+hyphens with true minus signs, and adds commas to large numbers. Plus
+signs are added if \code{add_plusses = TRUE}, leading zeros are removed if
+\code{trim_leading_zeros = TRUE}, and trailing zeros are dropped if
+\code{drop0trailing = TRUE}. Whole numbers are not given decimals unless
+\code{format_integers = TRUE}.
+\item Splits each value at the first \code{center} character, then pads the part
+before it on the left and the part after it on the right (\code{side} limits
+the padding to one side), so that every value has the same width on each
+side of the center.
+}
+
+By default, values are padded with figure spaces, which are as wide as a
+digit. With this default, if \code{width_aware_padding = TRUE} in
+\code{\link[=apa7_defaults]{apa7_defaults()}} (the default) and the default font is installed, values
+are instead padded to the same \emph{rendered} width in that font (see
+\code{\link[=num_pad]{num_pad()}}), so that values with minus signs, commas, or markdown still
+line up. Other \code{padding_character} values are counted in characters.
+
+The padded values line up only if every cell in the column is aligned the
+same way. \code{\link[=apa_flextable]{apa_flextable()}} centers the columns of numbers and lines up
+padded values (see its Details).
 }
 \examples{
 align_chr(c(1, 10, 100))

@@ -428,6 +428,14 @@ separate_star_column <- function(
 #' rows, with a warning.
 #' @importFrom rlang .data
 #'
+#' @references
+#' Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery
+#' rate: A practical and powerful approach to multiple testing. *Journal of the
+#' Royal Statistical Society: Series B (Methodological), 57*(1), 289--300.
+#' \doi{10.1111/j.2517-6161.1995.tb02031.x}
+#'
+#' Holm, S. (1979). A simple sequentially rejective multiple test
+#' procedure. *Scandinavian Journal of Statistics, 6*(2), 65--70.
 #' @return flextable::flextable
 #' @export
 #'
@@ -942,6 +950,9 @@ apa_cor <- function(
 #' @param ... passed to [apa_style()]. Every argument of [apa_style()] is also
 #'   an argument of `apa_flextable()`, so this is rarely needed.
 #'
+#' @references
+#' American Psychological Association. (2020). *Publication manual of the
+#' American Psychological Association* (7th ed.). \doi{10.1037/0000165-000}
 #' @return flextable::flextable
 #' @export
 #'
@@ -2902,6 +2913,32 @@ performance_rows <- function(d_fit, comparison) {
 #'   them.
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
+#' @references
+#' McFadden, D. (1974). Conditional logit analysis of qualitative choice
+#' behavior. In P. Zarembka (Ed.), *Frontiers in econometrics* (pp. 105--142).
+#' Academic Press.
+#'
+#' Nagelkerke, N. J. D. (1991). A note on a general definition of the
+#' coefficient of determination. *Biometrika, 78*(3), 691--692.
+#' \doi{10.1093/biomet/78.3.691}
+#'
+#' Nakagawa, S., & Schielzeth, H. (2013). A general and simple method for
+#' obtaining \eqn{R^2} from generalized linear mixed-effects models. *Methods
+#' in Ecology and Evolution, 4*(2), 133--142.
+#' \doi{10.1111/j.2041-210x.2012.00261.x}
+#'
+#' Satorra, A., & Bentler, P. M. (1994). Corrections to test statistics
+#' and standard errors in covariance structure analysis. In A. von Eye & C. C.
+#' Clogg (Eds.), *Latent variables analysis: Applications for developmental
+#' research* (pp. 399--419). Sage.
+#'
+#' Tjur, T. (2009). Coefficients of determination in logistic regression
+#' models---A new proposal: The coefficient of discrimination. *The American
+#' Statistician, 63*(4), 366--372. \doi{10.1198/tast.2009.08210}
+#'
+#' Yuan, K.-H., & Bentler, P. M. (2000). Three likelihood-based methods
+#' for mean and covariance structure analysis with nonnormal missing data.
+#' *Sociological Methodology, 30*(1), 165--200. \doi{10.1111/0081-1750.00078}
 #' @return tibble
 #' @export
 #'
@@ -3166,6 +3203,20 @@ has_fixed_dispersion <- function(fit) {
 #' Nested `lavaan` models (e.g., the configural, metric, and scalar models of a measurement invariance analysis) are compared each with the one before it, so they should be listed from the least to the most constrained. Each row shows the fit of the model (any of the metrics of [apa_performance.lavaan()]), followed, under a "Change from previous model" spanner, by the chi-square difference test from [lavaan::lavTestLRT()] (`"deltaChi2"`, `"deltaChi2_df"`, `"p_deltaChi2"`) and the changes in fit indices (`"deltaCFI"`, `"deltaTLI"`, `"deltaRMSEA"`, `"deltaSRMR"`), shown with three decimals. The default metrics are `"Chi2"`, `"Chi2_df"`, `"CFI"`, `"RMSEA"`, `"RMSEA_CI"`, `"SRMR"`, `"deltaChi2"`, `"deltaChi2_df"`, `"p_deltaChi2"`, `"deltaCFI"`, and `"deltaRMSEA"`. With a robust estimator (e.g., MLR or WLSMV), the difference test is scaled (e.g., the Satorra-Bentler scaled difference test), and the changes in fit indices are computed from their robust versions. [apa_note()] names the difference test. `starred` is ignored for `lavaan` models.
 #' @param column_formats column_formats object to format columns. If NULL, the default column_formats is used.
 #'
+#' @references
+#' Satorra, A. (2000). Scaled and adjusted restricted tests in
+#' multi-sample analysis of moment structures. In R. D. H. Heijmans, D. S. G.
+#' Pollock, & A. Satorra (Eds.), *Innovations in multivariate statistical
+#' analysis* (pp. 233--247). Kluwer Academic Publishers.
+#' \doi{10.1007/978-1-4615-4603-0_17}
+#'
+#' Satorra, A., & Bentler, P. M. (2001). A scaled difference chi-square
+#' test statistic for moment structure analysis. *Psychometrika, 66*(4),
+#' 507--514. \doi{10.1007/BF02296192}
+#'
+#' Satorra, A., & Bentler, P. M. (2010). Ensuring positiveness of the
+#' scaled difference chi-square test statistic. *Psychometrika, 75*(2),
+#' 243--248. \doi{10.1007/s11336-009-9135-y}
 #' @return tibble
 #' @export
 #'
@@ -3495,6 +3546,39 @@ model_names <- function(models) {
 
 #' Style `flextable::flextable` object according to APA style
 #'
+#' `apa_style()` applies the fonts, rules, spacing, and alignment of an APA-style
+#' table to a flextable and converts markdown in its cells. [apa_flextable()]
+#' calls it, so it is needed only for a flextable made some other way.
+#'
+#' @details
+#' With a few minor details omitted, `apa_style()` does roughly this:
+#'
+#' 1. Separates the headers into column spanners and deckered heads at
+#'    underscores, if `separate_headers = TRUE` and the header has one row.
+#' 2. Sets the font, font size, and text color of every cell.
+#' 3. Draws the three horizontal rules of an APA table: above the header, below
+#'    the header, and below the body.
+#' 4. Top-aligns the cells and centers the header text.
+#' 5. Adds space above and below each cell's text, (`line_spacing` - 1) times
+#'    2/3 of the font size, so that rows have the spacing of `line_spacing`
+#'    while text that wraps within a cell stays single-spaced. In Typst output,
+#'    the space is a little larger, because Typst measures lines differently
+#'    than Word does. The left and right padding is `horizontal_padding`.
+#' 6. Styles apa7's helper columns. Break columns (from [add_break_columns()])
+#'    are left empty. Star columns (from [add_star_column()] and
+#'    [separate_star_column()]) and list columns (from [add_list_column()]) have
+#'    no header and no padding on the side next to the column they belong to,
+#'    so that the two read as one column.
+#' 7. Sets the table's layout, alignment on the page, and width (`layout`,
+#'    `table_align`, and `table_width`). In Word, the table is kept on the same
+#'    page as the text that follows it.
+#' 8. Converts markdown in the header and the body with
+#'    [ftExtra::colformat_md()], except in the columns named in
+#'    `no_markdown_columns_header` and `no_markdown_columns` and in cells that
+#'    are already formatted.
+#' 9. If the first column is named `Variable` or `Predictor`, left-aligns it and
+#'    applies `header_align_vertical` to the header.
+#'
 #' @param x a [flextable::flextable()]
 #' @param font_family font family (e.g., `"Times New Roman"` or `"Arial"`). If
 #'   `NULL` (default), the font set with `apa7_defaults(font_family = )`
@@ -3547,6 +3631,9 @@ model_names <- function(models) {
 #'   row, column names with an underscore are split into a column spanner and
 #'   a header (e.g., `Model 1_B` becomes "B" under a "Model 1" spanner)
 #' @name apa_style
+#' @references
+#' American Psychological Association. (2020). *Publication manual of the
+#' American Psychological Association* (7th ed.). \doi{10.1037/0000165-000}
 #' @return flextable::flextable
 #' @export
 #'
@@ -3762,7 +3849,27 @@ apa_style <- function(
   x
 }
 
-#' Use flextable::dim_pretty to fit column widths
+#' Fit column widths to the contents and the table width
+#'
+#' `pretty_widths()` sets each column's width to fit its contents and then
+#' scales the widths so that the table has the width given by `table_width`.
+#'
+#' @details
+#' The widths are first measured with [flextable::dim_pretty()], and no column
+#' is narrower than `min_width`. If the table width is 0, these widths are kept.
+#' Otherwise, they are scaled up or down in proportion so that they add up to
+#' the table width, with two exceptions:
+#'
+#' * Break columns (from [add_break_columns()]) are kept at `min_width`.
+#' * List columns (from [add_list_column()]) keep their measured width, and the
+#'   column to the right of each one (the text of the list) gets the extra width
+#'   instead.
+#'
+#' The table's layout is then set to `"fixed"`, so that Word keeps the widths.
+#'
+#' If `table_width` is `NULL` (default), the width is taken from the code
+#' chunk's options or from [apa7_defaults()] (see the `table_width` argument).
+#' With the defaults, the table is as wide as the text on a portrait page.
 #'
 #' @param x flextable
 #' @inheritParams apa_flextable
@@ -3825,9 +3932,20 @@ pretty_widths <- function(
     )
 }
 
-#' A wrapper for tidyr::pivot_wider that creates columns names as `name_variable` instead of `variable_name`
+#' A wrapper for tidyr::pivot_wider that creates column names as `name_variable` instead of `variable_name`
 #'
-#' The default for `names_vary` is "slowest" instead of the usual "fastest".
+#' `pivot_wider_name_first()` reshapes data from long to wide like
+#' [tidyr::pivot_wider()], but it puts the value of `names_from` first in the
+#' new column names (e.g., `Model 1_t` instead of `t_Model 1`). In
+#' [apa_flextable()], the `names_from` values then become column spanners.
+#'
+#' @details
+#' The new columns are grouped by the value of `names_from` (as with
+#' `names_vary = "slowest"`), so that the columns under each spanner are next
+#' to each other. Only one `names_from` column is allowed. Because the names are
+#' always made as `{names_from}_{.value}`, the `names_prefix`, `names_sep`, and
+#' `names_vary` arguments have no effect.
+#'
 #' @inheritParams tidyr::pivot_wider
 #' @return data.frame
 #' @export

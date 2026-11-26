@@ -20,6 +20,26 @@
 #'
 #' Model comparisons (e.g., `anova(m1, m2)`) are not ANOVA source tables. Use [apa_performance_comparison()] for them.
 #'
+#' @references
+#' Greenhouse, S. W., & Geisser, S. (1959). On methods in the analysis of
+#' profile data. *Psychometrika, 24*(2), 95--112. \doi{10.1007/BF02289823}
+#'
+#' Huynh, H., & Feldt, L. S. (1976). Estimation of the Box correction for
+#' degrees of freedom from sample data in randomized block and split-plot
+#' designs. *Journal of Educational Statistics, 1*(1), 69--82.
+#' \doi{10.3102/10769986001001069}
+#'
+#' Kenward, M. G., & Roger, J. H. (1997). Small sample inference for fixed
+#' effects from restricted maximum likelihood. *Biometrics, 53*(3), 983--997.
+#' \doi{10.2307/2533558}
+#'
+#' Olejnik, S., & Algina, J. (2003). Generalized eta and omega squared
+#' statistics: Measures of effect size for some common research designs.
+#' *Psychological Methods, 8*(4), 434--447. \doi{10.1037/1082-989X.8.4.434}
+#'
+#' Satterthwaite, F. E. (1946). An approximate distribution of estimates
+#' of variance components. *Biometrics Bulletin, 2*(6), 110--114.
+#' \doi{10.2307/3002019}
 #' @return `apa7_tbl` (tibble)
 #' @export
 #'

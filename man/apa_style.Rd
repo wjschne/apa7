@@ -98,10 +98,46 @@ a header (e.g., \verb{Model 1_B} becomes "B" under a "Model 1" spanner)}
 flextable::flextable
 }
 \description{
-Style \code{flextable::flextable} object according to APA style
+\code{apa_style()} applies the fonts, rules, spacing, and alignment of an APA-style
+table to a flextable and converts markdown in its cells. \code{\link[=apa_flextable]{apa_flextable()}}
+calls it, so it is needed only for a flextable made some other way.
+}
+\details{
+With a few minor details omitted, \code{apa_style()} does roughly this:
+\enumerate{
+\item Separates the headers into column spanners and deckered heads at
+underscores, if \code{separate_headers = TRUE} and the header has one row.
+\item Sets the font, font size, and text color of every cell.
+\item Draws the three horizontal rules of an APA table: above the header, below
+the header, and below the body.
+\item Top-aligns the cells and centers the header text.
+\item Adds space above and below each cell's text, (\code{line_spacing} - 1) times
+2/3 of the font size, so that rows have the spacing of \code{line_spacing}
+while text that wraps within a cell stays single-spaced. In Typst output,
+the space is a little larger, because Typst measures lines differently
+than Word does. The left and right padding is \code{horizontal_padding}.
+\item Styles apa7's helper columns. Break columns (from \code{\link[=add_break_columns]{add_break_columns()}})
+are left empty. Star columns (from \code{\link[=add_star_column]{add_star_column()}} and
+\code{\link[=separate_star_column]{separate_star_column()}}) and list columns (from \code{\link[=add_list_column]{add_list_column()}}) have
+no header and no padding on the side next to the column they belong to,
+so that the two read as one column.
+\item Sets the table's layout, alignment on the page, and width (\code{layout},
+\code{table_align}, and \code{table_width}). In Word, the table is kept on the same
+page as the text that follows it.
+\item Converts markdown in the header and the body with
+\code{\link[ftExtra:colformat_md]{ftExtra::colformat_md()}}, except in the columns named in
+\code{no_markdown_columns_header} and \code{no_markdown_columns} and in cells that
+are already formatted.
+\item If the first column is named \code{Variable} or \code{Predictor}, left-aligns it and
+applies \code{header_align_vertical} to the header.
+}
 }
 \examples{
 d <- data.frame(x = 1:3, y = 4:6)
 flextable::flextable(d) |>
   apa_style()
+}
+\references{
+American Psychological Association. (2020). \emph{Publication manual of the
+American Psychological Association} (7th ed.). \doi{10.1037/0000165-000}
 }

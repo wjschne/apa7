@@ -175,3 +175,30 @@ list(
 ) |>
   apa_performance()
 }
+\references{
+McFadden, D. (1974). Conditional logit analysis of qualitative choice
+behavior. In P. Zarembka (Ed.), \emph{Frontiers in econometrics} (pp. 105--142).
+Academic Press.
+
+Nagelkerke, N. J. D. (1991). A note on a general definition of the
+coefficient of determination. \emph{Biometrika, 78}(3), 691--692.
+\doi{10.1093/biomet/78.3.691}
+
+Nakagawa, S., & Schielzeth, H. (2013). A general and simple method for
+obtaining \eqn{R^2} from generalized linear mixed-effects models. \emph{Methods
+in Ecology and Evolution, 4}(2), 133--142.
+\doi{10.1111/j.2041-210x.2012.00261.x}
+
+Satorra, A., & Bentler, P. M. (1994). Corrections to test statistics
+and standard errors in covariance structure analysis. In A. von Eye & C. C.
+Clogg (Eds.), \emph{Latent variables analysis: Applications for developmental
+research} (pp. 399--419). Sage.
+
+Tjur, T. (2009). Coefficients of determination in logistic regression
+models---A new proposal: The coefficient of discrimination. \emph{The American
+Statistician, 63}(4), 366--372. \doi{10.1198/tast.2009.08210}
+
+Yuan, K.-H., & Bentler, P. M. (2000). Three likelihood-based methods
+for mean and covariance structure analysis with nonnormal missing data.
+\emph{Sociological Methodology, 30}(1), 165--200. \doi{10.1111/0081-1750.00078}
+}

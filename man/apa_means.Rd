@@ -181,3 +181,24 @@ if (requireNamespace("modelbased", quietly = TRUE) &&
     apa_note()
 }
 }
+\references{
+Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery
+rate: A practical and powerful approach to multiple testing. \emph{Journal of the
+Royal Statistical Society: Series B (Methodological), 57}(1), 289--300.
+\doi{10.1111/j.2517-6161.1995.tb02031.x}
+
+Holm, S. (1979). A simple sequentially rejective multiple test
+procedure. \emph{Scandinavian Journal of Statistics, 6}(2), 65--70.
+
+Johnson, P. O., & Neyman, J. (1936). Tests of certain linear hypotheses
+and their application to some educational problems. \emph{Statistical Research
+Memoirs, 1}, 57--93.
+
+Kramer, C. Y. (1956). Extension of multiple range tests to group means
+with unequal numbers of replications. \emph{Biometrics, 12}(3), 307--310.
+\doi{10.2307/3001469}
+
+Tukey, J. W. (1994). The problem of multiple comparisons. In H. I.
+Braun (Ed.), \emph{The collected works of John W. Tukey: Vol. VIII. Multiple
+comparisons, 1948--1983} (pp. 1--300). Chapman & Hall.
+}

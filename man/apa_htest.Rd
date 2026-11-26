@@ -187,3 +187,8 @@ apa_htest(list(
   Displacement = cor.test(d$mpg, d$disp)
 ))
 }
+\references{
+Lakens, D. (2013). Calculating and reporting effect sizes to facilitate
+cumulative science: A practical primer for \emph{t}-tests and ANOVAs. \emph{Frontiers
+in Psychology, 4}, Article 863. \doi{10.3389/fpsyg.2013.00863}
+}

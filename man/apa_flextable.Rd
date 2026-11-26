@@ -220,3 +220,7 @@ apa_flextable(apa_parameters(fit), table_width = "landscape")
 apa_flextable(apa_parameters(fit), table_width = "column")
 apa_flextable(apa_parameters(fit), table_width = c(cm = 10))
 }
+\references{
+American Psychological Association. (2020). \emph{Publication manual of the
+American Psychological Association} (7th ed.). \doi{10.1037/0000165-000}
+}

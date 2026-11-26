@@ -2,7 +2,7 @@
 % Please edit documentation in R/tables.R
 \name{pivot_wider_name_first}
 \alias{pivot_wider_name_first}
-\title{A wrapper for tidyr::pivot_wider that creates columns names as \code{name_variable} instead of \code{variable_name}}
+\title{A wrapper for tidyr::pivot_wider that creates column names as \code{name_variable} instead of \code{variable_name}}
 \usage{
 pivot_wider_name_first(
   data,
@@ -119,7 +119,17 @@ unused columns using \code{unused_fn}.}
 data.frame
 }
 \description{
-The default for \code{names_vary} is "slowest" instead of the usual "fastest".
+\code{pivot_wider_name_first()} reshapes data from long to wide like
+\code{\link[tidyr:pivot_wider]{tidyr::pivot_wider()}}, but it puts the value of \code{names_from} first in the
+new column names (e.g., \verb{Model 1_t} instead of \verb{t_Model 1}). In
+\code{\link[=apa_flextable]{apa_flextable()}}, the \code{names_from} values then become column spanners.
+}
+\details{
+The new columns are grouped by the value of \code{names_from} (as with
+\code{names_vary = "slowest"}), so that the columns under each spanner are next
+to each other. Only one \code{names_from} column is allowed. Because the names are
+always made as \verb{\{names_from\}_\{.value\}}, the \code{names_prefix}, \code{names_sep}, and
+\code{names_vary} arguments have no effect.
 }
 \examples{
 d <- data.frame(Model = paste0("Model","_", 1:2), t = 1:2, p = c(.05, .45))

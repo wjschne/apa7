@@ -2,7 +2,7 @@
 % Please edit documentation in R/tables.R
 \name{pretty_widths}
 \alias{pretty_widths}
-\title{Use flextable::dim_pretty to fit column widths}
+\title{Fit column widths to the contents and the table width}
 \usage{
 pretty_widths(
   x,
@@ -41,7 +41,26 @@ warning to write it as \code{c(inches = )}.}
 flextable::flextable
 }
 \description{
-Use flextable::dim_pretty to fit column widths
+\code{pretty_widths()} sets each column's width to fit its contents and then
+scales the widths so that the table has the width given by \code{table_width}.
+}
+\details{
+The widths are first measured with \code{\link[flextable:dim_pretty]{flextable::dim_pretty()}}, and no column
+is narrower than \code{min_width}. If the table width is 0, these widths are kept.
+Otherwise, they are scaled up or down in proportion so that they add up to
+the table width, with two exceptions:
+\itemize{
+\item Break columns (from \code{\link[=add_break_columns]{add_break_columns()}}) are kept at \code{min_width}.
+\item List columns (from \code{\link[=add_list_column]{add_list_column()}}) keep their measured width, and the
+column to the right of each one (the text of the list) gets the extra width
+instead.
+}
+
+The table's layout is then set to \code{"fixed"}, so that Word keeps the widths.
+
+If \code{table_width} is \code{NULL} (default), the width is taken from the code
+chunk's options or from \code{\link[=apa7_defaults]{apa7_defaults()}} (see the \code{table_width} argument).
+With the defaults, the table is as wide as the text on a portrait page.
 }
 \examples{
 ft <- flextable::flextable(head(mtcars[, 1:4]))

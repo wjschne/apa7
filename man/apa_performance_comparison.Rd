@@ -56,3 +56,18 @@ if (requireNamespace("lavaan", quietly = TRUE)) {
 }
 }
 }
+\references{
+Satorra, A. (2000). Scaled and adjusted restricted tests in
+multi-sample analysis of moment structures. In R. D. H. Heijmans, D. S. G.
+Pollock, & A. Satorra (Eds.), \emph{Innovations in multivariate statistical
+analysis} (pp. 233--247). Kluwer Academic Publishers.
+\doi{10.1007/978-1-4615-4603-0_17}
+
+Satorra, A., & Bentler, P. M. (2001). A scaled difference chi-square
+test statistic for moment structure analysis. \emph{Psychometrika, 66}(4),
+507--514. \doi{10.1007/BF02296192}
+
+Satorra, A., & Bentler, P. M. (2010). Ensuring positiveness of the
+scaled difference chi-square test statistic. \emph{Psychometrika, 75}(2),
+243--248. \doi{10.1007/s11336-009-9135-y}
+}

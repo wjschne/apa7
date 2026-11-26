@@ -36,7 +36,40 @@ apa_format_columns(
 tibble
 }
 \description{
-Format data columns
+\code{apa_format_columns()} formats the columns of a data frame of results and
+renames their headers in APA style, using a set of \code{\link[=column_formats]{column_formats()}}.
+\code{\link[=apa_flextable]{apa_flextable()}} calls it when \code{auto_format_columns = TRUE}.
+}
+\details{
+Each column is matched by name to a \code{\link[=column_format]{column_format()}} in \code{column_formats}
+(e.g., \code{p}, \code{SE}, \code{beta}, or \code{R2}). The values of a matched column are
+formatted by the format's formatter, and its name is replaced by the
+format's markdown header (e.g., \code{beta} becomes \verb{*&beta;*}), or by its LaTeX
+header if \code{latex_headers = TRUE}. Columns without a format, and columns
+named in \code{no_format_columns}, are left as they are.
+
+If \code{format_separated_headers = TRUE} (default), a column name with a
+separator (\code{sep}, an underscore by default) is matched by its last part, so
+\verb{Model 1_R2} is formatted like \code{R2} and becomes \verb{Model 1_*R*^2^}. In
+\code{\link[=apa_flextable]{apa_flextable()}}, the part before the separator becomes a column spanner.
+Format names that contain an underscore themselves (e.g., \code{R2_adjusted}) are
+matched whole.
+
+A few columns are matched by a pattern or combined:
+\itemize{
+\item \code{CI}, \code{CI_low}, and \code{CI_high} (e.g., from \code{\link[parameters:parameters]{parameters::parameters()}})
+become a single column of intervals, with a header such as "95\% CI" that
+gives the confidence level stored in \code{CI}.
+\item If there are \code{t} and \code{df_error} columns, the degrees of freedom are moved
+into the \code{t} header (e.g., \emph{t}(28)), and \code{df_error} is dropped.
+\item A column named like \code{t(28)} is formatted with the \code{t_df} format (and
+gets the header \emph{t}(28)), and one named like \verb{90\% CI} with the
+\code{CI_percent} format.
+}
+
+To see the default formats, run \code{column_formats()@get_tibble}. The article
+\href{https://wjschne.github.io/apa7/articles/summarize.html}{Building Tables by Hand}
+shows how to change them.
 }
 \examples{
 lm(mpg ~ cyl + wt, data = mtcars) |>

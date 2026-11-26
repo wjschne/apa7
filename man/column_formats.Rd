@@ -32,6 +32,19 @@ column_formats
 \description{
 Returns an S7 object that contains a list of \code{column_format} objects that can be used to format parameters in APA style.
 }
+\details{
+Each \code{\link[=column_format]{column_format()}} in the list is named by the column it formats.
+Formats are read, added, replaced, and removed with \code{$} (e.g.,
+\code{my_formats$beta}, \code{my_formats$Predictor <- column_format("Predictor")}, or
+\code{my_formats$beta <- NULL}), and the properties of a single format are read
+and changed with \code{@} (e.g., \code{my_formats$p@header}). The \code{get_} properties
+listed under Slots return the names, headers, formatters, and so on of all
+the formats at once (e.g., \code{my_formats@get_tibble}).
+
+Use the object with the \code{column_formats} argument of \code{\link[=apa_flextable]{apa_flextable()}},
+\code{\link[=apa_format_columns]{apa_format_columns()}}, and the table functions, or set it for every table
+with \code{apa7_defaults(column_formats = my_formats)}.
+}
 \section{Slots}{
 
 \describe{

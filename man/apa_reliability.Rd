@@ -118,3 +118,11 @@ apa_reliability(
   level = "scales"
 )
 }
+\references{
+Feldt, L. S., Woodruff, D. J., & Salih, F. A. (1987). Statistical
+inference for coefficient alpha. \emph{Applied Psychological Measurement,
+11}(1), 93--103. \doi{10.1177/014662168701100107}
+
+McDonald, R. P. (1999). \emph{Test theory: A unified treatment}. Lawrence
+Erlbaum. \doi{10.4324/9781410601087}
+}

@@ -175,3 +175,12 @@ apa_cor(d, method = "spearman", partial = TRUE)
 correlation::correlation(trees, method = "spearman") |>
   apa_cor()
 }
+\references{
+Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery
+rate: A practical and powerful approach to multiple testing. \emph{Journal of the
+Royal Statistical Society: Series B (Methodological), 57}(1), 289--300.
+\doi{10.1111/j.2517-6161.1995.tb02031.x}
+
+Holm, S. (1979). A simple sequentially rejective multiple test
+procedure. \emph{Scandinavian Journal of Statistics, 6}(2), 65--70.
+}

@@ -43,6 +43,17 @@
 #' @param ... arguments passed to [parameters::n_factors()] when `x` is a data
 #'   frame (e.g., `type`, `rotation`, `algorithm`, and `package`)
 #'
+#' @references
+#' Horn, J. L. (1965). A rationale and test for the number of factors in
+#' factor analysis. *Psychometrika, 30*(2), 179--185. \doi{10.1007/BF02289447}
+#'
+#' Kaiser, H. F. (1960). The application of electronic computers to
+#' factor analysis. *Educational and Psychological Measurement, 20*(1),
+#' 141--151. \doi{10.1177/001316446002000116}
+#'
+#' Velicer, W. F. (1976). Determining the number of components from the
+#' matrix of partial correlations. *Psychometrika, 41*(3), 321--327.
+#' \doi{10.1007/BF02293557}
 #' @returns `apa7_tbl` (tibble)
 #' @export
 #' @examples

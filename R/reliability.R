@@ -61,6 +61,13 @@
 #' @param digits number of decimal places (unaffected by
 #'   `apa7_defaults(accuracy = )`)
 #'
+#' @references
+#' Feldt, L. S., Woodruff, D. J., & Salih, F. A. (1987). Statistical
+#' inference for coefficient alpha. *Applied Psychological Measurement,
+#' 11*(1), 93--103. \doi{10.1177/014662168701100107}
+#'
+#' McDonald, R. P. (1999). *Test theory: A unified treatment*. Lawrence
+#' Erlbaum. \doi{10.4324/9781410601087}
 #' @returns `apa7_tbl` (tibble)
 #' @export
 #' @examples

@@ -20,6 +20,7 @@ Benjamini
 Bentler
 bfi
 Biometrics
+Biometrika
 biserial
 Blomqvist's
 bmatrix
@@ -32,6 +33,7 @@ bolds
 Bollen
 Bollen's
 Borenstein
+Braun
 bsicons
 bslib
 carData
@@ -43,6 +45,7 @@ Cheung
 citeproc
 Citeproc
 CLI
+Clogg
 communalities
 Communalities
 communality
@@ -73,6 +76,7 @@ edf
 effectsize
 Egger
 Egger's
+Erlbaum
 et
 Eurosceptic
 extraversion
@@ -95,6 +99,7 @@ Gohel
 Greiner
 gtsummary
 Hartung
+Heijmans
 heteroskedasticity
 Hochberg
 Hoeffding's
@@ -110,6 +115,7 @@ IRR
 Jusko
 kableExtra
 Kenward
+Kluwer
 knitr
 Kuder
 Labour
@@ -136,12 +142,14 @@ modelbased
 Monette
 Nagelkerke
 Nagelkerke's
+Nakagawa
 Neyman
 nFactors
 nlme
 nlme's
 noncentral
 nonmissing
+nonnormal
 nonsignificant
 oblimin
 Olejnik
@@ -155,6 +163,7 @@ Piscitello
 pmatrix
 Polychoric
 pscl
+Psychometrika
 psychTools
 purrr
 ragg
@@ -162,6 +171,7 @@ rb
 rclipboard
 readr
 reformats
+rejective
 relevel
 Rensvold
 reoffended
@@ -169,10 +179,12 @@ reoffending
 Revelle
 RMSEA
 Rothstein
+Salih
 Satorra
 Satterthwaite
 Satterthwaite's
 Schatz
+Schielzeth
 SentenceCompletion
 setosa
 shinyWidgets
@@ -205,15 +217,19 @@ unmined
 unrotated
 Unrotated
 varimax
+Velicer
 Velicer's
 versicolor
 VIF
 VIFs
 vmatrix
 Vmatrix
+von
 Welch's
 WLSMV
+Woodruff
 yaml
+Zarembka
 Zotero
 Zotero's
 α

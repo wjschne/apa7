@@ -108,6 +108,10 @@
 #' The rows are labeled by the list's names or, if unnamed, by the objects'
 #' data names (e.g., "mpg by am"). The table has no descriptive statistics.
 #'
+#' @references
+#' Lakens, D. (2013). Calculating and reporting effect sizes to facilitate
+#' cumulative science: A practical primer for *t*-tests and ANOVAs. *Frontiers
+#' in Psychology, 4*, Article 863. \doi{10.3389/fpsyg.2013.00863}
 #' @return `apa7_tbl` (tibble)
 #' @export
 #'
