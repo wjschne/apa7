@@ -83,5 +83,5 @@ test_that("lists of GAMs are compared by R2 and AIC, without tests or stars", {
   both <- apa_parameters(list(g1, g2))
   expect_true("*AIC*" %in% colnames(both))
   expect_false(any(grepl("*", both$`&Delta;*R*^2^`, fixed = TRUE)))
-  expect_no_match(apa_note(both), "p* < .05", fixed = TRUE)
+  expect_no_match(apa_note(both), "*p* ≤ .05", fixed = TRUE)
 })

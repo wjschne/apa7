@@ -568,7 +568,7 @@ apa_cor <- function(
       p_note[ii] <- paste0(
         "^",
         paste0(rep("\\*", ii), collapse = ""),
-        "\u00A0^*p*&nbsp;<&nbsp;",
+        "\u00A0^*p*&nbsp;\u2264&nbsp;",
         stringr::str_remove(as.character(pv), "^0")
       )
 
@@ -730,7 +730,7 @@ apa_cor <- function(
             flextable::as_i("Note. "),
             "Correlations significant at ",
             flextable::as_i("p"),
-            " < ",
+            " \u2264 ",
             cutoff,
             " are ",
             flextable::as_b("bolded"),
@@ -739,7 +739,7 @@ apa_cor <- function(
         } else {
           paragraphs <- list(ftExtra::as_paragraph_md(paste0(
             "*Note*. ", general,
-            " Correlations significant at *p* < ", cutoff, " are **bolded**."
+            " Correlations significant at *p* \u2264 ", cutoff, " are **bolded**."
           )))
         }
       } else {

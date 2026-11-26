@@ -32,7 +32,7 @@ test_that("apa_slopes() notes give the Johnson-Neyman intervals", {
   expect_match(
     note,
     paste0(
-      "Johnson\u2013Neyman intervals (Johnson & Neyman, 1936): the slope of Wt is significant (*p* < .05) when Hp is from 52 to ",
+      "Johnson\u2013Neyman intervals (Johnson & Neyman, 1936): the slope of Wt is significant (*p* \u2264 .05) when Hp is from 52 to ",
       boundary, " (observed range: 52 to 335)."
     ),
     fixed = TRUE
@@ -49,12 +49,12 @@ test_that("apa_slopes() notes give the Johnson-Neyman intervals", {
     segments = tibble::tibble(from = 1, to = 5, significant = TRUE, direction = "negative"),
     range = c(1, 5), alpha = 0.05, trend = "X", moderator = "M"
   ))
-  expect_match(everywhere, "is significant (*p* < .05) across the observed range of M (1 to 5)", fixed = TRUE)
+  expect_match(everywhere, "is significant (*p* \u2264 .05) across the observed range of M (1 to 5)", fixed = TRUE)
   nowhere <- apa7:::johnson_neyman_sentence(list(
     segments = tibble::tibble(from = 1, to = 5, significant = FALSE, direction = "negative"),
     range = c(1, 5), alpha = 0.05, trend = "X", moderator = "M"
   ))
-  expect_match(nowhere, "is not significant (*p* < .05) anywhere in the observed range of M", fixed = TRUE)
+  expect_match(nowhere, "is not significant (*p* \u2264 .05) anywhere in the observed range of M", fixed = TRUE)
 })
 
 test_that("Johnson-Neyman intervals are skipped or refused when they do not apply", {

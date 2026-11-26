@@ -156,7 +156,7 @@ test_that("apa_flextable adds the generated note with note = TRUE", {
   text <- footer_text(ft)
   expect_true(startsWith(text, "Note. "))
   expect_match(text, "standardized coefficient", fixed = TRUE)
-  expect_match(text, "p.<.[.]05")
+  expect_match(text, "p.\u2264.[.]05")
 
   # The note does not change column widths
   expect_equal(ft$body$colwidths, apa_flextable(tbl)$body$colwidths)

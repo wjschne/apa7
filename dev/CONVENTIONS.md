@@ -160,8 +160,12 @@ APA 7 section 6.36. Their formats use `the$trim_leading_zero`.
 **FMT-4: *p*-values** are formatted by `apa_p()`: three decimals at most,
 no leading zero, and "<.001" below .001.
 
-**FMT-5: Stars mark *p* ≤ each value of `alpha`**, as superscripts,
-and `apa_p_star_note()` explains them. Bold marks *p* ≤ .05.
+**FMT-5: A result is significant when *p* ≤ α.** Stars mark *p* ≤ each
+value of `alpha`, as superscripts, and bold marks *p* ≤ .05. Every note
+that states a threshold says ≤ (e.g., the star note from
+`apa_p_star_note()` and the Johnson–Neyman sentence).
+*Why:* *p* = .05 is significant at α = .05, and a note must describe
+exactly what the table marks.
 
 **FMT-6: Whole numbers get no decimals** (e.g., degrees of freedom and
 sample sizes), unless the column's format says otherwise.
@@ -261,4 +265,3 @@ fix it, or record it as an exception to the rule.
 | 7 | ARG-6 | `pivot_wider_name_first()` accepts `names_prefix`, `names_sep`, and `names_vary` but ignores them. | Remove them (with deprecation) or honor them |
 | 8 | TAB-1 | `apa_format_columns()` looks for `Model 1_low`/`Model 1_high` rather than `Model 1_CI_low`/`Model 1_CI_high` for prefixed intervals (untested). | Test, then fix |
 | 9 | CODE-2 | 28 `stop()` and 3 `warning()` calls remain beside 125 `cli::cli_abort()` calls. | Convert when the code is next touched |
-| 10 | FMT-5 | Stars and bold use *p* ≤ α; APA examples usually say *p* < .05. | Decide which; the note text must match the rule |

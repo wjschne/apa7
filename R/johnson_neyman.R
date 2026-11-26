@@ -75,7 +75,7 @@ johnson_neyman <- function(model, trend, moderator, ci = 0.95, required = FALSE,
 
   slope <- function(m) b1 + b3 * m
   se <- function(m) sqrt(v11 + 2 * m * v13 + m^2 * v33)
-  significant <- function(m) abs(slope(m)) / se(m) > crit
+  significant <- function(m) abs(slope(m)) / se(m) >= crit
 
   # Roots of (b3^2 - c^2 v33) m^2 + 2 (b1 b3 - c^2 v13) m + (b1^2 - c^2 v11) = 0
   qa <- b3^2 - crit^2 * v33
@@ -119,7 +119,7 @@ johnson_neyman_sentence <- function(jn) {
     return(character(0))
   }
   num <- function(v) trimws(align_chr(v, accuracy = the$accuracy))
-  p_text <- paste0("*p* < ", sub("^0", "", format(jn$alpha)))
+  p_text <- paste0("*p* \u2264 ", sub("^0", "", format(jn$alpha)))
   seg <- jn$segments
   range_text <- paste0(num(jn$range[1]), " to ", num(jn$range[2]))
   sig <- seg[seg$significant, , drop = FALSE]

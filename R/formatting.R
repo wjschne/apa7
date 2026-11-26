@@ -344,7 +344,7 @@ apa_p_star_note <- function(
       first_alpha_marginal = first_alpha_marginal,
       add_trailing_space = TRUE
     ),
-    "*p*\u00A0<\u00A0",
+    "*p*\u00A0\u2264\u00A0",
     signs::signs(
       x,
       trim_leading_zeros = TRUE,

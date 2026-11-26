@@ -24,6 +24,7 @@ These change the output of code that worked with apa7 0.2.0.
   * `apa_cor(p_value = )` is now `alpha`, as in `p2stars()` and `add_star_column()`.
   * `apa_p_star_note(x = )` is now `alpha`.
   * `add_break_columns(d = )` is now `data`, as in the other functions.
+* Notes say *p* ≤ .05 (and ≤ .01 and ≤ .001) where they explain stars or bold, matching the values that are marked: a *p*-value equal to a threshold has always been starred or bolded, but star notes (from `apa_p_star_note()` and `apa_cor()`), `apa_cor()`'s bold note, and Johnson–Neyman sentences said *p* < .05.
 * Table notes are now single-spaced, even when the table is double-spaced. This applies to `apa_flextable(note = TRUE)`, `apa_cor()`, `apa_chisq()`, and footers styled by `apa_style()`. `line_spacing` now sets only the spacing of the header and body.
 
 ## New table functions

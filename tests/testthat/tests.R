@@ -266,8 +266,10 @@ test_that("variable name formatter", {
 testthat::test_that("add_star_note", {
   expect_equal(
     apa7::apa_p_star_note(),
-    "^\\*\u2009^*p*\u00A0<\u00A0.05. ^\\*\\*\u2009^*p*\u00A0<\u00A0.01. ^\\*\\*\\*\u2009^*p*\u00A0<\u00A0.001"
+    "^\\*\u2009^*p*\u00A0\u2264\u00A0.05. ^\\*\\*\u2009^*p*\u00A0\u2264\u00A0.01. ^\\*\\*\\*\u2009^*p*\u00A0\u2264\u00A0.001"
   )
 
-  expect_equal(apa7::apa_p_star_note(.001), "^\\*\u2009^*p*\u00A0<\u00A0.001")
+  expect_equal(apa7::apa_p_star_note(.001), "^\\*\u2009^*p*\u00A0\u2264\u00A0.001")
+  # The note says p <= alpha because a p-value equal to a threshold is starred
+  expect_equal(apa7::p2stars(c(.05, .01, .001)), c("\\*", "\\*\\*", "\\*\\*\\*"))
 })
